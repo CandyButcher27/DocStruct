@@ -66,6 +66,7 @@ def create_block_from_data(block_data: Dict[str, Any], block_id: str) -> Block:
     # Create block
     block = Block(
         block_id=block_id,
+        parent_id=None,
         block_type=block_data["block_type"],
         bbox=bbox,
         page_num=page_num,

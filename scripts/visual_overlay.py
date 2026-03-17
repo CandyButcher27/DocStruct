@@ -3,9 +3,9 @@ import pdfplumber
 from PIL import ImageDraw
 from pathlib import Path
 
-INPUT_PDF = "arxiv_test/pdfs/1706.03762.pdf"
-INPUT_JSON = "arxiv_test/outputs/1706.03762.json"
-OUTPUT_DIR = Path("arxiv_test/overlays")
+INPUT_PDF = "arxiv_test/pdfs/2302.04062.pdf"
+INPUT_JSON = "arxiv_test/outputs/2302.04062.json"
+OUTPUT_DIR = Path("arxiv_test/overlays/2302.04062")
 
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 

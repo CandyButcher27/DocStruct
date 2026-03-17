@@ -89,7 +89,11 @@ def test_block_valid():
         page_num=0,
         text="Hello world",
         confidence=conf,
-        reading_order=0
+        reading_order=0,
+        table_data=None,
+        image_metadata=None,
+        caption_id=None,
+        parent_id=None
     )
     
     assert block.block_type == "text"
@@ -116,7 +120,10 @@ def test_block_table_data_validation():
             text="Hello",
             confidence=conf,
             reading_order=0,
-            table_data={"num_rows": 3}
+            table_data={"num_rows": 3},
+            image_metadata=None,
+            caption_id=None,
+            parent_id=None
         )
 
 
@@ -140,7 +147,10 @@ def test_block_image_metadata_validation():
             text="Hello",
             confidence=conf,
             reading_order=0,
-            image_metadata={"width": 100}
+            image_metadata={"width": 100},
+            table_data=None,
+            parent_id=None,
+            caption_id=None
         )
 
 

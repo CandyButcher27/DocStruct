@@ -200,7 +200,7 @@ def classify_block(
     # Try each type
     for block_type in block_types:
         rule_score = compute_rule_score(block, block_type, avg_font_size)
-        model_score = compute_model_score(block.bbox, detections, block_type)
+        model_score = compute_model_score(block.bbox, detections, block_type) if block.bbox else 0.0
         
         # Weighted combination: 30% rule, 50% model, 20% geometric
         final_score = 0.3 * rule_score + 0.5 * model_score + 0.2 * geometric_score

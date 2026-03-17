@@ -10,6 +10,9 @@ import json
 from pathlib import Path
 from main import process_pdf
 
+#Configuration
+INPUT_PDF = "arxiv_test/pdfs/2302.04062.pdf"
+OUTPUT_JSON = "arxiv_test/outputs/2302.04062.json"
 
 def example_basic_usage():
     """Basic example: process a PDF and save JSON."""
@@ -18,8 +21,8 @@ def example_basic_usage():
     print("=" * 60)
     
     # Define paths
-    input_pdf = "example_input.pdf"
-    output_json = "example_output.json"
+    input_pdf = INPUT_PDF
+    output_json = OUTPUT_JSON
     
     # Process PDF
     try:
@@ -28,7 +31,7 @@ def example_basic_usage():
         print(f"✓ Output saved to {output_json}")
     except FileNotFoundError:
         print(f"✗ File not found: {input_pdf}")
-        print("  Create a PDF file named 'example_input.pdf' to test")
+        print(f"  Create a PDF file named {input_pdf} to test")
 
 
 def example_analyze_output():
@@ -37,7 +40,7 @@ def example_analyze_output():
     print("Example 2: Analyzing Output")
     print("=" * 60)
     
-    output_file = "example_output.json"
+    output_file = OUTPUT_JSON
     
     if not Path(output_file).exists():
         print(f"✗ Output file not found: {output_file}")
@@ -45,7 +48,7 @@ def example_analyze_output():
         return
     
     # Load output
-    with open(output_file, 'r') as f:
+    with open(output_file, 'r' , encoding='utf-8') as f:
         data = json.load(f)
     
     # Print summary
@@ -82,13 +85,13 @@ def example_filter_tables():
     print("Example 3: Filtering Tables")
     print("=" * 60)
     
-    output_file = "example_output.json"
+    output_file = OUTPUT_JSON
     
     if not Path(output_file).exists():
         print(f"✗ Output file not found: {output_file}")
         return
     
-    with open(output_file, 'r') as f:
+    with open(output_file, 'r', encoding='utf-8') as f:
         data = json.load(f)
     
     # Find all tables

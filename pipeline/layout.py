@@ -53,7 +53,7 @@ class LayoutBlock:
         font_counts = {}
         for span in self.spans:
             font_counts[span.font_name] = font_counts.get(span.font_name, 0) + 1
-        self.dominant_font = max(font_counts, key=font_counts.get)
+        self.dominant_font = max(font_counts, key=font_counts.get) # type: ignore
     
     def __repr__(self) -> str:
         return f"LayoutBlock(text='{self.text[:30]}...', spans={len(self.spans)})"
@@ -163,7 +163,10 @@ def detect_columns(blocks: List[LayoutBlock], page_width: float) -> List[List[La
         return []
     
     # Find horizontal clusters
-    x_positions = [(b.bbox.x0 + b.bbox.x1) / 2 for b in blocks]
+    x_positions = [(b.bbox.x0 + b.bbox.x1) / 2 for b in blocks if b.bbox is not None]
+    
+    # Filter blocks to only those with valid bounding boxes
+    blocks = [b for b in blocks if b.bbox is not None]
     
     # Simple clustering: if there's a large gap, it's a column boundary
     # Use 30% of page width as threshold
@@ -174,6 +177,8 @@ def detect_columns(blocks: List[LayoutBlock], page_width: float) -> List[List[La
     last_x = None
     
     # Sort by x position
+    if not x_positions:
+        return []
     sorted_blocks = sorted(zip(x_positions, blocks), key=lambda x: x[0])
     
     for x, block in sorted_blocks:

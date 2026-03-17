@@ -9,21 +9,10 @@ without modifying pipeline code.
 from typing import List, Dict, Literal
 from abc import ABC, abstractmethod
 from schemas.block import BoundingBox
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 DetectionType = Literal["table", "figure", "text", "header"]
-
-
-class Detection(BaseModel):
-    """A single detection from a vision model."""
-    bbox: BoundingBox
-    detection_type: DetectionType
-    confidence: float  # Model's raw confidence score
-    
-    
-from pydantic import BaseModel, Field
-
 
 class Detection(BaseModel):
     """A single detection from a vision model."""

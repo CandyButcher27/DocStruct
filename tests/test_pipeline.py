@@ -101,7 +101,7 @@ def test_blocks_do_not_overlap_excessively():
     blocks = form_layout_blocks(page_data)
     
     # Check blocks don't overlap
-    if len(blocks) >= 2:
+    if len(blocks) >= 2 and blocks[0].bbox is not None and blocks[1].bbox is not None:
         overlap = bbox_overlap(blocks[0].bbox, blocks[1].bbox)
         assert overlap < 0.5  # Should have minimal overlap
 
