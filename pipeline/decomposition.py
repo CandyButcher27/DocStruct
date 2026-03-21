@@ -133,12 +133,13 @@ def extract_images(pdf_page: PDFPage, page_num: int) -> List[Dict[str, Any]]:
     page_height = float(pdf_page.height)
     
     for img in page_images:
+        # pdfplumber image dicts use 'y0'/'y1' natively as bottom-left origin!
         image_data = {
             'bbox': BoundingBox(
                 x0=float(img['x0']),
-                y0=page_height-float(img['bottom']),
+                y0=float(img['y0']),
                 x1=float(img['x1']),
-                y1=page_height-float(img['top'])
+                y1=float(img['y1'])
             ),
             'width': float(img['width']),
             'height': float(img['height']),
@@ -163,13 +164,20 @@ def extract_lines(pdf_page: PDFPage) -> List[Dict[str, Any]]:
     
     # Extract horizontal and vertical lines
     page_lines = pdf_page.lines
+    page_height = float(pdf_page.height)
     
     for line in page_lines:
+        # Convert from pdfplumber top-origin to bottom-left origin so that
+        # line bboxes are in the same coordinate system as all other bboxes.
+        # pdfplumber 'top' = distance from page top to line top edge.
+        # pdfplumber 'bottom' = distance from page top to line bottom edge.
+        # bottom-left y0 = page_height - pdfplumber 'bottom'
+        # bottom-left y1 = page_height - pdfplumber 'top'
         line_data = {
             'x0': float(line['x0']),
-            'y0': float(line['top']),
+            'y0': page_height - float(line['bottom']),
             'x1': float(line['x1']),
-            'y1': float(line['bottom']),
+            'y1': page_height - float(line['top']),
             'orientation': 'horizontal' if abs(line['top'] - line['bottom']) < 1 else 'vertical'
         }
         lines.append(line_data)
@@ -222,6 +230,17 @@ def decompose_pdf(pdf_path: str) -> List[PageData]:
             lines = extract_lines(pdf_page)
             for line in lines:
                 page_data.add_line(line)
+                
+            # Phase 5: OCR fallback for scanned pages
+            from utils.ocr import is_scanned_page, ocr_page
+            if is_scanned_page(page_data):
+                from utils.rendering import render_page_as_png
+                logger.info(f"Page {page_num} appears scanned. Invoking OCR fallback.")
+                image_bytes = render_page_as_png(pdf_path, page_num)
+                if image_bytes:
+                    ocr_spans = ocr_page(image_bytes, page_num, page_data.width, page_data.height)
+                    for span in ocr_spans:
+                        page_data.add_span(span)
             
             pages_data.append(page_data)
             

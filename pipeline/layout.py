@@ -114,10 +114,12 @@ def form_layout_blocks(page_data: PageData) -> List[LayoutBlock]:
         logger.debug(f"Page {page_data.page_num}: No spans to form blocks")
         return []
     
-    # Sort spans in reading order
+    # Sort spans in reading order: top-to-bottom, left-to-right.
+    # In bottom-left origin, y0=0 is the bottom of the page, so
+    # we sort by DESCENDING y0 (largest y0 = near top of page first).
     sorted_spans = sorted(
         page_data.spans,
-        key=lambda s: (s.bbox.y0, s.bbox.x0)  # Top-to-bottom, left-to-right
+        key=lambda s: (-s.bbox.y0, s.bbox.x0)
     )
     
     blocks = []
@@ -144,61 +146,6 @@ def form_layout_blocks(page_data: PageData) -> List[LayoutBlock]:
     logger.debug(f"Page {page_data.page_num}: Formed {len(blocks)} layout blocks from {len(sorted_spans)} spans")
     
     return blocks
-
-
-def detect_columns(blocks: List[LayoutBlock], page_width: float) -> List[List[LayoutBlock]]:
-    """
-    Detect and group blocks into columns.
-    
-    Simple column detection based on horizontal clustering.
-    
-    Args:
-        blocks: List of layout blocks
-        page_width: Page width
-        
-    Returns:
-        List of columns (each column is a list of blocks)
-    """
-    if not blocks:
-        return []
-    
-    # Find horizontal clusters
-    x_positions = [(b.bbox.x0 + b.bbox.x1) / 2 for b in blocks if b.bbox is not None]
-    
-    # Filter blocks to only those with valid bounding boxes
-    blocks = [b for b in blocks if b.bbox is not None]
-    
-    # Simple clustering: if there's a large gap, it's a column boundary
-    # Use 30% of page width as threshold
-    threshold = page_width * 0.3
-    
-    columns = []
-    current_column = []
-    last_x = None
-    
-    # Sort by x position
-    if not x_positions:
-        return []
-    sorted_blocks = sorted(zip(x_positions, blocks), key=lambda x: x[0])
-    
-    for x, block in sorted_blocks:
-        if last_x is None or abs(x - last_x) < threshold:
-            current_column.append(block)
-        else:
-            if current_column:
-                columns.append(current_column)
-            current_column = [block]
-        last_x = x
-    
-    if current_column:
-        columns.append(current_column)
-    
-    # If only one column detected, return all blocks as single column
-    if len(columns) == 1:
-        return [blocks]
-    
-    logger.debug(f"Detected {len(columns)} columns")
-    return columns
 
 
 def process_page_layout(page_data: PageData) -> Tuple[List[LayoutBlock], List[Dict]]:

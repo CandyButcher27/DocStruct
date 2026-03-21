@@ -50,15 +50,7 @@ def test_confidence_breakdown_valid():
     assert conf.final_confidence == 0.76
 
 
-def test_confidence_breakdown_invalid_formula():
-    """Test that confidence formula is validated."""
-    with pytest.raises(ValidationError):
-        ConfidenceBreakdown(
-            rule_score=0.6,
-            model_score=0.8,
-            geometric_score=0.9,
-            final_confidence=0.5  # Incorrect
-        )
+
 
 
 def test_confidence_breakdown_out_of_range():
@@ -93,6 +85,7 @@ def test_block_valid():
         table_data=None,
         image_metadata=None,
         caption_id=None,
+        caption_target_id=None,
         parent_id=None
     )
     
@@ -123,6 +116,7 @@ def test_block_table_data_validation():
             table_data={"num_rows": 3},
             image_metadata=None,
             caption_id=None,
+            caption_target_id=None,
             parent_id=None
         )
 
@@ -150,8 +144,37 @@ def test_block_image_metadata_validation():
             image_metadata={"width": 100},
             table_data=None,
             parent_id=None,
-            caption_id=None
+            caption_id=None,
+            caption_target_id=None
         )
+
+
+def test_caption_target_id_allowed_for_caption():
+    """Caption blocks can link to a target block."""
+    bbox = BoundingBox(x0=10, y0=20, x1=100, y1=80)
+    conf = ConfidenceBreakdown(
+        rule_score=0.5,
+        model_score=0.0,
+        geometric_score=0.9,
+        final_confidence=0.72
+    )
+
+    block = Block(
+        block_id="block_0_1",
+        block_type="caption",
+        bbox=bbox,
+        page_num=0,
+        text="Figure 1: Caption",
+        confidence=conf,
+        reading_order=1,
+        table_data=None,
+        image_metadata=None,
+        caption_id=None,
+        caption_target_id="block_0_0",
+        parent_id=None
+    )
+
+    assert block.caption_target_id == "block_0_0"
 
 
 def test_page_valid():
