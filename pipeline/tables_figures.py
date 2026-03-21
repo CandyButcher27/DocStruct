@@ -35,11 +35,19 @@ def extract_table_grid(
     # Find lines within table bbox
     table_lines = []
     for line in lines:
+        x0 = min(float(line['x0']), float(line['x1']))
+        x1 = max(float(line['x0']), float(line['x1']))
+        y0 = min(float(line['y0']), float(line['y1']))
+        y1 = max(float(line['y0']), float(line['y1']))
+        if x1 <= x0:
+            x1 = x0 + 0.1
+        if y1 <= y0:
+            y1 = y0 + 0.1
         line_bbox = BoundingBox(
-            x0=line['x0'],
-            y0=line['y0'],
-            x1=line['x1'],
-            y1=line['y1']
+            x0=x0,
+            y0=y0,
+            x1=x1,
+            y1=y1
         )
         
         if bbox_overlap(table_bbox, line_bbox) > 0.5:
@@ -102,15 +110,24 @@ def refine_table_block(
     grid = extract_table_grid(bbox, page_data.lines)
     
     if grid:
+        if "table_source" in block_data:
+            grid["source"] = block_data["table_source"]
+        if "table_evidence" in block_data:
+            grid["evidence"] = block_data["table_evidence"]
         return grid
     
     # Fallback: unruled table
-    return {
+    result = {
         "has_ruling": False,
         "num_rows": 0,  # Unknown without parsing
         "num_cols": 0,
         "note": "Unruled table - structure detection not supported in v1"
     }
+    if "table_source" in block_data:
+        result["source"] = block_data["table_source"]
+    if "table_evidence" in block_data:
+        result["evidence"] = block_data["table_evidence"]
+    return result
 
 
 def refine_figure_block(

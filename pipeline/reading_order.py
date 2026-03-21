@@ -111,8 +111,9 @@ def sort_blocks_in_reading_order(
             if bbox:
                 column_blocks.append((idx, bbox.y0))
 
-        # Sort top → bottom within column
-        column_blocks.sort(key=lambda x: x[1])
+        # Sort top → bottom within column.
+        # In bottom-left origin, high y0 = near top of page, so sort DESCENDING.
+        column_blocks.sort(key=lambda x: x[1], reverse=True)
         sorted_indices.extend([idx for idx, _ in column_blocks])
 
     return sorted_indices
@@ -145,8 +146,8 @@ def find_nearest_figure_or_table(
             (caption_center[1] - block_center[1]) ** 2
         ) ** 0.5
 
-        # Prefer captions below figures/tables
-        if caption_bbox.y0 > bbox.y1:
+        # Prefer captions below figures/tables in bottom-left coordinates.
+        if caption_bbox.y1 <= bbox.y0:
             distance *= 0.5
 
         if distance < min_distance:

@@ -62,7 +62,13 @@ def create_block_from_data(block_data: Dict[str, Any], block_id: str) -> Block:
     if "has_caption" in block_data:
         caption_idx = block_data["has_caption"]
         caption_id = f"block_{page_num}_{caption_idx}"
-    
+
+    # Populate caption_target_id on caption blocks (Bug 6 fix)
+    caption_target_id = None
+    if block_data.get("block_type") == "caption" and "caption_for" in block_data:
+        target_idx = block_data["caption_for"]
+        caption_target_id = f"block_{page_num}_{target_idx}"
+
     # Create block
     block = Block(
         block_id=block_id,
@@ -75,7 +81,8 @@ def create_block_from_data(block_data: Dict[str, Any], block_id: str) -> Block:
         reading_order=reading_order,
         table_data=table_data,
         image_metadata=image_metadata,
-        caption_id=caption_id
+        caption_id=caption_id,
+        caption_target_id=caption_target_id
     )
     
     return block
