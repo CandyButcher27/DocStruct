@@ -100,13 +100,13 @@ def test_form_layout_blocks_multiple():
     """Test forming multiple layout blocks."""
     page_data = PageData(page_num=0, width=612, height=792)
     
-    # First block
-    bbox1 = BoundingBox(x0=10, y0=20, x1=100, y1=32)
+    # First block (higher on the page -> larger y0 in bottom-left origin)
+    bbox1 = BoundingBox(x0=10, y0=700, x1=100, y1=712)
     span1 = TextSpan("First paragraph", bbox1, "Arial", 12.0, 0)
     page_data.add_span(span1)
     
-    # Second block (far below)
-    bbox2 = BoundingBox(x0=10, y0=100, x1=100, y1=112)
+    # Second block (far below -> smaller y0)
+    bbox2 = BoundingBox(x0=10, y0=600, x1=100, y1=612)
     span2 = TextSpan("Second paragraph", bbox2, "Arial", 12.0, 0)
     page_data.add_span(span2)
     
