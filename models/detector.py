@@ -1,161 +1,115 @@
-"""
-Detector interface for ML-based block detection.
+﻿"""Detector interface and detector factory."""
 
-This module provides an abstract interface for pretrained vision models.
-The stub implementation can be replaced with real models (DETR, LayoutLM, etc.)
-without modifying pipeline code.
-"""
+from __future__ import annotations
 
-from typing import List, Dict, Literal
 from abc import ABC, abstractmethod
-from schemas.block import BoundingBox
+from typing import List, Literal
+
 from pydantic import BaseModel, Field
 
+from schemas.block import BoundingBox
 
-DetectionType = Literal["table", "figure", "text", "header"]
+DetectionType = Literal["table", "figure", "text", "header", "caption"]
+
 
 class Detection(BaseModel):
     """A single detection from a vision model."""
+
     bbox: BoundingBox
     detection_type: DetectionType
     confidence: float = Field(..., ge=0, le=1)
 
 
 class Detector(ABC):
-    """
-    Abstract base class for layout detection models.
-    
-    Subclasses must implement the detect() method to return bounding boxes
-    and classifications for layout elements.
-    """
-    
     @abstractmethod
     def detect(self, page_image: bytes, page_width: float, page_height: float) -> List[Detection]:
-        """
-        Detect layout elements in a page image.
-        
-        Args:
-            page_image: Raw image bytes (PNG format)
-            page_width: Page width in points
-            page_height: Page height in points
-            
-        Returns:
-            List of detections with bboxes and classifications
-        """
         pass
-    
+
     @abstractmethod
     def get_model_name(self) -> str:
-        """Return the name/version of the detection model."""
         pass
+
+    def is_ready(self) -> bool:
+        return True
+
+    def get_last_error(self) -> str | None:
+        return None
 
 
 class StubDetector(Detector):
-    """
-    Stub detector for testing and development.
-    
-    Uses simple geometric heuristics to simulate ML detection.
-    This should be replaced with a real model in production.
-    
-    NOTE: This is NOT a production implementation. It uses basic rules
-    to approximate what a real detector would return.
-    """
-    
     def __init__(self, seed: int = 42):
-        """
-        Initialize stub detector.
-        
-        Args:
-            seed: Random seed for deterministic behavior
-        """
         self.seed = seed
         import random
+
         random.seed(seed)
-    
+
     def detect(self, page_image: bytes, page_width: float, page_height: float) -> List[Detection]:
-        """
-        Stub detection using placeholder logic.
-        
-        In production, this would:
-        1. Decode page_image
-        2. Run through a pretrained model (e.g., DETR, LayoutLM)
-        3. Post-process detections
-        4. Return structured results
-        
-        Args:
-            page_image: Raw image bytes
-            page_width: Page width in points
-            page_height: Page height in points
-            
-        Returns:
-            Empty list (stub implementation)
-        """
-        # In production, would process image through model
-        # For now, return empty to rely on rule-based classification
         return []
-    
+
     def get_model_name(self) -> str:
-        """Return stub model identifier."""
         return "stub-detector-v1"
 
 
-class TableNetDetector(Detector):
-    """
-    Placeholder for a real table detection model.
-    
-    To integrate a real model:
-    1. Install model dependencies (e.g., transformers, torch)
-    2. Load model weights in __init__
-    3. Implement detect() to run inference
-    4. Ensure deterministic behavior (fixed seed, no dropout)
-    
-    Example integration with HuggingFace:
-        from transformers import DetrImageProcessor, DetrForObjectDetection
-        
-        class TableNetDetector(Detector):
-            def __init__(self):
-                self.processor = DetrImageProcessor.from_pretrained(
-                    "microsoft/table-transformer-detection"
-                )
-                self.model = DetrForObjectDetection.from_pretrained(
-                    "microsoft/table-transformer-detection"
-                )
-                self.model.eval()
-            
-            def detect(self, page_image, page_width, page_height):
-                # Decode image, run model, post-process
-                ...
-    """
-    
-    def __init__(self):
-        """Initialize with stub configuration."""
-        self.model_loaded = False
-    
+class CombinedLayoutDetector(Detector):
+    """Combine local DocLayNet layout detections with TableTransformer tables."""
+
+    def __init__(self, model_confidence_threshold: float = 0.7, doclaynet_confidence_threshold: float = 0.5):
+        from models.doclaynet_detector import LocalDocLayNetDetector
+        from models.table_transformer import TableTransformerDetector
+
+        self.doclaynet = LocalDocLayNetDetector(confidence_threshold=doclaynet_confidence_threshold)
+        self.table_transformer = TableTransformerDetector(confidence_threshold=model_confidence_threshold)
+
     def detect(self, page_image: bytes, page_width: float, page_height: float) -> List[Detection]:
-        """Stub - would run real model here."""
-        return []
-    
+        detections: List[Detection] = []
+
+        layout_detections = self.doclaynet.detect(page_image, page_width, page_height)
+        table_detections = self.table_transformer.detect(page_image, page_width, page_height)
+
+        use_layout_tables = not table_detections
+        for det in layout_detections:
+            if det.detection_type == "table" and not use_layout_tables:
+                continue
+            detections.append(det)
+
+        detections.extend(table_detections)
+        return detections
+
     def get_model_name(self) -> str:
-        """Return model identifier."""
-        return "tablenet-stub"
+        return f"combined-layout ({self.doclaynet.get_model_name()} + {self.table_transformer.get_model_name()})"
+
+    def is_ready(self) -> bool:
+        return self.doclaynet.is_ready()
+
+    def get_last_error(self) -> str | None:
+        errors = []
+        if self.doclaynet.get_last_error():
+            errors.append(f"doclaynet={self.doclaynet.get_last_error()}")
+        if self.table_transformer.get_last_error():
+            errors.append(f"table_transformer={self.table_transformer.get_last_error()}")
+        return "; ".join(errors) if errors else None
 
 
-def create_detector(detector_type: str = "stub") -> Detector:
-    """
-    Factory function to create detector instances.
-    
-    Args:
-        detector_type: Type of detector ("stub" or "tablenet")
-        
-    Returns:
-        Detector instance
-        
-    Raises:
-        ValueError: If detector_type is unknown
-    """
+def create_detector(
+    detector_type: str = "stub",
+    model_confidence_threshold: float = 0.7,
+    doclaynet_confidence_threshold: float = 0.5,
+) -> Detector:
     if detector_type == "stub":
         return StubDetector()
-    elif detector_type == "tablenet":
-        return TableNetDetector()
-    else:
-        raise ValueError(f"Unknown detector type: {detector_type}")
+    if detector_type == "table_transformer":
+        from models.table_transformer import TableTransformerDetector
+
+        return TableTransformerDetector(confidence_threshold=model_confidence_threshold)
+    if detector_type == "doclaynet":
+        from models.doclaynet_detector import LocalDocLayNetDetector
+
+        return LocalDocLayNetDetector(confidence_threshold=doclaynet_confidence_threshold)
+    if detector_type == "combined":
+        return CombinedLayoutDetector(
+            model_confidence_threshold=model_confidence_threshold,
+            doclaynet_confidence_threshold=doclaynet_confidence_threshold,
+        )
+    raise ValueError(
+        f"Unknown detector type: '{detector_type}'. Valid options: stub, table_transformer, doclaynet, combined"
+    )
