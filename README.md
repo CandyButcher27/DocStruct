@@ -1,121 +1,61 @@
-# DocStruct
+# DocStruct: Hybrid PDF Structure Extraction
 
-DocStruct is a PDF structure extractor that supports geometry-only, model-only, and hybrid pipelines. It outputs structured JSON for text blocks, headers, tables, figures, and captions using deterministic PDF parsing, optional OCR for scanned pages, and local/offline Hugging Face models.
+DocStruct is a research-grade PDF understanding pipeline that fuses deterministic geometry parsing with deep learning-based vision models. It is designed to extract high-fidelity structured JSON from complex documents, supporting multiple extraction strategies and multi-layer ensemble reasoning.
 
-## Supported Features
+## 🚀 Key Features
 
-- Deterministic geometry-only extraction with `--detector stub`
-- Offline layout detection with `--detector doclaynet` (from `hf_models/deformable-detr-doclaynet`)
-- Offline table detection with `--detector table_transformer` (from `hf_models/table-transformer`)
-- Combined layout+table detection with `--detector combined`
-- Three output variants in one run: `geometry`, `model`, `hybrid`
-- Side-by-side overlay comparison for two JSON outputs
-- OCR fallback for scanned pages through Tesseract
-- Real evaluation modes for local PDF datasets and Hugging Face page-image datasets
+- **Hybrid Intelligence**: Combines `pdfplumber` geometry rules with `DocLayNet` and `Table Transformer` models.
+- **Ensemble Benchmarking**: Run `geometry`, `model`, and `hybrid` variants side-by-side to find the best fit for your data.
+- **OCR Fallback**: Automatically invokes Tesseract OCR for scanned/image-only pages with unified coordinate mapping.
+- **Precision Gating**: Per-class confidence thresholds ensure high-quality extraction for sensitive fields like tables and headers.
+- **Visual Overlay**: Human-in-the-loop validation with overlaid bounding boxes for visual audit.
 
-## Not Supported
+## 🛠️ Architecture
 
-- Hugging Face-hosted PDF ingestion
-- LayoutLMv3 or DiT as stable runtime detectors
-- Smoke-test benchmarks presented as real metrics
+DocStruct follows a 6-stage pipeline:
+1. **Decomposition**: Atomic extraction + OCR fallback.
+2. **Layout Formation**: Clustering spans into logical blocks.
+3. **Classification**: Hybrid scoring (Hugging Face Models + Geometric Rules).
+4. **Reading Order**: Spatial sorting for multi-column documents.
+5. **Refinement**: Table and figure boundary optimisation.
+6. **Validation**: Pydantic-based schema enforcement.
 
-## Setup
+Refer to [docs/architecture.md](docs/architecture.md) for a detailed technical breakdown.
+
+## 📦 Setup
 
 ```bash
 pip install -r requirements.txt
+# Optional: Install Tesseract for OCR fallback
 ```
 
-Install Tesseract on the host system if you want OCR fallback.
+## ⌨️ CLI Usage
 
-Local model directories expected by default:
+### Basic Extraction (Geometry Only)
+```bash
+python main.py work.pdf output.json --detector stub
+```
 
-- `hf_models/deformable-detr-doclaynet`
-- `hf_models/table-transformer`
+### Full Hybrid Model Run (All Variants)
+```bash
+python main.py work.pdf output.json --detector combined --output-variants all --verbose
+```
 
-## CLI
+### Visual Verification
+```bash
+python visualize_overlay.py work.pdf output_hybrid.json --output-dir audit_results
+```
 
-Single-output geometry extraction:
+## 📊 Evaluation & Benchmarking
+
+Benchmarking against DocLayNet using the Hugging Face hub:
 
 ```bash
-python main.py input.pdf output.json --detector stub
+python -m evaluation.runner --eval-mode hf_image --dataset doclaynet --max-docs 5 --detector combined
 ```
 
-Single-output model extraction using local DocLayNet model:
-
-```bash
-python main.py input.pdf output.json --detector doclaynet --variant model
-```
-
-Single-output hybrid extraction using both local models:
-
-```bash
-python main.py input.pdf output.json --detector combined --variant hybrid
-```
-
-Generate all three outputs in one run:
-
-```bash
-python main.py input.pdf output.json --detector combined --output-variants all
-```
-
-This creates:
-
-- `output_geometry.json`
-- `output_model.json`
-- `output_hybrid.json`
-
-Single JSON visual overlay:
-
-```bash
-python visualize_overlay.py input.pdf output.json --output-dir overlay_output
-```
-
-Side-by-side JSON comparison overlay:
-
-```bash
-python visualize_overlay.py input.pdf --left-json output_geometry.json --right-json output_hybrid.json --output-dir compare_overlay
-```
-
-## CLI Verification
-
-Run these to validate all CLI entry points:
-
-```bash
-python main.py -h
-python visualize_overlay.py -h
-python -m evaluation.runner -h
-```
-
-Smoke run (all variants):
-
-```bash
-python main.py tests/fixtures/sample.pdf outputs/sample.json --detector combined --output-variants all --verbose
-```
-
-Visualizer smoke run:
-
-```bash
-python visualize_overlay.py tests/fixtures/sample.pdf --left-json outputs/sample_geometry.json --right-json outputs/sample_hybrid.json --output-dir outputs/compare_overlay
-```
-
-Test suite:
-
-```bash
-python -m pytest -q
-```
-
-## Evaluation
-
-Local PDF evaluation:
-
-```bash
-python -m evaluation.runner --eval-mode local_pdf --data-dir ./data/publaynet --detector combined --output results/local.csv
-```
-
-Hugging Face page-image evaluation:
-
-```bash
-python -m evaluation.runner --eval-mode hf_image --detector table_transformer --output results/hf.csv
-```
-
-The supported Hugging Face dataset is `nielsr/publaynet-processed`. That path evaluates page images and annotations only. It does not import PDFs from Hugging Face.
+## 📜 Roadmap
+Detailed in [docs/future_work.md](docs/future_work.md):
+- [ ] LayoutLMv3 integration
+- [ ] Table-to-Markdown parsing
+- [ ] FastAPI service wrapper

@@ -5,6 +5,7 @@ numpy==1.26.0
 Pillow==10.1.0
 python-dotenv>=1.0.0
 PyPDF2
+pdf2image
 timm
 
 # ── HuggingFace model stack (required for model-based detector modes) ──────────

@@ -1,4 +1,4 @@
-﻿"""Block classification stage."""
+"""Block classification stage."""
 
 from __future__ import annotations
 
@@ -18,9 +18,16 @@ TEXT_BLOCK_TYPES = ["text", "header", "table", "caption"]
 HYBRID_MODEL_WEIGHT = 0.60
 HYBRID_RULE_WEIGHT = 0.25
 HYBRID_GEO_WEIGHT = 0.15
+CLASS_CONFIDENCE_THRESHOLDS = {
+    "text": 0.35,
+    "header": 0.50,
+    "table": 0.55,
+    "figure": 0.45,
+    "caption": 0.45,
+}
 
 
-def compute_rule_score(block: LayoutBlock, block_type: str, avg_font_size: float) -> float:
+def compute_rule_score(block: LayoutBlock, block_type: str, avg_font_size: float, page_height: float) -> float:
     score = 0.0
 
     if block_type == "header":
@@ -28,7 +35,7 @@ def compute_rule_score(block: LayoutBlock, block_type: str, avg_font_size: float
             score += 0.4
         if len(block.text.split()) < 15:
             score += 0.3
-        if block.bbox and block.bbox.y1 > page_top_threshold():
+        if block.bbox and block.bbox.y1 > page_top_threshold(page_height):
             score += 0.3
     elif block_type == "text":
         if 0.8 < block.avg_font_size / avg_font_size < 1.2:
@@ -67,8 +74,8 @@ def compute_model_score(
     return best_score
 
 
-def page_top_threshold() -> float:
-    return 650.0
+def page_top_threshold(page_height: float) -> float:
+    return page_height * 0.85
 
 
 def compute_geometric_score(block: LayoutBlock, page_width: float, page_height: float) -> float:
@@ -95,8 +102,9 @@ def _score_text_block(
     block: LayoutBlock,
     detections: List[Detection],
     avg_font_size: float,
+    page_height: float,
 ) -> tuple[Dict[str, float], Dict[str, float]]:
-    rule_scores = {block_type: compute_rule_score(block, block_type, avg_font_size) for block_type in TEXT_BLOCK_TYPES}
+    rule_scores = {block_type: compute_rule_score(block, block_type, avg_font_size, page_height) for block_type in TEXT_BLOCK_TYPES}
     if not block.bbox:
         model_scores = {block_type: 0.0 for block_type in TEXT_BLOCK_TYPES}
     else:
@@ -123,7 +131,7 @@ def classify_block(
     page_lines: Optional[List[Dict[str, Any]]] = None,
     variant_mode: str = "hybrid",
 ) -> Dict[str, Any]:
-    rule_scores, model_scores = _score_text_block(block, detections, avg_font_size)
+    rule_scores, model_scores = _score_text_block(block, detections, avg_font_size, page_height)
     geometric_score = compute_geometric_score(block, page_width, page_height)
     best_rule_type, best_rule_score = _max_score(rule_scores)
     best_model_type, best_model_score = _max_score(model_scores)
@@ -328,14 +336,33 @@ def classify_blocks(
             page_lines,
             variant_mode=variant_mode,
         )
+        # Apply class-wise threshold gating
+        btype = classification["block_type"]
+        conf = classification["confidence"]["final_confidence"]
+        if conf < CLASS_CONFIDENCE_THRESHOLDS.get(btype, 0.0):
+            # If threshold not met, downgrade to text or skip if it's already text
+            if btype != "text":
+                classification["block_type"] = "text"
+                btype = "text"
+                # Re-check text threshold
+                if conf < CLASS_CONFIDENCE_THRESHOLDS.get("text", 0.0):
+                    continue
+            else:
+                continue
+
         block_data = {
             "layout_block": block,
-            "block_type": classification["block_type"],
+            "block_type": btype,
             "confidence": classification["confidence"],
             "has_model_support": classification.get("has_model_support", False),
         }
         if table_candidates:
             _apply_table_variant_override(block_data, variant_mode, table_candidates, table_match_threshold)
+        
+        # Final check after table override
+        if block_data["confidence"]["final_confidence"] < CLASS_CONFIDENCE_THRESHOLDS.get(block_data["block_type"], 0.0):
+            continue
+
         if variant_mode == "model" and not block_data.get("has_model_support", False):
             continue
         classified_blocks.append(block_data)
@@ -348,6 +375,11 @@ def classify_blocks(
             page_height,
             variant_mode=variant_mode,
         )
+        
+        # Apply class-wise threshold gating for images (figures)
+        if classification["confidence"]["final_confidence"] < CLASS_CONFIDENCE_THRESHOLDS.get("figure", 0.0):
+            continue
+
         if variant_mode == "model" and not classification.get("has_model_support", False):
             continue
         classified_blocks.append(
@@ -361,3 +393,4 @@ def classify_blocks(
 
     logger.debug(f"Classified {len(classified_blocks)} blocks")
     return classified_blocks
+

@@ -1,0 +1,8 @@
+1. The entire script using geometry based detection followed by classification of each bounding box : 
+
+python main.py sample.pdf final_output/result.json --detector combined --output-variants all --verbose
+
+
+2. Visualizing using two outputs
+
+python visualize_overlay.py sample.pdf --left-json final_output/result_geometry.json --right-json final_output/result_model.json --output-dir final_output/compare_geometry_vs_model

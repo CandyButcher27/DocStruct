@@ -16,16 +16,6 @@ env/
 .env
 
 # ===============================
-# Fuzzer Output Artifacts
-# ===============================
-crashes/
-example/
-results/
-coverage/
-logs/
-*.log
-
-# ===============================
 # Build & Distribution
 # ===============================
 build/
@@ -64,14 +54,15 @@ out*.json
 # ===============================
 # Redundant Files
 # ===============================
-final_output/
-evaluation/
-outputs
-run*.py
-sample.pdf
-work.pdf
-check*.py
-running_commands.txt
-trim_pdf.py
-test*.py
-main2.py
+# final_output/
+# evaluation/
+# outputs
+# run*.py
+# sample.pdf
+# work.pdf
+# check*.py
+# trim_pdf.py
+# test*.py
+# main2.py
+# output*/
+# *.txt

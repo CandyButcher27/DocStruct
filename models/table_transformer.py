@@ -6,14 +6,14 @@ import io
 from pathlib import Path
 from typing import List
 
-from models.detector import Detection, Detector
+from models.detector import ClasswiseThresholdConfig, Detection, Detector
 from schemas.block import BoundingBox
 from utils.logging import setup_logger
 
 logger = setup_logger(__name__)
 
 MODEL_DIR = Path("hf_models") / "table-transformer"
-CONFIDENCE_THRESHOLD = 0.5
+DEFAULT_TABLE_THRESHOLD = 0.7
 
 
 class TableTransformerDetector(Detector):
@@ -22,9 +22,9 @@ class TableTransformerDetector(Detector):
         "table rotated": "table",
     }
 
-    def __init__(self, model_path: str | Path = MODEL_DIR, confidence_threshold: float = CONFIDENCE_THRESHOLD):
+    def __init__(self, model_path: str | Path = MODEL_DIR, threshold_config: ClasswiseThresholdConfig | None = None):
         self.model_path = Path(model_path)
-        self.confidence_threshold = confidence_threshold
+        self.threshold_config = threshold_config or ClasswiseThresholdConfig(table=DEFAULT_TABLE_THRESHOLD)
         self._model = None
         self._processor = None
         self._ready = False
@@ -74,18 +74,24 @@ class TableTransformerDetector(Detector):
                 outputs = self._model(**inputs)
 
             target_sizes = torch.tensor([[img_h, img_w]])
+            # Use minimum threshold for initial filtering (0.3), then apply class-wise filtering
             results = self._processor.post_process_object_detection(
                 outputs,
-                threshold=self.confidence_threshold,
+                threshold=0.3,
                 target_sizes=target_sizes,
             )[0]
 
             detections: List[Detection] = []
             label_names = self._model.config.id2label
+            table_threshold = self.threshold_config.get_threshold("table")
             for score, label_id, box in zip(results["scores"], results["labels"], results["boxes"]):
                 label_str = label_names.get(label_id.item(), "")
                 det_type = self._LABEL_MAP.get(label_str)
                 if det_type is None:
+                    continue
+                # Apply class-wise threshold
+                confidence = round(float(score), 4)
+                if confidence < table_threshold:
                     continue
                 x0_px, y0_px, x1_px, y1_px = box.tolist()
                 scale_x = page_width / img_w
@@ -100,7 +106,7 @@ class TableTransformerDetector(Detector):
                     Detection(
                         bbox=BoundingBox(x0=max(0.0, x0), y0=max(0.0, y0), x1=x1, y1=y1),
                         detection_type=det_type,
-                        confidence=round(float(score), 4),
+                        confidence=confidence,
                     )
                 )
             return detections

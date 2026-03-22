@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 """DocStruct main pipeline entrypoint."""
 
 from __future__ import annotations
@@ -15,7 +15,7 @@ try:
 except ImportError:
     pass
 
-from models.detector import create_detector
+from models.detector import ClasswiseThresholdConfig, create_detector
 from pipeline.classification import classify_blocks
 from pipeline.confidence import ensure_confidence_scores
 from pipeline.decomposition import decompose_pdf
@@ -48,7 +48,11 @@ def process_pdf(
     geometry_table_threshold: float = 0.45,
     table_overlap_threshold: float = 0.35,
     fusion_acceptance_threshold: float = 0.45,
-    model_confidence_threshold: float = 0.7,
+    threshold_table: float = 0.7,
+    threshold_figure: float = 0.7,
+    threshold_text: float = 0.5,
+    threshold_header: float = 0.6,
+    threshold_caption: float = 0.6,
     doclaynet_confidence_threshold: float = 0.5,
     table_match_threshold: float = 0.4,
 ) -> None:
@@ -60,9 +64,18 @@ def process_pdf(
         raise ValueError("output_variants must be 'single' or 'all'")
     selected_variants = [variant] if output_variants == "single" else list(VALID_VARIANTS)
 
+    # Build class-wise threshold configuration
+    threshold_config = ClasswiseThresholdConfig(
+        table=threshold_table,
+        figure=threshold_figure,
+        text=threshold_text,
+        header=threshold_header,
+        caption=threshold_caption,
+    )
+
     detector = create_detector(
         detector_type=detector_type,
-        model_confidence_threshold=model_confidence_threshold,
+        threshold_config=threshold_config,
         doclaynet_confidence_threshold=doclaynet_confidence_threshold,
     )
     logger.info(f"Using detector: {detector.get_model_name()}")
@@ -98,14 +111,14 @@ def process_pdf(
         )
         model_candidates, model_diag = model_table_candidates(
             detections,
-            score_threshold=model_confidence_threshold,
+            score_threshold=threshold_table,
         )
         fused_candidates, fusion_diag = fuse_table_candidates(
             geometry_candidates,
             model_candidates,
             overlap_threshold=table_overlap_threshold,
             fusion_acceptance_threshold=fusion_acceptance_threshold,
-            model_confidence_threshold=model_confidence_threshold,
+            model_confidence_threshold=threshold_table,
         )
         logger.info(
             "Page %s table diagnostics: geometry_candidates=%s model_candidates=%s fused_tables=%s dropped_candidates=%s",
@@ -214,7 +227,11 @@ Examples:
             geometry_table_threshold=args.geometry_table_threshold,
             table_overlap_threshold=args.table_overlap_threshold,
             fusion_acceptance_threshold=args.fusion_acceptance_threshold,
-            model_confidence_threshold=args.model_confidence_threshold,
+            threshold_table=args.model_confidence_threshold,
+            threshold_figure=args.model_confidence_threshold,
+            threshold_text=args.model_confidence_threshold,
+            threshold_header=args.model_confidence_threshold,
+            threshold_caption=args.model_confidence_threshold,
             doclaynet_confidence_threshold=args.doclaynet_confidence_threshold,
             table_match_threshold=args.table_match_threshold,
         )
