@@ -53,7 +53,7 @@ class StubDetector(Detector):
 class CombinedLayoutDetector(Detector):
     """Combine local DocLayNet layout detections with TableTransformer tables."""
 
-    def __init__(self, model_confidence_threshold: float = 0.7, doclaynet_confidence_threshold: float = 0.5):
+    def __init__(self, model_confidence_threshold: float = 0.7, doclaynet_confidence_threshold: float = 0.3):
         from models.doclaynet_detector import LocalDocLayNetDetector
         from models.table_transformer import TableTransformerDetector
 
@@ -93,7 +93,7 @@ class CombinedLayoutDetector(Detector):
 def create_detector(
     detector_type: str = "stub",
     model_confidence_threshold: float = 0.7,
-    doclaynet_confidence_threshold: float = 0.5,
+    doclaynet_confidence_threshold: float = 0.3,
 ) -> Detector:
     if detector_type == "stub":
         return StubDetector()

@@ -13,7 +13,7 @@ from utils.logging import setup_logger
 logger = setup_logger(__name__)
 
 MODEL_DIR = Path("hf_models") / "table-transformer"
-CONFIDENCE_THRESHOLD = 0.7
+CONFIDENCE_THRESHOLD = 0.5
 
 
 class TableTransformerDetector(Detector):
