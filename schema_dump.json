@@ -1,0 +1,27 @@
+{
+  "keys": [
+    "image_id",
+    "image",
+    "width",
+    "height",
+    "doc_category",
+    "collection",
+    "doc_name",
+    "page_no",
+    "objects"
+  ],
+  "bboxes": [],
+  "categories": [],
+  "ner_tags": [],
+  "features": {
+    "image_id": "Value(dtype='int64', id=None)",
+    "image": "Image(mode=None, decode=True, id=None)",
+    "width": "Value(dtype='int32', id=None)",
+    "height": "Value(dtype='int32', id=None)",
+    "doc_category": "Value(dtype='string', id=None)",
+    "collection": "Value(dtype='string', id=None)",
+    "doc_name": "Value(dtype='string', id=None)",
+    "page_no": "Value(dtype='int64', id=None)",
+    "objects": "[{'category_id': ClassLabel(names=['Caption', 'Footnote', 'Formula', 'List-item', 'Page-footer', 'Page-header', 'Picture', 'Section-header', 'Table', 'Text', 'Title'], id=None), 'image_id': Value(dtype='string', id=None), 'id': Value(dtype='int64', id=None), 'area': Value(dtype='int64', id=None), 'bbox': Sequence(feature=Value(dtype='float32', id=None), length=4, id=None), 'segmentation': [[Value(dtype='float32', id=None)]], 'iscrowd': Value(dtype='bool', id=None), 'precedence': Value(dtype='int32', id=None)}]"
+  }
+}
