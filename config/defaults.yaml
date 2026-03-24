@@ -1,0 +1,74 @@
+# DocStruct: Pipeline Configuration Parameters
+# These values control the decision-making "brain" of the system.
+
+# --- Ensemble Blend Weights ---
+# These control how much we trust different classification sub-systems.
+ensemble:
+  model_weight: 0.50  # Weight given to the Deep Learning Vision Model (DocLayNet DETR)
+  rule_weight: 0.30   # Weight given to text-content rules (regex, keywords, alignment)
+  geo_weight: 0.20  # Weight given to physical page position (headers are usually at top, etc.)
+
+# --- Per-Class Confidence Gates ---
+# The minimum combined score needed to "keep" a label. 
+# If a block scores lower than this, it is downgraded to 'text' for safety.
+classification_thresholds:
+  text: 0.30        # Baseline for general text elements
+  header: 0.45        # Strictness for titles and section breaks
+  table: 0.50         # High bar for tables to avoid structural false positives
+  figure: 0.40        # Bar for images, charts, and diagrams
+  caption: 0.40       # Bar for text directly associated with figures/tables
+
+# --- Global Detector Gating ---
+# These control the "raw" output of the Vision AI (Machine Learning) model.
+detector_thresholds:
+  table: 0.50         # Require 50% AI confidence to even consider something a table
+  figure: 0.50        # Require 50% AI confidence for figures
+  text: 0.40          # Standard confidence for visual text regions
+  header: 0.45        # Standard confidence for visual headers
+  caption: 0.45       # Standard confidence for visual captions
+  doclaynet_confidence: 0.40 # General fallback confidence floor for all classes
+
+# --- Structural Refinement Parameters ---
+# These control how we group and merge multi-column or overlapping layouts.
+table_candidates:
+  geometry_threshold: 0.35   # Minimum geometric "likeness" to be considered a table candidate
+  overlap_threshold: 0.25    # How much AI and Geometry boxes must overlap to be "matched"
+  fusion_acceptance: 0.40    # Minimum score for a model box to "fused" into a final block
+  table_match_threshold: 0.35 # Threshold for linking captions to their respective tables
+
+# --- True Hybrid Pipeline Parameters ---
+# These control the true-hybrid mode where model and geometry proposals are fused.
+hybrid_pipeline:
+  # Proposal matching
+  proposal_iou_threshold: 0.35  # Minimum IoU to consider model+geometry match
+  nms_iou_threshold: 0.50       # IoU threshold for NMS deduplication
+
+  # Confidence floors by source (minimum confidence)
+  confirmed_floor: 0.70         # Minimum confidence for confirmed blocks (model+geo agree)
+  model_only_floor: 0.40        # Minimum confidence for model-only blocks
+  geometry_only_floor: 0.25     # Minimum confidence for geometry-only blocks
+
+  # Confidence ceilings by source (maximum confidence)
+  confirmed_ceiling: 1.00
+  model_only_ceiling: 0.85
+  geometry_only_ceiling: 0.65
+
+  # Source-specific weights (how to blend model/rule/geo scores)
+  weights:
+    confirmed:
+      model: 0.50
+      rule: 0.30
+      geo: 0.20
+    model_only:
+      model: 0.75
+      rule: 0.15
+      geo: 0.10
+    geometry_only:
+      model: 0.00
+      rule: 0.55
+      geo: 0.45
+
+  # Geometry proposal strategies
+  enable_line_bounded: true     # Detect line-bounded regions (tables)
+  enable_image_regions: true    # Detect regions around images (figures)
+  min_line_bounded_area: 1000   # Minimum area for line-bounded regions (px^2)
