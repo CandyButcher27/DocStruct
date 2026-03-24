@@ -1,12 +1,12 @@
-﻿"""Block classification stage."""
+"""Block classification stage."""
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from models.detector import Detection
-from pipeline.conflict_resolver import ConflictResolver
 from pipeline.layout import LayoutBlock
+from pipeline.proposal_fusion import CONFIDENCE_BOUNDS, HYBRID_SOURCE_WEIGHTS
 from pipeline.table_candidates import block_table_match
 from schemas.block import BoundingBox
 from utils.geometry import bbox_overlap
@@ -15,12 +15,35 @@ from utils.logging import setup_logger
 logger = setup_logger(__name__)
 
 TEXT_BLOCK_TYPES = ["text", "header", "table", "caption"]
-HYBRID_MODEL_WEIGHT = 0.60
-HYBRID_RULE_WEIGHT = 0.25
-HYBRID_GEO_WEIGHT = 0.15
+
+# ---------------------------------------------------------------------------
+# Default fallbacks (used when no config dict is supplied)
+# ---------------------------------------------------------------------------
+_DEFAULT_THRESHOLDS: Dict[str, float] = {
+    "text": 0.35,
+    "header": 0.50,
+    "table": 0.55,
+    "figure": 0.45,
+    "caption": 0.45,
+}
+_DEFAULT_WEIGHTS: Tuple[float, float, float] = (0.60, 0.25, 0.15)  # model, rule, geo
 
 
-def compute_rule_score(block: LayoutBlock, block_type: str, avg_font_size: float) -> float:
+def _resolve_thresholds(cfg: Optional[Dict[str, Any]]) -> Dict[str, float]:
+    if cfg is None:
+        return _DEFAULT_THRESHOLDS
+    from utils.config import get_classification_thresholds
+    return get_classification_thresholds(cfg)
+
+
+def _resolve_weights(cfg: Optional[Dict[str, Any]]) -> Tuple[float, float, float]:
+    if cfg is None:
+        return _DEFAULT_WEIGHTS
+    from utils.config import get_ensemble_weights
+    return get_ensemble_weights(cfg)
+
+
+def compute_rule_score(block: LayoutBlock, block_type: str, avg_font_size: float, page_height: float) -> float:
     score = 0.0
 
     if block_type == "header":
@@ -28,7 +51,7 @@ def compute_rule_score(block: LayoutBlock, block_type: str, avg_font_size: float
             score += 0.4
         if len(block.text.split()) < 15:
             score += 0.3
-        if block.bbox and block.bbox.y1 > page_top_threshold():
+        if block.bbox and block.bbox.y1 > page_top_threshold(page_height):
             score += 0.3
     elif block_type == "text":
         if 0.8 < block.avg_font_size / avg_font_size < 1.2:
@@ -53,7 +76,7 @@ def compute_model_score(
     block_bbox: BoundingBox,
     detections: List[Detection],
     target_type: str,
-    overlap_threshold: float = 0.4,
+    overlap_threshold: float = 0.2,
 ) -> float:
     best_score = 0.0
     for detection in detections:
@@ -67,8 +90,8 @@ def compute_model_score(
     return best_score
 
 
-def page_top_threshold() -> float:
-    return 650.0
+def page_top_threshold(page_height: float) -> float:
+    return page_height * 0.85
 
 
 def compute_geometric_score(block: LayoutBlock, page_width: float, page_height: float) -> float:
@@ -95,8 +118,9 @@ def _score_text_block(
     block: LayoutBlock,
     detections: List[Detection],
     avg_font_size: float,
+    page_height: float,
 ) -> tuple[Dict[str, float], Dict[str, float]]:
-    rule_scores = {block_type: compute_rule_score(block, block_type, avg_font_size) for block_type in TEXT_BLOCK_TYPES}
+    rule_scores = {block_type: compute_rule_score(block, block_type, avg_font_size, page_height) for block_type in TEXT_BLOCK_TYPES}
     if not block.bbox:
         model_scores = {block_type: 0.0 for block_type in TEXT_BLOCK_TYPES}
     else:
@@ -122,8 +146,10 @@ def classify_block(
     avg_font_size: float,
     page_lines: Optional[List[Dict[str, Any]]] = None,
     variant_mode: str = "hybrid",
+    cfg: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
-    rule_scores, model_scores = _score_text_block(block, detections, avg_font_size)
+    model_w, rule_w, geo_w = _resolve_weights(cfg)
+    rule_scores, model_scores = _score_text_block(block, detections, avg_font_size, page_height)
     geometric_score = compute_geometric_score(block, page_width, page_height)
     best_rule_type, best_rule_score = _max_score(rule_scores)
     best_model_type, best_model_score = _max_score(model_scores)
@@ -165,23 +191,14 @@ def classify_block(
             "has_model_support": False,
         }
 
-    resolver = ConflictResolver()
-    resolved_type, _ = resolver.resolve(
-        rule_type=best_rule_type,
-        model_type=best_model_type,
-        rule_score=best_rule_score,
-        model_score=best_model_score,
-        block_bbox=block.bbox,
-        page_lines=page_lines,
-        page_width=page_width,
-        page_height=page_height,
-    )
+    # Model-first hybrid: model decides label; geometry/rules refine confidence.
+    resolved_type = best_model_type
     resolved_rule = rule_scores.get(resolved_type, 0.0)
-    resolved_model = model_scores.get(resolved_type, 0.0)
+    resolved_model = best_model_score
     final_confidence = (
-        HYBRID_MODEL_WEIGHT * resolved_model
-        + HYBRID_RULE_WEIGHT * resolved_rule
-        + HYBRID_GEO_WEIGHT * geometric_score
+        model_w * resolved_model
+        + rule_w * resolved_rule
+        + geo_w * geometric_score
     )
     return {
         "block_type": resolved_type,
@@ -238,7 +255,10 @@ def classify_image_block(
     if model_score == 0.0:
         final_conf = 0.6 * rule_score + 0.4 * geometric_score
     else:
-        final_conf = HYBRID_MODEL_WEIGHT * model_score + HYBRID_RULE_WEIGHT * rule_score + HYBRID_GEO_WEIGHT * geometric_score
+        # Use default weights here; cfg is not threaded into classify_image_block yet
+        # (image blocks are always classified as figure so the blend doesn't vary by class)
+        model_w, rule_w, geo_w = _DEFAULT_WEIGHTS
+        final_conf = model_w * model_score + rule_w * rule_score + geo_w * geometric_score
     return {
         "block_type": "figure",
         "confidence": {
@@ -289,7 +309,8 @@ def _apply_table_variant_override(
         candidate_score = float(table_candidate.get("score", 0.0))
         rule_score = max(rule_score, 0.8 * candidate_score)
         model_score = max(model_score, candidate_score)
-        final_conf = HYBRID_MODEL_WEIGHT * model_score + HYBRID_RULE_WEIGHT * rule_score + HYBRID_GEO_WEIGHT * geometric_score
+        model_w, rule_w, geo_w = _DEFAULT_WEIGHTS
+        final_conf = model_w * model_score + rule_w * rule_score + geo_w * geometric_score
         block_data["has_model_support"] = model_score > 0
 
     block_data["block_type"] = "table"
@@ -314,9 +335,11 @@ def classify_blocks(
     variant_mode: str = "hybrid",
     table_candidates: Optional[List[Dict[str, Any]]] = None,
     table_match_threshold: float = 0.4,
+    cfg: Optional[Dict[str, Any]] = None,
 ) -> List[Dict[str, Any]]:
     classified_blocks = []
     avg_font_size = calculate_page_avg_font_size(layout_blocks)
+    thresholds = _resolve_thresholds(cfg)
 
     for block in layout_blocks:
         classification = classify_block(
@@ -327,15 +350,35 @@ def classify_blocks(
             avg_font_size,
             page_lines,
             variant_mode=variant_mode,
+            cfg=cfg,
         )
+        # Apply class-wise threshold gating
+        btype = classification["block_type"]
+        conf = classification["confidence"]["final_confidence"]
+        if conf < thresholds.get(btype, 0.0):
+            # If threshold not met, downgrade to text or skip if it's already text
+            if btype != "text":
+                classification["block_type"] = "text"
+                btype = "text"
+                # Re-check text threshold
+                if conf < thresholds.get("text", 0.0):
+                    continue
+            else:
+                continue
+
         block_data = {
             "layout_block": block,
-            "block_type": classification["block_type"],
+            "block_type": btype,
             "confidence": classification["confidence"],
             "has_model_support": classification.get("has_model_support", False),
         }
         if table_candidates:
             _apply_table_variant_override(block_data, variant_mode, table_candidates, table_match_threshold)
+        
+        # Final check after table override
+        if block_data["confidence"]["final_confidence"] < thresholds.get(block_data["block_type"], 0.0):
+            continue
+
         if variant_mode == "model" and not block_data.get("has_model_support", False):
             continue
         classified_blocks.append(block_data)
@@ -348,6 +391,11 @@ def classify_blocks(
             page_height,
             variant_mode=variant_mode,
         )
+        
+        # Apply class-wise threshold gating for images (figures)
+        if classification["confidence"]["final_confidence"] < thresholds.get("figure", 0.0):
+            continue
+
         if variant_mode == "model" and not classification.get("has_model_support", False):
             continue
         classified_blocks.append(
@@ -361,3 +409,76 @@ def classify_blocks(
 
     logger.debug(f"Classified {len(classified_blocks)} blocks")
     return classified_blocks
+
+
+# ---------------------------------------------------------------------------
+# True Hybrid Pipeline Classification
+# ---------------------------------------------------------------------------
+
+
+def classify_fused_proposal(
+    proposal,  # FusedProposal
+    layout_block: Optional[LayoutBlock],
+    page_width: float,
+    page_height: float,
+    avg_font_size: float,
+    cfg: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    """
+    Classify a fused proposal using source-appropriate weights.
+
+    For true hybrid pipeline: applies different scoring weights based on
+    whether the proposal was confirmed (model+geometry), model-only, or
+    geometry-only.
+
+    Args:
+        proposal: FusedProposal from proposal_fusion module
+        layout_block: Optional LayoutBlock if available (for rule scoring)
+        page_width: Page width in points
+        page_height: Page height in points
+        avg_font_size: Average font size on page
+        cfg: Optional config dict
+
+    Returns:
+        Classification dict with block_type, confidence breakdown, and source info
+    """
+    source = proposal.source
+    weights = HYBRID_SOURCE_WEIGHTS.get(source, HYBRID_SOURCE_WEIGHTS["geometry_only"])
+    bounds = CONFIDENCE_BOUNDS.get(source, CONFIDENCE_BOUNDS["geometry_only"])
+
+    # Compute individual scores
+    if layout_block is not None:
+        rule_score = compute_rule_score(
+            layout_block, proposal.block_type, avg_font_size, page_height
+        )
+        geometric_score = compute_geometric_score(layout_block, page_width, page_height)
+    else:
+        # No LayoutBlock available - use defaults
+        rule_score = 0.3
+        geometric_score = 0.8  # Bbox exists, so geometry is reasonable
+
+    model_score = proposal.model_confidence
+
+    # Weighted combination based on source
+    weighted_score = (
+        weights["model"] * model_score
+        + weights["rule"] * rule_score
+        + weights["geo"] * geometric_score
+    )
+
+    # Apply source-specific floor/ceiling
+    final_confidence = max(bounds["floor"], min(bounds["ceiling"], weighted_score))
+
+    return {
+        "block_type": proposal.block_type,
+        "confidence": {
+            "rule_score": round(rule_score, 4),
+            "model_score": round(model_score, 4),
+            "geometric_score": round(geometric_score, 4),
+            "final_confidence": round(final_confidence, 4),
+        },
+        "has_model_support": source in ("confirmed", "model_only"),
+        "proposal_source": source,
+        "agreement_score": round(proposal.agreement_score, 4),
+    }
+

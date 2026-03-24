@@ -232,6 +232,13 @@ def decompose_pdf(pdf_path: str) -> List[PageData]:
                 page_data.add_line(line)
                 
             # Phase 5: OCR fallback for scanned pages
+            # Trigger: is_scanned_page() returns True if the page has zero or 
+            # very few text spans relative to its size, suggesting it's an image.
+            # Mechanics: 
+            # 1. Render page as high-DPI PNG.
+            # 2. Invoke Tesseract OCR via ocr_page().
+            # 3. OCR spans are returned in bottom-left origin coordinates, 
+            #    matching the pipeline's deterministic extraction system.
             from utils.ocr import is_scanned_page, ocr_page
             if is_scanned_page(page_data):
                 from utils.rendering import render_page_as_png
