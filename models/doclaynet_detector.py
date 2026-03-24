@@ -1,4 +1,4 @@
-﻿"""Offline DocLayNet detector using a local Hugging Face model directory."""
+"""Offline DocLayNet detector using a local Hugging Face model directory."""
 
 from __future__ import annotations
 
@@ -57,10 +57,9 @@ class LocalDocLayNetDetector(Detector):
             from transformers import AutoImageProcessor, DeformableDetrForObjectDetection
 
             logger.info(f"Loading DocLayNet model from {self.model_path}")
-            self._processor = AutoImageProcessor.from_pretrained(str(self.model_path), local_files_only=True)
+            self._processor = AutoImageProcessor.from_pretrained(str(self.model_path))
             self._model = DeformableDetrForObjectDetection.from_pretrained(
                 str(self.model_path),
-                local_files_only=True,
             )
             self._model.eval()
             self._ready = True
