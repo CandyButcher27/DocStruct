@@ -1,10 +1,8 @@
-﻿"""Tests for block classification stage."""
+"""Tests for block classification stage."""
 
 from models.detector import Detection
 from pipeline.classification import (
-    HYBRID_GEO_WEIGHT,
-    HYBRID_MODEL_WEIGHT,
-    HYBRID_RULE_WEIGHT,
+    _DEFAULT_WEIGHTS,
     classify_block,
     compute_geometric_score,
     compute_model_score,
@@ -25,7 +23,7 @@ def create_test_block(text: str, font_size: float, y_position: float) -> LayoutB
 
 def test_compute_rule_score_header():
     block = create_test_block("Introduction", font_size=18.0, y_position=700)
-    score = compute_rule_score(block, "header", avg_font_size=12.0)
+    score = compute_rule_score(block, "header", avg_font_size=12.0, page_height=792)
     assert score > 0.5
 
 
@@ -35,13 +33,13 @@ def test_compute_rule_score_text():
         font_size=12.0,
         y_position=200,
     )
-    score = compute_rule_score(block, "text", avg_font_size=12.0)
+    score = compute_rule_score(block, "text", avg_font_size=12.0, page_height=792)
     assert score > 0.5
 
 
 def test_compute_rule_score_caption():
     block = create_test_block("Figure 1: Example caption", font_size=10.0, y_position=400)
-    score = compute_rule_score(block, "caption", avg_font_size=12.0)
+    score = compute_rule_score(block, "caption", avg_font_size=12.0, page_height=792)
     assert score > 0.5
 
 
@@ -122,9 +120,10 @@ def test_hybrid_confidence_formula_uses_model_preference():
         variant_mode="hybrid",
     )
     conf = result["confidence"]
+    model_w, rule_w, geo_w = _DEFAULT_WEIGHTS
     expected = (
-        HYBRID_MODEL_WEIGHT * conf["model_score"]
-        + HYBRID_RULE_WEIGHT * conf["rule_score"]
-        + HYBRID_GEO_WEIGHT * conf["geometric_score"]
+        model_w * conf["model_score"]
+        + rule_w * conf["rule_score"]
+        + geo_w * conf["geometric_score"]
     )
     assert abs(conf["final_confidence"] - expected) < 1e-6

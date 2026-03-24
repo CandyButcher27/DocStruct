@@ -45,8 +45,8 @@ def test_determinism(temp_output):
     block2 = create_block()
     
     # Compute scores
-    score1 = compute_rule_score(block1, "text", 12.0)
-    score2 = compute_rule_score(block2, "text", 12.0)
+    score1 = compute_rule_score(block1, "text", 12.0, page_height=792)
+    score2 = compute_rule_score(block2, "text", 12.0, page_height=792)
     
     # Should be identical
     assert score1 == score2
