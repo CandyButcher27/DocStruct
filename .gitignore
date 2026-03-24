@@ -1,77 +1,39 @@
-# ===============================
-# Python Bytecode & Cache
-# ===============================
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 
-# ===============================
-# Virtual Environments
-# ===============================
-venv/
-.env/
-.venv/
-.venv_test/
-env/
+# Virtual Environments & Environments
 .env
+.venv/
+env/
+venv/
 
-# ===============================
-# Fuzzer Output Artifacts
-# ===============================
-crashes/
-example/
-results/
-coverage/
-logs/
-*.log
+# IDE and Project Settings
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
 
-# ===============================
-# Build & Distribution
-# ===============================
-build/
-dist/
-*.egg-info/
 
-# ===============================
-# Testing & Coverage
-# ===============================
+# Testing and Coverage
 .pytest_cache/
 .coverage
 htmlcov/
 
-# ===============================
-# IDE & Editor Files
-# ===============================
-.vscode/
-.idea/
-*.swp
-*.swo
+# Process Outputs
+outputs/
+results/*.csv
+results/*.json
 
-# ===============================
-# OS Files
-# ===============================
-.DS_Store
-Thumbs.db
-
-# ===============================
-# Temporary Files
-# ===============================
+# Temporary Diagnostic Scripts
+debug_*.py
+run_*.py
+test_*.py
+check_*.py
 *.tmp
 *.bak
-*.out
-out*.json
-
-# ===============================
-# Redundant Files
-# ===============================
-final_output/
-evaluation/
-outputs
-run*.py
-sample.pdf
-work.pdf
-check*.py
-running_commands.txt
-trim_pdf.py
-test*.py
-main2.py
+*.txt
+!requirements.txt
+!README.md
+!cli-commands.md
