@@ -3,9 +3,11 @@ pydantic==2.5.0
 pytest==7.4.3
 numpy==1.26.0
 Pillow==10.1.0
+pyyaml>=6.0.0
 python-dotenv>=1.0.0
-PyPDF2
-timm
+pdf2image
+timm>=0.9.0
+pytesseract
 
 # ── HuggingFace model stack (required for model-based detector modes) ──────────
 # Install with: pip install -r requirements.txt
