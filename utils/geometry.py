@@ -41,35 +41,6 @@ def bbox_overlap(bbox1: BoundingBox, bbox2: BoundingBox) -> float:
     return intersection_area / union_area
 
 
-def bbox_contains(outer: BoundingBox, inner: BoundingBox, threshold: float = 0.9) -> bool:
-    """
-    Check if one bbox substantially contains another.
-    
-    Args:
-        outer: Potentially containing bbox
-        inner: Potentially contained bbox
-        threshold: Minimum overlap ratio (inner area in outer / inner area)
-        
-    Returns:
-        True if inner is substantially contained in outer
-    """
-    x_left = max(outer.x0, inner.x0)
-    y_top = max(outer.y0, inner.y0)
-    x_right = min(outer.x1, inner.x1)
-    y_bottom = min(outer.y1, inner.y1)
-    
-    if x_right < x_left or y_bottom < y_top:
-        return False
-    
-    intersection_area = (x_right - x_left) * (y_bottom - y_top)
-    inner_area = inner.area()
-    
-    if inner_area == 0:
-        return False
-    
-    return (intersection_area / inner_area) >= threshold
-
-
 def merge_bboxes(bboxes: List[BoundingBox]) -> BoundingBox:
     """
     Merge multiple bounding boxes into one encompassing box.
@@ -151,45 +122,97 @@ def bbox_center(bbox: BoundingBox) -> Tuple[float, float]:
     return (center_x, center_y)
 
 
-def vertical_alignment_score(bbox1: BoundingBox, bbox2: BoundingBox) -> float:
-    """
-    Calculate how well two boxes are vertically aligned.
-    
-    Args:
-        bbox1: First bounding box
-        bbox2: Second bounding box
-        
-    Returns:
-        Score between 0 and 1 (1 = perfectly aligned)
-    """
-    # Calculate overlap in vertical range
-    y_top = max(bbox1.y0, bbox2.y0)
-    y_bottom = min(bbox1.y1, bbox2.y1)
-    
-    if y_bottom <= y_top:
-        return 0.0
-    
-    overlap = y_bottom - y_top
-    min_height = min(bbox1.height(), bbox2.height())
-    
-    if min_height == 0:
-        return 0.0
-    
-    return min(1.0, overlap / min_height)
-
-
 def is_column_break(bbox1: BoundingBox, bbox2: BoundingBox, page_width: float, threshold: float = 0.3) -> bool:
     """
     Determine if two boxes are in different columns.
-    
+
     Args:
         bbox1: First bounding box
         bbox2: Second bounding box
         page_width: Width of the page
         threshold: Minimum horizontal distance as fraction of page width
-        
+
     Returns:
         True if boxes likely in different columns
     """
     h_distance = horizontal_distance(bbox1, bbox2)
     return h_distance > (page_width * threshold)
+
+
+def refine_bbox_with_lines(bbox: BoundingBox, lines: List, padding: float = 2.0) -> BoundingBox:
+    """
+    Refine a bounding box by expanding it to include overlapping PDF lines.
+
+    Used in model-first pipelines to adjust model detection boxes to better
+    align with actual text content boundaries.
+
+    Args:
+        bbox: Original bounding box (typically from model detection)
+        lines: List of line objects or dicts with 'bbox' key
+        padding: Extra padding to add around the refined box
+
+    Returns:
+        Refined bounding box that encompasses overlapping lines
+    """
+    x0, y0, x1, y1 = bbox.x0, bbox.y0, bbox.x1, bbox.y1
+
+    for line in lines:
+        if isinstance(line, dict):
+            lb = line.get("bbox")
+            if not lb:
+                continue
+            if not isinstance(lb, BoundingBox):
+                lb = BoundingBox(**lb)
+        else:
+            lb = getattr(line, "bbox", None)
+            if lb is None:
+                continue
+
+        # Check for overlap
+        if not (lb.x1 < x0 or lb.x0 > x1 or lb.y1 < y0 or lb.y0 > y1):
+            x0 = min(x0, lb.x0)
+            y0 = min(y0, lb.y0)
+            x1 = max(x1, lb.x1)
+            y1 = max(y1, lb.y1)
+
+    return BoundingBox(
+        x0=max(0, x0 - padding),
+        y0=max(0, y0 - padding),
+        x1=x1 + padding,
+        y1=y1 + padding,
+    )
+
+
+def extract_text_from_bbox(lines: List, bbox: BoundingBox, overlap_threshold: float = 0.3) -> str:
+    """
+    Extract text from lines that overlap with a bounding box.
+
+    Args:
+        lines: List of line objects or dicts with 'bbox' and 'text' keys
+        bbox: Bounding box to extract text from
+        overlap_threshold: Minimum IoU overlap required (default 0.3)
+
+    Returns:
+        Concatenated text from overlapping lines
+    """
+    collected = []
+
+    for line in lines:
+        if isinstance(line, dict):
+            lb = line.get("bbox")
+            text = line.get("text", "")
+            if not lb:
+                continue
+            if not isinstance(lb, BoundingBox):
+                lb = BoundingBox(**lb)
+        else:
+            lb = getattr(line, "bbox", None)
+            text = getattr(line, "text", "")
+            if lb is None:
+                continue
+
+        if bbox_overlap(bbox, lb) >= overlap_threshold:
+            if text:
+                collected.append(text)
+
+    return " ".join(collected).strip()
