@@ -1,26 +1,23 @@
-"""Evaluation runner for local PDF, local DocLayNet, and HF page-image modes."""
+"""Evaluation runner for local DocLayNet and HF page-image modes."""
 
 from __future__ import annotations
 
 import argparse
 import csv
 import io
-import json
 from pathlib import Path
 from typing import Any, Dict, List
 
 from evaluation.ground_truth import (
     HF_DOCLAYNET_DATASET_ID,
-    HF_PUBLAYNET_DATASET_ID,
     load_doclaynet_hf,
     load_doclaynet_local,
-    load_hf_publaynet,
-    load_publaynet_sample,
 )
 from evaluation.metrics import compute_map_at_thresholds
-from main import process_pdf
 from pipeline.decomposition import PageData
+from pipeline.hybrid_proposals import detections_to_proposals, generate_geometry_proposals
 from pipeline.layout import process_page_layout
+from pipeline.proposal_fusion import deduplicate_proposals, match_and_fuse_proposals
 from utils.logging import setup_logger
 from utils.ocr import ocr_page
 
@@ -47,6 +44,10 @@ def write_csv_report(results: List[Dict[str, Any]], output_path: str) -> None:
         "table_f1",
         "figure_f1",
         "caption_f1",
+        "image_path",
+        "matched_gt_image_id",
+        "match_score",
+        "match_status",
     ]
     with open(output_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames, extrasaction="ignore")
@@ -65,6 +66,10 @@ def write_csv_report(results: List[Dict[str, Any]], output_path: str) -> None:
                     "table_f1": metrics.get("per_class_f1", {}).get("table", ""),
                     "figure_f1": metrics.get("per_class_f1", {}).get("figure", ""),
                     "caption_f1": metrics.get("per_class_f1", {}).get("caption", ""),
+                    "image_path": row.get("image_path", ""),
+                    "matched_gt_image_id": row.get("matched_gt_image_id", ""),
+                    "match_score": row.get("match_score", ""),
+                    "match_status": row.get("match_status", ""),
                 }
             )
     logger.info(f"Report written to {output_path}")
@@ -80,7 +85,7 @@ def _normalize_blocks(page_blocks: List[Dict[str, Any]]) -> List[Dict[str, Any]]
             bbox_obj = block["image_block"].get("bbox")
         elif "bbox" in block:
             bbox_obj = block["bbox"]
-        
+
         if bbox_obj:
             # Handle Pydantic BoundingBox objects vs dicts
             if hasattr(bbox_obj, "model_dump"):
@@ -89,7 +94,7 @@ def _normalize_blocks(page_blocks: List[Dict[str, Any]]) -> List[Dict[str, Any]]
                 bbox_dict = bbox_obj.dict()
             else:
                 bbox_dict = bbox_obj
-                
+
             normalized.append({
                 "block_type": block.get("block_type", "text"),
                 "bbox": bbox_dict,
@@ -98,55 +103,142 @@ def _normalize_blocks(page_blocks: List[Dict[str, Any]]) -> List[Dict[str, Any]]
     return normalized
 
 
-def _evaluate_local_pdfs(args: argparse.Namespace) -> List[Dict[str, Any]]:
-    docs = load_publaynet_sample(args.data_dir, args.max_docs)
-    if not docs:
-        raise RuntimeError("No local annotation documents were loaded")
+def _bbox_to_dict(bbox_obj: Any) -> Dict[str, float] | None:
+    if bbox_obj is None:
+        return None
+    if hasattr(bbox_obj, "model_dump"):
+        return bbox_obj.model_dump()
+    if hasattr(bbox_obj, "dict"):
+        return bbox_obj.dict()
+    if isinstance(bbox_obj, dict):
+        return bbox_obj
+    return None
 
-    logger.info(f"Running local PDF evaluation with variant comparison: docs={len(docs)}")
-    results = []
-    tmp_dir = Path(args.output).parent / "_eval_predictions"
-    tmp_dir.mkdir(parents=True, exist_ok=True)
 
-    for doc in docs:
-        pdf_path = doc.get("pdf_path")
-        if not pdf_path:
-            raise RuntimeError("Local evaluation requires matching PDFs under <data-dir>/pdfs/")
+def _prediction(block_type: str | None, bbox_obj: Any, confidence: float) -> Dict[str, Any] | None:
+    if not block_type:
+        return None
+    if block_type not in {"text", "header", "table", "figure", "caption"}:
+        return None
+    bbox = _bbox_to_dict(bbox_obj)
+    if not bbox:
+        return None
+    return {
+        "block_type": block_type,
+        "bbox": bbox,
+        "confidence": float(confidence),
+    }
 
-        base_output = tmp_dir / f"{doc['image_id']}.json"
-        process_pdf(
-            pdf_path,
-            str(base_output),
-            detector_type=args.detector,
-            output_variants="all",
-            fail_on_detector_error=args.fail_on_detector_error,
-            threshold_table=args.model_confidence_threshold,
-            threshold_figure=args.model_confidence_threshold,
-            threshold_text=args.model_confidence_threshold,
-            threshold_header=args.model_confidence_threshold,
-            threshold_caption=args.model_confidence_threshold,
-            doclaynet_confidence_threshold=args.doclaynet_confidence_threshold,
+
+def _predictions_from_detections(detections: List[Any]) -> List[Dict[str, Any]]:
+    preds: List[Dict[str, Any]] = []
+    for det in detections:
+        p = _prediction(
+            getattr(det, "detection_type", None),
+            getattr(det, "bbox", None),
+            getattr(det, "confidence", 0.0),
         )
+        if p is not None:
+            preds.append(p)
+    return preds
 
-        for variant in VARIANTS:
-            output_path = _variant_output_path(base_output, variant)
-            with open(output_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            predictions = []
-            for page in data.get("pages", []):
-                predictions.extend(_normalize_blocks(page.get("blocks", [])))
-            metrics = compute_map_at_thresholds(predictions, doc["ground_truths"])
-            results.append({"doc_id": doc.get("image_id", ""), "variant": variant, "metrics": metrics})
-    return results
+
+def _predictions_from_region_proposals(proposals: List[Any]) -> List[Dict[str, Any]]:
+    preds: List[Dict[str, Any]] = []
+    for prop in proposals:
+        p = _prediction(
+            getattr(prop, "proposed_type", None),
+            getattr(prop, "bbox", None),
+            getattr(prop, "confidence", 0.0),
+        )
+        if p is not None:
+            preds.append(p)
+    return preds
+
+
+def _predictions_from_fused_proposals(fused: List[Any]) -> List[Dict[str, Any]]:
+    preds: List[Dict[str, Any]] = []
+    for prop in fused:
+        p = _prediction(
+            getattr(prop, "block_type", None),
+            getattr(prop, "bbox", None),
+            getattr(prop, "final_confidence", 0.0),
+        )
+        if p is not None:
+            preds.append(p)
+    return preds
+
+
+def _run_all_variants(
+    page_image_bytes: bytes,
+    img_w: float,
+    img_h: float,
+    detections: List[Any],
+    ground_truths: List[Dict[str, Any]],
+    doc_id: str,
+    image_path: str,
+) -> List[Dict[str, Any]]:
+    """Run geometry, model, and hybrid variants and return result rows."""
+    model_predictions = _predictions_from_detections(detections)
+
+    pred_class_counts: Dict[str, int] = {}
+    for d in detections:
+        t = getattr(d, "detection_type", "")
+        pred_class_counts[t] = pred_class_counts.get(t, 0) + 1
+    gt_class_counts: Dict[str, int] = {}
+    for g in ground_truths:
+        t = g.get("block_type", "")
+        gt_class_counts[t] = gt_class_counts.get(t, 0) + 1
+    logger.debug("[eval] %s  det=%s  gt=%s", doc_id, pred_class_counts, gt_class_counts)
+
+    page_data = PageData(page_num=0, width=img_w, height=img_h)
+    ocr_spans = ocr_page(page_image_bytes, 0, img_w, img_h)
+    logger.info("[eval] image_id=%s OCR_spans=%d", doc_id, len(ocr_spans))
+    for span in ocr_spans:
+        page_data.add_span(span)
+
+    layout_blocks, _ = process_page_layout(page_data)
+    geo_proposals = generate_geometry_proposals(
+        page_data=page_data,
+        layout_blocks=layout_blocks,
+        page_lines=[],
+    )
+    model_proposals = detections_to_proposals(detections)
+    fused_proposals, _ = match_and_fuse_proposals(
+        model_proposals=model_proposals,
+        geometry_proposals=geo_proposals,
+        iou_threshold=0.35,
+    )
+    hybrid_predictions = _predictions_from_fused_proposals(
+        deduplicate_proposals(fused_proposals, iou_threshold=0.5)
+    )
+    geometry_predictions = _predictions_from_region_proposals(geo_proposals)
+
+    rows = []
+    for variant in VARIANTS:
+        predictions = {
+            "geometry": geometry_predictions,
+            "model": model_predictions,
+        }.get(variant, hybrid_predictions)
+        metrics = compute_map_at_thresholds(predictions, ground_truths)
+        rows.append({
+            "doc_id": doc_id,
+            "variant": variant,
+            "metrics": metrics,
+            "image_path": image_path,
+            "matched_gt_image_id": doc_id,
+            "match_score": 1.0,
+            "match_status": "direct",
+        })
+    return rows
+
 
 
 def _evaluate_local_doclaynet(args: argparse.Namespace) -> List[Dict[str, Any]]:
     """Evaluate using locally downloaded DocLayNet page images + annotations.
 
-    This mode:
-    - Reads images and ground-truths from ``data/doclaynet/``.
-    - Runs the detector on each page image directly (no PDF decomposition).
-    - Computes mAP / F1 against the ground-truth bboxes.
+    Each record from load_doclaynet_local already contains image_path, dimensions,
+    and ground_truths together — no image-to-GT pairing is needed.
     """
     docs = load_doclaynet_local(args.data_dir, args.max_docs)
     if not docs:
@@ -156,11 +248,7 @@ def _evaluate_local_doclaynet(args: argparse.Namespace) -> List[Dict[str, Any]]:
         )
     logger.info(f"Running local DocLayNet evaluation: pages={len(docs)}")
 
-    # Lazy-load detector (avoids heavy imports if not needed)
     from models.detector import ClasswiseThresholdConfig, create_detector
-    from utils.config import load_config, get_classification_thresholds, get_ensemble_weights
-
-    cfg = load_config(getattr(args, 'config', None))
     threshold_config = ClasswiseThresholdConfig(
         table=args.model_confidence_threshold,
         figure=args.model_confidence_threshold,
@@ -179,102 +267,77 @@ def _evaluate_local_doclaynet(args: argparse.Namespace) -> List[Dict[str, Any]]:
             raise RuntimeError(f"Detector not ready: {err}")
         logger.warning(f"Detector not ready ({err}); detections will be empty.")
 
-    from pipeline.classification import classify_blocks
-    from pipeline.confidence import ensure_confidence_scores
-
-    results = []
+    results: List[Dict[str, Any]] = []
     for doc in docs:
-        img_path = doc.get("image_path", "")
+        image_path = doc.get("image_path", "")
         img_w = float(doc.get("image_width", 1025))
         img_h = float(doc.get("image_height", 1025))
         ground_truths = doc.get("ground_truths", [])
+        doc_id = doc.get("image_id", "")
 
-        # Read image bytes for detector
         try:
-            page_image_bytes = Path(img_path).read_bytes()
+            page_image_bytes = Path(image_path).read_bytes()
         except (FileNotFoundError, OSError) as exc:
-            logger.warning(f"Cannot read image {img_path}: {exc}")
-            page_image_bytes = b""
+            logger.warning(f"Cannot read image {image_path}: {exc}")
+            continue
 
         detections = detector.detect(page_image_bytes, img_w, img_h)
-
-        # Phase 5: OCR Fallback for image-only evaluation (DocLayNet PNGs)
-        # We must generate text blocks so the classifier has something to work with.
-        page_data = PageData(page_num=0, width=img_w, height=img_h)
-        ocr_spans = ocr_page(page_image_bytes, 0, img_w, img_h)
-        for span in ocr_spans:
-            page_data.add_span(span)
-        
-        layout_blocks, image_blocks = process_page_layout(page_data)
-
-        # Run classification stage
-        classified_blocks = classify_blocks(
-            layout_blocks=layout_blocks,
-            image_blocks=image_blocks,
-            detections=detections,
-            page_width=img_w,
-            page_height=img_h,
-            variant_mode="hybrid",  # default for the combined list
-            cfg=cfg,
+        results.extend(
+            _run_all_variants(page_image_bytes, img_w, img_h, detections, ground_truths, doc_id, image_path)
         )
-        validated = ensure_confidence_scores(classified_blocks)
-        predictions = _normalize_blocks(validated)
-
-        for variant in VARIANTS:
-            # Re-classify for each specific variant mode to get variant-specific results
-            variant_blocks = classify_blocks(
-                layout_blocks=layout_blocks,
-                image_blocks=image_blocks,
-                detections=detections,
-                page_width=img_w,
-                page_height=img_h,
-                variant_mode=variant,
-                cfg=cfg,
-            )
-            val_variant = ensure_confidence_scores(variant_blocks)
-            predictions = _normalize_blocks(val_variant)
-            
-            metrics = compute_map_at_thresholds(predictions, ground_truths)
-            results.append({
-                "doc_id": doc.get("image_id", ""),
-                "variant": variant,
-                "metrics": metrics,
-            })
 
     return results
 
 
 def _evaluate_hf_images(args: argparse.Namespace) -> List[Dict[str, Any]]:
-    if args.dataset == "doclaynet":
-        docs = load_doclaynet_hf(args.max_docs)
-        ds_id = HF_DOCLAYNET_DATASET_ID
-    else:
-        docs = load_hf_publaynet(args.max_docs)
-        ds_id = HF_PUBLAYNET_DATASET_ID
-
+    docs = load_doclaynet_hf(args.max_docs)
     if not docs:
-        raise RuntimeError(f"No documents loaded from {ds_id}")
-    logger.info(f"Running HF image evaluation on {ds_id}: docs={len(docs)}")
+        raise RuntimeError(f"No documents loaded from {HF_DOCLAYNET_DATASET_ID}")
+    logger.info(f"Running HF image evaluation on {HF_DOCLAYNET_DATASET_ID}: docs={len(docs)}")
+
+    from models.detector import ClasswiseThresholdConfig, create_detector
+    threshold_config = ClasswiseThresholdConfig(
+        table=args.model_confidence_threshold,
+        figure=args.model_confidence_threshold,
+        text=args.model_confidence_threshold,
+        header=args.model_confidence_threshold,
+        caption=args.model_confidence_threshold,
+    )
+    detector = create_detector(
+        detector_type=args.detector,
+        threshold_config=threshold_config,
+        doclaynet_confidence_threshold=args.doclaynet_confidence_threshold,
+    )
+    if not detector.is_ready():
+        err = detector.get_last_error() or "unknown"
+        if args.fail_on_detector_error:
+            raise RuntimeError(f"Detector not ready: {err}")
+        logger.warning(f"Detector not ready ({err}); detections will be empty.")
+
     results = []
     for doc in docs:
         image = doc.get("image")
         if image is None:
             raise RuntimeError("HF dataset item is missing the page image payload")
 
-        tmp_pdf = Path(args.output).parent / "_hf_tmp" / f"{doc['image_id']}.pdf"
-        tmp_pdf.parent.mkdir(parents=True, exist_ok=True)
-        # This mode remains a placeholder until PDF-backed evaluation is added.
         buf = io.BytesIO()
         image.save(buf, format="PNG")
-        for variant in VARIANTS:
-            metrics = compute_map_at_thresholds([], doc["ground_truths"])
-            results.append({"doc_id": doc.get("image_id", ""), "variant": variant, "metrics": metrics})
+        page_image_bytes = buf.getvalue()
+        img_w, img_h = float(image.size[0]), float(image.size[1])
+        doc_id = doc.get("image_id", "")
+        ground_truths = doc.get("ground_truths", [])
+
+        detections = detector.detect(page_image_bytes, img_w, img_h)
+        results.extend(
+            _run_all_variants(page_image_bytes, img_w, img_h, detections, ground_truths, doc_id, "")
+        )
+
     return results
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="DocStruct Evaluation Runner")
-    parser.add_argument("--eval-mode", choices=["local_pdf", "local_doclaynet", "hf_image"], default="local_pdf")
+    parser.add_argument("--eval-mode", choices=["local_doclaynet", "hf_image"], default="local_doclaynet")
     parser.add_argument("--data-dir", default="./data", help="Local dataset directory")
     parser.add_argument(
         "--detector",
@@ -282,22 +345,14 @@ def main() -> None:
         choices=["stub", "table_transformer", "doclaynet", "combined"],
         help="Detector backend to evaluate",
     )
-    parser.add_argument(
-        "--dataset",
-        choices=["publaynet", "doclaynet"],
-        default="publaynet",
-        help="HF dataset to use in hf_image mode",
-    )
     parser.add_argument("--max-docs", type=int, default=50)
     parser.add_argument("--output", default="results/benchmark.csv")
     parser.add_argument("--fail-on-detector-error", action="store_true")
-    parser.add_argument("--model-confidence-threshold", type=float, default=0.7)
-    parser.add_argument("--doclaynet-confidence-threshold", type=float, default=0.5)
+    parser.add_argument("--model-confidence-threshold", type=float, default=0.3)
+    parser.add_argument("--doclaynet-confidence-threshold", type=float, default=0.3)
     args = parser.parse_args()
 
-    if args.eval_mode == "local_pdf":
-        all_results = _evaluate_local_pdfs(args)
-    elif args.eval_mode == "local_doclaynet":
+    if args.eval_mode == "local_doclaynet":
         all_results = _evaluate_local_doclaynet(args)
     else:
         all_results = _evaluate_hf_images(args)
