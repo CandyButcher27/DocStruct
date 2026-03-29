@@ -1,363 +1,228 @@
-# DocStruct: True Hybrid PDF Structure Extraction
+# DocStruct
 
-**DocStruct** is a production-grade PDF understanding pipeline that implements a revolutionary `true hybrid` architecture. It combines:
-
-- **Model-Driven Detection**: Deep learning models (DocLayNet, Table Transformer) propose block regions
-- **Geometry Confirmation**: Geometric analysis confirms and boosts model predictions
-- **Gap-Filling**: Geometry-only blocks catch regions the model missed
-- **Tiered Confidence**: Final blocks scored by provenance (confirmed > model-only > geometry-only)
-
-This approach achieves **higher precision AND recall** compared to either pure geometry or pure model approaches.
+PDF document layout analysis pipeline. Extracts structured content (text, headers, tables, figures, captions) from PDFs using a **true hybrid** architecture that combines deep learning detection with geometry-based heuristics.
 
 ---
 
-## 🎯 Three Pipeline Modes
+## How It Works
 
-### 1. **Standard Mode** (`--mode standard`)
-Layout-first approach: geometry-based blocks classified by models.
-- **Variants**: `geometry`, `model`, `hybrid`
-- **Use case**: Quick processing, baseline comparison
+Three pipeline modes share the same output format but differ in how they combine geometry and model signals:
 
-### 2. **Model-First Mode** (`--mode model-first`)
-Detection-driven with OCR fallback: model detections refined by geometry.
-- **Detectors**: DocLayNet, Table Transformer, combined
-- **Use case**: Document-heavy domains, high confidence in detections
+| Mode | Description | When to use |
+|---|---|---|
+| `standard` | Geometry forms blocks → model classifies them | Baseline comparison |
+| `model-first` | Model detections drive block creation → geometry refines | High-confidence detection domains |
+| `true-hybrid` | Both sources generate proposals independently → IoU fusion | **Production (recommended)** |
 
-### 3. **True Hybrid Mode** (`--mode true-hybrid`) ⭐ **RECOMMENDED**
-Dual-source proposal matching with source-aware scoring.
-- **Proposals from**: Model detection + independent geometry analysis
-- **Fusion**: IoU-based matching (IoU ≥ 0.35)
-- **Classes**: Confirmed (0.85-1.0) | Model-only (0.40-0.85) | Geometry-only (0.25-0.65)
-- **Use case**: Maximum accuracy, production deployments
+### True-Hybrid Fusion
+
+```
+PDF → PageData (text spans)
+       ↓
+   Layout Extraction
+       ↓
+   Geometry Proposals ──┐
+   Model Detections ────┤  IoU match (≥ 0.35)
+                        ↓
+          Proposal Fusion
+        (confirmed / model_only / geo_only)
+                        ↓
+               NMS Deduplication
+                        ↓
+              Classification
+     (model + geometry + agreement scoring)
+                        ↓
+          Text Assignment (conditional)
+                        ↓
+        Reading Order + Refinement
+                        ↓
+                     JSON
+```
 
 ---
 
-## 🏗️ Architecture Overview
+## Quick Start
 
-```
-PDF Input
-    |
-    +---> Decomposition ---> PageData (spans, lines, images)
-    |
-    +---> Model Detection ---> Detection[] (bbox, type, confidence)
-    |           |
-    |           v
-    |     Model Proposals
-    |           |
-    +---> Geometry Proposals (independent)
-                |
-                v
-        Match & Fuse (IoU ≥ 0.35)
-                |
-    +-----------+-----------+
-    |           |           |
-Confirmed   Model-Only   Geo-Only
-(0.85-1.0)  (0.40-0.85)  (0.25-0.65)
-    |           |           |
-    +-----------+-----------+
-                |
-        NMS Deduplication
-                |
-        Reading Order & Output
-```
-
-### Key Stages
-
-| Stage | Input | Process | Output |
-|-------|-------|---------|--------|
-| **Decomposition** | PDF | Extract spans, lines, images | PageData |
-| **Geometry Proposals** | PageData | Text clustering, line analysis, image detection | RegionProposal[] |
-| **Model Detection** | Rendered page | DocLayNet/Table Transformer | Detection[] |
-| **Proposal Fusion** | Both proposal types | IoU-based matching | FusedProposal[] |
-| **Classification** | FusedProposal | Source-aware weights | Block (with confidence) |
-| **Deduplication** | Blocks | Priority-based NMS | Final blocks |
-| **Reading Order** | Blocks | Spatial y-sort, x-sort | Ordered blocks |
-| **Refinement** | Blocks | Table/figure post-processing | Refined blocks |
-| **Output** | Refined blocks | JSON serialization | Document.json |
-
----
-
-## 💡 Confidence Scoring
-
-Each block gets a **source-aware confidence score** reflecting how it was detected:
-
-### Confirmed (Model + Geometry Agree)
-```
-confidence = 0.85 + (0.10 * model_score) + (0.05 * iou)
-Range: 0.85 - 1.00
-Formula: 0.50*model + 0.30*rule + 0.20*geo (blended)
-```
-Highest confidence because both sources provide independent evidence.
-
-### Model-Only (Unconfirmed by Geometry)
-```
-confidence = model_score * 0.75 (bounded 0.40-0.85)
-Formula: 0.75*model + 0.15*rule + 0.10*geo
-```
-Medium confidence: model detected but no geometric support found.
-
-### Geometry-Only (Model Missed)
-```
-confidence = geometry_score * 0.60 (bounded 0.25-0.65)
-Formula: 0.00*model + 0.55*rule + 0.45*geo
-```
-Lower confidence: no model detection, geometry-driven classification.
-
----
-
-## 🚀 Quick Start
-
-### Installation
 ```bash
 pip install -r requirements.txt
-```
 
-### Basic Extraction
-```bash
-# Standard mode (default)
-python main.py documents/sample.pdf output.json
+# Process a PDF (true-hybrid, recommended)
+python main.py --mode true-hybrid --detector doclaynet documents/sample.pdf output.json
 
-# True Hybrid mode (RECOMMENDED)
-python main.py --mode true-hybrid --detector doclaynet documents/sample.pdf output.json --verbose
-```
-
-### Comparison Demo
-```bash
-# Generate all three for side-by-side comparison
-python main.py --mode standard --variant geometry documents/sample.pdf geo.json
-python main.py --mode standard --variant model documents/sample.pdf model.json --detector doclaynet
-python main.py --mode true-hybrid --detector doclaynet documents/sample.pdf hybrid.json
+# Compare all three modes
+python main.py --mode standard --variant geometry --detector stub documents/sample.pdf geo.json
+python main.py --mode standard --variant model   --detector doclaynet documents/sample.pdf model.json
+python main.py --mode true-hybrid                --detector doclaynet documents/sample.pdf hybrid.json
 ```
 
 ---
 
-## ⚙️ Configuration
+## Output Format
 
-Edit `config/defaults.yaml` to tune behavior:
-
-```yaml
-# Proposal matching thresholds
-hybrid_pipeline:
-  proposal_iou_threshold: 0.35  # Min IoU to match model+geo
-  nms_iou_threshold: 0.50       # NMS suppression threshold
-
-  # Source-specific confidence bounds
-  confirmed_floor: 0.70
-  model_only_floor: 0.40
-  geometry_only_floor: 0.25
-
-  # Weights (how to blend model/rule/geo scores)
-  weights:
-    confirmed:
-      model: 0.50
-      rule: 0.30
-      geo: 0.20
-    # ... etc
-```
-
----
-
-## 📊 Output Format
-
-Each block includes:
 ```json
 {
   "block_id": "uuid",
-  "block_type": "table | text | header | figure | caption",
-  "bbox": { "x0": 0, "y0": 0, "x1": 100, "y1": 50 },
-  "text": "extracted text",
+  "block_type": "text | header | table | figure | caption",
+  "bbox": { "x0": 66.8, "y0": 528.5, "x1": 395.6, "y1": 609.1 },
+  "text": "...",
   "confidence": {
-    "model_score": 0.9,
-    "rule_score": 0.6,
-    "geometric_score": 0.8,
-    "final_confidence": 0.92
+    "model_score": 0.91,
+    "rule_score": 0.72,
+    "geometric_score": 0.80,
+    "final_confidence": 0.85
   },
   "proposal_source": "confirmed | model_only | geometry_only",
-  "agreement_score": 0.85,
-  "has_model_support": true,
   "reading_order": 1
 }
 ```
 
+`bbox` uses PDF coordinate space: bottom-left origin, units in points.
+
 ---
 
-## 🧪 Testing
+## Benchmark Results
+
+Evaluated on DocLayNet v1.2 validation split (50 pages), detector = DocLayNet DETR, threshold = 0.3:
+
+| Variant | mAP@0.50 | mAP@0.75 | macro F1 | text F1 | table F1 | figure F1 |
+|---|---|---|---|---|---|---|
+| geometry | 0.028 | 0.009 | 0.021 | 0.050 | 0.000 | 0.000 |
+| **model** | **0.844** | **0.716** | **0.816** | **0.795** | **0.866** | **0.927** |
+| hybrid | 0.802 | 0.686 | 0.518 | 0.362 | 0.893 | 0.927 |
+
+Geometry near-zero is expected: DocLayNet images have no embedded text layer for OCR.
+Hybrid slightly below model-only because OCR geometry proposals add noise on image-only pages.
+
+Full benchmark (600 docs): `results/benchmark.csv`
+
+---
+
+## Evaluation
 
 ```bash
-# Run all hybrid pipeline tests
+# Download ground truth from HuggingFace (first time only)
+python scripts/download_doclaynet.py --out-dir ./data/doclaynet --split validation --max-docs 200
+
+# Run evaluation
+python -m evaluation.runner \
+  --eval-mode local_doclaynet \
+  --data-dir ./data/doclaynet \
+  --detector doclaynet \
+  --max-docs 50 \
+  --doclaynet-confidence-threshold 0.3 \
+  --output results/my_run.csv
+```
+
+Supported eval modes: `local_pdf`, `local_doclaynet`, `hf_image`
+
+---
+
+## Configuration
+
+All tunable parameters are in `config/defaults.yaml`:
+
+```yaml
+ensemble:
+  model_weight: 0.50
+  rule_weight:  0.30
+  geo_weight:   0.20
+
+classification_thresholds:
+  text:    0.30
+  header:  0.45
+  table:   0.50
+  figure:  0.40
+  caption: 0.40
+
+hybrid_pipeline:
+  proposal_iou_threshold: 0.35
+  nms_iou_threshold:      0.50
+  confirmed_floor:        0.70
+  model_only_floor:       0.40
+  geometry_only_floor:    0.25
+```
+
+---
+
+## Project Structure
+
+```
+DocStruct/
+├── main.py                        # Entry point (3 pipeline modes)
+├── visualize_overlay.py           # Render bbox overlays on PDF pages
+├── pipeline/
+│   ├── decomposition.py           # PDF → PageData (text spans, lines, images)
+│   ├── layout.py                  # Geometry-based block clustering
+│   ├── hybrid_proposals.py        # Independent geometry proposal generation
+│   ├── proposal_fusion.py         # IoU-based model+geometry fusion
+│   ├── classification.py          # Source-aware block classification
+│   ├── table_candidates.py        # Table candidate detection
+│   ├── tables_figures.py          # Table/figure post-processing
+│   ├── reading_order.py           # Spatial block ordering
+│   ├── confidence.py              # Confidence score post-processing
+│   └── validator.py               # Pydantic schema validation → JSON
+├── models/
+│   ├── detector.py                # Detector ABC + factory (create_detector)
+│   ├── doclaynet_detector.py      # DocLayNet DETR wrapper
+│   └── table_transformer.py       # Table Transformer wrapper
+├── schemas/
+│   ├── block.py                   # BoundingBox, ConfidenceBreakdown, Block
+│   ├── page.py                    # Page schema
+│   └── document.py                # Document schema
+├── utils/
+│   ├── geometry.py                # IoU, bbox merge, distance utilities
+│   ├── rendering.py               # PDF → PNG for model input
+│   ├── ocr.py                     # Tesseract OCR fallback
+│   ├── logging.py                 # Structured logging setup
+│   └── config.py                  # YAML config loader (cached)
+├── evaluation/
+│   ├── runner.py                  # Evaluation loop (3 modes)
+│   ├── ground_truth.py            # GT loaders (local JSONL, HuggingFace)
+│   └── metrics.py                 # mAP@0.50, mAP@0.75, per-class F1
+├── scripts/
+│   ├── download_doclaynet.py      # Download DocLayNet GT from HuggingFace
+│   └── prepare_publaynet_local_pdf.py
+├── tests/                         # pytest test suite
+├── config/
+│   └── defaults.yaml
+├── documents/                     # Sample PDFs for testing
+├── data/                          # Downloaded evaluation datasets
+├── results/                       # Benchmark CSV outputs
+└── hf_models/                     # Cached model configs
+```
+
+---
+
+## Testing
+
+```bash
+# Full test suite
+python -m pytest tests/ -v
+
+# Hybrid pipeline unit tests (18 tests)
 python -m pytest tests/test_hybrid_pipeline.py -v
 
-# 18 tests covering:
-# - Region proposal generation
-# - Type inference from text features
-# - IoU-based proposal matching
-# - Confidence scoring by source
-# - NMS deduplication
-# - Hybrid classification
+# Single module
+python -m pytest tests/test_classification.py -v
 ```
 
 ---
 
-## 🔧 Advanced Features
+## Detectors
 
-### OCR Fallback for Scanned Pages
-Automatically triggers when pages have images but sparse text (<5 text spans).
-```python
-from utils.ocr import is_scanned_page, ocr_page
+| Detector | Flag | Coverage | Notes |
+|---|---|---|---|
+| stub | `--detector stub` | None | Geometry-only baseline |
+| doclaynet | `--detector doclaynet` | All classes | Recommended |
+| table_transformer | `--detector table_transformer` | Tables only | Specialized |
+| combined | `--detector combined` | All + tables | Both models ensemble |
 
-if is_scanned_page(page_data):
-    ocr_spans = ocr_page(image_bytes, page_num, width, height)
-    # Use OCR results for text extraction
-```
-
-### Custom Detector
-```bash
-# Use combined detector (DocLayNet + Table Transformer)
-python main.py --mode true-hybrid --detector combined document.pdf output.json
-
-# Use Table Transformer only
-python main.py --mode true-hybrid --detector table_transformer document.pdf output.json
-```
-
-### Verbose Logging
-```bash
-python main.py --mode true-hybrid --detector doclaynet document.pdf output.json --verbose
-# Shows per-page proposal counts, fusion diagnostics, deduplication details
-```
+Models are downloaded on first use and cached in `hf_models/`.
 
 ---
 
-## 📈 Expected Performance
+## Notes
 
-| Metric | Geometry-Only | Model-Only | True Hybrid |
-|--------|---------------|-----------|-----------|
-| Precision | Medium | High | **Very High** |
-| Recall | High | Medium | **Very High** |
-| Table F1 | 0.65 | 0.75 | **0.85+** |
-| Text F1 | 0.80 | 0.82 | **0.88+** |
-| Blocks Extracted | Highest | Lowest | **Balanced** |
-
-*Estimates based on typical dense documents. Run evaluation on your domain for exact numbers.*
-
----
-
-## 🐛 Debugging
-
-### Check Proposal Matching
-Enable verbose mode to see fusion diagnostics:
-```bash
-python main.py --mode true-hybrid --detector doclaynet document.pdf output.json --verbose
-# Output: [Page 1] Fusion: confirmed=5, model_only=2, geo_only=3
-```
-
-### Inspect Confidence Breakdown
-Each block includes all scoring components:
-```python
-block["confidence"]["model_score"]      # Raw model confidence
-block["confidence"]["rule_score"]        # Heuristic-based score
-block["confidence"]["geometric_score"]   # Sanity check score
-block["confidence"]["final_confidence"]  # Weighted final score
-block["proposal_source"]                 # confirmed|model_only|geometry_only
-```
-
-### Compare Output Modes
-Use the CLI to generate all three variants:
-```bash
-python main.py --mode standard --variant geometry --detector stub doc.pdf geo.json
-python main.py --mode standard --variant model --detector doclaynet doc.pdf model.json
-python main.py --mode true-hybrid --detector doclaynet doc.pdf hybrid.json
-# Compare JSON files to see differences in block detection
-```
-
----
-
-## 📁 Project Structure
-
-```
-DocStruct_new/
-├── main.py                          # Entry point (3 modes)
-├── pipeline/
-│   ├── decomposition.py             # PDF → PageData
-│   ├── layout.py                    # Geometry-based blocks
-│   ├── hybrid_proposals.py           # Geometry proposal generation ⭐
-│   ├── proposal_fusion.py            # Model-geometry matching ⭐
-│   ├── classification.py             # Block type + scoring
-│   ├── confidence.py                 # Confidence post-processing
-│   ├── reading_order.py              # Spatial ordering
-│   └── validator.py                  # JSON schema validation
-├── models/
-│   ├── detector.py                  # Model abstraction
-│   ├── doclaynet_detector.py         # DocLayNet DETR
-│   └── table_transformer.py          # Table Transformer
-├── utils/
-│   ├── geometry.py                  # Bbox operations, IoU, merge
-│   ├── ocr.py                       # Tesseract fallback
-│   ├── rendering.py                 # PDF → PNG
-│   └── logging.py                   # Structured logging
-├── schemas/
-│   └── block.py                     # Pydantic models
-├── config/
-│   └── defaults.yaml                # All tunable parameters
-├── tests/
-│   └── test_hybrid_pipeline.py      # 18 unit tests ⭐
-└── requirements.txt
-```
-
----
-
-## 📚 Key Modules
-
-### `pipeline/hybrid_proposals.py` ⭐ NEW
-Generates geometry-based proposals independently:
-- Text clustering (from LayoutBlocks)
-- Line-bounded regions (ruling lines → tables)
-- Image regions (embedded images → figures)
-
-### `pipeline/proposal_fusion.py` ⭐ NEW
-Matches and fuses proposals:
-- IoU-based matching (≥ 0.35)
-- Confidence scoring by source
-- Priority-based NMS deduplication
-
-### `pipeline/classification.py` (Updated)
-Source-aware classification:
-- Different weights for confirmed vs unconfirmed
-- Confidence bounds by source type
-
----
-
-## 🎓 Research Notes
-
-The true hybrid approach addresses fundamental limitations:
-
-**Geometry-only**: High recall but misclassifies (text→table, caption→text)
-**Model-only**: Better classification but misses regions model wasn't trained on
-**True Hybrid**: Both sources propose independently → model confirms geometry + geometry fills model gaps
-
-This is analogous to how humans use both: visual scan (geometry) + semantic understanding (model).
-
----
-
-## 📞 Support
-
-For issues, consult:
-1. `config/defaults.yaml` - Tune thresholds
-2. `--verbose` flag - See per-page diagnostics
-3. Test suite - Run `pytest tests/test_hybrid_pipeline.py -v`
-4. JSON output - Check `proposal_source` and confidence breakdown
-
----
-
-## 📋 License & Citation
-
-If you use DocStruct in your research, please cite:
-```
-@software{docstruct2025,
-  title={DocStruct: True Hybrid PDF Understanding},
-  year={2025}
-}
-```
-
----
-
-**Last Updated**: March 2025 | **Status**: Production Ready
+- OCR fallback (pytesseract) activates on scanned pages — requires Tesseract binaries installed separately.
+- Coordinates use bottom-left origin (PDF space). All IoU/merge operations in `utils/geometry.py` assume this convention.
+- `load_doclaynet_hf` and `scripts/download_doclaynet.py` use `category_id` field (1-based) and `metadata.coco_height` from the `docling-project/DocLayNet-v1.2` HuggingFace dataset.
