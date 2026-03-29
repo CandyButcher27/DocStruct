@@ -34,6 +34,5 @@ check_*.py
 *.tmp
 *.bak
 *.txt
-!requirements.txt
-!README.md
-!cli-commands.md
+.claude
+CLaude.md
