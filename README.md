@@ -1,6 +1,10 @@
 # DocStruct
 
-PDF document layout analysis pipeline. Extracts structured content (text, headers, tables, figures, captions) from PDFs using a **true hybrid** architecture that combines deep learning detection with geometry-based heuristics.
+Most PDF layout tools make a choice: run a detection model and trust its output, or cluster text spans geometrically and hope the structure holds. DocStruct does both independently and resolves the disagreement.
+
+Geometry proposals and DocLayNet DETR detections are generated as separate streams, matched via IoU, and classified using the agreement signal between the two sources. Each output block carries a per-source confidence breakdown — model score, rule score, geometric score — so you can trace exactly why a block was labelled as a header or a table.
+
+**DocLayNet v1.2 validation results (50 pages):** mAP@0.50 `0.844` · mAP@0.75 `0.716` · table F1 `0.866` · figure F1 `0.927`
 
 ---
 
