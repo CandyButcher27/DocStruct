@@ -26,6 +26,15 @@ outputs/
 results/*.csv
 results/*.json
 
+# Data — generated outputs and large binaries
+data/raw-pdfs/
+data/hybrid-outputs/
+data/model-outputs/
+data/markdown-outputs/
+data/v1/
+data/*.json
+hf_models/
+
 # Temporary Diagnostic Scripts
 debug_*.py
 run_*.py
