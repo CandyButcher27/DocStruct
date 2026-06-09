@@ -40,14 +40,31 @@ def _group_by_page(proposals) -> Dict[int, list]:
     return grouped
 
 
+def _cached_detect(detect_fn, pdf_path: str, cache):
+    if cache is not None:
+        hit = cache.get(pdf_path)
+        if hit is not None:
+            return hit
+    proposals = detect_fn(pdf_path)
+    if cache is not None:
+        cache.set(pdf_path, proposals)
+    return proposals
+
+
 def run_pipeline(
     pdf_path: str,
     *,
     model_detector=None,
     weights: Optional[str] = None,
+    cache_dir: Optional[str] = None,
 ) -> PipelineResult:
     """Run the full pipeline on a single PDF."""
-    geometry_props = geometry_detector.detect(pdf_path)
+    geo_cache = None
+    if cache_dir:
+        from docstruct.cache.pdf_cache import ProposalCache
+
+        geo_cache = ProposalCache(cache_dir)
+    geometry_props = _cached_detect(geometry_detector.detect, pdf_path, geo_cache)
 
     model_props: list = []
     mode = "geometry-only"
@@ -57,7 +74,12 @@ def run_pipeline(
 
         detector = ModelDetector(weights)
     if detector is not None:
-        model_props = detector.detect(pdf_path)
+        model_cache = None
+        if cache_dir and weights:
+            from docstruct.cache.model_cache import ModelProposalCache
+
+            model_cache = ModelProposalCache(cache_dir, weights)
+        model_props = _cached_detect(detector.detect, pdf_path, model_cache)
         mode = "hybrid"
 
     geo_by_page = _group_by_page(geometry_props)

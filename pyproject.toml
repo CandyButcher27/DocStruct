@@ -46,6 +46,7 @@ Repository = "https://github.com/CandyButcher27/DocStruct"
 
 [tool.setuptools.packages.find]
 include = ["docstruct*"]
+exclude = ["tests*", "data*", "weights*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
