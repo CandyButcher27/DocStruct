@@ -185,7 +185,9 @@ def detect_page(page, page_num: int) -> List[Proposal]:
     def _in_table(bbox: BoundingBox) -> bool:
         return any(bbox_overlap(bbox, tb) > 0.5 for tb in table_boxes)
 
-    words = page.extract_words(extra_attrs=["fontname", "size"])
+    # Drop rotated/vertical text (e.g. arXiv sidebars); it is not reading flow.
+    upright_page = page.filter(lambda obj: obj.get("upright", True))
+    words = upright_page.extract_words(extra_attrs=["fontname", "size"])
     lines = _group_words_into_lines(words)
     lines = [l for l in lines if not _in_table(_to_bbox(l.x0, l.top, l.x1, l.bottom, page))]
 

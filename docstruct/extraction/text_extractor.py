@@ -17,7 +17,9 @@ def _crop(page, bbox: BoundingBox):
     bottom = min(page.height, bbox.y1)
     if x1 <= x0 or bottom <= top:
         return None
-    return page.crop((x0, top, x1, bottom))
+    region = page.crop((x0, top, x1, bottom))
+    # Exclude rotated/vertical glyphs so margin text doesn't pollute block text.
+    return region.filter(lambda obj: obj.get("upright", True))
 
 
 def extract_text(page, bbox: BoundingBox) -> str:
