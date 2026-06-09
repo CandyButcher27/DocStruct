@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "docstruct"
+version = "0.2.0"
+description = "Local, deterministic, structure-aware PDF chunking pipeline for RAG"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Aryaman Srivastava" }]
+keywords = ["pdf", "rag", "layout-analysis", "chunking", "document-ai", "retrieval"]
+classifiers = [
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Text Processing :: Indexing",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+dependencies = [
+    "pdfplumber>=0.11",
+    "numpy>=1.26",
+]
+
+[project.optional-dependencies]
+model = ["ultralytics>=8.0"]
+retrieval = ["chromadb>=0.5", "sentence-transformers>=3.0"]
+viz = ["pymupdf>=1.24"]
+eval = ["groq>=0.11"]
+dev = ["pytest>=8.0"]
+all = [
+    "ultralytics>=8.0",
+    "chromadb>=0.5",
+    "sentence-transformers>=3.0",
+    "pymupdf>=1.24",
+    "groq>=0.11",
+    "pytest>=8.0",
+]
+
+[project.scripts]
+docstruct = "docstruct.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/CandyButcher27/DocStruct"
+Repository = "https://github.com/CandyButcher27/DocStruct"
+
+[tool.setuptools.packages.find]
+include = ["docstruct*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
