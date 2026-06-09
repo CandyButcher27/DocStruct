@@ -50,3 +50,6 @@ CLaude.md
 *.egg-info/
 build/
 dist/
+
+# Model weights (download separately)
+weights/
