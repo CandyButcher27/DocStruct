@@ -37,8 +37,14 @@ LINE_Y_TOLERANCE = 3.0          # words within this vertical gap share a line
 PARAGRAPH_GAP_FACTOR = 1.6      # line gap > factor * line_height breaks a block
 HEADER_SIZE_RATIO = 1.15        # font size > ratio * body median => header
 HEADER_MAX_LINES = 3            # headers are short
+HEADER_BOLD_BONUS = 0.05        # confidence bump for bold headers
+GEOMETRY_CONFIDENCE_CEIL = 0.95
 FIGURE_MIN_AREA_RATIO = 0.03    # graphic cluster must cover >= this of page area
+FIGURE_CLUSTER_GAP = 10.0       # merge graphic primitives within this gap
+FIGURE_MAX_TEXT_OVERLAP = 0.10  # graphic cluster must be mostly text-free
 TABLE_MIN_ROWS = 2
+# Universal caption markers in prose documents (not a layout assumption).
+CAPTION_PREFIX_PATTERN = r"^\s*(figure|fig\.?|table|tab\.?|scheme|algorithm)\s*\.?\s*\d+"
 
 GEOMETRY_CONFIDENCE = {
     "text": 0.70,
