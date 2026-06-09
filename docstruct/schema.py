@@ -84,6 +84,7 @@ class Block:
     caption_target_id: str | None = None
     text: str | None = None
     table_data: list[list[str]] | None = None
+    font_size: float | None = None
 
 
 @dataclass
