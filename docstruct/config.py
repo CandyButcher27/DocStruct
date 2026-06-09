@@ -37,6 +37,9 @@ LINE_Y_TOLERANCE = 3.0          # words within this vertical gap share a line
 PARAGRAPH_GAP_FACTOR = 1.6      # line gap > factor * line_height breaks a block
 HEADER_SIZE_RATIO = 1.15        # font size > ratio * body median => header
 HEADER_MAX_LINES = 3            # headers are short
+HEADER_MAX_WORDS = 12           # a short all-bold line also counts as a header
+# Font-weight markers that signal emphasis (headers), beyond plain "bold".
+BOLD_FONT_MARKERS = ("bold", "black", "heavy", "semibold", "medium", "-medi")
 HEADER_BOLD_BONUS = 0.05        # confidence bump for bold headers
 GEOMETRY_CONFIDENCE_CEIL = 0.95
 FIGURE_MIN_AREA_RATIO = 0.03    # graphic cluster must cover >= this of page area
@@ -57,6 +60,25 @@ GEOMETRY_CONFIDENCE = {
 # --- Chunking ---
 MAX_CHUNK_TOKENS = 400
 HEADER_LEVELS = 3
+
+# --- Model detector (optional, YOLOv8 / DocLayNet) ---
+MODEL_WEIGHTS = None            # path or ultralytics-resolvable name; set to enable
+MODEL_DPI = 150                 # page render resolution for inference
+MODEL_CONF_THRESHOLD = 0.25
+# DocLayNet (11 classes) -> the 5 DocStruct labels. Keyed by lowercased class name.
+DOCLAYNET_LABEL_MAP = {
+    "caption": "caption",
+    "footnote": "text",
+    "formula": "text",
+    "list-item": "text",
+    "page-footer": "text",
+    "page-header": "text",
+    "section-header": "header",
+    "title": "header",
+    "table": "table",
+    "text": "text",
+    "picture": "figure",
+}
 
 # --- Indexing / retrieval ---
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"

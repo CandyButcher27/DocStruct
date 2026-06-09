@@ -51,7 +51,10 @@ def _group_words_into_lines(words: List[Dict[str, Any]]) -> List[_Line]:
     for group in lines:
         group.sort(key=lambda w: w["x0"])
         sizes = [w.get("size", 0.0) for w in group if w.get("size")]
-        bolds = [("bold" in (w.get("fontname", "") or "").lower()) for w in group]
+        bolds = [
+            any(m in (w.get("fontname", "") or "").lower() for m in config.BOLD_FONT_MARKERS)
+            for w in group
+        ]
         result.append(
             _Line(
                 words=group,
@@ -93,6 +96,13 @@ def _split_columns(lines: List[_Line], page_width: float) -> List[List[_Line]]:
 
 def _line_kind(line: _Line, body_median: float) -> str:
     if body_median > 0 and line.size > body_median * config.HEADER_SIZE_RATIO:
+        return "header"
+    # A short, fully-bold line at body size is a numbered/styled section header.
+    if (
+        line.bold
+        and len(line.words) <= config.HEADER_MAX_WORDS
+        and (body_median == 0 or line.size >= body_median)
+    ):
         return "header"
     return "body"
 
