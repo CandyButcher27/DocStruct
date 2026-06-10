@@ -26,13 +26,33 @@ outputs/
 results/*.csv
 results/*.json
 
-# Temporary Diagnostic Scripts
-debug_*.py
-run_*.py
-test_*.py
-check_*.py
+# Data — generated outputs and large binaries
+data/raw-pdfs/
+data/hybrid-outputs/
+data/model-outputs/
+data/markdown-outputs/
+data/v1/
+data/*.json
+hf_models/
+
+# Temporary Diagnostic Scripts (repo root only — keep tests/ tracked)
+/debug_*.py
+/run_*.py
+/test_*.py
+/check_*.py
+/_*.py
 *.tmp
 *.bak
-*.txt
 .claude
 CLaude.md
+
+# Packaging artifacts
+*.egg-info/
+build/
+dist/
+
+# Model weights (download separately)
+weights/
+
+# Annotation review sessions (bulky, embedded page images; final GT JSON is tracked)
+data/annotations/_sessions/

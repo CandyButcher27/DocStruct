@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>DocStruct annotation review</title>
+<style>
+  :root {
+    --text: #1f77b4; --header: #d62728; --table: #2ca02c;
+    --figure: #9467bd; --caption: #ff7f0e;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 13px/1.4 system-ui, sans-serif; background: #1e1e1e; color: #ddd; }
+  #bar {
+    position: sticky; top: 0; z-index: 10; display: flex; flex-wrap: wrap;
+    gap: 10px; align-items: center; padding: 8px 12px; background: #2b2b2b;
+    border-bottom: 1px solid #444;
+  }
+  #bar button, #bar label.file {
+    background: #3a3a3a; color: #eee; border: 1px solid #555; border-radius: 4px;
+    padding: 4px 9px; cursor: pointer;
+  }
+  #bar button:hover { background: #484848; }
+  #bar .sep { width: 1px; height: 20px; background: #555; }
+  .legend { display: flex; gap: 6px; }
+  .chip {
+    padding: 3px 8px; border-radius: 4px; cursor: pointer; border: 2px solid transparent;
+    color: #fff; font-weight: 600; user-select: none;
+  }
+  .chip.active { border-color: #fff; }
+  #info { color: #aaa; }
+  #stage { padding: 16px; overflow: auto; }
+  #wrap { position: relative; display: inline-block; box-shadow: 0 0 0 1px #000; }
+  #wrap img { display: block; }
+  .box {
+    position: absolute; border: 2px solid; cursor: move; background: rgba(0,0,0,0.02);
+  }
+  .box .tag {
+    position: absolute; top: -16px; left: -2px; font-size: 10px; font-weight: 700;
+    color: #fff; padding: 0 4px; white-space: nowrap;
+  }
+  .box.sel { border-style: solid; box-shadow: 0 0 0 1px #fff inset; }
+  .handle {
+    position: absolute; right: -5px; bottom: -5px; width: 11px; height: 11px;
+    background: #fff; border: 1px solid #000; cursor: nwse-resize;
+  }
+  #hint { color: #888; padding: 0 16px 16px; }
+  kbd { background:#3a3a3a; border:1px solid #555; border-radius:3px; padding:0 4px; }
+</style>
+</head>
+<body>
+<div id="bar">
+  <label class="file">Load session<input id="load" type="file" accept=".json" hidden /></label>
+  <span class="sep"></span>
+  <button id="prev">◀ Prev</button>
+  <span id="pageind">— / —</span>
+  <button id="next">Next ▶</button>
+  <span class="sep"></span>
+  <button id="zout">−</button><span id="zoom">100%</span><button id="zin">+</button>
+  <span class="sep"></span>
+  <button id="mode">Mode: Select</button>
+  <div class="legend" id="legend"></div>
+  <span class="sep"></span>
+  <span id="info">no session</span>
+  <button id="save">⤓ Download GT JSON</button>
+</div>
+<div id="hint">
+  Click a box to select. Drag body to move, corner to resize. Keys
+  <kbd>1</kbd>text <kbd>2</kbd>header <kbd>3</kbd>table <kbd>4</kbd>figure
+  <kbd>5</kbd>caption to relabel, <kbd>Del</kbd> to delete, <kbd>a</kbd> toggle Add,
+  <kbd>←</kbd>/<kbd>→</kbd> pages. In Add mode drag on the page to draw a new box.
+</div>
+<div id="stage"><div id="wrap"></div></div>
+
+<script>
+const LABELS = ["text","header","table","figure","caption"];
+const COLORS = {text:"#1f77b4",header:"#d62728",table:"#2ca02c",figure:"#9467bd",caption:"#ff7f0e"};
+
+let session = null, scale = 1, page = 0, zoom = 1;
+let boxes = [];           // {id,label,page_num,x0,y0,x1,y1,pw,ph} in PDF points
+let active = "text", mode = "select", selId = null, uid = 1;
+
+const $ = id => document.getElementById(id);
+const wrap = $("wrap");
+
+function buildLegend() {
+  const el = $("legend"); el.innerHTML = "";
+  LABELS.forEach((l, i) => {
+    const c = document.createElement("span");
+    c.className = "chip" + (l === active ? " active" : "");
+    c.style.background = COLORS[l];
+    c.textContent = `${i+1} ${l}`;
+    c.onclick = () => { active = l; if (selId) { boxAt(selId).label = l; } render(); };
+    el.appendChild(c);
+  });
+}
+const boxAt = id => boxes.find(b => b.id === id);
+const onPage = () => boxes.filter(b => b.page_num === page);
+const f = scale; // unused alias guard
+
+function px(ptVal) { return ptVal * scale * zoom; }
+function pt(pxVal) { return pxVal / (scale * zoom); }
+
+function loadSession(obj) {
+  session = obj;
+  scale = obj.dpi / 72;
+  page = 0; zoom = 1; selId = null; uid = 1;
+  boxes = (obj.boxes || []).map(b => ({
+    id: uid++, label: b.label, page_num: b.page_num,
+    x0: b.bbox[0], y0: b.bbox[1], x1: b.bbox[2], y1: b.bbox[3],
+    pw: b.bbox[4], ph: b.bbox[5],
+  }));
+  render();
+}
+
+function render() {
+  if (!session) return;
+  const p = session.pages[page];
+  wrap.innerHTML = "";
+  const img = document.createElement("img");
+  img.src = p.image;
+  img.style.width = px(p.width_pt) + "px";
+  img.style.height = px(p.height_pt) + "px";
+  img.draggable = false;
+  wrap.appendChild(img);
+
+  onPage().forEach(b => wrap.appendChild(boxEl(b)));
+
+  $("pageind").textContent = `${page + 1} / ${session.pages.length}`;
+  $("zoom").textContent = Math.round(zoom * 100) + "%";
+  $("mode").textContent = "Mode: " + (mode === "add" ? "Add" : "Select");
+  $("info").textContent = `${session.doc} — ${boxes.length} boxes`;
+  buildLegend();
+}
+
+function boxEl(b) {
+  const d = document.createElement("div");
+  d.className = "box" + (b.id === selId ? " sel" : "");
+  d.style.borderColor = COLORS[b.label] || "#888";
+  d.style.left = px(b.x0) + "px";
+  d.style.top = px(b.y0) + "px";
+  d.style.width = px(b.x1 - b.x0) + "px";
+  d.style.height = px(b.y1 - b.y0) + "px";
+  const tag = document.createElement("div");
+  tag.className = "tag"; tag.style.background = COLORS[b.label] || "#888";
+  tag.textContent = b.label; d.appendChild(tag);
+  if (b.id === selId) {
+    const h = document.createElement("div"); h.className = "handle";
+    h.addEventListener("mousedown", e => startResize(e, b)); d.appendChild(h);
+  }
+  d.addEventListener("mousedown", e => startMove(e, b));
+  return d;
+}
+
+let drag = null; // {type, b, ox, oy} or {type:'create', x0,y0}
+
+function localXY(e) {
+  const r = wrap.getBoundingClientRect();
+  return [pt(e.clientX - r.left), pt(e.clientY - r.top)];
+}
+
+function startMove(e, b) {
+  e.stopPropagation();
+  selId = b.id; active = b.label;
+  const [mx, my] = localXY(e);
+  drag = { type: "move", b, dx: mx - b.x0, dy: my - b.y0 };
+  render();
+}
+function startResize(e, b) {
+  e.stopPropagation(); selId = b.id;
+  drag = { type: "resize", b };
+  render();
+}
+wrap.addEventListener("mousedown", e => {
+  if (mode !== "add") { selId = null; render(); return; }
+  const [x, y] = localXY(e);
+  const b = { id: uid++, label: active, page_num: page, x0: x, y0: y, x1: x, y1: y,
+              pw: session.pages[page].width_pt, ph: session.pages[page].height_pt };
+  boxes.push(b); selId = b.id; drag = { type: "create", b }; render();
+});
+
+document.addEventListener("mousemove", e => {
+  if (!drag) return;
+  const [x, y] = localXY(e);
+  const b = drag.b;
+  if (drag.type === "move") {
+    const w = b.x1 - b.x0, h = b.y1 - b.y0;
+    b.x0 = x - drag.dx; b.y0 = y - drag.dy; b.x1 = b.x0 + w; b.y1 = b.y0 + h;
+  } else { // resize or create
+    b.x1 = Math.max(b.x0, x); b.y1 = Math.max(b.y0, y);
+  }
+  render();
+});
+document.addEventListener("mouseup", () => {
+  if (drag && drag.type === "create") {
+    const b = drag.b;
+    if (px(b.x1 - b.x0) < 5 || px(b.y1 - b.y0) < 5) {
+      boxes = boxes.filter(x => x.id !== b.id); selId = null;
+    }
+  }
+  drag = null; render();
+});
+
+document.addEventListener("keydown", e => {
+  if (e.target.tagName === "INPUT") return;
+  if (e.key >= "1" && e.key <= "5") {
+    active = LABELS[+e.key - 1];
+    if (selId) boxAt(selId).label = active;
+    render();
+  } else if (e.key === "Delete" || e.key === "Backspace") {
+    if (selId) { boxes = boxes.filter(b => b.id !== selId); selId = null; render(); }
+  } else if (e.key === "a") { mode = mode === "add" ? "select" : "add"; render(); }
+  else if (e.key === "ArrowLeft") { if (page > 0) { page--; selId = null; render(); } }
+  else if (e.key === "ArrowRight") {
+    if (session && page < session.pages.length - 1) { page++; selId = null; render(); }
+  }
+});
+
+$("prev").onclick = () => { if (page > 0) { page--; selId = null; render(); } };
+$("next").onclick = () => { if (session && page < session.pages.length - 1) { page++; selId = null; render(); } };
+$("zin").onclick = () => { zoom = Math.min(2, zoom + 0.1); render(); };
+$("zout").onclick = () => { zoom = Math.max(0.4, zoom - 0.1); render(); };
+$("mode").onclick = () => { mode = mode === "add" ? "select" : "add"; render(); };
+
+$("load").onchange = e => {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = () => loadSession(JSON.parse(r.result));
+  r.readAsText(file);
+};
+
+$("save").onclick = () => {
+  if (!session) return;
+  const out = {
+    boxes: boxes.map(b => ({
+      label: b.label, page_num: b.page_num,
+      bbox: [Math.round(b.x0), Math.round(b.y0), Math.round(b.x1), Math.round(b.y1),
+             Math.round(b.pw), Math.round(b.ph)],
+    })),
+  };
+  const blob = new Blob([JSON.stringify(out, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = (session.doc || "doc").replace(/\.pdf$/i, "") + ".json";
+  a.click();
+};
+
+buildLegend();
+</script>
+</body>
+</html>

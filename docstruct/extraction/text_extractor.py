@@ -1,0 +1,58 @@
+"""Fill block text (and header font size) by cropping the source PDF."""
+
+from __future__ import annotations
+
+import statistics
+from typing import Dict, List
+
+import pdfplumber
+
+from docstruct.schema import Block, BoundingBox
+
+
+def _crop(page, bbox: BoundingBox):
+    x0 = max(0, bbox.x0)
+    top = max(0, bbox.y0)
+    x1 = min(page.width, bbox.x1)
+    bottom = min(page.height, bbox.y1)
+    if x1 <= x0 or bottom <= top:
+        return None
+    region = page.crop((x0, top, x1, bottom))
+    # Exclude rotated/vertical glyphs so margin text doesn't pollute block text.
+    return region.filter(lambda obj: obj.get("upright", True))
+
+
+def extract_text(page, bbox: BoundingBox) -> str:
+    """Extract text contained in a bbox on a pdfplumber page."""
+    region = _crop(page, bbox)
+    if region is None:
+        return ""
+    return (region.extract_text() or "").strip()
+
+
+def median_font_size(page, bbox: BoundingBox) -> float | None:
+    """Median character size inside a bbox, used to rank header levels."""
+    region = _crop(page, bbox)
+    if region is None:
+        return None
+    sizes = [c.get("size") for c in region.chars if c.get("size")]
+    return round(statistics.median(sizes), 2) if sizes else None
+
+
+def populate_text(pdf_path: str, blocks: List[Block]) -> List[Block]:
+    """Set ``text`` on text-bearing blocks and ``font_size`` on headers, in place."""
+    by_page: Dict[int, List[Block]] = {}
+    for block in blocks:
+        by_page.setdefault(block.page_num, []).append(block)
+
+    with pdfplumber.open(pdf_path) as pdf:
+        for page_num, page_blocks in by_page.items():
+            if page_num >= len(pdf.pages):
+                continue
+            page = pdf.pages[page_num]
+            for block in page_blocks:
+                if block.label in ("text", "header", "caption"):
+                    block.text = extract_text(page, block.bbox)
+                if block.label == "header":
+                    block.font_size = median_font_size(page, block.bbox)
+    return blocks
