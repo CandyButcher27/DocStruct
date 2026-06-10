@@ -53,3 +53,6 @@ dist/
 
 # Model weights (download separately)
 weights/
+
+# Annotation review sessions (bulky, embedded page images; final GT JSON is tracked)
+data/annotations/_sessions/

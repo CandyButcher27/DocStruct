@@ -81,6 +81,18 @@ def _cmd_visualize(args) -> int:
     return 0
 
 
+def _cmd_export_annotations(args) -> int:
+    from docstruct.eval.annotate import export_annotation_session
+
+    out, n_boxes, n_pages = export_annotation_session(
+        args.pdf, args.out, weights=args.weights, dpi=args.dpi
+    )
+    print(f"wrote draft session -> {out} ({n_boxes} boxes, {n_pages} pages)")
+    print("Open tools/annotate.html in a browser, load this file, correct the "
+          "boxes, and download the ground-truth JSON to data/annotations/.")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="docstruct",
@@ -116,6 +128,16 @@ def build_parser() -> argparse.ArgumentParser:
     v_p.add_argument("--weights", default=None)
     v_p.add_argument("--cache-dir", default=None)
     v_p.set_defaults(func=_cmd_visualize)
+
+    e_p = sub.add_parser(
+        "export-annotations",
+        help="Export a model-assisted annotation session for tools/annotate.html",
+    )
+    e_p.add_argument("pdf", help="path to a born-digital PDF")
+    e_p.add_argument("--out", required=True, help="session JSON output path")
+    e_p.add_argument("--weights", default=None, help="weights for hybrid pre-fill")
+    e_p.add_argument("--dpi", type=int, default=110, help="page render DPI for the UI")
+    e_p.set_defaults(func=_cmd_export_annotations)
 
     return parser
 
