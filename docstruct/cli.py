@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import dataclasses
 import json
+import os
 import sys
 from typing import Optional, Sequence
 
@@ -93,6 +94,52 @@ def _cmd_export_annotations(args) -> int:
     return 0
 
 
+def _cmd_gen_qa(args) -> int:
+    from docstruct.llm.client import LLMClient
+    from docstruct.eval.qa_generator import generate_for_pdf, save_qa
+
+    client = LLMClient(model=args.model) if args.model else LLMClient()
+    print(f"generating Q&A with model '{client.model}' ...")
+    all_items = []
+    for pdf in args.pdfs:
+        items = generate_for_pdf(pdf, client, weights=args.weights, n=args.per_doc)
+        print(f"  {pdf}: {len(items)} questions")
+        all_items.extend(items)
+    save_qa(all_items, args.out)
+    print(f"wrote {len(all_items)} Q&A items -> {args.out}")
+    return 0
+
+
+def _cmd_benchmark(args) -> int:
+    import glob as _glob
+
+    from docstruct.eval.adapters import get_adapters, _ALL
+    from docstruct.eval.benchmark import run_benchmark
+    from docstruct.eval.qa_generator import load_qa
+    from docstruct.eval.report import now_iso, write_report
+
+    qa = load_qa(args.qa)
+    pdfs = sorted(_glob.glob(os.path.join(args.pdfs_dir, "*.pdf")))
+    names = args.tools.split(",") if args.tools else None
+    adapters = get_adapters(names, weights=args.weights)
+    skipped = [n for n in (names or _ALL) if n not in adapters]
+    print(f"tools: {list(adapters)}  skipped: {skipped}")
+
+    results = run_benchmark(adapters, pdfs, qa, top_k=args.top_k)
+    meta = {
+        "timestamp": now_iso(),
+        "n_docs": len({q.source_doc for q in qa}),
+        "n_questions": len(qa),
+        "llm_model": args.model or "gpt-oss:120b",
+        "skipped": skipped,
+    }
+    write_report(results, meta, args.report_md, args.report_json)
+    print(f"\nwrote report -> {args.report_md}")
+    for i, r in enumerate(results, 1):
+        print(f"  {i}. {r.name:14} MRR={r.mrr}  NDCG={r.ndcg}  Recall={r.recall}  Hit@1={r.hit1}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="docstruct",
@@ -138,6 +185,25 @@ def build_parser() -> argparse.ArgumentParser:
     e_p.add_argument("--weights", default=None, help="weights for hybrid pre-fill")
     e_p.add_argument("--dpi", type=int, default=110, help="page render DPI for the UI")
     e_p.set_defaults(func=_cmd_export_annotations)
+
+    g_p = sub.add_parser("gen-qa", help="Generate LLM Q&A gold for benchmarking")
+    g_p.add_argument("pdfs", nargs="+", help="PDF paths")
+    g_p.add_argument("--out", required=True, help="output Q&A JSON path")
+    g_p.add_argument("--weights", default=None, help="weights for hybrid chunking")
+    g_p.add_argument("--per-doc", type=int, default=5, help="questions per document")
+    g_p.add_argument("--model", default=None, help="LLM model id (default gpt-oss:120b)")
+    g_p.set_defaults(func=_cmd_gen_qa)
+
+    b_p = sub.add_parser("benchmark", help="Run the cross-tool retrieval benchmark")
+    b_p.add_argument("--pdfs-dir", required=True, help="directory of PDFs")
+    b_p.add_argument("--qa", required=True, help="Q&A JSON from gen-qa")
+    b_p.add_argument("--report-md", default="reports/baseline_report.md")
+    b_p.add_argument("--report-json", default="reports/baseline_results.json")
+    b_p.add_argument("--tools", default=None, help="comma list (default: all available)")
+    b_p.add_argument("--weights", default=None, help="weights for the DocStruct adapter")
+    b_p.add_argument("--top-k", type=int, default=5)
+    b_p.add_argument("--model", default=None, help="LLM model id used (recorded in report)")
+    b_p.set_defaults(func=_cmd_benchmark)
 
     return parser
 
