@@ -84,3 +84,12 @@ DOCLAYNET_LABEL_MAP = {
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 COLLECTION_NAME = "docstruct"
 RETRIEVAL_TOP_K = 5
+
+# --- LLM (eval-only: Q&A generation + optional judge; never in the pipeline) ---
+LLM_MODEL = "gpt-oss:120b"      # Ollama cloud, open-weights; override via DOCSTRUCT_LLM_MODEL
+LLM_TIMEOUT = 120.0
+
+# --- Benchmark / eval ---
+QA_PER_DOC = 5                  # questions generated per document
+BENCHMARK_TOP_K = 5
+RELEVANCE_MIN_OVERLAP = 0.6     # token-overlap fallback when answer span isn't an exact substring
