@@ -60,7 +60,7 @@ def _cmd_query(args) -> int:
     from docstruct.query.retriever import Retriever
 
     where = {"h1": args.h1} if args.h1 else None
-    retriever = Retriever(VectorStore(persist_dir=args.db))
+    retriever = Retriever(VectorStore(persist_dir=args.db), hybrid=args.hybrid)
     results = retriever.retrieve(args.text, top_k=args.top_k, where=where)
     if not results:
         print("no results")
@@ -166,7 +166,8 @@ def build_parser() -> argparse.ArgumentParser:
     q_p.add_argument("text", help="query string")
     q_p.add_argument("--db", required=True, help="Chroma persist directory")
     q_p.add_argument("--top-k", type=int, default=5)
-    q_p.add_argument("--h1", default=None, help="filter to a top-level section")
+    q_p.add_argument("--h1", default=None, help="filter to a top-level section (dense mode)")
+    q_p.add_argument("--hybrid", action="store_true", help="dense + BM25 fused by RRF")
     q_p.set_defaults(func=_cmd_query)
 
     v_p = sub.add_parser("visualize", help="Render an annotated PDF of detected blocks")
