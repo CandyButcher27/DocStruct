@@ -96,17 +96,27 @@ def _cmd_export_annotations(args) -> int:
 
 def _cmd_gen_qa(args) -> int:
     from docstruct.llm.client import LLMClient
-    from docstruct.eval.qa_generator import generate_for_pdf, save_qa
+    from docstruct.eval.qa_generator import generate_for_pdf, save_qa, load_qa
 
     client = LLMClient(model=args.model) if args.model else LLMClient()
-    print(f"generating Q&A with model '{client.model}' ...")
-    all_items = []
+    print(f"generating Q&A with model '{client.model}' ...", flush=True)
+
+    # Resume: keep questions already saved, skip documents already done.
+    all_items = load_qa(args.out) if os.path.exists(args.out) else []
+    done = {it.source_doc for it in all_items}
+    if done:
+        print(f"resuming: {len(all_items)} items for {len(done)} docs already on disk", flush=True)
+
     for pdf in args.pdfs:
+        if os.path.basename(pdf) in done:
+            print(f"  {pdf}: skip (already done)", flush=True)
+            continue
         items = generate_for_pdf(pdf, client, weights=args.weights, n=args.per_doc, cache_dir=args.cache_dir)
-        print(f"  {pdf}: {len(items)} questions")
         all_items.extend(items)
-    save_qa(all_items, args.out)
-    print(f"wrote {len(all_items)} Q&A items -> {args.out}")
+        save_qa(all_items, args.out)  # incremental: survive interruptions
+        print(f"  {pdf}: {len(items)} questions (total {len(all_items)})", flush=True)
+
+    print(f"wrote {len(all_items)} Q&A items -> {args.out}", flush=True)
     return 0
 
 
