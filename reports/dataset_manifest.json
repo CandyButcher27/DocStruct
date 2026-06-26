@@ -1,0 +1,170 @@
+[
+  {
+    "file": "doc25.pdf",
+    "category": "cs.CL",
+    "arxiv_id": "2606.27377v1",
+    "title": "DanceOPD: On-Policy Generative Field Distillation",
+    "pdf_url": "https://arxiv.org/pdf/2606.27377v1"
+  },
+  {
+    "file": "doc26.pdf",
+    "category": "cs.CL",
+    "arxiv_id": "2606.27347v1",
+    "title": "Mapping Political-Elite Networks in Europe with a Multilingual Joint Entity-Relation Extraction Pipeline",
+    "pdf_url": "https://arxiv.org/pdf/2606.27347v1"
+  },
+  {
+    "file": "doc27.pdf",
+    "category": "cs.CL",
+    "arxiv_id": "2606.27330v1",
+    "title": "Empowering GUI Agents via Autonomous Experience Exploration and Hindsight Experience Utilization for Task Planning",
+    "pdf_url": "https://arxiv.org/pdf/2606.27330v1"
+  },
+  {
+    "file": "doc28.pdf",
+    "category": "cs.CL",
+    "arxiv_id": "2606.27316v1",
+    "title": "LLM-Based Examination of Eligibility Criteria from Securities Prospectuses at the German Central Bank",
+    "pdf_url": "https://arxiv.org/pdf/2606.27316v1"
+  },
+  {
+    "file": "doc29.pdf",
+    "category": "cs.CL",
+    "arxiv_id": "2606.27314v1",
+    "title": "Beyond Surface Forms: A Comprehensive, Mechanism-Oriented Taxonomy of Indirect Linguistic Encoding for LLM-Based Coded Language Detection",
+    "pdf_url": "https://arxiv.org/pdf/2606.27314v1"
+  },
+  {
+    "file": "doc30.pdf",
+    "category": "cs.CL",
+    "arxiv_id": "2606.27306v1",
+    "title": "Multilingual Reasoning Cascades Need More Context",
+    "pdf_url": "https://arxiv.org/pdf/2606.27306v1"
+  },
+  {
+    "file": "doc32.pdf",
+    "category": "cs.LG",
+    "arxiv_id": "2606.27369v1",
+    "title": "Reinforcement Learning without Ground-Truth Solutions can Improve LLMs",
+    "pdf_url": "https://arxiv.org/pdf/2606.27369v1"
+  },
+  {
+    "file": "doc33.pdf",
+    "category": "cs.LG",
+    "arxiv_id": "2606.27361v1",
+    "title": "Autoregressive Boltzmann Generators",
+    "pdf_url": "https://arxiv.org/pdf/2606.27361v1"
+  },
+  {
+    "file": "doc34.pdf",
+    "category": "cs.LG",
+    "arxiv_id": "2606.27359v1",
+    "title": "When are likely answers right? On Sequence Probability and Correctness in LLMs",
+    "pdf_url": "https://arxiv.org/pdf/2606.27359v1"
+  },
+  {
+    "file": "doc35.pdf",
+    "category": "cs.LG",
+    "arxiv_id": "2606.27354v1",
+    "title": "Error-Conditioned Neural Solvers",
+    "pdf_url": "https://arxiv.org/pdf/2606.27354v1"
+  },
+  {
+    "file": "doc37.pdf",
+    "category": "stat.ML",
+    "arxiv_id": "2606.27349v1",
+    "title": "All you need is log",
+    "pdf_url": "https://arxiv.org/pdf/2606.27349v1"
+  },
+  {
+    "file": "doc38.pdf",
+    "category": "stat.ML",
+    "arxiv_id": "2606.27298v1",
+    "title": "Fast algorithms for learning a Gaussian under halfspace truncation with optimal sample complexity",
+    "pdf_url": "https://arxiv.org/pdf/2606.27298v1"
+  },
+  {
+    "file": "doc39.pdf",
+    "category": "stat.ML",
+    "arxiv_id": "2606.27269v1",
+    "title": "Ribbon: Scalable Approximation and Robust Uncertainty Quantification",
+    "pdf_url": "https://arxiv.org/pdf/2606.27269v1"
+  },
+  {
+    "file": "doc40.pdf",
+    "category": "q-bio.NC",
+    "arxiv_id": "2606.26733v1",
+    "title": "Surviving by Serving: Functional Relevance Drives Self-Organization in Complex Adaptive Systems",
+    "pdf_url": "https://arxiv.org/pdf/2606.26733v1"
+  },
+  {
+    "file": "doc41.pdf",
+    "category": "q-bio.NC",
+    "arxiv_id": "2606.26448v1",
+    "title": "Closing the Loop to Discover Psychological Theories with an Automated Cognitive Scientist",
+    "pdf_url": "https://arxiv.org/pdf/2606.26448v1"
+  },
+  {
+    "file": "doc42.pdf",
+    "category": "q-bio.NC",
+    "arxiv_id": "2606.26279v1",
+    "title": "Beyond Single-Source Cognitive Taskonomy:Multi-Source Task Relations through fMRI Transfer Learning",
+    "pdf_url": "https://arxiv.org/pdf/2606.26279v1"
+  },
+  {
+    "file": "doc43.pdf",
+    "category": "q-bio.NC",
+    "arxiv_id": "2606.25874v1",
+    "title": "Topology-Dependent Emergence of Polychronous Neuronal Groups: A Recurrence-Plot Characterization",
+    "pdf_url": "https://arxiv.org/pdf/2606.25874v1"
+  },
+  {
+    "file": "doc44.pdf",
+    "category": "econ.EM",
+    "arxiv_id": "2606.26432v1",
+    "title": "Embedding Foundation Model Predictions in Discrete-Choice Models with Structural Guarantees",
+    "pdf_url": "https://arxiv.org/pdf/2606.26432v1"
+  },
+  {
+    "file": "doc45.pdf",
+    "category": "econ.EM",
+    "arxiv_id": "2606.25688v1",
+    "title": "Choosing What to Calibrate and What to Estimate in Structural Models",
+    "pdf_url": "https://arxiv.org/pdf/2606.25688v1"
+  },
+  {
+    "file": "doc46.pdf",
+    "category": "econ.EM",
+    "arxiv_id": "2606.25292v1",
+    "title": "Time-Varying Model Averaging of Multi-layer Network Vector Autoregressions",
+    "pdf_url": "https://arxiv.org/pdf/2606.25292v1"
+  },
+  {
+    "file": "doc47.pdf",
+    "category": "econ.EM",
+    "arxiv_id": "2606.24867v1",
+    "title": "Bounds for Standard Errors in Combined Data",
+    "pdf_url": "https://arxiv.org/pdf/2606.24867v1"
+  },
+  {
+    "file": "doc48.pdf",
+    "category": "math.OC",
+    "arxiv_id": "2606.27312v1",
+    "title": "A Verification Theorem for an Optimal Control Problem Governed by the Convective Brinkman--Forchheimer Equations",
+    "pdf_url": "https://arxiv.org/pdf/2606.27312v1"
+  },
+  {
+    "file": "doc49.pdf",
+    "category": "math.OC",
+    "arxiv_id": "2606.27260v1",
+    "title": "Conjecture About Arbitrary Even-Order Convexity of $w$-Optimization of the Split CIF",
+    "pdf_url": "https://arxiv.org/pdf/2606.27260v1"
+  },
+  {
+    "file": "doc50.pdf",
+    "category": "math.OC",
+    "arxiv_id": "2606.27217v1",
+    "title": "CHAMB-GA: A Containerized HPC Scalable Microservice-Based Framework for Genetic Algorithms",
+    "pdf_url": "https://arxiv.org/pdf/2606.27217v1"
+  }
+]
