@@ -1,9 +1,9 @@
 """Evaluation harness tying the pipeline to the metrics.
 
 Layer 1 (detection) compares fused blocks against ground-truth boxes loaded from
-a simple JSON format. Layer 2 (retrieval) runs question/answer cases against an
-index and reports MRR / NDCG@k. A convenience routine indexes both DocStruct and
-naive baseline chunks to quantify the structure-aware advantage.
+a simple JSON format. Layer 2 (retrieval) runs (question, relevant_ids) cases
+against a DocStruct index and reports MRR / NDCG@k. Cross-tool comparison lives
+in :mod:`docstruct.eval.benchmark` (tool-agnostic, answer-span relevance).
 
 Ground-truth JSON format (one file per document)::
 
@@ -18,7 +18,7 @@ from dataclasses import dataclass
 from typing import Dict, List, Sequence, Tuple
 
 from docstruct import config
-from docstruct.schema import BoundingBox, Chunk
+from docstruct.schema import BoundingBox
 from docstruct.eval import metrics
 
 
@@ -77,26 +77,3 @@ def evaluate_retrieval(
         f"ndcg@{top_k}": metrics.mean_ndcg_at_k(ranked_cases, top_k),
         "n_cases": len(ranked_cases),
     }
-
-
-def compare_chunking(
-    docstruct_chunks: List[Chunk],
-    naive_chunks: List[Chunk],
-    cases: Sequence[Tuple[str, Sequence[str]]],
-    top_k: int = config.RETRIEVAL_TOP_K,
-) -> Dict[str, Dict[str, float]]:
-    """Index both chunk sets in fresh collections and compare retrieval quality.
-
-    Relevant ids in ``cases`` must reference DocStruct chunk ids; the naive run
-    is scored on whether retrieved naive chunks textually contain the relevant
-    DocStruct chunk content (mapping happens in the caller's cases for naive).
-    """
-    from docstruct.indexing.vector_store import VectorStore
-    from docstruct.query.retriever import Retriever
-
-    out: Dict[str, Dict[str, float]] = {}
-    for name, chunks in (("docstruct", docstruct_chunks), ("naive", naive_chunks)):
-        store = VectorStore(collection_name=f"eval_{name}")
-        store.index(chunks)
-        out[name] = evaluate_retrieval(Retriever(store), cases, top_k=top_k)
-    return out
