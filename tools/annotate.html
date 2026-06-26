@@ -79,8 +79,43 @@ let session = null, scale = 1, page = 0, zoom = 1;
 let boxes = [];           // {id,label,page_num,x0,y0,x1,y1,pw,ph} in PDF points
 let active = "text", mode = "select", selId = null, uid = 1;
 
+function autosaveKey() { return session ? "docstruct_annot_" + session.doc : null; }
+function autosave() {
+  const k = autosaveKey(); if (!k) return;
+  localStorage.setItem(k, JSON.stringify({ boxes, uid }));
+  $("info").textContent = `${session.doc} — ${boxes.length} boxes (autosaved)`;
+}
+function loadAutosave() {
+  const k = autosaveKey(); if (!k) return false;
+  const raw = localStorage.getItem(k); if (!raw) return false;
+  const saved = JSON.parse(raw);
+  boxes = saved.boxes; uid = saved.uid;
+  return true;
+}
+
 const $ = id => document.getElementById(id);
 const wrap = $("wrap");
+const PRIORITY = {table:5, figure:4, caption:3, header:2, text:1};
+
+function containmentCleanup() {
+  const pageBoxes = onPage();
+  const toDelete = new Set();
+  for (let i = 0; i < pageBoxes.length; i++) {
+    for (let j = 0; j < pageBoxes.length; j++) {
+      if (i === j || toDelete.has(pageBoxes[i].id)) continue;
+      const a = pageBoxes[i], b = pageBoxes[j];
+      const ix0 = Math.max(a.x0,b.x0), iy0 = Math.max(a.y0,b.y0);
+      const ix1 = Math.min(a.x1,b.x1), iy1 = Math.min(a.y1,b.y1);
+      if (ix1 <= ix0 || iy1 <= iy0) continue;
+      const inter = (ix1-ix0)*(iy1-iy0);
+      const bArea = (b.x1-b.x0)*(b.y1-b.y0);
+      if (bArea <= 0) continue;
+      if (inter/bArea > 0.8 && (PRIORITY[a.label]||1) >= (PRIORITY[b.label]||1))
+        toDelete.add(b.id);
+    }
+  }
+  if (toDelete.size) boxes = boxes.filter(b => !toDelete.has(b.id));
+}
 
 function buildLegend() {
   const el = $("legend"); el.innerHTML = "";
@@ -109,10 +144,13 @@ function loadSession(obj) {
     x0: b.bbox[0], y0: b.bbox[1], x1: b.bbox[2], y1: b.bbox[3],
     pw: b.bbox[4], ph: b.bbox[5],
   }));
-  render();
+  if (loadAutosave()) {
+    $("info").textContent = `${session.doc} — restored from autosave`;
+  }
+  render(true);
 }
 
-function render() {
+function render(skipAutosave) {
   if (!session) return;
   const p = session.pages[page];
   wrap.innerHTML = "";
@@ -130,6 +168,7 @@ function render() {
   $("mode").textContent = "Mode: " + (mode === "add" ? "Add" : "Select");
   $("info").textContent = `${session.doc} — ${boxes.length} boxes`;
   buildLegend();
+  if (!skipAutosave) autosave();
 }
 
 function boxEl(b) {
@@ -195,7 +234,11 @@ document.addEventListener("mouseup", () => {
     const b = drag.b;
     if (px(b.x1 - b.x0) < 5 || px(b.y1 - b.y0) < 5) {
       boxes = boxes.filter(x => x.id !== b.id); selId = null;
+    } else {
+      containmentCleanup();
     }
+  } else if (drag) {
+    containmentCleanup();
   }
   drag = null; render();
 });
@@ -242,6 +285,7 @@ $("save").onclick = () => {
   a.href = URL.createObjectURL(blob);
   a.download = (session.doc || "doc").replace(/\.pdf$/i, "") + ".json";
   a.click();
+  const k = autosaveKey(); if (k) localStorage.removeItem(k);
 };
 
 buildLegend();
