@@ -93,3 +93,6 @@ LLM_TIMEOUT = 120.0
 QA_PER_DOC = 5                  # questions generated per document
 BENCHMARK_TOP_K = 5
 RELEVANCE_MIN_OVERLAP = 0.6     # token-overlap fallback when answer span isn't an exact substring
+# Hybrid retrieval (BM25 lexical + dense vector, fused by Reciprocal Rank Fusion)
+RRF_K = 60                      # standard RRF constant
+BM25_CANDIDATES = 20            # candidate pool per retriever before fusion

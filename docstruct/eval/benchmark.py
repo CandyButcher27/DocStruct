@@ -5,6 +5,12 @@ tool and each document: chunk the PDF, index those chunks (shared embedder), run
 that document's questions, and score by answer-span containment. Per-document
 indexing isolates chunking quality from cross-document confusion.
 
+Two retrievers are scored side by side, identical for every tool:
+- **vector** — dense cosine search (sentence-transformers).
+- **hybrid** — dense + BM25 lexical, fused by Reciprocal Rank Fusion (RRF), the
+  ``RAG_Fundamentals`` "two indexes + merge" recipe. Lexical recall catches exact
+  terms, symbols and citations that embeddings miss.
+
 Metrics per tool (averaged over all questions): MRR, NDCG@k, Recall@k, Hit@1.
 """
 
@@ -28,10 +34,16 @@ logger = logging.getLogger(__name__)
 @dataclass
 class ToolResult:
     name: str
+    # primary = hybrid retriever
     mrr: float = 0.0
     ndcg: float = 0.0
     recall: float = 0.0
     hit1: float = 0.0
+    # vector-only retriever (for the hybrid-lift comparison)
+    vec_mrr: float = 0.0
+    vec_ndcg: float = 0.0
+    vec_recall: float = 0.0
+    vec_hit1: float = 0.0
     n_questions: int = 0
     n_chunks: int = 0
     mean_chunk_words: float = 0.0
@@ -53,6 +65,15 @@ def _score(retrieved_texts: List[str], answer_span: str, k: int):
     return rr, hit1, recall, ndcg
 
 
+def _rrf(rank_lists: List[List[int]], k: int = config.RRF_K) -> List[int]:
+    """Reciprocal Rank Fusion of several ranked index lists."""
+    score: Dict[int, float] = {}
+    for lst in rank_lists:
+        for pos, idx in enumerate(lst):
+            score[idx] = score.get(idx, 0.0) + 1.0 / (k + pos + 1)
+    return sorted(score, key=lambda i: score[i], reverse=True)
+
+
 def _qa_by_doc(qa: List[QAItem]) -> Dict[str, List[QAItem]]:
     out: Dict[str, List[QAItem]] = {}
     for item in qa:
@@ -68,12 +89,16 @@ def benchmark_tool(
     top_k: int = config.BENCHMARK_TOP_K,
 ) -> ToolResult:
     """Benchmark one tool across all documents that have questions."""
+    from rank_bm25 import BM25Okapi
+
     from docstruct.indexing.vector_store import VectorStore
 
     by_doc = _qa_by_doc(qa)
     result = ToolResult(name=adapter.name)
-    rr_sum = hit_sum = rec_sum = ndcg_sum = 0.0
+    v = [0.0, 0.0, 0.0, 0.0]  # rr, hit, recall, ndcg (vector)
+    h = [0.0, 0.0, 0.0, 0.0]  # rr, hit, recall, ndcg (hybrid)
     total_words = 0
+    candidates = max(top_k * 4, config.BM25_CANDIDATES)
 
     for doc_idx, pdf in enumerate(pdf_paths):
         doc_id = os.path.basename(pdf)
@@ -94,37 +119,41 @@ def benchmark_tool(
         if not chunks:
             result.errors += 1
             continue
+        texts = [c.text for c in chunks]
         result.n_chunks += len(chunks)
-        total_words += sum(len(c.text.split()) for c in chunks)
+        total_words += sum(len(t.split()) for t in texts)
 
         store = VectorStore(collection_name=f"bench_{adapter.name}_{doc_idx}", embedder=embedder)
         store.collection.add(
-            ids=[c.id for c in chunks],
-            documents=[c.text for c in chunks],
-            embeddings=embedder.encode([c.text for c in chunks], show_progress_bar=False).tolist(),
+            ids=[str(i) for i in range(len(texts))],
+            documents=texts,
+            embeddings=embedder.encode(texts, show_progress_bar=False).tolist(),
         )
+        bm25 = BM25Okapi([t.lower().split() for t in texts])
 
         t1 = time.perf_counter()
         for case in cases:
-            res = store.collection.query(
-                query_embeddings=embedder.encode([case.question], show_progress_bar=False).tolist(),
-                n_results=min(top_k, len(chunks)),
-            )
-            texts = res.get("documents", [[]])[0]
-            rr, hit1, recall, ndcg = _score(texts, case.answer_span, top_k)
-            rr_sum += rr; hit_sum += hit1; rec_sum += recall; ndcg_sum += ndcg
+            qv = embedder.encode([case.question], show_progress_bar=False).tolist()
+            res = store.collection.query(query_embeddings=qv, n_results=min(candidates, len(texts)))
+            vec_order = [int(i) for i in res.get("ids", [[]])[0]]
+            scores = bm25.get_scores(case.question.lower().split())
+            bm_order = sorted(range(len(texts)), key=lambda i: scores[i], reverse=True)[:candidates]
+            hyb_order = _rrf([vec_order, bm_order])[:top_k]
+
+            vr = _score([texts[i] for i in vec_order[:top_k]], case.answer_span, top_k)
+            hr = _score([texts[i] for i in hyb_order], case.answer_span, top_k)
+            for i in range(4):
+                v[i] += vr[i]; h[i] += hr[i]
             result.n_questions += 1
             result.per_question.append(
-                {"doc": doc_id, "question": case.question, "rr": round(rr, 4),
-                 "hit1": hit1, "recall": recall, "ndcg": round(ndcg, 4)}
+                {"doc": doc_id, "question": case.question,
+                 "vec_rr": round(vr[0], 4), "hyb_rr": round(hr[0], 4)}
             )
         result.eval_seconds += time.perf_counter() - t1
 
     n = max(result.n_questions, 1)
-    result.mrr = round(rr_sum / n, 4)
-    result.hit1 = round(hit_sum / n, 4)
-    result.recall = round(rec_sum / n, 4)
-    result.ndcg = round(ndcg_sum / n, 4)
+    result.mrr, result.hit1, result.recall, result.ndcg = (round(h[0] / n, 4), round(h[1] / n, 4), round(h[2] / n, 4), round(h[3] / n, 4))
+    result.vec_mrr, result.vec_hit1, result.vec_recall, result.vec_ndcg = (round(v[0] / n, 4), round(v[1] / n, 4), round(v[2] / n, 4), round(v[3] / n, 4))
     result.mean_chunk_words = round(total_words / max(result.n_chunks, 1), 1)
     result.chunk_seconds = round(result.chunk_seconds, 2)
     result.eval_seconds = round(result.eval_seconds, 2)
@@ -137,7 +166,7 @@ def run_benchmark(
     qa: List[QAItem],
     top_k: int = config.BENCHMARK_TOP_K,
 ) -> List[ToolResult]:
-    """Benchmark every adapter, ranked by MRR. Embedder loaded once and shared."""
+    """Benchmark every adapter, ranked by hybrid MRR. Embedder loaded once."""
     from sentence_transformers import SentenceTransformer
 
     embedder = SentenceTransformer(config.EMBEDDING_MODEL)

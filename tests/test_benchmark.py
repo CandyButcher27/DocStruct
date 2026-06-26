@@ -1,6 +1,6 @@
 import math
 
-from docstruct.eval.benchmark import _score, _qa_by_doc, ToolResult
+from docstruct.eval.benchmark import _score, _qa_by_doc, _rrf, ToolResult
 from docstruct.eval.qa_generator import QAItem
 
 
@@ -45,4 +45,15 @@ def test_qa_by_doc_groups():
 
 def test_toolresult_defaults():
     r = ToolResult(name="x")
-    assert r.mrr == 0.0 and r.n_questions == 0
+    assert r.mrr == 0.0 and r.vec_mrr == 0.0 and r.n_questions == 0
+
+
+def test_rrf_rewards_agreement():
+    # index 2 is top in both lists -> fused winner; 0 and 1 trail
+    fused = _rrf([[2, 0, 1], [2, 1, 0]])
+    assert fused[0] == 2
+    assert set(fused) == {0, 1, 2}
+
+
+def test_rrf_single_list_preserves_order():
+    assert _rrf([[3, 1, 2]]) == [3, 1, 2]
