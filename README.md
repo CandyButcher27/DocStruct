@@ -91,7 +91,8 @@ docstruct run paper.pdf --weights weights/yolov8m-doclaynet.pt --json chunks.jso
 # Index a corpus and query it with section citations
 docstruct index a.pdf b.pdf --db .chroma --weights weights/yolov8m-doclaynet.pt
 docstruct query "what baseline did they compare against?" --db .chroma --top-k 5
-docstruct query "results" --db .chroma --h1 "4. Experiments"   # filtered
+docstruct query "results" --db .chroma --h1 "4. Experiments"   # section-filtered (dense)
+docstruct query "BM25-XR-7 ablation" --db .chroma --hybrid     # dense + BM25 (RRF)
 
 # Annotated overlay for inspection / figures
 docstruct visualize paper.pdf --out annotated.pdf --weights weights/yolov8m-doclaynet.pt
