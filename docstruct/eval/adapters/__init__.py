@@ -17,9 +17,11 @@ from docstruct.eval.adapters.pymupdf4llm_adapter import PyMuPDF4LLMAdapter
 _ALL = ["docstruct", "langchain", "pymupdf4llm", "unstructured", "docling"]
 
 
-def build_adapter(name: str, weights: Optional[str] = None) -> ChunkAdapter:
+def build_adapter(
+    name: str, weights: Optional[str] = None, cache_dir: Optional[str] = None
+) -> ChunkAdapter:
     if name == "docstruct":
-        return DocStructAdapter(weights=weights)
+        return DocStructAdapter(weights=weights, cache_dir=cache_dir)
     if name == "langchain":
         return LangChainAdapter()
     if name == "pymupdf4llm":
@@ -34,13 +36,15 @@ def build_adapter(name: str, weights: Optional[str] = None) -> ChunkAdapter:
 
 
 def get_adapters(
-    names: Optional[List[str]] = None, weights: Optional[str] = None
+    names: Optional[List[str]] = None,
+    weights: Optional[str] = None,
+    cache_dir: Optional[str] = None,
 ) -> Dict[str, ChunkAdapter]:
     """Return {name: adapter} for requested adapters whose deps are available."""
     out: Dict[str, ChunkAdapter] = {}
     for name in names or _ALL:
         try:
-            adapter = build_adapter(name, weights=weights)
+            adapter = build_adapter(name, weights=weights, cache_dir=cache_dir)
         except Exception:  # noqa: BLE001 - missing optional adapter module
             continue
         if adapter.available():

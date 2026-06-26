@@ -101,11 +101,12 @@ def generate_for_pdf(
     client,
     weights: Optional[str] = None,
     n: int = config.QA_PER_DOC,
+    cache_dir: Optional[str] = None,
 ) -> List[QAItem]:
     """Run the pipeline on a PDF and generate QA items from its chunks."""
     from docstruct.pipeline import run_pipeline
 
-    result = run_pipeline(pdf_path, weights=weights)
+    result = run_pipeline(pdf_path, weights=weights, cache_dir=cache_dir)
     return generate_for_chunks(result.chunks, os.path.basename(pdf_path), client, n)
 
 

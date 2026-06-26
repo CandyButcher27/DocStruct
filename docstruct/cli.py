@@ -102,7 +102,7 @@ def _cmd_gen_qa(args) -> int:
     print(f"generating Q&A with model '{client.model}' ...")
     all_items = []
     for pdf in args.pdfs:
-        items = generate_for_pdf(pdf, client, weights=args.weights, n=args.per_doc)
+        items = generate_for_pdf(pdf, client, weights=args.weights, n=args.per_doc, cache_dir=args.cache_dir)
         print(f"  {pdf}: {len(items)} questions")
         all_items.extend(items)
     save_qa(all_items, args.out)
@@ -121,7 +121,7 @@ def _cmd_benchmark(args) -> int:
     qa = load_qa(args.qa)
     pdfs = sorted(_glob.glob(os.path.join(args.pdfs_dir, "*.pdf")))
     names = args.tools.split(",") if args.tools else None
-    adapters = get_adapters(names, weights=args.weights)
+    adapters = get_adapters(names, weights=args.weights, cache_dir=args.cache_dir)
     skipped = [n for n in (names or _ALL) if n not in adapters]
     print(f"tools: {list(adapters)}  skipped: {skipped}")
 
@@ -192,6 +192,7 @@ def build_parser() -> argparse.ArgumentParser:
     g_p.add_argument("--weights", default=None, help="weights for hybrid chunking")
     g_p.add_argument("--per-doc", type=int, default=5, help="questions per document")
     g_p.add_argument("--model", default=None, help="LLM model id (default gpt-oss:120b)")
+    g_p.add_argument("--cache-dir", default=None, help="cache detector proposals (reused by benchmark)")
     g_p.set_defaults(func=_cmd_gen_qa)
 
     b_p = sub.add_parser("benchmark", help="Run the cross-tool retrieval benchmark")
@@ -203,6 +204,7 @@ def build_parser() -> argparse.ArgumentParser:
     b_p.add_argument("--weights", default=None, help="weights for the DocStruct adapter")
     b_p.add_argument("--top-k", type=int, default=5)
     b_p.add_argument("--model", default=None, help="LLM model id used (recorded in report)")
+    b_p.add_argument("--cache-dir", default=None, help="reuse cached detector proposals from gen-qa")
     b_p.set_defaults(func=_cmd_benchmark)
 
     return parser
