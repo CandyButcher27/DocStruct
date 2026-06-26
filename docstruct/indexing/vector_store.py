@@ -36,9 +36,9 @@ class VectorStore:
         persist_dir: Optional[str] = None,
         collection_name: str = config.COLLECTION_NAME,
         embedding_model: str = config.EMBEDDING_MODEL,
+        embedder=None,
     ) -> None:
         import chromadb
-        from sentence_transformers import SentenceTransformer
 
         self.client = (
             chromadb.PersistentClient(path=persist_dir)
@@ -48,7 +48,12 @@ class VectorStore:
         self.collection = self.client.get_or_create_collection(
             collection_name, metadata={"hnsw:space": "cosine"}
         )
-        self.embedder = SentenceTransformer(embedding_model)
+        if embedder is not None:  # reuse a shared model (e.g. across a benchmark)
+            self.embedder = embedder
+        else:
+            from sentence_transformers import SentenceTransformer
+
+            self.embedder = SentenceTransformer(embedding_model)
 
     def index(self, chunks: List[Chunk], doc_id: Optional[str] = None) -> int:
         """Embed and add chunks; returns the number indexed."""
