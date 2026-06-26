@@ -27,6 +27,8 @@ model = ["ultralytics>=8.0"]
 retrieval = ["chromadb>=0.5", "sentence-transformers>=3.0"]
 viz = ["pymupdf>=1.24"]
 eval = ["groq>=0.11"]
+benchmark = ["langchain-text-splitters>=0.3", "pymupdf4llm>=0.0.17"]
+benchmark-heavy = ["unstructured[pdf]>=0.15", "docling>=2.0"]
 dev = ["pytest>=8.0"]
 all = [
     "ultralytics>=8.0",
@@ -34,6 +36,8 @@ all = [
     "sentence-transformers>=3.0",
     "pymupdf>=1.24",
     "groq>=0.11",
+    "langchain-text-splitters>=0.3",
+    "pymupdf4llm>=0.0.17",
     "pytest>=8.0",
 ]
 
