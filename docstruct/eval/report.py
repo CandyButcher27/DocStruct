@@ -29,6 +29,26 @@ def _table(results: List[ToolResult]) -> List[str]:
     return rows
 
 
+def _per_doc_table(result: ToolResult) -> List[str]:
+    """Per-doc breakdown for one tool, sorted worst MRR first."""
+    if not result.per_doc:
+        return []
+    rows = [
+        f"### Per-doc breakdown: {result.name} (worst first)",
+        "",
+        "| Doc | Q | Chunks | Avg words | MRR | Recall@5 | Hit@1 | Hits |",
+        "|---|---|---|---|---|---|---|---|",
+    ]
+    for d in sorted(result.per_doc, key=lambda x: x["mrr"]):
+        flag = " ⚠" if d["mrr"] == 0.0 else ""
+        rows.append(
+            f"| {d['doc']}{flag} | {d['n_questions']} | {d['n_chunks']} | "
+            f"{d['avg_words_per_chunk']} | {d['mrr']} | {d['recall']} | "
+            f"{d['hit1']} | {d['hits']}/{d['n_questions']} |"
+        )
+    return rows
+
+
 def render_markdown(results: List[ToolResult], meta: Dict) -> str:
     lines = [
         "# DocStruct retrieval baseline report",
@@ -78,6 +98,9 @@ def render_markdown(results: List[ToolResult], meta: Dict) -> str:
         "- This is a **signal/baseline**, not the Phase-2 public benchmark (50 PDFs, 200 human-checked Q&A).",
         "",
     ]
+    for r in results:
+        if r.per_doc:
+            lines += ["", *_per_doc_table(r), ""]
     return "\n".join(lines)
 
 

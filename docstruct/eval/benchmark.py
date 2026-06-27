@@ -52,6 +52,7 @@ class ToolResult:
     eval_seconds: float = 0.0
     errors: int = 0
     per_question: List[dict] = field(default_factory=list)
+    per_doc: List[dict] = field(default_factory=list)
 
 
 def _score(retrieved_texts: List[str], answer_span: str, k: int):
@@ -137,6 +138,7 @@ def benchmark_tool(
         result.chunk_seconds = ckpt["chunk_seconds"]
         result.eval_seconds = ckpt["eval_seconds"]
         result.per_question = ckpt["per_question"]
+        result.per_doc = ckpt.get("per_doc", [])
         result.n_questions = len(result.per_question)
         done_docs = set(ckpt["done_docs"])
         print(f"  [{adapter.name}] resuming: {len(done_docs)}/{n_total} docs already done", flush=True)
@@ -189,6 +191,7 @@ def benchmark_tool(
 
         t1 = time.perf_counter()
         doc_hits = 0
+        doc_rr = 0.0; doc_recall = 0.0; doc_hit1 = 0.0
         for case in cases:
             qv = embedder.encode([case.question], show_progress_bar=False).tolist()
             res = store.collection.query(query_embeddings=qv, n_results=min(candidates, len(texts)))
@@ -203,6 +206,7 @@ def benchmark_tool(
                 v[i] += vr[i]; h[i] += hr[i]
             result.n_questions += 1
             doc_hits += int(hr[2] > 0)
+            doc_rr += hr[0]; doc_recall += hr[2]; doc_hit1 += hr[1]
             result.per_question.append(
                 {"doc": doc_id, "question": case.question,
                  "vec_rr": round(vr[0], 4), "hyb_rr": round(hr[0], 4)}
@@ -211,10 +215,24 @@ def benchmark_tool(
         result.eval_seconds += eval_t
         done_docs.add(doc_id)
 
+        n_q = max(len(cases), 1)
+        doc_avg_words = round(sum(len(t.split()) for t in texts) / max(len(chunks), 1), 1)
+        doc_stat = {
+            "doc": doc_id,
+            "n_questions": len(cases),
+            "n_chunks": len(chunks),
+            "avg_words_per_chunk": doc_avg_words,
+            "mrr": round(doc_rr / n_q, 4),
+            "recall": round(doc_recall / n_q, 4),
+            "hit1": round(doc_hit1 / n_q, 4),
+            "hits": doc_hits,
+        }
+        result.per_doc.append(doc_stat)
+
         running_mrr = round(h[0] / max(result.n_questions, 1), 4)
         print(
             f"  [{adapter.name}] {doc_id}: {doc_hits}/{len(cases)} hits  "
-            f"running MRR={running_mrr}  ({eval_t:.1f}s)",
+            f"MRR={doc_stat['mrr']}  running_MRR={running_mrr}  ({eval_t:.1f}s)",
             flush=True,
         )
 
@@ -222,7 +240,8 @@ def benchmark_tool(
             "v": v, "h": h, "total_words": total_words,
             "n_chunks": result.n_chunks, "errors": result.errors,
             "chunk_seconds": result.chunk_seconds, "eval_seconds": result.eval_seconds,
-            "per_question": result.per_question, "done_docs": list(done_docs),
+            "per_question": result.per_question, "per_doc": result.per_doc,
+            "done_docs": list(done_docs),
         })
 
     n = max(result.n_questions, 1)
