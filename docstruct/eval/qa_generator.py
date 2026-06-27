@@ -1,9 +1,15 @@
 """LLM-generated, tool-agnostic Q&A gold for retrieval benchmarking.
 
-For sampled DocStruct chunks, an LLM writes one specific question plus a
-**verbatim** answer span copied from the chunk. The span is validated to be an
-actual substring of the source (hallucinated spans are rejected), so relevance
-can later be judged by containment against any tool's chunks.
+Q&A is generated from the full concatenated raw text of each PDF — NOT from
+DocStruct chunks. This ensures the gold standard is tool-agnostic: no tool gets
+an unfair advantage because questions were written from its own chunking view.
+
+The LLM sees the whole document and writes N (question, verbatim_answer_span)
+pairs. Each span is validated as a substring of the raw document text, so any
+tool that preserves that content can score a hit.
+
+If a document exceeds the token budget, it is split into halves and N/2 pairs
+are generated from each half.
 """
 
 from __future__ import annotations
@@ -15,18 +21,22 @@ from dataclasses import asdict, dataclass
 from typing import List, Optional
 
 from docstruct import config
-from docstruct.schema import Chunk
 from docstruct.eval.relevance import contains_verbatim
 
 logger = logging.getLogger(__name__)
 
+_WORDS_PER_TOKEN = 0.75
+_MAX_TOKENS = 80_000
+_MAX_WORDS = int(_MAX_TOKENS * _WORDS_PER_TOKEN)
+_MIN_LINE_WORDS = 4
+
 _SYSTEM = (
     "You write evaluation questions for a document retrieval benchmark. "
-    "Given one passage, produce a single specific factual question that the "
-    "passage answers, and copy the exact verbatim text span (character-for-"
-    "character from the passage) that answers it. The span must be 3-20 words "
-    "and appear word-for-word in the passage. Respond with JSON only: "
-    '{"question": "...", "answer_span": "..."}'
+    "Given a document, produce exactly {n} specific factual questions that the "
+    "document answers, each with a verbatim answer span copied character-for-"
+    "character from the document text. Each span must be 8-20 words and appear "
+    'word-for-word in the document. Respond with JSON only: {{"items": '
+    '[{{"question": "...", "answer_span": "..."}}, ...]}}'
 )
 
 
@@ -35,64 +45,59 @@ class QAItem:
     question: str
     answer_span: str
     source_doc: str
-    source_chunk_id: str
-    page_num: int
-    section_path: str
+    source_chunk_id: str  # "fulldoc" or "half_0" / "half_1"
+    page_num: int          # -1 for full-doc sourced items
+    section_path: str      # empty string for raw-text sourced items
 
 
-def _section_str(chunk: Chunk) -> str:
-    parts = [chunk.section_path.h1, chunk.section_path.h2, chunk.section_path.h3]
-    return " > ".join(p for p in parts if p)
+def _extract_full_text(pdf_path: str) -> str:
+    """Concatenate all page text, stripping short noisy lines (headers/footers)."""
+    import pdfplumber
+
+    lines = []
+    with pdfplumber.open(pdf_path) as pdf:
+        for page in pdf.pages:
+            raw = page.extract_text() or ""
+            for line in raw.splitlines():
+                if len(line.split()) >= _MIN_LINE_WORDS:
+                    lines.append(line)
+    return "\n".join(lines)
 
 
-def _sample_chunks(chunks: List[Chunk], n: int) -> List[Chunk]:
-    rich = [
-        c for c in chunks
-        if c.chunk_type in ("text", "abstract") and len(c.content.split()) >= 40
-    ]
-    rich.sort(key=lambda c: len(c.content), reverse=True)
-    if len(rich) <= n:
-        return rich
-    step = len(rich) / n
-    return [rich[int(i * step)] for i in range(n)]
-
-
-def generate_for_chunks(
-    chunks: List[Chunk], doc_id: str, client, n: int = config.QA_PER_DOC
-) -> List[QAItem]:
-    """Generate up to ``n`` validated QA items from a document's chunks."""
+def _generate_from_text(text: str, doc_id: str, chunk_id: str, client, n: int) -> List[QAItem]:
     items: List[QAItem] = []
-    for chunk in _sample_chunks(chunks, n):
-        try:
-            out = client.chat_json(
-                [
-                    {"role": "system", "content": _SYSTEM},
-                    {"role": "user", "content": f'Passage:\n"""\n{chunk.content}\n"""'},
-                ],
-                temperature=0.2,
-            )
-            question = (out.get("question") or "").strip()
-            span = (out.get("answer_span") or "").strip()
-        except Exception as err:  # noqa: BLE001 - generation is best-effort
-            logger.warning("QA generation failed for %s: %s", chunk.chunk_id, err)
-            continue
+    try:
+        out = client.chat_json(
+            [
+                {"role": "system", "content": _SYSTEM.format(n=n)},
+                {"role": "user", "content": f'Document:\n"""\n{text}\n"""'},
+            ],
+            temperature=0.2,
+        )
+    except Exception as err:  # noqa: BLE001
+        logger.warning("QA generation failed for %s (%s): %s", doc_id, chunk_id, err)
+        return []
 
+    pairs = out.get("items", [])
+    print(f"    LLM returned {len(pairs)} pairs for {doc_id} ({chunk_id})", flush=True)
+    for pair in pairs:
+        if not isinstance(pair, dict):
+            continue
+        question = (pair.get("question") or "").strip()
+        span = (pair.get("answer_span") or "").strip()
         if not question or not span:
             continue
-        if not contains_verbatim(chunk.content, span):
-            logger.info("rejected non-verbatim span for %s", chunk.chunk_id)
+        if not contains_verbatim(text, span):
+            logger.info("rejected non-verbatim span for %s (%s)", doc_id, chunk_id)
             continue
-
-        items.append(
-            QAItem(
-                question=question,
-                answer_span=span,
-                source_doc=doc_id,
-                source_chunk_id=chunk.chunk_id,
-                page_num=chunk.page_num,
-                section_path=_section_str(chunk),
-            )
-        )
+        items.append(QAItem(
+            question=question,
+            answer_span=span,
+            source_doc=doc_id,
+            source_chunk_id=chunk_id,
+            page_num=-1,
+            section_path="",
+        ))
     return items
 
 
@@ -103,11 +108,25 @@ def generate_for_pdf(
     n: int = config.QA_PER_DOC,
     cache_dir: Optional[str] = None,
 ) -> List[QAItem]:
-    """Run the pipeline on a PDF and generate QA items from its chunks."""
-    from docstruct.pipeline import run_pipeline
+    """Generate Q&A from full document text — tool-agnostic, no DocStruct bias."""
+    doc_id = os.path.basename(pdf_path)
+    full_text = _extract_full_text(pdf_path)
+    if not full_text.strip():
+        logger.warning("no usable text in %s", doc_id)
+        return []
 
-    result = run_pipeline(pdf_path, weights=weights, cache_dir=cache_dir)
-    return generate_for_chunks(result.chunks, os.path.basename(pdf_path), client, n)
+    words = full_text.split()
+    if len(words) <= _MAX_WORDS:
+        return _generate_from_text(full_text, doc_id, "fulldoc", client, n)
+
+    mid = len(words) // 2
+    half0 = " ".join(words[:mid])
+    half1 = " ".join(words[mid:])
+    n0 = n // 2
+    n1 = n - n0
+    items = _generate_from_text(half0, doc_id, "half_0", client, n0)
+    items += _generate_from_text(half1, doc_id, "half_1", client, n1)
+    return items
 
 
 def save_qa(items: List[QAItem], path: str) -> None:

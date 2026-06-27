@@ -135,7 +135,7 @@ def _cmd_benchmark(args) -> int:
     skipped = [n for n in (names or _ALL) if n not in adapters]
     print(f"tools: {list(adapters)}  skipped: {skipped}")
 
-    results = run_benchmark(adapters, pdfs, qa, top_k=args.top_k)
+    results = run_benchmark(adapters, pdfs, qa, top_k=args.top_k, cache_dir=args.cache_dir)
     meta = {
         "timestamp": now_iso(),
         "n_docs": len({q.source_doc for q in qa}),

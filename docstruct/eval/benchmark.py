@@ -16,12 +16,13 @@ Metrics per tool (averaged over all questions): MRR, NDCG@k, Recall@k, Hit@1.
 
 from __future__ import annotations
 
+import json
 import logging
 import math
 import os
 import time
 from dataclasses import dataclass, field
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from docstruct import config
 from docstruct.eval.adapters.base import ChunkAdapter, EvalChunk
@@ -81,12 +82,33 @@ def _qa_by_doc(qa: List[QAItem]) -> Dict[str, List[QAItem]]:
     return out
 
 
+def _ckpt_path(cache_dir: Optional[str], tool_name: str) -> Optional[str]:
+    if not cache_dir:
+        return None
+    os.makedirs(cache_dir, exist_ok=True)
+    return os.path.join(cache_dir, f"bench_ckpt_{tool_name}.json")
+
+
+def _load_ckpt(path: Optional[str]):
+    if path and os.path.exists(path):
+        with open(path, encoding="utf-8") as fh:
+            return json.load(fh)
+    return None
+
+
+def _save_ckpt(path: Optional[str], data: dict) -> None:
+    if path:
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump(data, fh)
+
+
 def benchmark_tool(
     adapter: ChunkAdapter,
     pdf_paths: List[str],
     qa: List[QAItem],
     embedder,
     top_k: int = config.BENCHMARK_TOP_K,
+    cache_dir: Optional[str] = None,
 ) -> ToolResult:
     """Benchmark one tool across all documents that have questions."""
     from rank_bm25 import BM25Okapi
@@ -94,10 +116,30 @@ def benchmark_tool(
     from docstruct.indexing.vector_store import VectorStore
 
     by_doc = _qa_by_doc(qa)
+    docs_with_qa = [p for p in pdf_paths if os.path.basename(p) in by_doc]
+    n_total = len(docs_with_qa)
+
+    ckpt_path = _ckpt_path(cache_dir, adapter.name)
+    ckpt = _load_ckpt(ckpt_path)
+
     result = ToolResult(name=adapter.name)
-    v = [0.0, 0.0, 0.0, 0.0]  # rr, hit, recall, ndcg (vector)
-    h = [0.0, 0.0, 0.0, 0.0]  # rr, hit, recall, ndcg (hybrid)
+    v = [0.0, 0.0, 0.0, 0.0]
+    h = [0.0, 0.0, 0.0, 0.0]
     total_words = 0
+    done_docs: set = set()
+
+    if ckpt:
+        v = ckpt["v"]; h = ckpt["h"]
+        total_words = ckpt["total_words"]
+        result.n_chunks = ckpt["n_chunks"]
+        result.errors = ckpt["errors"]
+        result.chunk_seconds = ckpt["chunk_seconds"]
+        result.eval_seconds = ckpt["eval_seconds"]
+        result.per_question = ckpt["per_question"]
+        result.n_questions = len(result.per_question)
+        done_docs = set(ckpt["done_docs"])
+        print(f"  [{adapter.name}] resuming: {len(done_docs)}/{n_total} docs already done", flush=True)
+
     candidates = max(top_k * 4, config.BM25_CANDIDATES)
 
     for doc_idx, pdf in enumerate(pdf_paths):
@@ -105,23 +147,36 @@ def benchmark_tool(
         cases = by_doc.get(doc_id, [])
         if not cases:
             continue
+        if doc_id in done_docs:
+            print(f"  [{adapter.name}] {doc_id}: skip (cached)", flush=True)
+            continue
+
+        doc_num = len(done_docs) + 1
+        print(f"  [{adapter.name}] {doc_id} ({doc_num}/{n_total}) chunking...", flush=True)
 
         try:
             t0 = time.perf_counter()
             chunks: List[EvalChunk] = adapter.chunk(pdf)
-            result.chunk_seconds += time.perf_counter() - t0
-        except Exception as err:  # noqa: BLE001 - a tool may fail on some PDFs
+            chunk_t = time.perf_counter() - t0
+            result.chunk_seconds += chunk_t
+        except Exception as err:  # noqa: BLE001
+            print(f"  [{adapter.name}] {doc_id}: ERROR — {err}", flush=True)
             logger.warning("%s failed on %s: %s", adapter.name, doc_id, err)
             result.errors += 1
+            done_docs.add(doc_id)
             continue
 
         chunks = [c for c in chunks if c.text.strip()]
         if not chunks:
+            print(f"  [{adapter.name}] {doc_id}: ERROR — 0 chunks produced", flush=True)
             result.errors += 1
+            done_docs.add(doc_id)
             continue
+
         texts = [c.text for c in chunks]
         result.n_chunks += len(chunks)
         total_words += sum(len(t.split()) for t in texts)
+        print(f"  [{adapter.name}] {doc_id}: {len(chunks)} chunks ({chunk_t:.1f}s), embedding...", flush=True)
 
         store = VectorStore(collection_name=f"bench_{adapter.name}_{doc_idx}", embedder=embedder)
         store.collection.add(
@@ -132,6 +187,7 @@ def benchmark_tool(
         bm25 = BM25Okapi([t.lower().split() for t in texts])
 
         t1 = time.perf_counter()
+        doc_hits = 0
         for case in cases:
             qv = embedder.encode([case.question], show_progress_bar=False).tolist()
             res = store.collection.query(query_embeddings=qv, n_results=min(candidates, len(texts)))
@@ -145,11 +201,28 @@ def benchmark_tool(
             for i in range(4):
                 v[i] += vr[i]; h[i] += hr[i]
             result.n_questions += 1
+            doc_hits += int(hr[2] > 0)
             result.per_question.append(
                 {"doc": doc_id, "question": case.question,
                  "vec_rr": round(vr[0], 4), "hyb_rr": round(hr[0], 4)}
             )
-        result.eval_seconds += time.perf_counter() - t1
+        eval_t = time.perf_counter() - t1
+        result.eval_seconds += eval_t
+        done_docs.add(doc_id)
+
+        running_mrr = round(h[0] / max(result.n_questions, 1), 4)
+        print(
+            f"  [{adapter.name}] {doc_id}: {doc_hits}/{len(cases)} hits  "
+            f"running MRR={running_mrr}  ({eval_t:.1f}s)",
+            flush=True,
+        )
+
+        _save_ckpt(ckpt_path, {
+            "v": v, "h": h, "total_words": total_words,
+            "n_chunks": result.n_chunks, "errors": result.errors,
+            "chunk_seconds": result.chunk_seconds, "eval_seconds": result.eval_seconds,
+            "per_question": result.per_question, "done_docs": list(done_docs),
+        })
 
     n = max(result.n_questions, 1)
     result.mrr, result.hit1, result.recall, result.ndcg = (round(h[0] / n, 4), round(h[1] / n, 4), round(h[2] / n, 4), round(h[3] / n, 4))
@@ -157,6 +230,7 @@ def benchmark_tool(
     result.mean_chunk_words = round(total_words / max(result.n_chunks, 1), 1)
     result.chunk_seconds = round(result.chunk_seconds, 2)
     result.eval_seconds = round(result.eval_seconds, 2)
+
     return result
 
 
@@ -165,6 +239,7 @@ def run_benchmark(
     pdf_paths: List[str],
     qa: List[QAItem],
     top_k: int = config.BENCHMARK_TOP_K,
+    cache_dir: Optional[str] = None,
 ) -> List[ToolResult]:
     """Benchmark every adapter, ranked by hybrid MRR. Embedder loaded once."""
     from sentence_transformers import SentenceTransformer
@@ -172,7 +247,9 @@ def run_benchmark(
     embedder = SentenceTransformer(config.EMBEDDING_MODEL)
     results = []
     for name, adapter in adapters.items():
-        logger.info("benchmarking %s ...", name)
-        results.append(benchmark_tool(adapter, pdf_paths, qa, embedder, top_k))
+        print(f"\n=== {name} ===", flush=True)
+        results.append(benchmark_tool(adapter, pdf_paths, qa, embedder, top_k, cache_dir=cache_dir))
+        r = results[-1]
+        print(f"  => MRR={r.mrr}  NDCG={r.ndcg}  Recall={r.recall}  Hit@1={r.hit1}  ({r.n_questions} questions)", flush=True)
     results.sort(key=lambda r: r.mrr, reverse=True)
     return results
