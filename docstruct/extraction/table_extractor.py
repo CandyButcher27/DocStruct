@@ -1,4 +1,4 @@
-"""Extract table cell grids and serialize them to Markdown."""
+"""Extract table cell grids and serialize them for retrieval and display."""
 
 from __future__ import annotations
 
@@ -47,6 +47,19 @@ def table_to_markdown(grid: List[List[str]]) -> str:
     return "\n".join(lines)
 
 
+def table_to_plaintext(grid: List[List[str]]) -> str:
+    """Render a cell grid as space-joined rows.
+
+    Each row becomes one line of space-separated values. This preserves the
+    verbatim cell content as substrings, matching how pdfplumber extract_text()
+    renders table regions — which is what the Q&A gold standard is built from.
+    Markdown pipes break substring-containment relevance checks.
+    """
+    if not grid:
+        return ""
+    return "\n".join("  ".join(cell for cell in row if cell) for row in grid)
+
+
 def populate_tables(pdf_path: str, blocks: List[Block]) -> List[Block]:
     """Set ``table_data`` (and Markdown ``text``) on table blocks, in place."""
     by_page: Dict[int, List[Block]] = {}
@@ -65,5 +78,5 @@ def populate_tables(pdf_path: str, blocks: List[Block]) -> List[Block]:
                 grid = extract_table(page, block.bbox)
                 if grid:
                     block.table_data = grid
-                    block.text = table_to_markdown(grid)
+                    block.text = table_to_plaintext(grid)
     return blocks
