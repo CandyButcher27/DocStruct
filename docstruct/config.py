@@ -58,7 +58,8 @@ GEOMETRY_CONFIDENCE = {
 }
 
 # --- Chunking ---
-MAX_CHUNK_TOKENS = 400
+MAX_CHUNK_TOKENS = 800
+CHUNK_OVERLAP_TOKENS = 75  # tail words carried into next chunk on token-limit flush
 HEADER_LEVELS = 3
 
 # --- Model detector (optional, YOLOv8 / DocLayNet) ---

@@ -56,6 +56,7 @@ def test_text_accumulates_until_token_limit(monkeypatch):
     from docstruct import config
 
     monkeypatch.setattr(config, "MAX_CHUNK_TOKENS", 5)
+    monkeypatch.setattr(config, "CHUNK_OVERLAP_TOKENS", 0)
     blocks = [
         _blk("t1", "text", "one two three", 0),
         _blk("t2", "text", "four five six", 1),  # crosses limit -> flush
@@ -63,6 +64,25 @@ def test_text_accumulates_until_token_limit(monkeypatch):
     ]
     chunks = build_chunks(blocks)
     assert len(chunks) == 2
+
+
+def test_chunk_overlap_carries_tail_into_next(monkeypatch):
+    from docstruct import config
+
+    monkeypatch.setattr(config, "MAX_CHUNK_TOKENS", 6)
+    monkeypatch.setattr(config, "CHUNK_OVERLAP_TOKENS", 3)
+    blocks = [
+        _blk("t1", "text", "a b c", 0),
+        _blk("t2", "text", "d e f", 1),  # total 6 -> flush, t2 kept as overlap
+        _blk("t3", "text", "g h i", 2),
+    ]
+    chunks = build_chunks(blocks)
+    all_content = " ".join(c.content for c in chunks)
+    # overlap tail (t2) must appear in more than one chunk
+    assert sum("d e f" in c.content for c in chunks) >= 2
+    # all content from all blocks must appear somewhere
+    assert "a b c" in all_content
+    assert "g h i" in all_content
 
 
 def test_table_is_atomic_chunk():

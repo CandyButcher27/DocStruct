@@ -97,7 +97,7 @@ def build_chunks(
         )
         counter += 1
 
-    def flush_text() -> None:
+    def flush_text(keep_overlap: bool = False) -> None:
         nonlocal buffer
         if not buffer or _in_references(section):
             buffer = []
@@ -105,7 +105,18 @@ def build_chunks(
         chunk_type = "abstract" if _in_abstract(section) else "text"
         content = "\n".join(b.text for b in buffer if b.text)
         emit(chunk_type, content, buffer)
-        buffer = []
+        if keep_overlap and config.CHUNK_OVERLAP_TOKENS > 0:
+            overlap: List[Block] = []
+            words = 0
+            for block in reversed(buffer):
+                bw = len((block.text or "").split())
+                if words + bw > config.CHUNK_OVERLAP_TOKENS:
+                    break
+                overlap.insert(0, block)
+                words += bw
+            buffer = overlap
+        else:
+            buffer = []
 
     for block in ordered:
         if block.label == "header":
@@ -133,7 +144,7 @@ def build_chunks(
                 continue
             buffer.append(block)
             if _token_count(buffer) >= config.MAX_CHUNK_TOKENS:
-                flush_text()
+                flush_text(keep_overlap=True)
 
     flush_text()
     return chunks

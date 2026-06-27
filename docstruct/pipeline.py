@@ -17,6 +17,7 @@ from docstruct.schema import Block, Chunk
 from docstruct.geometry import detector as geometry_detector
 from docstruct.fusion.matcher import match_proposals
 from docstruct.fusion.fusion import fuse
+from docstruct.fusion.containment import suppress_contained
 from docstruct.reading_order import assign_reading_order
 from docstruct.extraction.text_extractor import populate_text
 from docstruct.extraction.table_extractor import populate_tables
@@ -96,7 +97,7 @@ def run_pipeline(
         for key in totals:
             totals[key] += result.diagnostics.get(key, 0)
 
-        blocks = fuse(result)
+        blocks = suppress_contained(fuse(result))
         for block in blocks:
             block.block_id = f"block_{id_counter:04d}"
             id_counter += 1
