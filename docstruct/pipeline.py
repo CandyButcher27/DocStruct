@@ -97,7 +97,7 @@ def run_pipeline(
         for key in totals:
             totals[key] += result.diagnostics.get(key, 0)
 
-        blocks = suppress_table_contained(fuse(result))
+        blocks = fuse(result)
         for block in blocks:
             block.block_id = f"block_{id_counter:04d}"
             id_counter += 1
