@@ -111,6 +111,7 @@ def benchmark_tool(
     top_k: int = config.BENCHMARK_TOP_K,
     cache_dir: Optional[str] = None,
     rrf_k: int = config.RRF_K,
+    reranker=None,
 ) -> ToolResult:
     """Benchmark one tool across all documents that have questions."""
     from rank_bm25 import BM25Okapi
@@ -199,7 +200,12 @@ def benchmark_tool(
             vec_order = [int(i) for i in res.get("ids", [[]])[0]]
             scores = bm25.get_scores(case.question.lower().split())
             bm_order = sorted(range(len(texts)), key=lambda i: scores[i], reverse=True)[:candidates]
-            hyb_order = _rrf([vec_order, bm_order], k=rrf_k)[:top_k]
+            hyb_order = _rrf([vec_order, bm_order], k=rrf_k)[:top_k * 4]
+            if reranker is not None and hyb_order:
+                pairs = [(case.question, texts[i]) for i in hyb_order]
+                ce_scores = reranker.predict(pairs, show_progress_bar=False)
+                hyb_order = [hyb_order[i] for i in sorted(range(len(hyb_order)), key=lambda x: ce_scores[x], reverse=True)]
+            hyb_order = hyb_order[:top_k]
 
             vr = _score([texts[i] for i in vec_order[:top_k]], case.answer_span, top_k)
             hr = _score([texts[i] for i in hyb_order], case.answer_span, top_k)
@@ -262,15 +268,22 @@ def run_benchmark(
     top_k: int = config.BENCHMARK_TOP_K,
     cache_dir: Optional[str] = None,
     rrf_k: int = config.RRF_K,
+    reranker_model: Optional[str] = None,
 ) -> List[ToolResult]:
     """Benchmark every adapter, ranked by hybrid MRR. Embedder loaded once."""
     from sentence_transformers import SentenceTransformer
 
     embedder = SentenceTransformer(config.EMBEDDING_MODEL)
+    reranker = None
+    if reranker_model:
+        from sentence_transformers import CrossEncoder
+        reranker = CrossEncoder(reranker_model)
+        print(f"reranker: {reranker_model}", flush=True)
+
     results = []
     for name, adapter in adapters.items():
         print(f"\n=== {name} ===", flush=True)
-        results.append(benchmark_tool(adapter, pdf_paths, qa, embedder, top_k, cache_dir=cache_dir, rrf_k=rrf_k))
+        results.append(benchmark_tool(adapter, pdf_paths, qa, embedder, top_k, cache_dir=cache_dir, rrf_k=rrf_k, reranker=reranker))
         r = results[-1]
         print(f"  => MRR={r.mrr}  NDCG={r.ndcg}  Recall={r.recall}  Hit@1={r.hit1}  ({r.n_questions} questions)", flush=True)
     results.sort(key=lambda r: r.mrr, reverse=True)
