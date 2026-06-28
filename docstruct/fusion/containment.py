@@ -26,6 +26,26 @@ def _is_contained(inner: BoundingBox, outer: BoundingBox) -> bool:
     )
 
 
+def suppress_table_contained(blocks: List[Block]) -> List[Block]:
+    """Drop blocks fully inside a TABLE block (Rule 1 only — safe, no recall damage).
+
+    TABLE cells are already captured in the table chunk via extract_tables/extract_text.
+    Any geometry or model block that falls inside a TABLE bbox is a duplicate.
+    """
+    if len(blocks) <= 1:
+        return blocks
+
+    n = len(blocks)
+    to_drop: set[int] = set()
+    for i, block in enumerate(blocks):
+        if block.label != "table":
+            continue
+        for j in range(n):
+            if j != i and blocks[j].label != "table" and _is_contained(blocks[j].bbox, block.bbox):
+                to_drop.add(j)
+    return [b for i, b in enumerate(blocks) if i not in to_drop]
+
+
 def suppress_contained(blocks: List[Block]) -> List[Block]:
     """Return blocks with nested duplicates removed."""
     if len(blocks) <= 1:

@@ -177,10 +177,11 @@ def benchmark_tool(
             continue
 
         texts = [c.text for c in chunks]
-        index_texts = [
-            f"[{c.metadata['section']}]\n{c.text}" if c.metadata.get("section") else c.text
-            for c in chunks
-        ]
+        index_texts = []
+        for c in chunks:
+            prefix_parts = [p for p in [c.metadata.get("type"), c.metadata.get("section")] if p]
+            prefix = " | ".join(prefix_parts)
+            index_texts.append(f"[{prefix}]\n{c.text}" if prefix else c.text)
         result.n_chunks += len(chunks)
         total_words += sum(len(t.split()) for t in texts)
         print(f"  [{adapter.name}] {doc_id}: {len(chunks)} chunks ({chunk_t:.1f}s), embedding...", flush=True)
