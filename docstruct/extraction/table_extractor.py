@@ -79,4 +79,10 @@ def populate_tables(pdf_path: str, blocks: List[Block]) -> List[Block]:
                 if grid:
                     block.table_data = grid
                     block.text = table_to_plaintext(grid)
+                else:
+                    region = _crop(page, block.bbox)
+                    if region is not None:
+                        raw = (region.extract_text() or "").strip()
+                        if raw:
+                            block.text = raw
     return blocks

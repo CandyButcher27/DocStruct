@@ -177,17 +177,21 @@ def benchmark_tool(
             continue
 
         texts = [c.text for c in chunks]
+        index_texts = [
+            f"[{c.metadata['section']}]\n{c.text}" if c.metadata.get("section") else c.text
+            for c in chunks
+        ]
         result.n_chunks += len(chunks)
         total_words += sum(len(t.split()) for t in texts)
         print(f"  [{adapter.name}] {doc_id}: {len(chunks)} chunks ({chunk_t:.1f}s), embedding...", flush=True)
 
         store = VectorStore(collection_name=f"bench_{adapter.name}_{doc_idx}", embedder=embedder)
         store.collection.add(
-            ids=[str(i) for i in range(len(texts))],
-            documents=texts,
-            embeddings=embedder.encode(texts, show_progress_bar=False).tolist(),
+            ids=[str(i) for i in range(len(index_texts))],
+            documents=index_texts,
+            embeddings=embedder.encode(index_texts, show_progress_bar=False).tolist(),
         )
-        bm25 = BM25Okapi([t.lower().split() for t in texts])
+        bm25 = BM25Okapi([t.lower().split() for t in index_texts])
 
         t1 = time.perf_counter()
         doc_hits = 0
