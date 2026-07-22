@@ -49,6 +49,40 @@ def _per_doc_table(result: ToolResult) -> List[str]:
     return rows
 
 
+def config_snapshot() -> Dict[str, object]:
+    """Every public config value, so a run's settings travel with its numbers.
+
+    Without this, two reports with different MRR give no way to tell *why* short of
+    diffing ``config.py`` at the commit each was generated from.
+    """
+    return {
+        key: value
+        for key, value in sorted(vars(config).items())
+        if key.isupper() and not key.startswith("_")
+    }
+
+
+def _config_section(meta: Dict) -> List[str]:
+    cfg = meta.get("config") or {}
+    if not cfg:
+        return []
+    chunking = ("MAX_CHUNK_TOKENS", "MIN_CHUNK_TOKENS", "CHUNK_OVERLAP_TOKENS",
+                "OVERLAP_ON_BOUNDARY", "BREAK_TEXT_ON_TABLE", "BREAK_TEXT_ON_CAPTION",
+                "INLINE_HEADER_TEXT", "HEADER_LEVELS")
+    rows = [
+        "## Run configuration",
+        "",
+        "Chunking settings active for this run (full snapshot in the JSON sidecar "
+        "under `meta.config`):",
+        "",
+        "| Setting | Value |",
+        "|---|---|",
+    ]
+    rows += [f"| `{k}` | `{cfg[k]}` |" for k in chunking if k in cfg]
+    rows.append("")
+    return rows
+
+
 def render_markdown(results: List[ToolResult], meta: Dict) -> str:
     lines = [
         "# DocStruct retrieval baseline report",
@@ -82,6 +116,7 @@ def render_markdown(results: List[ToolResult], meta: Dict) -> str:
         "- **Hit@1** — fraction where the very first chunk already contains the answer.",
         "- **Avg words/chunk** — chunk granularity; huge chunks can inflate recall while hurting precision/precision-of-context.",
         "",
+        *_config_section(meta),
         "## DocStruct's unique axis (not in any competitor)",
         "",
         "Every chunk carries a section path, enabling **filtered retrieval** "
