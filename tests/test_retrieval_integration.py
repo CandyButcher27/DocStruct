@@ -69,3 +69,29 @@ def test_hybrid_retrieval_finds_exact_code(store):
     results = hybrid.retrieve("BM25-XR-7", top_k=3)
     assert results
     assert results[0].chunk_id == "c3"
+
+
+@pytest.mark.skipif(not _HAS_BM25, reason="rank-bm25 not installed")
+def test_hybrid_respects_section_filter(store):
+    """Hybrid used to silently score against the whole collection."""
+    from docstruct.query.retriever import Retriever
+
+    hybrid = Retriever(store, hybrid=True)
+    # "BM25-XR-7" lives in Setup; scoping to Morphology must not return it
+    results = hybrid.retrieve("BM25-XR-7", top_k=3, where={"h1": "Morphology"})
+    assert results
+    assert all(r.section_path == "Morphology" for r in results)
+
+
+@pytest.mark.skipif(not _HAS_BM25, reason="rank-bm25 not installed")
+def test_hybrid_filter_cache_is_keyed_by_filter(store):
+    """Two different filters in a row must not reuse each other's BM25 index."""
+    from docstruct.query.retriever import Retriever
+
+    hybrid = Retriever(store, hybrid=True)
+    assert all(r.section_path == "Methods"
+               for r in hybrid.retrieve("anything", top_k=3, where={"h1": "Methods"}))
+    assert all(r.section_path == "Corpus"
+               for r in hybrid.retrieve("anything", top_k=3, where={"h1": "Corpus"}))
+    unfiltered = hybrid.retrieve("BM25-XR-7", top_k=3)
+    assert unfiltered[0].chunk_id == "c3"

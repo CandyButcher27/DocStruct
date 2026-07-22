@@ -60,7 +60,9 @@ def _cmd_query(args) -> int:
     from docstruct.query.retriever import Retriever
 
     where = {"h1": args.h1} if args.h1 else None
-    retriever = Retriever(VectorStore(persist_dir=args.db), hybrid=args.hybrid)
+    retriever = Retriever(
+        VectorStore(persist_dir=args.db), hybrid=args.hybrid, rerank_model=args.rerank_model
+    )
     results = retriever.retrieve(args.text, top_k=args.top_k, where=where)
     if not results:
         print("no results")
@@ -126,7 +128,7 @@ def _cmd_benchmark(args) -> int:
     from docstruct.eval.adapters import get_adapters, _ALL
     from docstruct.eval.benchmark import run_benchmark
     from docstruct.eval.qa_generator import load_qa
-    from docstruct.eval.report import now_iso, write_report
+    from docstruct.eval.report import config_snapshot, now_iso, write_report
 
     qa = load_qa(args.qa)
     pdfs = sorted(_glob.glob(os.path.join(args.pdfs_dir, "*.pdf")))
@@ -142,6 +144,8 @@ def _cmd_benchmark(args) -> int:
         "n_questions": len(qa),
         "llm_model": args.model or "gpt-oss:120b",
         "skipped": skipped,
+        "rerank_model": args.rerank_model,
+        "config": config_snapshot(),
     }
     write_report(results, meta, args.report_md, args.report_json)
     print(f"\nwrote report -> {args.report_md}")
@@ -176,8 +180,10 @@ def build_parser() -> argparse.ArgumentParser:
     q_p.add_argument("text", help="query string")
     q_p.add_argument("--db", required=True, help="Chroma persist directory")
     q_p.add_argument("--top-k", type=int, default=5)
-    q_p.add_argument("--h1", default=None, help="filter to a top-level section (dense mode)")
+    q_p.add_argument("--h1", default=None, help="filter to a top-level section")
     q_p.add_argument("--hybrid", action="store_true", help="dense + BM25 fused by RRF")
+    q_p.add_argument("--rerank-model", default=None,
+                     help="cross-encoder to rerank candidates (e.g. cross-encoder/ms-marco-MiniLM-L-6-v2)")
     q_p.set_defaults(func=_cmd_query)
 
     v_p = sub.add_parser("visualize", help="Render an annotated PDF of detected blocks")
