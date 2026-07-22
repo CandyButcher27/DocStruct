@@ -4,15 +4,20 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "docstruct"
-version = "0.2.0"
-description = "Local, deterministic, structure-aware PDF chunking pipeline for RAG"
+version = "0.3.0"
+description = "Local, deterministic, structure-aware PDF text extraction and chunking for RAG"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "Aryaman Srivastava" }]
 keywords = ["pdf", "rag", "layout-analysis", "chunking", "document-ai", "retrieval"]
 classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: MIT License",
     "Topic :: Text Processing :: Indexing",
     "Topic :: Scientific/Engineering :: Information Analysis",
@@ -38,6 +43,7 @@ all = [
     "groq>=0.11",
     "langchain-text-splitters>=0.3",
     "pymupdf4llm>=0.0.17",
+    "rank-bm25>=0.2",
     "pytest>=8.0",
 ]
 

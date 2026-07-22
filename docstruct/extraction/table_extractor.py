@@ -32,6 +32,26 @@ def extract_table(page, bbox: BoundingBox) -> List[List[str]] | None:
     return [[(cell or "").strip() for cell in row] for row in best]
 
 
+def table_to_markdown(grid: List[List[str]]) -> str:
+    """Render a cell grid as a GitHub-flavored Markdown table.
+
+    Used by ``Document.markdown`` for human-readable export. Chunk text uses
+    :func:`table_to_plaintext` instead — Markdown pipes break the verbatim
+    substring containment that retrieval relevance is scored on.
+    """
+    if not grid:
+        return ""
+    width = max(len(row) for row in grid)
+    norm = [row + [""] * (width - len(row)) for row in grid]
+    lines = [
+        "| " + " | ".join(norm[0]) + " |",
+        "| " + " | ".join(["---"] * width) + " |",
+    ]
+    for row in norm[1:]:
+        lines.append("| " + " | ".join(row) + " |")
+    return "\n".join(lines)
+
+
 def table_to_plaintext(grid: List[List[str]]) -> str:
     """Render a cell grid as space-joined rows.
 
