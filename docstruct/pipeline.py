@@ -60,6 +60,19 @@ def run_pipeline(
     cache_dir: Optional[str] = None,
 ) -> PipelineResult:
     """Run the full pipeline on a single PDF."""
+    block_cache = None
+    if cache_dir:
+        from docstruct.cache.block_cache import BlockCache
+
+        block_cache = BlockCache(cache_dir, weights if model_detector is None else None)
+        hit = block_cache.get(pdf_path)
+        if hit is not None and model_detector is None:
+            cached_blocks, cached_diag = hit
+            chunks = build_chunks(cached_blocks, assign_header_levels(cached_blocks))
+            cached_diag = {**cached_diag, "n_chunks": len(chunks), "cached_blocks": True}
+            logger.info("pipeline complete (cached blocks): %s", cached_diag)
+            return PipelineResult(blocks=cached_blocks, chunks=chunks, diagnostics=cached_diag)
+
     geo_cache = None
     if cache_dir:
         from docstruct.cache.pdf_cache import ProposalCache
@@ -122,5 +135,7 @@ def run_pipeline(
         "n_chunks": len(chunks),
         **totals,
     }
+    if block_cache is not None and model_detector is None:
+        block_cache.set(pdf_path, all_blocks, {k: v for k, v in diagnostics.items() if k != "n_chunks"})
     logger.info("pipeline complete: %s", diagnostics)
     return PipelineResult(blocks=all_blocks, chunks=chunks, diagnostics=diagnostics)
