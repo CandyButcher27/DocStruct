@@ -101,23 +101,44 @@ docstruct visualize paper.pdf --out annotated.pdf --weights weights/yolov8m-docl
 ### Python
 
 ```python
-from docstruct.pipeline import run_pipeline
+import docstruct
 
-result = run_pipeline("paper.pdf", weights="weights/yolov8m-doclaynet.pt", cache_dir=".cache")
-print(result.diagnostics)            # mode, page/block/chunk counts, fusion stats
-for chunk in result.chunks:
+doc = docstruct.parse("paper.pdf")               # geometry-only: no model, no network
+doc = docstruct.parse("paper.pdf", weights="weights/yolov8m-doclaynet.pt")
+
+doc.text                                          # whole document, reading order
+doc.markdown                                      # headings, tables, captions preserved
+doc.pages()                                       # {page_num: text}
+doc.sections()                                    # ["1. Introduction", "2. Method > 2.1 Setup", ...]
+doc.to_json("chunks.json")
+
+for chunk in doc.chunks:                          # retrieval-ready units
     print(chunk.chunk_type, chunk.section_path, chunk.content[:80])
+
+doc.chunks_of_type("table")                       # table / text / figure_caption / abstract
 ```
+
+`cache_dir=".cache"` caches detector output and populated blocks by PDF content
+hash, so re-parsing an unchanged file is close to free. For the raw pipeline
+result (fused blocks, fusion diagnostics) use `docstruct.pipeline.run_pipeline`.
 
 ```python
 from docstruct.indexing.vector_store import VectorStore
 from docstruct.query.retriever import Retriever
 
 store = VectorStore(persist_dir=".chroma")
-store.index(result.chunks, doc_id="paper")
+store.index(doc.chunks, doc_id="paper")
 for r in Retriever(store).retrieve("how was the corpus prepared?", top_k=3):
     print(r.citation())              # [Corpus preparation] (page 2, score 0.48)
+
+# hybrid (dense + BM25 via RRF), section-scoped, optionally cross-encoder reranked
+retriever = Retriever(store, hybrid=True, rerank_model="cross-encoder/ms-marco-MiniLM-L-6-v2")
+retriever.retrieve("ablation results", top_k=5, where={"h1": "4. Experiments"})
 ```
+
+Both retrieval modes honour `where`. Reranking is off unless `rerank_model` is
+set — it loads a second model at query time, which the local-by-default design
+otherwise avoids.
 
 ---
 

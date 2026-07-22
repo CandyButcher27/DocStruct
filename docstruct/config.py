@@ -62,7 +62,14 @@ GEOMETRY_CONFIDENCE = {
 }
 
 # --- Chunking ---
-MAX_CHUNK_TOKENS = 800
+# MIN/MAX were chosen by sweeping both against the retrieval benchmark. Raw MRR
+# climbs monotonically with chunk size all the way to MIN=600 (0.7584) — a
+# containment metric always rewards handing the retriever more text — but that is
+# fixed-window chunking wearing a hat, and it costs 59% more retrieved context than
+# this setting for +0.027 MRR. 200/500 sits on the Pareto front: it beats every
+# larger setting except 600/800 on MRR while staying cheaper to feed to an LLM.
+# See notes.md "Stage 4" for the full grid.
+MAX_CHUNK_TOKENS = 500
 CHUNK_OVERLAP_TOKENS = 75  # tail words carried into next chunk on token-limit flush
 HEADER_LEVELS = 3
 # A structural boundary (header/table/caption) only ends the running text chunk once
@@ -70,7 +77,7 @@ HEADER_LEVELS = 3
 # buffer keeps accumulating, so a page of prose broken up by figures stays one chunk
 # instead of becoming several stubs. 0 restores the pre-0.3 flush-on-every-boundary
 # behaviour.
-MIN_CHUNK_TOKENS = 250
+MIN_CHUNK_TOKENS = 200
 # Tables and captions always emit their own chunk. When False they no longer *also*
 # split the prose around them.
 BREAK_TEXT_ON_TABLE = False

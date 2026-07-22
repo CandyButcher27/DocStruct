@@ -182,8 +182,8 @@ predicted, since the complaint was never that DocStruct couldn't find the answer
 **0.7257 beats pymupdf4llm's 0.6915 by +0.034**, at 339.6 words/chunk against its
 457.5. Kept.
 
-Sweeping the floor (120 / 250 / 400 / 600) to confirm 250 is not a lucky pick —
-results below.
+Sweeping both bounds to confirm 250/800 was not a lucky pick — see Stage 4. It
+wasn't lucky, but it wasn't optimal either.
 
 ### The honest objection, and what was done about it
 
@@ -199,3 +199,42 @@ as one that matches it with 5×180, and any future "just make chunks bigger" cha
 shows its price in the same table it improves. This is the metric DocStruct should
 want to be measured on anyway: it leads on MRR *while* being cheaper to feed to an
 LLM than the tool it beats.
+
+---
+
+## Stage 4 — Sweeping both bounds, and the trap in the results
+
+Grid over `MIN_CHUNK_TOKENS` / `MAX_CHUNK_TOKENS`, all else fixed, 48 docs / 298
+questions each. Sorted by retrieved-context cost:
+
+| MIN/MAX | MRR | NDCG@5 | Recall@5 | Hit@1 | Chunks | Avg words | Context words | MRR/1k |
+|---|---|---|---|---|---|---|---|---|
+| baseline (flush everywhere) | 0.6890 | 0.7199 | 0.8490 | 0.5872 | 3905 | 181.3 | — | — |
+| 80 / 300 | 0.7022 | 0.7320 | 0.8658 | 0.5973 | 3440 | 218.7 | 1411 | **0.4978** |
+| 120 / 400 | 0.7086 | 0.7431 | 0.8859 | 0.5940 | 2945 | 253.6 | 1686 | 0.4203 |
+| **200 / 500** | **0.7319** | 0.7560 | 0.8826 | **0.6342** | 2519 | 294.7 | 2050 | 0.3571 |
+| 120 / 800 | 0.7203 | 0.7513 | 0.8758 | 0.6141 | 2533 | 291.2 | 2170 | 0.3319 |
+| 250 / 800 | 0.7257 | 0.7541 | 0.8792 | 0.6242 | 2174 | 339.6 | 2555 | 0.2841 |
+| 400 / 800 | 0.7277 | 0.7612 | 0.8993 | 0.6174 | 1992 | 370.7 | 2873 | 0.2533 |
+| 600 / 800 | **0.7584** | 0.7886 | 0.9128 | 0.6477 | 1832 | 403.6 | 3251 | 0.2333 |
+
+**Raw MRR rises monotonically with chunk size, and MRR-per-1k-words falls
+monotonically.** Read only the MRR column and the "right" answer is MIN=600 —
+0.7584, the best number on the page. That is the trap. At MIN=600 against
+MAX=800 the floor is nearly the ceiling, so almost every flush is a token-limit
+flush and structural boundaries stop mattering: it is fixed-window chunking with
+extra steps, and it wins by becoming the thing DocStruct exists to be an
+alternative to. It also costs **59% more retrieved context than 200/500 to buy
++0.027 MRR**.
+
+**Chose 200/500.** It is on the Pareto front and it strictly dominates the 250/800
+I had defaulted to in Stage 3 — higher MRR (+0.006), higher Hit@1 (+0.010), higher
+recall (+0.003), and **20% less retrieved context**. Against pymupdf4llm's 0.6915 it
+is +0.040 MRR, and pymupdf4llm's own chunks average 457.5 words, so DocStruct wins
+while handing the generator less text per query.
+
+The two cheap settings (80/300, 120/400) are worth remembering: if context budget
+matters more than rank, 80/300 delivers 0.7022 MRR — still above pymupdf4llm — at
+**43% of the context cost**. That is a configuration story the old
+flush-at-every-boundary code could not tell at all, because it was paying for tiny
+chunks *and* getting the worst MRR.
