@@ -34,7 +34,12 @@ def test_header_levels_ranked_by_font_size():
     assert levels["h3"] == 3
 
 
-def test_header_updates_section_path_and_clears_deeper():
+def test_header_updates_section_path_and_clears_deeper(monkeypatch):
+    from docstruct import config
+
+    # cut at every boundary so each section lands in its own chunk
+    monkeypatch.setattr(config, "MIN_CHUNK_TOKENS", 0)
+    monkeypatch.setattr(config, "INLINE_HEADER_TEXT", False)
     blocks = [
         _blk("h1", "header", "Methods", 0, font_size=16),
         _blk("t1", "text", "intro to methods", 1),
@@ -50,6 +55,82 @@ def test_header_updates_section_path_and_clears_deeper():
     # new h1 clears h2
     assert paths["results text"].h1 == "Results"
     assert paths["results text"].h2 is None
+
+
+def test_header_text_is_retrievable_in_chunk_body():
+    """Headings must live in some chunk body, not only in section metadata."""
+    blocks = [
+        _blk("h1", "header", "Attention Is All You Need", 0, font_size=16),
+        _blk("t1", "text", "we propose the Transformer", 1),
+    ]
+    chunks = build_chunks(blocks)
+    assert any("Attention Is All You Need" in c.content for c in chunks)
+
+
+def test_boundary_below_floor_does_not_split(monkeypatch):
+    from docstruct import config
+
+    monkeypatch.setattr(config, "MIN_CHUNK_TOKENS", 50)
+    monkeypatch.setattr(config, "INLINE_HEADER_TEXT", False)
+    blocks = [
+        _blk("t1", "text", "alpha beta gamma", 0),
+        _blk("h", "header", "Section Two", 1, font_size=16),
+        _blk("t2", "text", "delta epsilon zeta", 2),
+    ]
+    chunks = build_chunks(blocks)
+    text_chunks = [c for c in chunks if c.chunk_type == "text"]
+    assert len(text_chunks) == 1
+    assert "alpha beta gamma" in text_chunks[0].content
+    assert "delta epsilon zeta" in text_chunks[0].content
+
+
+def test_boundary_above_floor_splits(monkeypatch):
+    from docstruct import config
+
+    monkeypatch.setattr(config, "MIN_CHUNK_TOKENS", 2)
+    monkeypatch.setattr(config, "INLINE_HEADER_TEXT", False)
+    blocks = [
+        _blk("t1", "text", "alpha beta gamma", 0),
+        _blk("h", "header", "Section Two", 1, font_size=16),
+        _blk("t2", "text", "delta epsilon zeta", 2),
+    ]
+    chunks = build_chunks(blocks)
+    assert [c.content for c in chunks] == ["alpha beta gamma", "delta epsilon zeta"]
+
+
+def test_chunk_keeps_the_section_it_started_in(monkeypatch):
+    """Crossing a header to reach the floor must not relabel the earlier text."""
+    from docstruct import config
+
+    monkeypatch.setattr(config, "MIN_CHUNK_TOKENS", 50)
+    monkeypatch.setattr(config, "INLINE_HEADER_TEXT", False)
+    blocks = [
+        _blk("h1", "header", "Methods", 0, font_size=16),
+        _blk("t1", "text", "short methods line", 1),
+        _blk("h2", "header", "Results", 2, font_size=16),
+        _blk("t2", "text", "short results line", 3),
+    ]
+    chunks = build_chunks(blocks)
+    assert len(chunks) == 1
+    assert chunks[0].section_path.h1 == "Methods"
+
+
+def test_table_does_not_split_surrounding_prose(monkeypatch):
+    from docstruct import config
+
+    monkeypatch.setattr(config, "MIN_CHUNK_TOKENS", 0)
+    monkeypatch.setattr(config, "BREAK_TEXT_ON_TABLE", False)
+    blocks = [
+        _blk("t1", "text", "before the table", 0),
+        _blk("tb", "table", "a b\n1 2", 1),
+        _blk("t2", "text", "after the table", 2),
+    ]
+    chunks = build_chunks(blocks)
+    text_chunks = [c for c in chunks if c.chunk_type == "text"]
+    assert len(text_chunks) == 1
+    assert "before the table" in text_chunks[0].content
+    assert "after the table" in text_chunks[0].content
+    assert any(c.chunk_type == "table" for c in chunks)
 
 
 def test_text_accumulates_until_token_limit(monkeypatch):

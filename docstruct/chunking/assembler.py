@@ -2,14 +2,24 @@
 
 Walks blocks in reading order maintaining a running :class:`SectionPath`:
 
-- header     -> updates the section path, never its own chunk
-- text       -> accumulated under the current section up to MAX_CHUNK_TOKENS,
-                flushed on the limit or at any section boundary
-- table      -> atomic chunk (Markdown-serialized), never split
+- header     -> updates the section path; its text opens the chunk it introduces
+                (``INLINE_HEADER_TEXT``), so headings stay retrievable
+- text       -> accumulated under the current section up to MAX_CHUNK_TOKENS
+- table      -> atomic chunk (plaintext rows), never split
 - caption    -> figure_caption chunk, linked to its target figure/table
 - figure     -> represented through its caption (standalone figures are skipped)
 - abstract   -> emitted with chunk_type "abstract" (detected by section name)
 - references -> skipped entirely
+
+A structural boundary only *ends* the running text chunk once it holds at least
+``MIN_CHUNK_TOKENS`` words; below the floor the boundary is crossed and the buffer
+keeps accumulating. Tables and captions emit their own chunk without splitting the
+prose around them unless ``BREAK_TEXT_ON_TABLE`` / ``BREAK_TEXT_ON_CAPTION`` say so.
+Together these stop a page of prose interleaved with figures from collapsing into a
+handful of unretrievable stubs.
+
+A chunk is attributed to the section it *started* in, so crossing a header to reach
+the floor never silently relabels the text that came before it.
 
 Token counts approximate with whitespace word counts to stay tokenizer-free.
 """
@@ -77,34 +87,63 @@ def build_chunks(
     section = SectionPath()
     chunks: List[Chunk] = []
     buffer: List[Block] = []
+    buffer_section: Optional[SectionPath] = None
     counter = 0
 
-    def emit(chunk_type: str, content: str, blocks_in: List[Block], ids=None) -> None:
+    def emit(
+        chunk_type: str,
+        content: str,
+        blocks_in: List[Block],
+        ids=None,
+        section_path: Optional[SectionPath] = None,
+    ) -> None:
         nonlocal counter
         if not content.strip():
             return
+        path = section_path if section_path is not None else _snapshot(section)
         chunks.append(
             Chunk(
                 chunk_id=f"chunk_{counter:04d}",
                 chunk_type=chunk_type,
                 content=content.strip(),
-                section_path=_snapshot(section),
+                section_path=path,
                 page_num=blocks_in[0].page_num,
                 reading_order=blocks_in[0].reading_order,
                 source_block_ids=ids or [b.block_id for b in blocks_in],
-                metadata=_metadata(section, blocks_in),
+                metadata=_metadata(path, blocks_in),
             )
         )
         counter += 1
 
-    def flush_text(keep_overlap: bool = False) -> None:
-        nonlocal buffer
-        if not buffer or _in_references(section):
-            buffer = []
+    def buffer_append(block: Block) -> None:
+        """Add a block to the running text buffer, tracking where the chunk began."""
+        nonlocal buffer_section
+        if not (block.text or "").strip():
             return
-        chunk_type = "abstract" if _in_abstract(section) else "text"
+        if not buffer:
+            buffer_section = _snapshot(section)
+        buffer.append(block)
+
+    def flush_text(keep_overlap: bool = False, force: bool = True) -> None:
+        """Emit the running text buffer.
+
+        ``force=False`` is a structural boundary: the buffer is only cut if it
+        already holds ``MIN_CHUNK_TOKENS`` words, otherwise the boundary is crossed
+        and accumulation continues.
+        """
+        nonlocal buffer, buffer_section
+        if not buffer:
+            return
+        path = buffer_section if buffer_section is not None else _snapshot(section)
+        if _in_references(path):
+            buffer = []
+            buffer_section = None
+            return
+        if not force and _token_count(buffer) < config.MIN_CHUNK_TOKENS:
+            return
+        chunk_type = "abstract" if _in_abstract(path) else "text"
         content = "\n".join(b.text for b in buffer if b.text)
-        emit(chunk_type, content, buffer)
+        emit(chunk_type, content, buffer, section_path=path)
         if keep_overlap and config.CHUNK_OVERLAP_TOKENS > 0:
             overlap: List[Block] = []
             words = 0
@@ -115,21 +154,34 @@ def build_chunks(
                 overlap.insert(0, block)
                 words += bw
             buffer = overlap
+            buffer_section = _snapshot(section) if overlap else None
         else:
             buffer = []
+            buffer_section = None
+
+    def boundary_flush() -> None:
+        flush_text(keep_overlap=config.OVERLAP_ON_BOUNDARY, force=False)
 
     for block in ordered:
         if block.label == "header":
-            flush_text()
-            _set_section(section, levels.get(block.block_id, config.HEADER_LEVELS), (block.text or "").strip())
+            boundary_flush()
+            _set_section(
+                section,
+                levels.get(block.block_id, config.HEADER_LEVELS),
+                (block.text or "").strip(),
+            )
+            if config.INLINE_HEADER_TEXT and not _in_references(section):
+                buffer_append(block)
 
         elif block.label == "table":
-            flush_text()
+            if config.BREAK_TEXT_ON_TABLE:
+                boundary_flush()
             if not _in_references(section):
                 emit("table", block.text or "", [block])
 
         elif block.label == "caption":
-            flush_text()
+            if config.BREAK_TEXT_ON_CAPTION:
+                boundary_flush()
             if not _in_references(section):
                 ids = [block.block_id]
                 if block.caption_target_id:
@@ -142,9 +194,16 @@ def build_chunks(
         else:  # text
             if _in_references(section):
                 continue
-            buffer.append(block)
+            buffer_append(block)
             if _token_count(buffer) >= config.MAX_CHUNK_TOKENS:
                 flush_text(keep_overlap=True)
 
     flush_text()
+
+    # Tables and captions emit while the text buffer is still open, so chunks are
+    # produced out of document order. Restore reading order and renumber, so
+    # chunk_id ordering means what callers assume it means.
+    chunks.sort(key=lambda c: c.reading_order)
+    for index, chunk in enumerate(chunks):
+        chunk.chunk_id = f"chunk_{index:04d}"
     return chunks

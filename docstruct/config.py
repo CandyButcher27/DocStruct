@@ -46,6 +46,10 @@ FIGURE_MIN_AREA_RATIO = 0.03    # graphic cluster must cover >= this of page are
 FIGURE_CLUSTER_GAP = 10.0       # merge graphic primitives within this gap
 FIGURE_MAX_TEXT_OVERLAP = 0.10  # graphic cluster must be mostly text-free
 TABLE_MIN_ROWS = 2
+# extract_tables() is ruled-line based: on a partly-ruled table it returns only the
+# ruled fragment. If the rendered grid holds less than this fraction of the words in
+# the region, fall back to raw region text so no rows are silently dropped.
+TABLE_GRID_MIN_COVERAGE = 0.85
 # Universal caption markers in prose documents (not a layout assumption).
 CAPTION_PREFIX_PATTERN = r"^\s*(figure|fig\.?|table|tab\.?|scheme|algorithm)\s*\.?\s*\d+"
 
@@ -61,6 +65,23 @@ GEOMETRY_CONFIDENCE = {
 MAX_CHUNK_TOKENS = 800
 CHUNK_OVERLAP_TOKENS = 75  # tail words carried into next chunk on token-limit flush
 HEADER_LEVELS = 3
+# A structural boundary (header/table/caption) only ends the running text chunk once
+# it holds at least this many words. Below the floor the boundary is crossed and the
+# buffer keeps accumulating, so a page of prose broken up by figures stays one chunk
+# instead of becoming several stubs. 0 restores the pre-0.3 flush-on-every-boundary
+# behaviour.
+MIN_CHUNK_TOKENS = 250
+# Tables and captions always emit their own chunk. When False they no longer *also*
+# split the prose around them.
+BREAK_TEXT_ON_TABLE = False
+BREAK_TEXT_ON_CAPTION = False
+# Write the header line into the body of the chunk it introduces, not only into
+# section-path metadata. Without this, text that is laid out as a heading (titles,
+# author lines, run-in headers) exists in no chunk and can never be retrieved.
+INLINE_HEADER_TEXT = True
+# Carry CHUNK_OVERLAP_TOKENS across structural boundaries too, not only across
+# token-limit flushes.
+OVERLAP_ON_BOUNDARY = False
 
 # --- Model detector (optional, YOLOv8 / DocLayNet) ---
 MODEL_WEIGHTS = None            # path or ultralytics-resolvable name; set to enable
