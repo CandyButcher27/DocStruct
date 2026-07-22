@@ -6,6 +6,7 @@ from typing import Dict, List
 
 import pdfplumber
 
+from docstruct import config
 from docstruct.schema import Block, BoundingBox
 
 
@@ -31,22 +32,6 @@ def extract_table(page, bbox: BoundingBox) -> List[List[str]] | None:
     return [[(cell or "").strip() for cell in row] for row in best]
 
 
-def table_to_markdown(grid: List[List[str]]) -> str:
-    """Render a cell grid as a GitHub-flavored Markdown table."""
-    if not grid:
-        return ""
-    width = max(len(row) for row in grid)
-    norm = [row + [""] * (width - len(row)) for row in grid]
-    header = norm[0]
-    lines = [
-        "| " + " | ".join(header) + " |",
-        "| " + " | ".join(["---"] * width) + " |",
-    ]
-    for row in norm[1:]:
-        lines.append("| " + " | ".join(row) + " |")
-    return "\n".join(lines)
-
-
 def table_to_plaintext(grid: List[List[str]]) -> str:
     """Render a cell grid as space-joined rows.
 
@@ -60,8 +45,22 @@ def table_to_plaintext(grid: List[List[str]]) -> str:
     return "\n".join("  ".join(cell for cell in row if cell) for row in grid)
 
 
+def _grid_covers_region(rendered: str, raw: str) -> bool:
+    """Did the extracted grid keep most of the words actually in the region?
+
+    ``extract_tables`` is ruled-line based, so on a table where only part of the
+    grid is ruled it happily returns that fragment — and rendering only the
+    fragment silently drops every unruled row from the block's text. Comparing
+    word counts against the raw region text catches that.
+    """
+    raw_words = len(raw.split())
+    if not raw_words:
+        return True
+    return len(rendered.split()) >= config.TABLE_GRID_MIN_COVERAGE * raw_words
+
+
 def populate_tables(pdf_path: str, blocks: List[Block]) -> List[Block]:
-    """Set ``table_data`` (and Markdown ``text``) on table blocks, in place."""
+    """Set ``table_data`` and serialized ``text`` on table blocks, in place."""
     by_page: Dict[int, List[Block]] = {}
     for block in blocks:
         if block.label == "table":
@@ -75,14 +74,14 @@ def populate_tables(pdf_path: str, blocks: List[Block]) -> List[Block]:
                 continue
             page = pdf.pages[page_num]
             for block in page_blocks:
+                region = _crop(page, block.bbox)
+                raw = (region.extract_text() or "").strip() if region is not None else ""
                 grid = extract_table(page, block.bbox)
                 if grid:
                     block.table_data = grid
-                    block.text = table_to_plaintext(grid)
-                else:
-                    region = _crop(page, block.bbox)
-                    if region is not None:
-                        raw = (region.extract_text() or "").strip()
-                        if raw:
-                            block.text = raw
+                    rendered = table_to_plaintext(grid)
+                    # Prefer the structured render, but never at the cost of losing rows.
+                    block.text = rendered if _grid_covers_region(rendered, raw) else raw
+                elif raw:
+                    block.text = raw
     return blocks
