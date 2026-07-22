@@ -15,8 +15,8 @@ from docstruct.eval.benchmark import ToolResult
 def _table(results: List[ToolResult]) -> List[str]:
     k = config.BENCHMARK_TOP_K
     rows = [
-        f"| Rank | Tool | MRR (hybrid) | NDCG@{k} | Recall@{k} | Hit@1 | MRR (vector) | Hybrid lift | Chunks | Avg words/chunk | Chunk s | Errors |",
-        "|---|---|---|---|---|---|---|---|---|---|---|---|",
+        f"| Rank | Tool | MRR (hybrid) | NDCG@{k} | Recall@{k} | Hit@1 | MRR (vector) | Hybrid lift | Chunks | Avg words/chunk | Context words | MRR/1k words | Chunk s | Errors |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for i, r in enumerate(results, 1):
         star = " **(ours)**" if r.name == "docstruct" else ""
@@ -24,7 +24,7 @@ def _table(results: List[ToolResult]) -> List[str]:
         rows.append(
             f"| {i} | {r.name}{star} | **{r.mrr}** | {r.ndcg} | {r.recall} | {r.hit1} | "
             f"{r.vec_mrr} | {lift:+} | {r.n_chunks} | {r.mean_chunk_words} | "
-            f"{r.chunk_seconds} | {r.errors} |"
+            f"{r.context_words} | {r.mrr_per_kword} | {r.chunk_seconds} | {r.errors} |"
         )
     return rows
 
@@ -84,6 +84,7 @@ def _config_section(meta: Dict) -> List[str]:
 
 
 def render_markdown(results: List[ToolResult], meta: Dict) -> str:
+    k = config.BENCHMARK_TOP_K
     lines = [
         "# DocStruct retrieval baseline report",
         "",
@@ -115,6 +116,11 @@ def render_markdown(results: List[ToolResult], meta: Dict) -> str:
         "- **Recall@k** — fraction of questions where the answer appears in the top-k.",
         "- **Hit@1** — fraction where the very first chunk already contains the answer.",
         "- **Avg words/chunk** — chunk granularity; huge chunks can inflate recall while hurting precision/precision-of-context.",
+        f"- **Context words** — words actually handed to the generator per query (summed over the "
+        f"top-{k} retrieved chunks). MRR can always be bought by making chunks bigger; this is what "
+        "that costs downstream in context window, latency and token spend.",
+        "- **MRR/1k words** — MRR per 1000 words of retrieved context. Rewards finding the answer "
+        "*and* being cheap to feed to an LLM, which raw MRR alone does not.",
         "",
         *_config_section(meta),
         "## DocStruct's unique axis (not in any competitor)",

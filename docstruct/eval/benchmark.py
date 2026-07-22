@@ -48,6 +48,10 @@ class ToolResult:
     n_questions: int = 0
     n_chunks: int = 0
     mean_chunk_words: float = 0.0
+    # Words handed to the generator per query (sum over the top-k retrieved chunks).
+    # A tool can buy MRR with bigger chunks; this is what that costs downstream.
+    context_words: float = 0.0
+    mrr_per_kword: float = 0.0
     chunk_seconds: float = 0.0
     eval_seconds: float = 0.0
     errors: int = 0
@@ -129,11 +133,13 @@ def benchmark_tool(
     v = [0.0, 0.0, 0.0, 0.0]
     h = [0.0, 0.0, 0.0, 0.0]
     total_words = 0
+    total_context_words = 0
     done_docs: set = set()
 
     if ckpt:
         v = ckpt["v"]; h = ckpt["h"]
         total_words = ckpt["total_words"]
+        total_context_words = ckpt.get("total_context_words", 0)
         result.n_chunks = ckpt["n_chunks"]
         result.errors = ckpt["errors"]
         result.chunk_seconds = ckpt["chunk_seconds"]
@@ -207,8 +213,10 @@ def benchmark_tool(
                 hyb_order = [hyb_order[i] for i in sorted(range(len(hyb_order)), key=lambda x: ce_scores[x], reverse=True)]
             hyb_order = hyb_order[:top_k]
 
+            retrieved = [texts[i] for i in hyb_order]
+            total_context_words += sum(len(t.split()) for t in retrieved)
             vr = _score([texts[i] for i in vec_order[:top_k]], case.answer_span, top_k)
-            hr = _score([texts[i] for i in hyb_order], case.answer_span, top_k)
+            hr = _score(retrieved, case.answer_span, top_k)
             for i in range(4):
                 v[i] += vr[i]; h[i] += hr[i]
             result.n_questions += 1
@@ -245,6 +253,7 @@ def benchmark_tool(
 
         _save_ckpt(ckpt_path, {
             "v": v, "h": h, "total_words": total_words,
+            "total_context_words": total_context_words,
             "n_chunks": result.n_chunks, "errors": result.errors,
             "chunk_seconds": result.chunk_seconds, "eval_seconds": result.eval_seconds,
             "per_question": result.per_question, "per_doc": result.per_doc,
@@ -255,6 +264,10 @@ def benchmark_tool(
     result.mrr, result.hit1, result.recall, result.ndcg = (round(h[0] / n, 4), round(h[1] / n, 4), round(h[2] / n, 4), round(h[3] / n, 4))
     result.vec_mrr, result.vec_hit1, result.vec_recall, result.vec_ndcg = (round(v[0] / n, 4), round(v[1] / n, 4), round(v[2] / n, 4), round(v[3] / n, 4))
     result.mean_chunk_words = round(total_words / max(result.n_chunks, 1), 1)
+    result.context_words = round(total_context_words / n, 1)
+    # MRR bought per 1000 words of retrieved context: how efficiently a tool spends
+    # the generator's context window, not just whether it can win by spending more.
+    result.mrr_per_kword = round(result.mrr / (result.context_words / 1000.0), 4) if result.context_words else 0.0
     result.chunk_seconds = round(result.chunk_seconds, 2)
     result.eval_seconds = round(result.eval_seconds, 2)
 

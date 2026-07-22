@@ -96,7 +96,8 @@ def main() -> int:
     print(f"\n--- {args.name} ---")
     print(f"MRR={result.mrr}  NDCG={result.ndcg}  Recall={result.recall}  Hit@1={result.hit1}")
     print(f"vector MRR={result.vec_mrr}  chunks={result.n_chunks}  "
-          f"avg_words={result.mean_chunk_words}  questions={result.n_questions}  "
+          f"avg_words={result.mean_chunk_words}  context_words={result.context_words}  "
+          f"MRR/1k={result.mrr_per_kword}  questions={result.n_questions}  "
           f"errors={result.errors}  wall={elapsed:.0f}s")
     worst = sorted(result.per_doc, key=lambda d: d["mrr"])[:10]
     print("\nworst docs:")
@@ -114,6 +115,7 @@ def main() -> int:
             "mrr": result.mrr, "ndcg": result.ndcg, "recall": result.recall,
             "hit1": result.hit1, "vec_mrr": result.vec_mrr,
             "n_chunks": result.n_chunks, "mean_chunk_words": result.mean_chunk_words,
+            "context_words": result.context_words, "mrr_per_kword": result.mrr_per_kword,
             "n_questions": result.n_questions, "errors": result.errors,
         },
         "per_doc": result.per_doc,
