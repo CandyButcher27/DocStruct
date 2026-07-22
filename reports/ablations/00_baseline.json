@@ -1,0 +1,579 @@
+{
+  "name": "00_baseline",
+  "tool": "docstruct",
+  "overrides": {},
+  "config": {
+    "IOU_MATCH_THRESHOLD": 0.35,
+    "NMS_IOU_THRESHOLD": 0.5,
+    "CONFIRMED_BASE": 0.85,
+    "CONFIRMED_MODEL_BOOST": 0.1,
+    "CONFIRMED_AGREEMENT_BOOST": 0.05,
+    "CONFIRMED_BBOX_MODEL_CONF": 0.8,
+    "CONFIRMED_BBOX_IOU": 0.6,
+    "DISPUTED_MULTIPLIER": 0.85,
+    "UNILATERAL_MODEL_SCALE": 0.75,
+    "UNILATERAL_GEOMETRY_SCALE": 0.6,
+    "CONFIDENCE_BOUNDS": {
+      "unilateral_model": {
+        "floor": 0.4,
+        "ceiling": 0.85
+      },
+      "unilateral_geometry": {
+        "floor": 0.25,
+        "ceiling": 0.65
+      }
+    },
+    "COLUMN_GAP_RATIO": 0.15,
+    "CAPTION_MAX_DISTANCE": 100.0,
+    "LINE_Y_TOLERANCE": 3.0,
+    "PARAGRAPH_GAP_FACTOR": 1.6,
+    "HEADER_SIZE_RATIO": 1.15,
+    "HEADER_MAX_LINES": 3,
+    "HEADER_MAX_WORDS": 12,
+    "BOLD_FONT_MARKERS": [
+      "bold",
+      "black",
+      "heavy",
+      "semibold",
+      "medium",
+      "-medi"
+    ],
+    "HEADER_BOLD_BONUS": 0.05,
+    "GEOMETRY_CONFIDENCE_CEIL": 0.95,
+    "FIGURE_MIN_AREA_RATIO": 0.03,
+    "FIGURE_CLUSTER_GAP": 10.0,
+    "FIGURE_MAX_TEXT_OVERLAP": 0.1,
+    "TABLE_MIN_ROWS": 2,
+    "CAPTION_PREFIX_PATTERN": "^\\s*(figure|fig\\.?|table|tab\\.?|scheme|algorithm)\\s*\\.?\\s*\\d+",
+    "GEOMETRY_CONFIDENCE": {
+      "text": 0.7,
+      "header": 0.65,
+      "table": 0.8,
+      "figure": 0.6,
+      "caption": 0.7
+    },
+    "MAX_CHUNK_TOKENS": 800,
+    "CHUNK_OVERLAP_TOKENS": 75,
+    "HEADER_LEVELS": 3,
+    "MODEL_WEIGHTS": null,
+    "MODEL_DPI": 150,
+    "MODEL_CONF_THRESHOLD": 0.25,
+    "DOCLAYNET_LABEL_MAP": {
+      "caption": "caption",
+      "footnote": "text",
+      "formula": "text",
+      "list-item": "text",
+      "page-footer": "text",
+      "page-header": "text",
+      "section-header": "header",
+      "title": "header",
+      "table": "table",
+      "text": "text",
+      "picture": "figure"
+    },
+    "EMBEDDING_MODEL": "all-MiniLM-L6-v2",
+    "COLLECTION_NAME": "docstruct",
+    "RETRIEVAL_TOP_K": 5,
+    "LLM_MODEL": "gpt-oss:120b",
+    "LLM_TIMEOUT": 120.0,
+    "QA_PER_DOC": 5,
+    "BENCHMARK_TOP_K": 5,
+    "RELEVANCE_MIN_OVERLAP": 0.6,
+    "RRF_K": 60,
+    "BM25_CANDIDATES": 20
+  },
+  "metrics": {
+    "mrr": 0.689,
+    "ndcg": 0.7199,
+    "recall": 0.849,
+    "hit1": 0.5872,
+    "vec_mrr": 0.5265,
+    "n_chunks": 3905,
+    "mean_chunk_words": 181.3,
+    "n_questions": 298,
+    "errors": 0
+  },
+  "per_doc": [
+    {
+      "doc": "doc1.pdf",
+      "n_questions": 6,
+      "n_chunks": 42,
+      "avg_words_per_chunk": 171.9,
+      "mrr": 0.4722,
+      "recall": 0.8333,
+      "hit1": 0.1667,
+      "hits": 5
+    },
+    {
+      "doc": "doc10.pdf",
+      "n_questions": 9,
+      "n_chunks": 69,
+      "avg_words_per_chunk": 235.7,
+      "mrr": 0.5,
+      "recall": 0.6667,
+      "hit1": 0.4444,
+      "hits": 6
+    },
+    {
+      "doc": "doc11.pdf",
+      "n_questions": 1,
+      "n_chunks": 16,
+      "avg_words_per_chunk": 174.6,
+      "mrr": 1.0,
+      "recall": 1.0,
+      "hit1": 1.0,
+      "hits": 1
+    },
+    {
+      "doc": "doc12.pdf",
+      "n_questions": 1,
+      "n_chunks": 95,
+      "avg_words_per_chunk": 163.8,
+      "mrr": 0.5,
+      "recall": 1.0,
+      "hit1": 0.0,
+      "hits": 1
+    },
+    {
+      "doc": "doc13.pdf",
+      "n_questions": 5,
+      "n_chunks": 65,
+      "avg_words_per_chunk": 233.0,
+      "mrr": 1.0,
+      "recall": 1.0,
+      "hit1": 1.0,
+      "hits": 5
+    },
+    {
+      "doc": "doc14.pdf",
+      "n_questions": 1,
+      "n_chunks": 165,
+      "avg_words_per_chunk": 186.0,
+      "mrr": 1.0,
+      "recall": 1.0,
+      "hit1": 1.0,
+      "hits": 1
+    },
+    {
+      "doc": "doc15.pdf",
+      "n_questions": 5,
+      "n_chunks": 7,
+      "avg_words_per_chunk": 280.0,
+      "mrr": 1.0,
+      "recall": 1.0,
+      "hit1": 1.0,
+      "hits": 5
+    },
+    {
+      "doc": "doc16.pdf",
+      "n_questions": 7,
+      "n_chunks": 16,
+      "avg_words_per_chunk": 244.4,
+      "mrr": 0.75,
+      "recall": 1.0,
+      "hit1": 0.5714,
+      "hits": 7
+    },
+    {
+      "doc": "doc17.pdf",
+      "n_questions": 8,
+      "n_chunks": 76,
+      "avg_words_per_chunk": 111.9,
+      "mrr": 0.4,
+      "recall": 0.5,
+      "hit1": 0.375,
+      "hits": 4
+    },
+    {
+      "doc": "doc18.pdf",
+      "n_questions": 3,
+      "n_chunks": 20,
+      "avg_words_per_chunk": 86.2,
+      "mrr": 1.0,
+      "recall": 1.0,
+      "hit1": 1.0,
+      "hits": 3
+    },
+    {
+      "doc": "doc19.pdf",
+      "n_questions": 2,
+      "n_chunks": 24,
+      "avg_words_per_chunk": 102.4,
+      "mrr": 0.5,
+      "recall": 0.5,
+      "hit1": 0.5,
+      "hits": 1
+    },
+    {
+      "doc": "doc2.pdf",
+      "n_questions": 10,
+      "n_chunks": 58,
+      "avg_words_per_chunk": 371.7,
+      "mrr": 0.7833,
+      "recall": 1.0,
+      "hit1": 0.6,
+      "hits": 10
+    },
+    {
+      "doc": "doc20.pdf",
+      "n_questions": 9,
+      "n_chunks": 166,
+      "avg_words_per_chunk": 109.5,
+      "mrr": 0.7722,
+      "recall": 1.0,
+      "hit1": 0.6667,
+      "hits": 9
+    },
+    {
+      "doc": "doc21.pdf",
+      "n_questions": 9,
+      "n_chunks": 58,
+      "avg_words_per_chunk": 371.7,
+      "mrr": 0.8889,
+      "recall": 1.0,
+      "hit1": 0.7778,
+      "hits": 9
+    },
+    {
+      "doc": "doc22.pdf",
+      "n_questions": 8,
+      "n_chunks": 43,
+      "avg_words_per_chunk": 115.4,
+      "mrr": 0.5,
+      "recall": 0.5,
+      "hit1": 0.5,
+      "hits": 4
+    },
+    {
+      "doc": "doc23.pdf",
+      "n_questions": 9,
+      "n_chunks": 9,
+      "avg_words_per_chunk": 288.1,
+      "mrr": 0.8148,
+      "recall": 1.0,
+      "hit1": 0.6667,
+      "hits": 9
+    },
+    {
+      "doc": "doc24.pdf",
+      "n_questions": 3,
+      "n_chunks": 113,
+      "avg_words_per_chunk": 51.3,
+      "mrr": 0.4167,
+      "recall": 0.6667,
+      "hit1": 0.3333,
+      "hits": 2
+    },
+    {
+      "doc": "doc25.pdf",
+      "n_questions": 9,
+      "n_chunks": 157,
+      "avg_words_per_chunk": 147.9,
+      "mrr": 0.6667,
+      "recall": 0.8889,
+      "hit1": 0.5556,
+      "hits": 8
+    },
+    {
+      "doc": "doc26.pdf",
+      "n_questions": 9,
+      "n_chunks": 83,
+      "avg_words_per_chunk": 73.9,
+      "mrr": 0.8556,
+      "recall": 1.0,
+      "hit1": 0.7778,
+      "hits": 9
+    },
+    {
+      "doc": "doc27.pdf",
+      "n_questions": 2,
+      "n_chunks": 94,
+      "avg_words_per_chunk": 97.4,
+      "mrr": 1.0,
+      "recall": 1.0,
+      "hit1": 1.0,
+      "hits": 2
+    },
+    {
+      "doc": "doc28.pdf",
+      "n_questions": 6,
+      "n_chunks": 38,
+      "avg_words_per_chunk": 120.3,
+      "mrr": 0.7917,
+      "recall": 1.0,
+      "hit1": 0.6667,
+      "hits": 6
+    },
+    {
+      "doc": "doc29.pdf",
+      "n_questions": 10,
+      "n_chunks": 54,
+      "avg_words_per_chunk": 107.9,
+      "mrr": 0.6833,
+      "recall": 0.8,
+      "hit1": 0.6,
+      "hits": 8
+    },
+    {
+      "doc": "doc3.pdf",
+      "n_questions": 3,
+      "n_chunks": 79,
+      "avg_words_per_chunk": 157.2,
+      "mrr": 0.4167,
+      "recall": 0.6667,
+      "hit1": 0.3333,
+      "hits": 2
+    },
+    {
+      "doc": "doc30.pdf",
+      "n_questions": 1,
+      "n_chunks": 271,
+      "avg_words_per_chunk": 75.5,
+      "mrr": 0.5,
+      "recall": 1.0,
+      "hit1": 0.0,
+      "hits": 1
+    },
+    {
+      "doc": "doc32.pdf",
+      "n_questions": 9,
+      "n_chunks": 65,
+      "avg_words_per_chunk": 77.2,
+      "mrr": 0.8,
+      "recall": 0.8889,
+      "hit1": 0.7778,
+      "hits": 8
+    },
+    {
+      "doc": "doc33.pdf",
+      "n_questions": 3,
+      "n_chunks": 95,
+      "avg_words_per_chunk": 113.8,
+      "mrr": 0.5,
+      "recall": 0.6667,
+      "hit1": 0.3333,
+      "hits": 2
+    },
+    {
+      "doc": "doc34.pdf",
+      "n_questions": 5,
+      "n_chunks": 217,
+      "avg_words_per_chunk": 53.0,
+      "mrr": 0.39,
+      "recall": 0.8,
+      "hit1": 0.2,
+      "hits": 4
+    },
+    {
+      "doc": "doc35.pdf",
+      "n_questions": 7,
+      "n_chunks": 79,
+      "avg_words_per_chunk": 203.6,
+      "mrr": 0.619,
+      "recall": 0.7143,
+      "hit1": 0.5714,
+      "hits": 5
+    },
+    {
+      "doc": "doc37.pdf",
+      "n_questions": 1,
+      "n_chunks": 90,
+      "avg_words_per_chunk": 208.7,
+      "mrr": 1.0,
+      "recall": 1.0,
+      "hit1": 1.0,
+      "hits": 1
+    },
+    {
+      "doc": "doc38.pdf",
+      "n_questions": 1,
+      "n_chunks": 145,
+      "avg_words_per_chunk": 376.3,
+      "mrr": 0.5,
+      "recall": 1.0,
+      "hit1": 0.0,
+      "hits": 1
+    },
+    {
+      "doc": "doc39.pdf",
+      "n_questions": 7,
+      "n_chunks": 43,
+      "avg_words_per_chunk": 343.1,
+      "mrr": 0.7905,
+      "recall": 1.0,
+      "hit1": 0.7143,
+      "hits": 7
+    },
+    {
+      "doc": "doc4.pdf",
+      "n_questions": 8,
+      "n_chunks": 115,
+      "avg_words_per_chunk": 508.0,
+      "mrr": 0.875,
+      "recall": 0.875,
+      "hit1": 0.875,
+      "hits": 7
+    },
+    {
+      "doc": "doc40.pdf",
+      "n_questions": 5,
+      "n_chunks": 47,
+      "avg_words_per_chunk": 361.2,
+      "mrr": 0.8667,
+      "recall": 1.0,
+      "hit1": 0.8,
+      "hits": 5
+    },
+    {
+      "doc": "doc41.pdf",
+      "n_questions": 9,
+      "n_chunks": 110,
+      "avg_words_per_chunk": 123.9,
+      "mrr": 0.5,
+      "recall": 0.5556,
+      "hit1": 0.4444,
+      "hits": 5
+    },
+    {
+      "doc": "doc42.pdf",
+      "n_questions": 10,
+      "n_chunks": 26,
+      "avg_words_per_chunk": 68.2,
+      "mrr": 0.72,
+      "recall": 0.9,
+      "hit1": 0.6,
+      "hits": 9
+    },
+    {
+      "doc": "doc43.pdf",
+      "n_questions": 3,
+      "n_chunks": 35,
+      "avg_words_per_chunk": 123.3,
+      "mrr": 0.8333,
+      "recall": 1.0,
+      "hit1": 0.6667,
+      "hits": 3
+    },
+    {
+      "doc": "doc44.pdf",
+      "n_questions": 8,
+      "n_chunks": 37,
+      "avg_words_per_chunk": 119.4,
+      "mrr": 0.25,
+      "recall": 0.625,
+      "hit1": 0.0,
+      "hits": 5
+    },
+    {
+      "doc": "doc45.pdf",
+      "n_questions": 8,
+      "n_chunks": 142,
+      "avg_words_per_chunk": 170.9,
+      "mrr": 0.5417,
+      "recall": 0.75,
+      "hit1": 0.375,
+      "hits": 6
+    },
+    {
+      "doc": "doc46.pdf",
+      "n_questions": 8,
+      "n_chunks": 136,
+      "avg_words_per_chunk": 150.3,
+      "mrr": 0.875,
+      "recall": 0.875,
+      "hit1": 0.875,
+      "hits": 7
+    },
+    {
+      "doc": "doc47.pdf",
+      "n_questions": 6,
+      "n_chunks": 53,
+      "avg_words_per_chunk": 351.5,
+      "mrr": 0.6167,
+      "recall": 0.8333,
+      "hit1": 0.5,
+      "hits": 5
+    },
+    {
+      "doc": "doc48.pdf",
+      "n_questions": 9,
+      "n_chunks": 176,
+      "avg_words_per_chunk": 177.8,
+      "mrr": 0.8704,
+      "recall": 1.0,
+      "hit1": 0.7778,
+      "hits": 9
+    },
+    {
+      "doc": "doc49.pdf",
+      "n_questions": 5,
+      "n_chunks": 11,
+      "avg_words_per_chunk": 317.4,
+      "mrr": 0.6,
+      "recall": 0.8,
+      "hit1": 0.4,
+      "hits": 4
+    },
+    {
+      "doc": "doc5.pdf",
+      "n_questions": 7,
+      "n_chunks": 140,
+      "avg_words_per_chunk": 235.5,
+      "mrr": 0.5357,
+      "recall": 1.0,
+      "hit1": 0.2857,
+      "hits": 7
+    },
+    {
+      "doc": "doc50.pdf",
+      "n_questions": 9,
+      "n_chunks": 46,
+      "avg_words_per_chunk": 162.7,
+      "mrr": 0.7778,
+      "recall": 0.7778,
+      "hit1": 0.7778,
+      "hits": 7
+    },
+    {
+      "doc": "doc6.pdf",
+      "n_questions": 9,
+      "n_chunks": 8,
+      "avg_words_per_chunk": 151.0,
+      "mrr": 0.5778,
+      "recall": 0.8889,
+      "hit1": 0.3333,
+      "hits": 8
+    },
+    {
+      "doc": "doc7.pdf",
+      "n_questions": 6,
+      "n_chunks": 127,
+      "avg_words_per_chunk": 261.9,
+      "mrr": 0.6667,
+      "recall": 0.6667,
+      "hit1": 0.6667,
+      "hits": 4
+    },
+    {
+      "doc": "doc8.pdf",
+      "n_questions": 10,
+      "n_chunks": 77,
+      "avg_words_per_chunk": 364.0,
+      "mrr": 0.8833,
+      "recall": 1.0,
+      "hit1": 0.8,
+      "hits": 10
+    },
+    {
+      "doc": "doc9.pdf",
+      "n_questions": 9,
+      "n_chunks": 67,
+      "avg_words_per_chunk": 196.8,
+      "mrr": 0.4944,
+      "recall": 0.6667,
+      "hit1": 0.4444,
+      "hits": 6
+    }
+  ],
+  "wall_seconds": 1059.3
+}

@@ -103,3 +103,99 @@ Measured with `scripts/ablate.py`, which runs one adapter with `docstruct.config
 overrides and writes metrics + per-doc breakdown to `reports/ablations/<name>.json`.
 Baselines are unchanged by chunking work, so only the DocStruct adapter is re-run
 between stages; the full four-tool benchmark is re-run once at the end to confirm.
+
+---
+
+## Stage 1 — Infrastructure before measurement
+
+Three things had to exist before any change could be honestly evaluated.
+
+**`scripts/ablate.py`** — runs one adapter with `--set KEY=VALUE` config overrides
+and no benchmark checkpoint (checkpoints would leak results between variants).
+
+**`docstruct/cache/block_cache.py`** — detection, fusion, reading order and
+pdfplumber extraction are deterministic in the PDF plus the layout config, and
+dominate wall time (one document took **256 s** to chunk). Caching at the block
+boundary means a chunking ablation redoes none of it. The key covers the PDF bytes,
+the weights identity and a fingerprint of every config value that can change block
+output; chunking keys are deliberately excluded, since varying those cheaply is the
+whole point. **Effect: full test suite 119 s → 30 s; benchmark run ~18 min → ~10 min
+warm.** Useful, and it is the reason the rest of this pass was affordable.
+
+**Config provenance in reports** (plan §7.9) — report `meta` recorded timestamp,
+doc count, question count and LLM model, and nothing about the settings that
+produced the numbers. This bit immediately: `reports/rrf40_results.json` is named
+for RRF k=40 while its own prose says k=60, and there is no way to tell which is
+true. Reports now carry the chunking settings inline and the full config dict in the
+JSON sidecar.
+
+**Baseline re-measured at HEAD** (the rrf40 report is old; the code moved under it):
+
+| | MRR | NDCG@5 | Recall@5 | Hit@1 | Chunks | Avg words |
+|---|---|---|---|---|---|---|
+| `00_baseline` | 0.6890 | 0.7199 | 0.8490 | 0.5872 | 3905 | 181.3 |
+
+Still behind pymupdf4llm's 0.6915, and the shape of the loss is unchanged.
+
+---
+
+## Stage 2 — Two real extraction bugs
+
+Found while separating "we dropped it" from "the gold is wrong". Neither is the
+main event, both are correctness issues worth fixing on their own.
+
+**Partly-ruled tables dropped their unruled rows.** `extract_tables()` is
+ruled-line based; on a table where only part of the grid is ruled it returns that
+fragment, and `populate_tables()` rendered the fragment as the block's *entire*
+text. Every unruled row vanished. Now the rendered grid is compared against the raw
+region text and falls back to raw text below `TABLE_GRID_MIN_COVERAGE` (0.85).
+`table_data` keeps the structure either way.
+
+**Headings were in no chunk at all.** `assembler.py` used header text only to update
+the running `SectionPath` — it never wrote it into a chunk body. Anything laid out
+as a heading (titles, author lines, run-in headers) was unretrievable by
+construction. Fixed as part of Stage 3 via `INLINE_HEADER_TEXT`.
+
+Also deleted `table_to_markdown()`, dead since tables switched to plaintext
+(`535c595`) — then restored it in Stage 5, which finally gave it a caller.
+
+---
+
+## Stage 3 — The fix: a floor on boundary flushes
+
+`MIN_CHUNK_TOKENS=250`: a structural boundary only ends the running chunk once it
+holds that many words. Below the floor the boundary is crossed and accumulation
+continues. `BREAK_TEXT_ON_TABLE=False` / `BREAK_TEXT_ON_CAPTION=False`: tables and
+captions still emit their own chunk but no longer *also* split the prose around
+them. `INLINE_HEADER_TEXT=True`: the header opens the body of the chunk it
+introduces. A chunk is attributed to the section it *started* in, so crossing a
+header to reach the floor never relabels the text before it.
+
+| | MRR | NDCG@5 | Recall@5 | Hit@1 | Chunks | Avg words |
+|---|---|---|---|---|---|---|
+| `00_baseline` | 0.6890 | 0.7199 | 0.8490 | 0.5872 | 3905 | 181.3 |
+| `01_minchunk250` | **0.7257** | **0.7541** | **0.8792** | **0.6242** | 2174 | 339.6 |
+| delta | **+0.0367** | +0.0342 | +0.0302 | **+0.0370** | −44% | +87% |
+
+Everything moves the right way, and Hit@1 moves most — which is what the diagnosis
+predicted, since the complaint was never that DocStruct couldn't find the answer.
+**0.7257 beats pymupdf4llm's 0.6915 by +0.034**, at 339.6 words/chunk against its
+457.5. Kept.
+
+Sweeping the floor (120 / 250 / 400 / 600) to confirm 250 is not a lucky pick —
+results below.
+
+### The honest objection, and what was done about it
+
+Part of this gain is simply *bigger chunks*, and a containment-based relevance
+metric rewards handing the retriever more text per chunk. Left unaddressed, "make
+chunks bigger" is an unbounded exploit of our own benchmark, and DocStruct would be
+winning by the same move it criticises fixed-window chunkers for.
+
+So the leaderboard now reports **context words** (words actually handed to the
+generator per query, summed over the top-k retrieved) and **MRR per 1000 context
+words**. A tool that wins MRR by returning 5×500 words is now visibly not the same
+as one that matches it with 5×180, and any future "just make chunks bigger" change
+shows its price in the same table it improves. This is the metric DocStruct should
+want to be measured on anyway: it leads on MRR *while* being cheaper to feed to an
+LLM than the tool it beats.
