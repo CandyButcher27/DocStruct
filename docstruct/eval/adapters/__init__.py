@@ -14,7 +14,11 @@ from docstruct.eval.adapters.docstruct_adapter import DocStructAdapter
 from docstruct.eval.adapters.langchain_adapter import LangChainAdapter
 from docstruct.eval.adapters.pymupdf4llm_adapter import PyMuPDF4LLMAdapter
 
-_ALL = ["docstruct", "langchain", "pymupdf4llm", "unstructured", "docling"]
+# docling is intentionally out of the default set: it is by far the slowest tool
+# (60s+/doc, out-of-memory crashes on some pages) and consistently last, so it costs
+# most of a benchmark run's wall time to confirm a result that never changes. Still
+# reachable with --tools docling for anyone who wants it.
+_ALL = ["docstruct", "langchain", "pymupdf4llm", "unstructured"]
 
 
 def build_adapter(
