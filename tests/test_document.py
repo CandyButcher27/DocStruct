@@ -83,3 +83,40 @@ def test_chunks_of_type_filters():
     doc = _doc()
     assert all(c.chunk_type == "table" for c in doc.chunks_of_type("table"))
     assert doc.chunks_of_type("table")
+
+
+def test_tables_accessor_returns_grid_page_section():
+    grid, page, section = _doc().tables[0]
+    assert grid == [["a", "b"], ["1", "2"]]
+    assert page == 0
+    assert section.h2 == "Setup"
+
+
+def test_figures_accessor_lists_figure_blocks():
+    blocks = [
+        _blk("f", "figure", "", 0),
+        _blk("t", "text", "body", 1),
+    ]
+    from docstruct.chunking.assembler import build_chunks
+
+    doc = Document("p.pdf", blocks, build_chunks(blocks), {})
+    assert doc.figures == [(0, blocks[0].bbox)]
+
+
+def test_markdown_escapes_control_chars_and_renders_figure_placeholder():
+    blocks = [
+        _blk("t", "text", "use pipe | and star * literally", 0),
+        _blk("f", "figure", "", 1, page=1),
+    ]
+    from docstruct.chunking.assembler import build_chunks
+
+    md = Document("p.pdf", blocks, build_chunks(blocks), {}).markdown
+    assert r"\|" in md and r"\*" in md
+    assert "![figure](page=1" in md
+
+
+def test_to_markdown_writes_file(tmp_path):
+    out = tmp_path / "doc.md"
+    md = _doc().to_markdown(str(out))
+    assert out.read_text(encoding="utf-8") == md
+    assert "# Introduction" in md
