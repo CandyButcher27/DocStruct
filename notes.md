@@ -805,3 +805,19 @@ corpus follows once it lands.
 Sweep → flip winners. gen-qa → merge gold + re-baseline. Then the remaining code work:
 §1.8 `ParseConfig`, §3.4 multi-page table merge, §4.3 SectionPath depth > 3 — none can
 touch core modules while the sweep's per-run subprocesses are re-importing from disk.
+
+### Sweep outcome — environment-blocked
+
+The sweep and the broadened-gold run were both **killed mid-flight** by the
+environment (long unattended jobs do not survive here — the baseline ran ~69 min,
+then the kill landed during run 2; gen-qa reached 4/23 docs). Measured facts:
+one `ablate.py` run is ~69 min on 92 docs (embedding ~7,100 chunks dominates, YOLO
+cached), so the 14-run sweep is ~16 h — not viable with hourly kills and a 10-min
+foreground cap. A 15-doc arXiv subset runs in ~3.3 min and reproduces a high baseline
+(MRR 0.910), but arXiv is exactly the corpus where most gated flags are no-ops
+(`DEDUPE_CHARS` measured byte-identical). The full baseline reproduced the headline
+(MRR 0.8194 ≈ 0.8203), which validates the harness and the config-aware-cache fix.
+
+**Decision:** no flag is flipped on this evidence. All gated features stay OFF (the
+honest default), `scripts/_sweep.sh` is committed for a capable machine, and effort
+moves to the measurement-independent code items (§1.8, §3.4, §4.3). See `results.md`.

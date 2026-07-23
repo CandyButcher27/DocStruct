@@ -3,11 +3,23 @@
 **Update this file whenever a benchmark or ablation runs.** It is the reference
 any "did this help?" question should be answered from.
 
-> **In progress (2026-07 Fable session):** a 14-run gated-feature sweep (baseline +
-> 13 flags) is running on the v6 corpus; results and any flag flips land here when it
-> completes. Corpus broadening beyond arXiv is also running (Ollama cloud gold). Until
-> both land, the headline below is the arXiv-only v6 baseline and every gated flag in
-> `decisions.md` is unproven.
+> **Gated-feature sweep (2026-07 Fable session): attempted, environment-blocked.**
+> The 14-flag sweep on the 92-doc v6 corpus is **not runnable in the current
+> environment**: one `ablate.py` run is **~69 min** (embedding ~7,100 chunks per run
+> dominates; YOLO is cached), so 14 runs ≈ 16 h, and long background jobs here are
+> killed roughly hourly while foreground calls cap at 10 min. What was obtained:
+> - **Baseline reproduced** on the full 92 docs: MRR **0.8194**, NDCG 0.8313, Recall
+>   0.9427, Hit@1 0.7384 — matches the headline docstruct 0.8203, so the harness (and
+>   the config-aware-cache fix) are validated.
+> - **15-doc arXiv subset** (108 q, ~3.3 min/run, a fast but low-power probe):
+>   baseline MRR 0.910 / Hit@1 0.8704; `DEDUPE_CHARS` byte-identical (0.910), as
+>   expected — the doubled-glyph bug is doc1-specific, not systemic on clean arXiv.
+>
+> **Consequence:** every gated flag in `decisions.md` stays **OFF**. None is flipped on
+> arXiv-subset signal — the corpus that would actually discriminate them (non-arXiv,
+> `benchmark_qa_v7`) needs the broadened-gold run, which also died mid-generation
+> (4/23 docs). Run `scripts/_sweep.sh` on a machine that does not kill hour-long jobs,
+> against the broadened corpus, to complete this.
 
 ## Current headline (`reports/v6_report.md`)
 
