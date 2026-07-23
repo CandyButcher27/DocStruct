@@ -25,6 +25,19 @@ def test_matcher_confirmed_and_unilateral():
     }
 
 
+def test_matcher_prefers_higher_confidence_model_for_shared_geometry():
+    # A low-conf model box is listed first, a high-conf one second; both fully
+    # overlap the single geometry box. Confidence-ordered greedy must let the
+    # high-conf box claim the match, not the one that happened to be listed first.
+    model = [
+        make_proposal("text", 0.50, make_bbox(0, 0, 100, 100), "model", "m_low"),
+        make_proposal("text", 0.95, make_bbox(0, 0, 100, 100), "model", "m_high"),
+    ]
+    geometry = [make_proposal("text", 0.6, make_bbox(0, 0, 100, 100), "geometry", "g0")]
+    result = match_proposals(model, geometry)
+    assert result.matched[0].model.proposal_id == "m_high"
+
+
 def test_matcher_respects_iou_threshold():
     model = [make_proposal("text", 0.9, make_bbox(0, 0, 100, 100), "model", "m0")]
     # tiny overlap, below 0.35

@@ -43,6 +43,14 @@ def _greedy_match(
     unmatched_model: List[Proposal] = []
     used_geo: set[int] = set()
 
+    # Highest-confidence model proposals claim their geometry match first, so an
+    # early low-confidence box can no longer take the geometry box a later
+    # high-confidence box needed. Deterministic either way; this is strictly closer
+    # to an optimal assignment. proposal_id breaks ties for stable ordering.
+    model_proposals = sorted(
+        model_proposals, key=lambda p: (-p.confidence, p.proposal_id)
+    )
+
     for model_prop in model_proposals:
         best_idx = -1
         best_iou = 0.0
