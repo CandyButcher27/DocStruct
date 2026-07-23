@@ -22,10 +22,24 @@ from docstruct import config
 
 _WS = re.compile(r"\s+")
 
+# Unicode dash and quote variants that mean the same character as their ASCII form.
+# PDFs are full of them, and a model quoting a document will happily normalise a
+# non-breaking hyphen (U+2011) to a plain one or the other way round. Treating
+# "FA-ISS" and "FA‑ISS" as different strings rejects a correct verbatim span and
+# scores a chunk that contains the answer as a miss.
+_EQUIVALENTS = {
+    "‐": "-", "‑": "-", "‒": "-", "–": "-", "—": "-",
+    "―": "-", "−": "-", "­": "",
+    "‘": "'", "’": "'", "‛": "'", "′": "'",
+    "“": '"', "”": '"', "„": '"',
+    " ": " ", " ": " ", " ": " ", "﻿": "",
+}
+_EQUIV_TABLE = str.maketrans(_EQUIVALENTS)
+
 
 def normalize_text(text: str) -> str:
-    """Lowercase, strip, collapse whitespace, drop soft hyphens."""
-    text = (text or "").replace("­", "").replace("-\n", "")
+    """Lowercase, strip, collapse whitespace, fold dash/quote/space variants."""
+    text = (text or "").translate(_EQUIV_TABLE).replace("-\n", "")
     return _WS.sub(" ", text).strip().lower()
 
 

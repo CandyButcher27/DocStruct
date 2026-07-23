@@ -170,14 +170,17 @@ QA_MAX_CHARS_PER_REQUEST = 14000
 # generators drift toward exactly those spans regardless of the prompt, so the floor
 # is enforced at validation rather than trusted to instruction-following.
 QA_MIN_SPAN_WORDS = 6
-# Completion budget per gold-generation request. Providers charge the *reserved*
-# budget against the per-minute token limit, not the tokens actually produced, so
-# leaving it unset reserves the model's full completion length and can make a
-# request that exceeds the limit on its own. Raise it for a reasoning model: those
-# spend the budget on hidden reasoning before the JSON, and a budget sized for the
-# answer alone gets the response truncated mid-object (GROQ rejects that with a
-# 400 "Failed to validate JSON" rather than returning the partial text).
-QA_MAX_COMPLETION_TOKENS = 1500
+# Completion budget per gold-generation request. Sized for a *reasoning* model:
+# those spend most of the budget on hidden reasoning before emitting any JSON, so a
+# budget sized for the answer alone comes back truncated mid-object — measured at
+# 1500 tokens, gpt-oss:120b returned `finish_reason: length` and unparseable JSON
+# every time, while 8000 completed cleanly.
+#
+# Lower it on a token-metered provider. Providers charge the *reserved* budget
+# against the per-minute limit rather than the tokens actually produced, so a large
+# reservation on a small allowance makes a request that can never succeed however
+# long it waits.
+QA_MAX_COMPLETION_TOKENS = 8000
 # Seconds to wait before each gold-generation request. One segment of a paper is
 # most of a free-tier minute's token allowance, so consecutive requests collide by
 # construction; pacing up front is cheaper than a rejected request plus the

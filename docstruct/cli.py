@@ -100,6 +100,11 @@ def _cmd_gen_qa(args) -> int:
     from docstruct.llm.client import LLMClient
     from docstruct.eval.qa_generator import generate_for_pdf, save_qa, load_qa
 
+    if args.pace is not None:
+        from docstruct import config as _config
+
+        _config.QA_REQUEST_PACING_SECONDS = args.pace
+
     kwargs = {"provider": args.provider}
     if args.model:
         kwargs["model"] = args.model
@@ -116,7 +121,8 @@ def _cmd_gen_qa(args) -> int:
         if os.path.basename(pdf) in done:
             print(f"  {pdf}: skip (already done)", flush=True)
             continue
-        items = generate_for_pdf(pdf, client, weights=args.weights, n=args.per_doc, cache_dir=args.cache_dir)
+        items = generate_for_pdf(pdf, client, weights=args.weights, n=args.per_doc,
+                                 cache_dir=args.cache_dir, max_chars=args.max_chars)
         all_items.extend(items)
         save_qa(all_items, args.out)  # incremental: survive interruptions
         print(f"  {pdf}: {len(items)} questions (total {len(all_items)})", flush=True)
@@ -217,6 +223,13 @@ def build_parser() -> argparse.ArgumentParser:
     g_p.add_argument("--model", default=None, help="LLM model id (default gpt-oss:120b)")
     g_p.add_argument("--provider", default="ollama", choices=("ollama", "groq"),
                      help="OpenAI-compatible provider to generate gold with")
+    # Both of these exist because the right value is a property of the provider's
+    # rate limits, not of DocStruct. A generous endpoint should see the whole
+    # document in one request; a metered one has to be fed in paced slices.
+    g_p.add_argument("--max-chars", type=int, default=None,
+                     help="source characters per request (default: config value)")
+    g_p.add_argument("--pace", type=float, default=None,
+                     help="seconds to wait before each request (0 to disable)")
     g_p.add_argument("--cache-dir", default=None, help="cache detector proposals (reused by benchmark)")
     g_p.set_defaults(func=_cmd_gen_qa)
 
