@@ -655,3 +655,51 @@ under `--tools docling`.
 - **The gold generator changed between v4 and v6** (gpt-oss:120b throughout now,
   vs a v5 interim that mixed two models). v4/v5 numbers are not comparable to v6
   and are marked superseded in `memory/results.md`.
+
+## Stage 8 — PyPI-release hardening (Fable review, batch 1)
+
+Fable reviewed the whole pipeline (`fable_suggestions.md`). Its list is ~40 items
+across nine sections; most of the structural ones are marked **[MEASURE]** and are
+worthless until they clear `scripts/ablate.py` on a corpus that is not all arXiv —
+so they are staged, not landed here. This stage is the subset that changes *no chunk
+output at all*: packaging and the library-facing API. None of it can move a
+benchmark number, so none of it needed one.
+
+- **§1.1 version single-source.** `__init__.py` hard-coded `0.3.0` while
+  `pyproject.toml` said `0.4.0`. Now read from installed metadata
+  (`importlib.metadata.version`) with a dev fallback; `test_errors.py` asserts the
+  runtime version equals the `pyproject` version so they can never drift again.
+  (Editable installs must be reinstalled on a version bump for the metadata to
+  refresh — did that.)
+- **§1.2 `model` extra missing pymupdf.** `ModelDetector` imports `fitz` to
+  rasterize pages, but the extra only pulled `ultralytics`. Added `pymupdf>=1.24`.
+- **§1.3 typed exceptions.** New `docstruct/errors.py`:
+  `DocStructError` → `InvalidPDFError` / `EncryptedPDFError` / `EmptyDocumentError`,
+  plus one `open_pdf()` context manager that every `pdfplumber.open` site
+  (geometry detector, both extractors) now routes through. It translates the ragged
+  pdfminer surface — including the wrapped `PdfminerException` whose real cause hides
+  in `__context__` with an empty message — into these three. Callers no longer need
+  to import pdfminer internals to catch a bad file. Tested against zero-byte,
+  corrupt, and AES-256-encrypted fixtures.
+- **§1.4 scanned-PDF diagnostic.** A wordless image-only PDF used to return an empty
+  `Document` with no explanation. `run_pipeline` now sets
+  `diagnostics["likely_scanned"]` when a majority of pages yield no extractable text
+  and logs a warning pointing at `ocrmypdf`. No OCR in the pipeline — that stays a
+  documented pre-processing step (contract).
+- **§1.5 logging hygiene.** `NullHandler` on the `docstruct` logger so importing the
+  library never spams a host app that has not configured logging.
+- **§1.6 `py.typed`.** Added the marker + `package-data` so the annotations in
+  `schema.py` are actually visible to downstream type checkers.
+- **§1.7 input flexibility (partial).** `parse()` now takes `str | Path` and a
+  `password=` that threads through `run_pipeline` → detector/extractors →
+  `pdfplumber.open`. Left `pages=` for later: it needs page-index remapping through
+  the detectors, extractors and cache keys, which is real work for a speculative
+  feature.
+- **§8 re-exports.** `run_pipeline` and `PipelineResult` are the documented
+  diagnostics surface; they are now in `__all__`, alongside the error classes.
+
+Deferred deliberately: §1.8 `ParseConfig` (its own mechanical branch), §1.9 CI, and
+every §2–§5 correctness/structural item — those are behind config flags and must be
+ablated before being kept on, which is blocked on the same corpus grind as Stage 7.
+
+Full suite: 149 passed (143 + 6 new in `test_errors.py`), no regressions.
