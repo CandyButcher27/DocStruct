@@ -150,6 +150,11 @@ FURNITURE_Y_TOLERANCE = 10.0    # points; lines within this share a repetition b
 MAX_CHUNK_TOKENS = 500
 CHUNK_OVERLAP_TOKENS = 75  # tail words carried into next chunk on token-limit flush
 HEADER_LEVELS = 3
+# Rank header levels by (font size, bold) instead of font size alone, so a bold and a
+# regular heading at the same size become different levels (bold above). Weight is a
+# real depth signal the font-rank-only approach throws away. [MEASURE — changes only
+# section-path metadata, not scored content, but off until measured]
+HEADER_RANK_BY_WEIGHT = False
 # Let an explicit section number ("3.2.1 Ablations") set the header's depth instead
 # of its font-size rank. Font size is a proxy for depth; a section number *is* the
 # depth, so where one exists there is nothing left to infer. Fixes documents that
@@ -170,6 +175,11 @@ BREAK_TEXT_ON_CAPTION = False
 # section-path metadata. Without this, text that is laid out as a heading (titles,
 # author lines, run-in headers) exists in no chunk and can never be retrieved.
 INLINE_HEADER_TEXT = True
+# Emit reference/bibliography sections as chunk_type "references" instead of dropping
+# them (the default). Excluded from retrieval indexing by default; useful for
+# citation-analysis users. Makes the dead "references" enum value real. [MEASURE that
+# the False default stays best for retrieval]
+KEEP_REFERENCES = False
 # Carry CHUNK_OVERLAP_TOKENS across structural boundaries too, not only across
 # token-limit flushes. Measured (reports/ablations/08_overlap_on_boundary.json,
 # 48 docs / 298 questions): MRR 0.7432 vs 0.7457, NDCG 0.7658 vs 0.7708, Recall

@@ -59,6 +59,18 @@ def median_font_size(page, bbox: BoundingBox) -> float | None:
     return round(statistics.median(sizes), 2) if sizes else None
 
 
+def is_bold_region(page, bbox: BoundingBox) -> bool | None:
+    """Whether a majority of a bbox's characters are bold, or None if no chars."""
+    region = _crop(page, bbox)
+    if region is None:
+        return None
+    fonts = [(c.get("fontname", "") or "").lower() for c in region.chars]
+    if not fonts:
+        return None
+    bold = sum(any(m in f for m in config.BOLD_FONT_MARKERS) for f in fonts)
+    return bold > len(fonts) / 2
+
+
 def populate_text(pdf_path: str, blocks: List[Block], *, password: str | None = None) -> List[Block]:
     """Set ``text`` on text-bearing blocks and ``font_size`` on headers, in place."""
     by_page: Dict[int, List[Block]] = {}
@@ -75,4 +87,6 @@ def populate_text(pdf_path: str, blocks: List[Block], *, password: str | None = 
                     block.text = extract_text(page, block.bbox)
                 if block.label == "header":
                     block.font_size = median_font_size(page, block.bbox)
+                    if config.HEADER_RANK_BY_WEIGHT:
+                        block.is_bold = is_bold_region(page, block.bbox)
     return blocks
