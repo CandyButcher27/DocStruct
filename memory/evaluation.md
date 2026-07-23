@@ -50,8 +50,28 @@ actual substring of the raw document text before it is kept, so any tool that
 preserves that content can hit it.
 
 Generation uses an OpenAI-compatible endpoint (Ollama cloud `gpt-oss:120b` by
-default, GROQ as alternate) via a stdlib-only client. Documents over ~60k words
-are split in half and half the questions generated from each.
+default, GROQ via `--provider groq`) through a stdlib-only client.
+
+Three constraints the generator has to respect, all learned the hard way:
+
+- **Segment by characters, not words** (`QA_MAX_CHARS_PER_REQUEST`). Word count is
+  a bad token proxy for scientific PDFs — a 3,641-word segment of an
+  equation-heavy paper tokenised to 12,228 tokens (3.4 tokens/word) against ~1.3
+  for ordinary prose. A word budget meant every dense document silently produced
+  zero questions.
+- **Cap `max_tokens`.** Providers charge the *reserved* completion budget against
+  the per-minute limit, not what is generated. Unset, the reservation is the
+  model's full completion length, which alone can exceed the limit and make a
+  request that can never succeed.
+- **Pace requests** (`QA_REQUEST_PACING_SECONDS`). One segment is most of a
+  free-tier minute's allowance, so consecutive requests collide by construction.
+  Waiting up front is cheaper than a rejected round trip plus `Retry-After`.
+
+Answer spans below `QA_MIN_SPAN_WORDS` (6) are discarded. A two-word span like
+`"DanceOPD"` is contained by almost any chunk that mentions the topic — it scores
+every tool alike and dissolves the benchmark's ability to discriminate. Weaker
+generators drift to exactly those spans regardless of the prompt, so the floor is
+enforced at validation.
 
 ### Relevance (`relevance.py`)
 
@@ -101,6 +121,19 @@ call a real difference insignificant.
 `chunk(pdf_path) -> List[EvalChunk]` interface; `get_adapters()` silently skips
 any whose optional dependency is not installed and the report records which were
 skipped.
+
+### Single-detector ablation
+
+`docstruct_geo` and `docstruct_model` run the same chunker with one detector
+disabled (`run_pipeline(pipeline_mode=...)`). They answer "what is each detector
+actually worth?" — the first question a two-detector design invites — and are
+**deliberately not in the default tool list**, because that is a different
+question from the cross-tool leaderboard.
+
+The trap here is the block cache: its key must include the pipeline mode, or a
+geometry-only run *with weights present* hashes identically to the hybrid run and
+serves its blocks, producing an ablation that measures nothing while appearing to
+work.
 
 ## Ablation workflow
 

@@ -536,3 +536,27 @@ and would have served the other's blocks — an ablation that measured nothing a
 looked like it worked. The mode is now part of the key. Tested by pointing
 geometry-only at a weights path that cannot load: if the model were reached it
 would raise rather than pass.
+
+### 7.6 Cross-boundary overlap: implemented long ago, never measured, and it loses
+
+`OVERLAP_ON_BOUNDARY` had been in `config.py` since the chunk-floor work, off by
+default, with no measurement behind that default — the plan (§7.3) argued for it
+on intuition: the first chunk of a new section loses the last sentence of the one
+before it. Intuition is not a result, so it was run.
+
+| | MRR | NDCG@5 | Recall@5 | Hit@1 | Chunks | Context words |
+|---|---|---|---|---|---|---|
+| off (`04_xtolerance`, current default) | **0.7457** | **0.7708** | **0.8859** | 0.6409 | 3070 | 2346 |
+| on (`08_overlap_on_boundary`) | 0.7432 | 0.7658 | 0.8826 | 0.6409 | 3156 | 2354 |
+
+Worse on every metric that moved, Hit@1 identical, and it costs 86 extra chunks
+and slightly more retrieved context to get there.
+
+The explanation is the floor. `MIN_CHUNK_TOKENS` already means most structural
+boundaries are *crossed* rather than cut, so the case the overlap was designed for
+— a section opening stranded without its preceding context — mostly does not
+arise any more. What the overlap does instead is duplicate text into a second
+chunk that then competes with its own source for the same query. Two chunks
+containing the answer do not rank better than one; they split the evidence.
+
+Stays off, now with a number attached to that decision rather than a hunch.

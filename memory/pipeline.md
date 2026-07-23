@@ -113,16 +113,24 @@ human-reading surface rather than a retrieval one.
 
 ## 6. Header levels — `chunking/hierarchy_builder.py`
 
-Levels come purely from the **font-size rank** of header blocks within the
-document: largest distinct size → level 1, clamped at `HEADER_LEVELS = 3`.
-Document-agnostic by design — no hardcoded section names, no regexes on
-"Introduction". Falls back to bbox height when `font_size` is missing.
+Two deterministic, document-local signals — no hardcoded section names, no regex
+on "Introduction".
 
-Known limitation: a document whose subsections share a font size with a different
-*weight*, or which numbers sections ("3.2.1 Methods") without a size difference,
-gets misassigned levels. A numbering-pattern regex as a tiebreaker is the obvious
-deterministic fix; it is unscheduled because header level feeds only
-`section_path` metadata and therefore is not measurable on the current benchmark.
+1. **Section numbering** (`HEADER_NUMBERING_LEVELS`, default on). "3 Method" → 1,
+   "3.2 Setup" → 2, "3.2.1 Ablations" → 3. Where a heading carries a number, that
+   number *states* its depth, so it wins outright. The regex is anchored and
+   requires text after the number, so a bare page number or list marker does not
+   qualify.
+2. **Font-size rank**, for unnumbered headings: largest distinct size → level 1,
+   clamped at `HEADER_LEVELS = 3`. Falls back to bbox height when `font_size` is
+   missing.
+
+Numbering was added because font size alone collapses the hierarchy entirely on
+documents that set every heading at one size, and misassigns levels on documents
+that separate depth by weight rather than size. It is **not visible in the
+retrieval benchmark** — header level never moves a chunk boundary, so chunk text
+is byte-identical — but `section_path` is what filtered retrieval is built on, and
+it was wrong on those documents.
 
 ## 7. Chunking — `chunking/assembler.py`
 
@@ -168,6 +176,6 @@ tokenizer would tie chunk boundaries to a model version and break determinism.
 - `fusion/containment.py` — `suppress_contained` / `suppress_table_contained` are
   implemented, imported by `pipeline.py`, and **never called**. Both were wired in
   and reverted after measurement; see `decisions.md` before re-enabling.
-- `run_pipeline()` has no `pipeline_mode` parameter, so there is no geometry-only
-  vs model-only ablation path. `implementation_plan.md` §3/§5b propose one.
 - Standalone figures with no caption produce no chunk at all.
+- The `# unvalidated` confidence constants feed nothing today, but anything that
+  starts consuming them (confidence-weighted ranking) is built on untuned numbers.

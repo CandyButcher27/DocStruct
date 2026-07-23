@@ -112,7 +112,13 @@ BREAK_TEXT_ON_CAPTION = False
 # author lines, run-in headers) exists in no chunk and can never be retrieved.
 INLINE_HEADER_TEXT = True
 # Carry CHUNK_OVERLAP_TOKENS across structural boundaries too, not only across
-# token-limit flushes.
+# token-limit flushes. Measured (reports/ablations/08_overlap_on_boundary.json,
+# 48 docs / 298 questions): MRR 0.7432 vs 0.7457, NDCG 0.7658 vs 0.7708, Recall
+# 0.8826 vs 0.8859, Hit@1 identical — slightly worse on every metric that moved,
+# at 86 more chunks and marginally more retrieved context. The intuition (a section
+# opening loses the sentence before it) is real, but with MIN_CHUNK_TOKENS in place
+# most boundaries are already crossed rather than cut, so the overlap mostly adds
+# duplicated text that competes with its own source chunk. Off. See notes.md Stage 7.
 OVERLAP_ON_BOUNDARY = False
 
 # --- Model detector (optional, YOLOv8 / DocLayNet) ---
