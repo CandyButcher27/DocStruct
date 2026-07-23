@@ -15,7 +15,7 @@
 <p align="center">
   <img alt="Python 3.11+" src="https://img.shields.io/badge/python-3.11%2B-blue">
   <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-green">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-119%20passing-brightgreen">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-143%20passing-brightgreen">
 </p>
 
 ---
@@ -273,7 +273,7 @@ python scripts/ablate.py --name min300 --set MIN_CHUNK_TOKENS=300
 
 ```
 docstruct/          the library (geometry, model, fusion, chunking, eval, cli)
-tests/              pytest suite, 119 tests
+tests/              pytest suite, 143 tests
 scripts/            corpus fetching and single-tool ablation runner
 tools/annotate.html browser UI for correcting detection ground truth
 reports/            benchmark reports, each with its full config snapshot
@@ -287,7 +287,7 @@ implementation_plan.md   standing plan-vs-code audit
 ```bash
 python -m venv .venv && .venv/Scripts/activate      # Windows
 pip install -e ".[all]"
-pytest -q                                            # ~119 tests, ~2.5 min
+pytest -q                                            # ~143 tests, ~3 min
 ```
 
 Tests that need optional extras, real PDFs or an LLM self-skip when those are

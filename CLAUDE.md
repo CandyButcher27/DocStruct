@@ -58,7 +58,7 @@ whether it was kept). `implementation_plan.md` is the standing plan-vs-code audi
 ## Running things
 
 ```bash
-.venv/Scripts/python.exe -m pytest -q          # 119 tests, ~2.5 min
+.venv/Scripts/python.exe -m pytest -q          # 143 tests, ~3 min
 python -m docstruct.cli run data/raw-pdfs/doc1.pdf
 python scripts/ablate.py --name try --set MIN_CHUNK_TOKENS=300
 ```
