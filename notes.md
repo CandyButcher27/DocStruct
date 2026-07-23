@@ -238,3 +238,68 @@ matters more than rank, 80/300 delivers 0.7022 MRR — still above pymupdf4llm �
 **43% of the context cost**. That is a configuration story the old
 flush-at-every-boundary code could not tell at all, because it was paying for tiny
 chunks *and* getting the worst MRR.
+
+---
+
+## Stage 5 — Packaging, and the bug the packaging found
+
+The library goal (`pip install docstruct` → `import docstruct`) was its own stage,
+but it is also what surfaced the largest remaining extraction bug.
+
+### The API
+
+`run_pipeline()` returns the pipeline's internal result — blocks, chunks, fusion
+diagnostics. Correct for evaluating the pipeline, wrong for using it. Added
+`docstruct.parse()` returning a `Document`:
+
+```python
+import docstruct
+doc = docstruct.parse("paper.pdf")
+doc.text / doc.markdown / doc.pages() / doc.sections() / doc.chunks / doc.to_json()
+```
+
+No new pipeline behaviour — a view over what was already there. `markdown` renders
+from *blocks*, not chunks, because chunks are sized for retrieval and deliberately
+merge across headings, which is the wrong shape for a document meant to be read.
+This is what finally gave `table_to_markdown()` a caller, so it came back.
+
+Verified properly rather than assumed: built the wheel and sdist, checked the
+wheel contains only `docstruct/` (no data, weights or tests — 58 entries), installed
+it into a **fresh venv with only the core dependencies**, and ran `parse()` on a
+real PDF. Geometry-only, no model, no network.
+
+### What the smoke test found
+
+The output read `IreneAmerini1,ElenaBalashova2` and `1.Introduction`. pdfplumber
+inserts a space when the inter-character gap exceeds a **flat 3pt default**, which
+is wider than the real inter-word gap in small type — so author lines, footnotes and
+table cells lose their word breaks entirely. `x_tolerance_ratio` scales the
+tolerance with font size and fixes it without over-splitting large headings.
+
+This was not only cosmetic. BM25 cannot match a term that has been concatenated to
+its neighbour, so it was costing real retrieval hits:
+
+| | MRR | NDCG@5 | Recall@5 | Hit@1 |
+|---|---|---|---|---|
+| `03_min200_max500` | 0.7319 | 0.7560 | 0.8826 | 0.6342 |
+| `04_xtolerance` | **0.7457** | **0.7708** | **0.8859** | **0.6409** |
+
+### A metric that would have punished the fix
+
+Word spacing in a PDF is *inferred*, not stored — extractors measure gaps and
+guess, and they disagree. The gold answer spans carry whichever guesses the
+generator made at the time. So a chunker that gets spacing *more right than the
+gold* scores *worse* on verbatim containment. The benchmark would have graded this
+fix as a regression.
+
+Made the containment check whitespace-blind (compare with all whitespace removed,
+in addition to the normalized comparison). It is applied identically to every tool,
+so it does not favour DocStruct — and measured in isolation it changes DocStruct's
+score by **exactly nothing** (0.7319, identical to `03`), which is the point: the
+entire +0.0138 is the extraction fix, and the rule is a guard against the metric
+measuring tokenizer agreement instead of retrieval quality.
+
+Isolating this mattered. Run `04` mixed both changes; without run `05`
+(`TEXT_X_TOLERANCE_RATIO=0`, new relevance rule) the honest attribution was
+unavailable, and it would have been easy to credit a permissive metric for a real
+improvement.
