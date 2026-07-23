@@ -141,3 +141,43 @@ def test_empty_and_single_block():
 
     assert xy_cut_order([], 600.0) == []
     assert xy_cut_order([_b("only", 0, 0, 10, 10)], 600.0) == [0]
+
+
+def test_multi_column_noop_on_two_columns(monkeypatch):
+    from docstruct import config
+    monkeypatch.setattr(config, "MULTI_COLUMN", True)
+    blocks = [
+        _block("L", "text", make_bbox(50, 20, 150, 60)),
+        _block("R", "text", make_bbox(400, 20, 500, 60)),
+    ]
+    # byte-identical to the legacy 2-column split
+    assert detect_columns(blocks, page_width=600) == [[0], [1]]
+
+
+def test_multi_column_splits_three_columns(monkeypatch):
+    from docstruct import config
+    monkeypatch.setattr(config, "MULTI_COLUMN", True)
+    blocks = [
+        _block("A", "text", make_bbox(20, 20, 120, 60)),
+        _block("B", "text", make_bbox(250, 20, 350, 60)),
+        _block("C", "text", make_bbox(480, 20, 580, 60)),
+    ]
+    cols = detect_columns(blocks, page_width=600)
+    assert len(cols) == 3
+    # legacy single-largest-gap split would give only 2
+    monkeypatch.setattr(config, "MULTI_COLUMN", False)
+    assert len(detect_columns(blocks, page_width=600)) == 2
+
+
+def test_band_split_orders_full_width_then_columns(monkeypatch):
+    from docstruct import config
+    monkeypatch.setattr(config, "BAND_SPLIT", True)
+    # full-width title on top, then a 2-column body below it
+    blocks = [
+        _block("title", "header", make_bbox(20, 10, 580, 40)),  # full width
+        _block("L", "text", make_bbox(20, 60, 250, 200)),
+        _block("R", "text", make_bbox(350, 60, 580, 200)),
+    ]
+    order = sort_reading_order(blocks, page_width=600)
+    ids = [blocks[i].block_id for i in order]
+    assert ids == ["title", "L", "R"]

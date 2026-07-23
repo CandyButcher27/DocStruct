@@ -81,14 +81,23 @@ def _split_columns(lines: List[_Line], page_width: float) -> List[List[_Line]]:
         (idx, center(ordered[idx]) - center(ordered[idx - 1]))
         for idx in range(1, len(ordered))
     ]
-    split_index, max_gap = max(gaps, key=lambda g: g[1])
+    min_gap = page_width * config.COLUMN_GAP_RATIO
 
-    if max_gap < page_width * config.COLUMN_GAP_RATIO:
+    if config.MULTI_COLUMN:
+        cut_indices = [idx for idx, gap in gaps if gap >= min_gap]
+    else:
+        split_index, max_gap = max(gaps, key=lambda g: g[1])
+        cut_indices = [split_index] if max_gap >= min_gap else []
+
+    if not cut_indices:
         return [lines]
 
-    left = ordered[:split_index]
-    right = ordered[split_index:]
-    columns = [left, right]
+    columns = []
+    start = 0
+    for idx in cut_indices:
+        columns.append(ordered[start:idx])
+        start = idx
+    columns.append(ordered[start:])
     columns.sort(key=lambda col: sum((l.x0 + l.x1) / 2 for l in col) / len(col))
     return columns
 

@@ -30,6 +30,19 @@ CONFIDENCE_BOUNDS = {
 
 # --- Reading order ---
 COLUMN_GAP_RATIO = 0.15         # legacy centre-gap column split (XY_CUT = False)
+# Split on *every* centre gap wider than COLUMN_GAP_RATIO x page_width, yielding k
+# columns instead of exactly 1 or 2 (the single largest gap). Removes the structural
+# ceiling for 3-column layouts. Expected byte-identical on 1/2-column pages — the
+# arXiv corpus — so a change there is a bug. [MEASURE: assert no-op on current corpus]
+MULTI_COLUMN = False
+# Before column-splitting, cut the page into horizontal bands at full-width blocks (a
+# block wider than FULL_WIDTH_RATIO x page_width acts as a separator), then run the
+# existing column split within each band. Targets the one case the centre-gap
+# splitter provably gets wrong — a full-width title/table across a 2-column body —
+# without changing column detection globally the way XY-cut did (its measured loss).
+# [MEASURE — highest-value reading-order experiment given decisions.md]
+BAND_SPLIT = False
+FULL_WIDTH_RATIO = 0.7
 CAPTION_MAX_DISTANCE = 100.0
 # Recursive XY-cut: split a region at real whitespace bands and recurse, instead of
 # forcing every page into one or two centre-defined columns. It is the more
