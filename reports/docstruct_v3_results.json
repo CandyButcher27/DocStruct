@@ -1,0 +1,2300 @@
+{
+  "meta": {
+    "timestamp": "2026-06-28 10:48 UTC",
+    "n_docs": 48,
+    "n_questions": 298,
+    "llm_model": "gpt-oss:120b",
+    "skipped": []
+  },
+  "results": [
+    {
+      "name": "docstruct",
+      "mrr": 0.6573,
+      "ndcg": 0.6928,
+      "recall": 0.8423,
+      "hit1": 0.5403,
+      "vec_mrr": 0.5041,
+      "vec_ndcg": 0.55,
+      "vec_recall": 0.7114,
+      "vec_hit1": 0.3826,
+      "n_questions": 298,
+      "n_chunks": 3773,
+      "mean_chunk_words": 185.1,
+      "chunk_seconds": 741.48,
+      "eval_seconds": 6.42,
+      "errors": 0,
+      "per_question": [
+        {
+          "doc": "doc1.pdf",
+          "question": "What neural network model was used to predict future air pollutant concentrations in Macau?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc1.pdf",
+          "question": "When did all AQMSs in Macau start measuring PM concentrations?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.25
+        },
+        {
+          "doc": "doc1.pdf",
+          "question": "What does the experimental sample include regarding its time span and measurements?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.3333
+        },
+        {
+          "doc": "doc1.pdf",
+          "question": "What advantage do LSTM RNNs initialized with transfer learning have over random initialization?",
+          "vec_rr": 0.5,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc1.pdf",
+          "question": "How is the original method for prediction described in the paper?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc1.pdf",
+          "question": "What happened to the High density residential area (Taipa) AQMS between July 2012 and June 2013?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc10.pdf",
+          "question": "What does the survey focus on and largely ignore?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc10.pdf",
+          "question": "How are emotions recognized in decision-making according to the article?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc10.pdf",
+          "question": "What potential benefit do emotion models offer to machine learning researchers?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc10.pdf",
+          "question": "How can emotions benefit the interactive ML and HRI community?",
+          "vec_rr": 0.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc10.pdf",
+          "question": "What does the article claim emotions allow affective modelling researchers to do?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc10.pdf",
+          "question": "What question does the article raise about studying emotions in machines?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc10.pdf",
+          "question": "For how many research fields is the study of emotions in learning agents useful?",
+          "vec_rr": 0.2,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc10.pdf",
+          "question": "How is emotion described in relation to human intelligence?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc10.pdf",
+          "question": "What did Damasio (1994) demonstrate about people with impaired emotional processing?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc11.pdf",
+          "question": "What are the two main classes of word formation?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc12.pdf",
+          "question": "How does the prompting method perform in the few‑shot setting?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc13.pdf",
+          "question": "What is the architecture of the frozen backbone used in the detector?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc13.pdf",
+          "question": "What value is the weight factor λ set to in the loss formulation?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc13.pdf",
+          "question": "To what size is the short edge of MVD images resized during inference?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc13.pdf",
+          "question": "What does the loss formulation state about λ and the RPN loss?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc13.pdf",
+          "question": "Which backbone models are used in the frozen configuration?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc14.pdf",
+          "question": "What does the Text Prompt approach introduce?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc15.pdf",
+          "question": "How many high quality submissions were received this year?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc15.pdf",
+          "question": "What is the total amount of sponsorship for this year?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc15.pdf",
+          "question": "Which companies are listed as Platinum sponsors?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc15.pdf",
+          "question": "Which companies are listed as Silver sponsors?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc15.pdf",
+          "question": "Which companies are listed as Bronze sponsors?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc16.pdf",
+          "question": "Who are the authors of the paper?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc16.pdf",
+          "question": "What is the main technique introduced in the paper?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc16.pdf",
+          "question": "How does the paper describe making Policy Gradient robust to external directives?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc16.pdf",
+          "question": "In which environment are the experiments conducted?",
+          "vec_rr": 0.25,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc16.pdf",
+          "question": "How many human interventions are simulated for advice with probability L = 0.05?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc16.pdf",
+          "question": "How does the network combine the advisory policy with the agent's policy?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc16.pdf",
+          "question": "What effect does human advice have on performance according to the results?",
+          "vec_rr": 1.0,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc17.pdf",
+          "question": "What is the name of the algorithm proposed in the paper?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc17.pdf",
+          "question": "What is the behavior policy formulation that incorporates the value bonus?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc17.pdf",
+          "question": "What is the weight update rule for DDQN as given in the document?",
+          "vec_rr": 0.5,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc17.pdf",
+          "question": "How is the random reward R defined in equation (3)?",
+          "vec_rr": 1.0,
+          "hyb_rr": 0.3333
+        },
+        {
+          "doc": "doc17.pdf",
+          "question": "What ensemble size is used for BDQN in the experiments?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc17.pdf",
+          "question": "What bonus scale c and ensemble size k are used for VBE in the Deepsea experiment?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc17.pdf",
+          "question": "What limitation of reward bonuses is mentioned in the text?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc17.pdf",
+          "question": "Where can the code for the proposed method be found?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.25
+        },
+        {
+          "doc": "doc18.pdf",
+          "question": "How is the policy space initially constrained when IPSE uses the LFD algorithm?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc18.pdf",
+          "question": "Which algorithms used the same rollout parameters according to the passage?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc18.pdf",
+          "question": "What reinforcement learning algorithm is introduced that learns feature directions?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc19.pdf",
+          "question": "What does deploying a context imply according to the authors?",
+          "vec_rr": 0.2,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc19.pdf",
+          "question": "How is the input image of the floor described?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc2.pdf",
+          "question": "Who introduced the Random Neural Network model and in what year?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc2.pdf",
+          "question": "Which learning algorithms were adapted for RNNs according to the document?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.3333
+        },
+        {
+          "doc": "doc2.pdf",
+          "question": "Under what condition is the RNN considered a universal approximator?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc2.pdf",
+          "question": "How is the output of a Random Neuron (RN) defined mathematically?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc2.pdf",
+          "question": "What are the two types of customers in a G-network?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc2.pdf",
+          "question": "What is the computational cost of computing the inverse of I−Ω for a feedforward RNN?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc2.pdf",
+          "question": "Which algorithm is described as more robust than Gauss-Newton?",
+          "vec_rr": 1.0,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc2.pdf",
+          "question": "What dataset is used for Internet traffic prediction in the ESQN example?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc2.pdf",
+          "question": "What cost function do RNN learning algorithms commonly use?",
+          "vec_rr": 0.5,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc2.pdf",
+          "question": "What advantage does the LM algorithm have according to the text?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.2
+        },
+        {
+          "doc": "doc20.pdf",
+          "question": "What algorithm is proposed to learn a joint policy through agent interactions?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc20.pdf",
+          "question": "What is the joint policy characterized as under mild conditions?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc20.pdf",
+          "question": "How is variational inference incorporated into the policy architecture?",
+          "vec_rr": 1.0,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc20.pdf",
+          "question": "How scalable is the proposed method in terms of number of agents?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc20.pdf",
+          "question": "On what type of tasks is the algorithm evaluated and how does it perform relative to prior work?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc20.pdf",
+          "question": "What assumption is made about each agent's reward function?",
+          "vec_rr": 0.5,
+          "hyb_rr": 0.3333
+        },
+        {
+          "doc": "doc20.pdf",
+          "question": "What name is given to the algorithm to highlight its connection to variational inference?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.25
+        },
+        {
+          "doc": "doc20.pdf",
+          "question": "What form does the optimal policy take according to the theory?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc20.pdf",
+          "question": "How is the collaborative multi-agent reinforcement learning algorithm described?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc21.pdf",
+          "question": "Who introduced the Random Neural Network model and in what year?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc21.pdf",
+          "question": "Which learning algorithms have been adapted for RNNs?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.3333
+        },
+        {
+          "doc": "doc21.pdf",
+          "question": "What universal property does the RNN possess under certain hypotheses?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc21.pdf",
+          "question": "How is the information presented in supervised learning according to the document?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc21.pdf",
+          "question": "What is the expression for the output of a Random Neuron (RN)?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc21.pdf",
+          "question": "How is the utilization factor of an M/M/1 queue defined?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc21.pdf",
+          "question": "Which algorithm is described as more robust than Gauss-Newton?",
+          "vec_rr": 1.0,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc21.pdf",
+          "question": "What are the two types of customers in a G-network?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc21.pdf",
+          "question": "What does a Quasi-Newton method use to solve normal equations?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc22.pdf",
+          "question": "What are the three components of the universal graph encoder architecture?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc22.pdf",
+          "question": "What hidden dimension is set in the Input Transformer?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc22.pdf",
+          "question": "What are the reported performance numbers for DUGNN across all benchmark datasets?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc22.pdf",
+          "question": "How is the loss function L defined in the model?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc22.pdf",
+          "question": "According to Theorem 1, how is the matrix X initialized?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.25
+        },
+        {
+          "doc": "doc22.pdf",
+          "question": "Why does the model concatenate intermediate encoding layers?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc22.pdf",
+          "question": "What effect does completely removing the graph decoder have on accuracy?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc22.pdf",
+          "question": "How is the function f(L) mathematically expressed?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc23.pdf",
+          "question": "What name is given to the proposed model in the paper?",
+          "vec_rr": 1.0,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc23.pdf",
+          "question": "Which datasets were used to evaluate the model?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc23.pdf",
+          "question": "Where can the proposed method be accessed publicly?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc23.pdf",
+          "question": "What is the first layer of the HAHNN architecture?",
+          "vec_rr": 0.5,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc23.pdf",
+          "question": "Which type of convolutional layers were added for flexible receptive fields?",
+          "vec_rr": 0.25,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc23.pdf",
+          "question": "How does the model measure the importance of a word?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc23.pdf",
+          "question": "What are the dimensions of the word embeddings and the optimizer settings?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc23.pdf",
+          "question": "What does the proposed model consider about different parts of a document?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc23.pdf",
+          "question": "What are the components of the strategy described for the model?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc24.pdf",
+          "question": "Who are the authors of the paper?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc24.pdf",
+          "question": "How is the attention mechanism described in the document?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc24.pdf",
+          "question": "Which funding program supported this work?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.25
+        },
+        {
+          "doc": "doc25.pdf",
+          "question": "What framework does the paper introduce for flow-matching models?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.3333
+        },
+        {
+          "doc": "doc25.pdf",
+          "question": "How does the student learn from the capability fields?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc25.pdf",
+          "question": "What are the three alignment challenges identified in the method?",
+          "vec_rr": 0.2,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc25.pdf",
+          "question": "What is the default route probability distribution over capability buckets?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc25.pdf",
+          "question": "By how much does DanceOPD improve GEditBench over the best reproduced OPD baseline?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc25.pdf",
+          "question": "What performance gain does hard routing provide compared to soft teacher mixing under MSE?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc25.pdf",
+          "question": "How does DanceOPD’s composition compare to its cost relative to baselines?",
+          "vec_rr": 1.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc25.pdf",
+          "question": "Who is listed as the corresponding author and what is the contact email?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc25.pdf",
+          "question": "What does hard‑routed sample‑wise field matching preserve?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc26.pdf",
+          "question": "What type of pipeline does the paper present for extracting political relationships?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc26.pdf",
+          "question": "How does the linker resolve mentions to Wikidata identifiers?",
+          "vec_rr": 1.0,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc26.pdf",
+          "question": "How many relations and articles are covered in the gold standard?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc26.pdf",
+          "question": "What is the detection F1 score and its precision and recall values?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc26.pdf",
+          "question": "What are the counts of entity nodes, article nodes, and content relations in the extracted graph?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc26.pdf",
+          "question": "Within which Horizon Europe project was the pipeline developed?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc26.pdf",
+          "question": "How many coarse labels does the NER model use and what are they?",
+          "vec_rr": 0.25,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc26.pdf",
+          "question": "What mapping assigns default orientations to each relationship type?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc26.pdf",
+          "question": "What percentage of mentions are resolved by the exact match stage and what additional step is used for morphologically rich languages?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc27.pdf",
+          "question": "What batch size and learning rate are used in training?",
+          "vec_rr": 0.2,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc27.pdf",
+          "question": "When is a model considered to generalize badly?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc28.pdf",
+          "question": "What is a key responsibility of the German Central Bank regarding securities?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc28.pdf",
+          "question": "What system models the task as a Named Entity Recognition (NER) problem?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc28.pdf",
+          "question": "What phrase indicates evidence for eligibility based on a security’s denomination?",
+          "vec_rr": 0.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc28.pdf",
+          "question": "What is the currency for the security mentioned in the document?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc28.pdf",
+          "question": "Which two models generally perform within 1–3 percent of each other?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc28.pdf",
+          "question": "According to the document, what results in an \"Ineligible\" due to OCR errors or formatting discrepancies?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc29.pdf",
+          "question": "What improvement percentages does the proposed taxonomy achieve in accuracy and F1?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc29.pdf",
+          "question": "How many TikTok video captions were collected for the dataset?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc29.pdf",
+          "question": "How many Bluesky posts were collected for the dataset?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc29.pdf",
+          "question": "Which performance metrics does the proposed taxonomy achieve for GPT-5.4?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc29.pdf",
+          "question": "What happens to performance when any single class is removed?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc29.pdf",
+          "question": "In what way does the proposed taxonomy perform across all classes?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc29.pdf",
+          "question": "What is the reported improvement percentage for the Formal Encoding Systems class?",
+          "vec_rr": 1.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc29.pdf",
+          "question": "How many manually annotated TikTok and Bluesky posts were used in the study?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc29.pdf",
+          "question": "Does the taxonomy assume mutual exclusivity among categories?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc29.pdf",
+          "question": "How does orthographic transformation affect linguistic form?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc3.pdf",
+          "question": "What novel regularization does the paper conduct to enable uncertainty quantification?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc3.pdf",
+          "question": "According to Theorem 3, what is the value of correct evidence regularization for non‑ground‑truth nodes?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc3.pdf",
+          "question": "How does the gradient value change as the number of classes increases?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc30.pdf",
+          "question": "Where can the code for the experiments be accessed?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc32.pdf",
+          "question": "What framework does the paper propose for training LLMs from solution optimality?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc32.pdf",
+          "question": "Which optimizer and reference are used in the training details?",
+          "vec_rr": 0.25,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc32.pdf",
+          "question": "How is a sampled response defined for a prompt q?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc32.pdf",
+          "question": "What types of feedback can Z represent depending on the environment?",
+          "vec_rr": 0.5,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc32.pdf",
+          "question": "What does Raw-Binary convert the aggregated raw score into?",
+          "vec_rr": 0.2,
+          "hyb_rr": 0.3333
+        },
+        {
+          "doc": "doc32.pdf",
+          "question": "What are the performance numbers listed for Raw-GRPO in the table?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc32.pdf",
+          "question": "What are the performance numbers listed for RiVER in the table?",
+          "vec_rr": 0.5,
+          "hyb_rr": 0.25
+        },
+        {
+          "doc": "doc32.pdf",
+          "question": "How does the paper formalize the intuition about feedback resolution?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc32.pdf",
+          "question": "What does the official evaluator do with a submitted program?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.2
+        },
+        {
+          "doc": "doc33.pdf",
+          "question": "What is the equilibrium distribution known as in statistical mechanics?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc33.pdf",
+          "question": "What bin count is used in the experiments?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc33.pdf",
+          "question": "What does Figure 1 show regarding model training loss?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc34.pdf",
+          "question": "What are large language models (LLMs) described as in the document?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.3333
+        },
+        {
+          "doc": "doc34.pdf",
+          "question": "What does Figure 1 illustrate regarding log‑probability and correctness?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc34.pdf",
+          "question": "Who introduced power sampling as a scalable SPS algorithm and when?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc34.pdf",
+          "question": "What does Remark 2.2 state about power sampling?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.25
+        },
+        {
+          "doc": "doc34.pdf",
+          "question": "What overall trend is observed for many methods regarding probability and accuracy?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc35.pdf",
+          "question": "How fast does ENS run for static and Navier-Stokes predictions in-distribution?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc35.pdf",
+          "question": "What is ENS's distinction among Neural Solvers concerning the residual?",
+          "vec_rr": 0.2,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc35.pdf",
+          "question": "Why can minimizing the PDE residual be problematic for reconstruction accuracy?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc35.pdf",
+          "question": "What property does ENS exhibit regarding residual floors across different initializations?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc35.pdf",
+          "question": "How does ENS perform in terms of reconstruction error and residual compared to other methods?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc35.pdf",
+          "question": "How does ENS's learned correction policy behave under distribution shift?",
+          "vec_rr": 0.25,
+          "hyb_rr": 0.25
+        },
+        {
+          "doc": "doc35.pdf",
+          "question": "What is the role of the step size β during ENS training?",
+          "vec_rr": 0.25,
+          "hyb_rr": 0.3333
+        },
+        {
+          "doc": "doc37.pdf",
+          "question": "Which theorem presents the multi‑way Laplace normal form for the Hellinger transform?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc38.pdf",
+          "question": "What dominates the runtime of the proposed algorithm?",
+          "vec_rr": 0.5,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc39.pdf",
+          "question": "What does Ribbon replace repeated refitting with?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.25
+        },
+        {
+          "doc": "doc39.pdf",
+          "question": "What value of the concentration parameter corresponds to the standard Bayesian bootstrap?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc39.pdf",
+          "question": "Under correct likelihood specification, what does Ribbon asymptotically coincide with?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc39.pdf",
+          "question": "What role does the Dirichlet concentration parameter α play?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc39.pdf",
+          "question": "What is the computational cost of Ribbon after the base model has been trained?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc39.pdf",
+          "question": "Which method provides the strongest out-of-distribution coverage in the synthetic sine regression experiment?",
+          "vec_rr": 0.5,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc39.pdf",
+          "question": "Which equation defines the penalized version used when a fixed penalty is present?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc4.pdf",
+          "question": "What is the narrow definition of deep learning used in this article?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc4.pdf",
+          "question": "Which activation function is defined as max{0,x}?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc4.pdf",
+          "question": "What does Theorem 1.18 assume about the activation function?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc4.pdf",
+          "question": "What phenomenon is described as the double descent curve or benign overfitting?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc4.pdf",
+          "question": "What term is used for training where parameters change very little?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc4.pdf",
+          "question": "What does Theorem 1.13 state about learning algorithms and distributions?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc4.pdf",
+          "question": "Which functions satisfy (cid:37)(x)→1 for x→∞ and (cid:37)(x)→0 for x→−∞?",
+          "vec_rr": 0.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc4.pdf",
+          "question": "What property does the activation function need for the Rademacher complexity bound in Theorem 2.1?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc40.pdf",
+          "question": "What principle is introduced as a general principle of self-organization?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc40.pdf",
+          "question": "According to SBS, when do components persist?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc40.pdf",
+          "question": "How does the probability of adaptation change with credit-less time steps?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc40.pdf",
+          "question": "When was evaluation activity enabled in the simulations?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc40.pdf",
+          "question": "What is stated as the central contribution of the work?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc41.pdf",
+          "question": "Who are the authors of the paper?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc41.pdf",
+          "question": "What sentence describes the application of AUTOCOG to expert ratings?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.25
+        },
+        {
+          "doc": "doc41.pdf",
+          "question": "How is the proportion of choosing option B computed across simulated subjects?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc41.pdf",
+          "question": "What is the full metric definition line including function and return type?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc41.pdf",
+          "question": "What accuracies are shown for the experts throughout the experiment?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc41.pdf",
+          "question": "What are the MSE and SEM values reported for WADD and Diminishing‑Returns WADD?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.2
+        },
+        {
+          "doc": "doc41.pdf",
+          "question": "What are the reported statistics for the H1 Concave vs. WADD hypothesis test?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc41.pdf",
+          "question": "How are validities described in the non‑linear subjective weighting model?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc41.pdf",
+          "question": "What is the lapse‑noise parameter range listed for Take‑The‑Best (exact)?",
+          "vec_rr": 1.0,
+          "hyb_rr": 0.2
+        },
+        {
+          "doc": "doc42.pdf",
+          "question": "Which dataset was used for the task-fMRI data?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc42.pdf",
+          "question": "Into how many cortical regions was the data parcellated?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc42.pdf",
+          "question": "What do the rows and columns of matrix x represent?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc42.pdf",
+          "question": "How many task-specific and transfer models were trained?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.3333
+        },
+        {
+          "doc": "doc42.pdf",
+          "question": "What is the definition of the loss function L?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.25
+        },
+        {
+          "doc": "doc42.pdf",
+          "question": "Which components were optimized during adaptation?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc42.pdf",
+          "question": "For which budget values was the BIP solved?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc42.pdf",
+          "question": "What do the Cognitive Atlas and Cognitive Paradigm Ontology provide?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc42.pdf",
+          "question": "What does this study extend in fMRI taskonomy?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc42.pdf",
+          "question": "On what does multi-source transfer further depend?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.3333
+        },
+        {
+          "doc": "doc43.pdf",
+          "question": "What minimum overlap does the detection algorithm require?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc43.pdf",
+          "question": "How is the recurrence matrix R computed?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc43.pdf",
+          "question": "What does the recurrence matrix reveal about the geometric landscape?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc44.pdf",
+          "question": "What are the reported accuracy, monotonicity, trade-off, and ECE values for the adapter model on Swissmetro?",
+          "vec_rr": 1.0,
+          "hyb_rr": 0.2
+        },
+        {
+          "doc": "doc44.pdf",
+          "question": "What are the reported accuracy, monotonicity, trade-off, and ECE values for the raw foundation model (Mitra) on IoT-Wearables?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc44.pdf",
+          "question": "What are the NLL, Brier, and uncalibrated ECE scores for the rawFM, MNL, and adapter models on Swissmetro with Mitra?",
+          "vec_rr": 0.2,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc44.pdf",
+          "question": "What are the accuracy, monotonicity, trade-off, and ECE values for the adapter model on LPMC with TabPFN?",
+          "vec_rr": 1.0,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc44.pdf",
+          "question": "What is the counterfactual aggregate share change for the Mitra model on the Swissmetro train scenario?",
+          "vec_rr": 1.0,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc44.pdf",
+          "question": "How does the adapter differ from per-observation gradients according to the text?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc44.pdf",
+          "question": "What are the accuracy and monotonicity percentages for the raw foundation model (Mitra) on LPMC?",
+          "vec_rr": 1.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc44.pdf",
+          "question": "What are the NLL, Brier, and uncalibrated ECE scores for the rawFM TabPFN on Swissmetro and the subsequent MNL and adapter scores?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.25
+        },
+        {
+          "doc": "doc45.pdf",
+          "question": "What problem does the paper treat the calibration–estimation choice as?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc45.pdf",
+          "question": "What does the scalar sensitivity statistic measure?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.25
+        },
+        {
+          "doc": "doc45.pdf",
+          "question": "What does the procedure require and avoid?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc45.pdf",
+          "question": "What does the criterion target instead of worst-case MSE?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc45.pdf",
+          "question": "How is the proposed statistic described regarding units?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.3333
+        },
+        {
+          "doc": "doc45.pdf",
+          "question": "Which literature does the minimax interpretation connect to?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc45.pdf",
+          "question": "Which work does the paper build most directly on?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc45.pdf",
+          "question": "What sample sizes are used in the Monte Carlo simulation?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.25
+        },
+        {
+          "doc": "doc46.pdf",
+          "question": "What method is proposed to determine optimal weights for candidate multi-layer network VAR models?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc46.pdf",
+          "question": "What empirical application is used to illustrate the proposed method?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc46.pdf",
+          "question": "Which network layer is dominant in the early part of the CPI inflation transmission period?",
+          "vec_rr": 0.5,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc46.pdf",
+          "question": "How is the conformal prediction method first described by Vovk, Gammerman and Shafer?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc46.pdf",
+          "question": "From which source is the monthly CPI inflation data obtained?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc46.pdf",
+          "question": "How many types of networks are considered to characterize CPI inflation transmission?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc46.pdf",
+          "question": "How are the time‑varying coefficients estimated in candidate models?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc46.pdf",
+          "question": "What asymptotic property of the proposed weight estimates is established in the paper?",
+          "vec_rr": 0.25,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc47.pdf",
+          "question": "How are sharp explicit bounds derived according to the paper?",
+          "vec_rr": 0.25,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc47.pdf",
+          "question": "What does the sharp lower bound describe regarding covariance configurations?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.2
+        },
+        {
+          "doc": "doc47.pdf",
+          "question": "What statement follows the description of the diagonal-only case?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc47.pdf",
+          "question": "What effect does information ruling out strong negative effective dependence have on the lower bound?",
+          "vec_rr": 0.2,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc47.pdf",
+          "question": "How do the authors formulate the problem to obtain bounds?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.3333
+        },
+        {
+          "doc": "doc47.pdf",
+          "question": "How do the best-case standard errors compare to the worst-case ones?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc48.pdf",
+          "question": "What does the article establish for the optimal control problem governed by the convective Brinkman–Forchheimer equations?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc48.pdf",
+          "question": "What are the conditions on the parameters µ, α, β and r in the model?",
+          "vec_rr": 0.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc48.pdf",
+          "question": "What is the condition for the critical case of the absorption exponent r?",
+          "vec_rr": 0.2,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc48.pdf",
+          "question": "How is the admissible control class defined in the optimal control problem?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc48.pdf",
+          "question": "What equality involving the Hamiltonian F and the functional W holds for almost every time s?",
+          "vec_rr": 0.25,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc48.pdf",
+          "question": "How is the case r = 3 described in the paper?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc48.pdf",
+          "question": "What does Case I in Table 1 specify for dimension d = 2?",
+          "vec_rr": 0.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc48.pdf",
+          "question": "What does the analysis require compared to the two‑dimensional Navier–Stokes equations?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc48.pdf",
+          "question": "In which regimes do weak solutions of the CBF system satisfy the energy equality?",
+          "vec_rr": 0.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc49.pdf",
+          "question": "Which higher-order convexity property does the w-optimization problem additionally possess?",
+          "vec_rr": 0.5,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc49.pdf",
+          "question": "What is the conjecture regarding the w-optimization problem's convexity order?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc49.pdf",
+          "question": "How is the Split CIF described in terms of its application domain?",
+          "vec_rr": 0.25,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc49.pdf",
+          "question": "How is the w-optimization problem alternatively expressed using the log-determinant?",
+          "vec_rr": 0.2,
+          "hyb_rr": 0.25
+        },
+        {
+          "doc": "doc49.pdf",
+          "question": "What are the values of lndet(P) and tr{P} in the first special case?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.3333
+        },
+        {
+          "doc": "doc5.pdf",
+          "question": "What procedure and its variant are equivalent to deep ReLU neural networks?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc5.pdf",
+          "question": "What does the document say demonstrates the ability of deep ReLU neural networks?",
+          "vec_rr": 0.5,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc5.pdf",
+          "question": "How do standard linear interpolation procedures degrade in accuracy?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.3333
+        },
+        {
+          "doc": "doc5.pdf",
+          "question": "What have artificial neural networks been shown to possess?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.2
+        },
+        {
+          "doc": "doc5.pdf",
+          "question": "Which interpolation and reconstruction procedure can be cast as a suitable deep ReLU neural network?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc5.pdf",
+          "question": "What does the paper prove exists that approximates piecewise smooth functions to second-order accuracy?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc5.pdf",
+          "question": "What class of functions do images constitute according to the document?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc50.pdf",
+          "question": "What is CHAMB-GA described as in the paper?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc50.pdf",
+          "question": "How does RabbitMQ scale according to the document?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc50.pdf",
+          "question": "What is the maximum number of nodes and CPU cores used in the scalability experiments?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc50.pdf",
+          "question": "Which scaling modes does CHAMB-GA support as shown in Figure 3?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc50.pdf",
+          "question": "What formula defines the population size in the baseline efficiency analysis?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc50.pdf",
+          "question": "What role do the CHAMB-GA scripts play for the user?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc50.pdf",
+          "question": "What penalty is applied for each critical line violation?",
+          "vec_rr": 0.2,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc50.pdf",
+          "question": "How many AC powerflow calculations are evaluated during a single optimization of the HVDC dispatch problem?",
+          "vec_rr": 0.25,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc50.pdf",
+          "question": "What is the termination criterion for the meta GA?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc6.pdf",
+          "question": "What factors are listed alongside drift and bias in the opening statement?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc6.pdf",
+          "question": "How does the document describe data abundance across different contexts?",
+          "vec_rr": 0.25,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc6.pdf",
+          "question": "What definition does the text give for the scientific discipline related to learning optimal model parameters?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.3333
+        },
+        {
+          "doc": "doc6.pdf",
+          "question": "What challenge does the document associate with selection bias?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.3333
+        },
+        {
+          "doc": "doc6.pdf",
+          "question": "What potential problem is mentioned regarding breaking changes or discontinuation of data sources?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc6.pdf",
+          "question": "According to the text, what does changing data sources imply for quality metrics?",
+          "vec_rr": 0.25,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc6.pdf",
+          "question": "What does the document say is required for technical robustness?",
+          "vec_rr": 0.25,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc6.pdf",
+          "question": "How does the document characterize the list of aspects covered?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.3333
+        },
+        {
+          "doc": "doc6.pdf",
+          "question": "What does the text say may happen when variables are considered controversial or intrusive?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc7.pdf",
+          "question": "Who are the authors and their affiliations?",
+          "vec_rr": 0.25,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc7.pdf",
+          "question": "How does the paper define a learning curve in supervised machine learning?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc7.pdf",
+          "question": "What three criteria does the proposed framework use to categorise learning‑curve approaches?",
+          "vec_rr": 0.25,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc7.pdf",
+          "question": "Which model is described as the most prominent for learning‑curve extrapolation?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.2
+        },
+        {
+          "doc": "doc7.pdf",
+          "question": "What binary decision question do some learning‑curve models answer?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc7.pdf",
+          "question": "What term is adopted in the survey to refer to a point on a learning curve?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc8.pdf",
+          "question": "What is online active learning?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc8.pdf",
+          "question": "Into how many categories can active learning approaches be divided?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.25
+        },
+        {
+          "doc": "doc8.pdf",
+          "question": "Which survey provided a review of online active learning approaches focusing on fuzzy models?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.25
+        },
+        {
+          "doc": "doc8.pdf",
+          "question": "What is the main challenge in active learning?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc8.pdf",
+          "question": "Which query strategy is most widely used for classification models?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc8.pdf",
+          "question": "Which approach uses an ensemble of models to identify instances with conflicting predictions?",
+          "vec_rr": 1.0,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc8.pdf",
+          "question": "Which acquisition function is commonly used because it measures model uncertainty?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc8.pdf",
+          "question": "What is the name of the perceptron approach introduced by Cesa‑Bianchi et al. (2004)?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc8.pdf",
+          "question": "How many macro scenarios are discussed for active learning in the survey?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc8.pdf",
+          "question": "Which method combines active learning with an error‑based drift detector?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc9.pdf",
+          "question": "What phrase describes the DOME components and its intended help for reviewers?",
+          "vec_rr": 0.25,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc9.pdf",
+          "question": "Which institution is listed first among the author affiliations?",
+          "vec_rr": 0.2,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc9.pdf",
+          "question": "What is the main goal of the community-wide recommendations?",
+          "vec_rr": 0.3333,
+          "hyb_rr": 0.3333
+        },
+        {
+          "doc": "doc9.pdf",
+          "question": "According to the text, how often are novel ML methods experimentally validated?",
+          "vec_rr": 0.25,
+          "hyb_rr": 0.2
+        },
+        {
+          "doc": "doc9.pdf",
+          "question": "What benefit does open access to data and precise splits provide?",
+          "vec_rr": 0.0,
+          "hyb_rr": 0.0
+        },
+        {
+          "doc": "doc9.pdf",
+          "question": "Which figure presents classification metrics for binary classification?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc9.pdf",
+          "question": "What statement is given regarding over‑fitting prevention techniques in the example?",
+          "vec_rr": 0.5,
+          "hyb_rr": 0.5
+        },
+        {
+          "doc": "doc9.pdf",
+          "question": "Name one member of the ELIXIR ML focus group and their affiliation.",
+          "vec_rr": 0.3333,
+          "hyb_rr": 1.0
+        },
+        {
+          "doc": "doc9.pdf",
+          "question": "What is suggested to assess prediction robustness?",
+          "vec_rr": 1.0,
+          "hyb_rr": 1.0
+        }
+      ],
+      "per_doc": [
+        {
+          "doc": "doc1.pdf",
+          "n_questions": 6,
+          "n_chunks": 41,
+          "avg_words_per_chunk": 162.6,
+          "mrr": 0.5139,
+          "recall": 0.8333,
+          "hit1": 0.3333,
+          "hits": 5
+        },
+        {
+          "doc": "doc10.pdf",
+          "n_questions": 9,
+          "n_chunks": 69,
+          "avg_words_per_chunk": 235.7,
+          "mrr": 0.3333,
+          "recall": 0.4444,
+          "hit1": 0.2222,
+          "hits": 4
+        },
+        {
+          "doc": "doc11.pdf",
+          "n_questions": 1,
+          "n_chunks": 16,
+          "avg_words_per_chunk": 173.9,
+          "mrr": 1.0,
+          "recall": 1.0,
+          "hit1": 1.0,
+          "hits": 1
+        },
+        {
+          "doc": "doc12.pdf",
+          "n_questions": 1,
+          "n_chunks": 92,
+          "avg_words_per_chunk": 168.9,
+          "mrr": 1.0,
+          "recall": 1.0,
+          "hit1": 1.0,
+          "hits": 1
+        },
+        {
+          "doc": "doc13.pdf",
+          "n_questions": 5,
+          "n_chunks": 65,
+          "avg_words_per_chunk": 233.0,
+          "mrr": 1.0,
+          "recall": 1.0,
+          "hit1": 1.0,
+          "hits": 5
+        },
+        {
+          "doc": "doc14.pdf",
+          "n_questions": 1,
+          "n_chunks": 149,
+          "avg_words_per_chunk": 205.4,
+          "mrr": 1.0,
+          "recall": 1.0,
+          "hit1": 1.0,
+          "hits": 1
+        },
+        {
+          "doc": "doc15.pdf",
+          "n_questions": 5,
+          "n_chunks": 7,
+          "avg_words_per_chunk": 280.0,
+          "mrr": 1.0,
+          "recall": 1.0,
+          "hit1": 1.0,
+          "hits": 5
+        },
+        {
+          "doc": "doc16.pdf",
+          "n_questions": 7,
+          "n_chunks": 16,
+          "avg_words_per_chunk": 244.4,
+          "mrr": 0.7143,
+          "recall": 0.8571,
+          "hit1": 0.5714,
+          "hits": 6
+        },
+        {
+          "doc": "doc17.pdf",
+          "n_questions": 8,
+          "n_chunks": 76,
+          "avg_words_per_chunk": 111.9,
+          "mrr": 0.3854,
+          "recall": 0.625,
+          "hit1": 0.25,
+          "hits": 5
+        },
+        {
+          "doc": "doc18.pdf",
+          "n_questions": 3,
+          "n_chunks": 20,
+          "avg_words_per_chunk": 86.2,
+          "mrr": 1.0,
+          "recall": 1.0,
+          "hit1": 1.0,
+          "hits": 3
+        },
+        {
+          "doc": "doc19.pdf",
+          "n_questions": 2,
+          "n_chunks": 24,
+          "avg_words_per_chunk": 102.4,
+          "mrr": 0.25,
+          "recall": 0.5,
+          "hit1": 0.0,
+          "hits": 1
+        },
+        {
+          "doc": "doc2.pdf",
+          "n_questions": 10,
+          "n_chunks": 58,
+          "avg_words_per_chunk": 371.5,
+          "mrr": 0.7533,
+          "recall": 1.0,
+          "hit1": 0.6,
+          "hits": 10
+        },
+        {
+          "doc": "doc20.pdf",
+          "n_questions": 9,
+          "n_chunks": 164,
+          "avg_words_per_chunk": 110.8,
+          "mrr": 0.6204,
+          "recall": 0.8889,
+          "hit1": 0.4444,
+          "hits": 8
+        },
+        {
+          "doc": "doc21.pdf",
+          "n_questions": 9,
+          "n_chunks": 58,
+          "avg_words_per_chunk": 371.5,
+          "mrr": 0.8704,
+          "recall": 1.0,
+          "hit1": 0.7778,
+          "hits": 9
+        },
+        {
+          "doc": "doc22.pdf",
+          "n_questions": 8,
+          "n_chunks": 39,
+          "avg_words_per_chunk": 125.8,
+          "mrr": 0.5312,
+          "recall": 0.625,
+          "hit1": 0.5,
+          "hits": 5
+        },
+        {
+          "doc": "doc23.pdf",
+          "n_questions": 9,
+          "n_chunks": 9,
+          "avg_words_per_chunk": 288.1,
+          "mrr": 0.8333,
+          "recall": 1.0,
+          "hit1": 0.6667,
+          "hits": 9
+        },
+        {
+          "doc": "doc24.pdf",
+          "n_questions": 3,
+          "n_chunks": 100,
+          "avg_words_per_chunk": 56.3,
+          "mrr": 0.4167,
+          "recall": 0.6667,
+          "hit1": 0.3333,
+          "hits": 2
+        },
+        {
+          "doc": "doc25.pdf",
+          "n_questions": 9,
+          "n_chunks": 157,
+          "avg_words_per_chunk": 147.8,
+          "mrr": 0.6481,
+          "recall": 0.7778,
+          "hit1": 0.5556,
+          "hits": 7
+        },
+        {
+          "doc": "doc26.pdf",
+          "n_questions": 9,
+          "n_chunks": 73,
+          "avg_words_per_chunk": 82.1,
+          "mrr": 0.7778,
+          "recall": 0.8889,
+          "hit1": 0.6667,
+          "hits": 8
+        },
+        {
+          "doc": "doc27.pdf",
+          "n_questions": 2,
+          "n_chunks": 91,
+          "avg_words_per_chunk": 100.2,
+          "mrr": 1.0,
+          "recall": 1.0,
+          "hit1": 1.0,
+          "hits": 2
+        },
+        {
+          "doc": "doc28.pdf",
+          "n_questions": 6,
+          "n_chunks": 38,
+          "avg_words_per_chunk": 120.1,
+          "mrr": 0.8333,
+          "recall": 0.8333,
+          "hit1": 0.8333,
+          "hits": 5
+        },
+        {
+          "doc": "doc29.pdf",
+          "n_questions": 10,
+          "n_chunks": 46,
+          "avg_words_per_chunk": 118.4,
+          "mrr": 0.7,
+          "recall": 0.7,
+          "hit1": 0.7,
+          "hits": 7
+        },
+        {
+          "doc": "doc3.pdf",
+          "n_questions": 3,
+          "n_chunks": 79,
+          "avg_words_per_chunk": 157.1,
+          "mrr": 0.6667,
+          "recall": 0.6667,
+          "hit1": 0.6667,
+          "hits": 2
+        },
+        {
+          "doc": "doc30.pdf",
+          "n_questions": 1,
+          "n_chunks": 247,
+          "avg_words_per_chunk": 81.2,
+          "mrr": 0.5,
+          "recall": 1.0,
+          "hit1": 0.0,
+          "hits": 1
+        },
+        {
+          "doc": "doc32.pdf",
+          "n_questions": 9,
+          "n_chunks": 63,
+          "avg_words_per_chunk": 65.5,
+          "mrr": 0.4204,
+          "recall": 0.7778,
+          "hit1": 0.2222,
+          "hits": 7
+        },
+        {
+          "doc": "doc33.pdf",
+          "n_questions": 3,
+          "n_chunks": 95,
+          "avg_words_per_chunk": 113.7,
+          "mrr": 0.6667,
+          "recall": 0.6667,
+          "hit1": 0.6667,
+          "hits": 2
+        },
+        {
+          "doc": "doc34.pdf",
+          "n_questions": 5,
+          "n_chunks": 217,
+          "avg_words_per_chunk": 53.0,
+          "mrr": 0.5167,
+          "recall": 0.8,
+          "hit1": 0.4,
+          "hits": 4
+        },
+        {
+          "doc": "doc35.pdf",
+          "n_questions": 7,
+          "n_chunks": 79,
+          "avg_words_per_chunk": 203.5,
+          "mrr": 0.6548,
+          "recall": 0.8571,
+          "hit1": 0.5714,
+          "hits": 6
+        },
+        {
+          "doc": "doc37.pdf",
+          "n_questions": 1,
+          "n_chunks": 90,
+          "avg_words_per_chunk": 208.7,
+          "mrr": 0.5,
+          "recall": 1.0,
+          "hit1": 0.0,
+          "hits": 1
+        },
+        {
+          "doc": "doc38.pdf",
+          "n_questions": 1,
+          "n_chunks": 140,
+          "avg_words_per_chunk": 387.0,
+          "mrr": 0.5,
+          "recall": 1.0,
+          "hit1": 0.0,
+          "hits": 1
+        },
+        {
+          "doc": "doc39.pdf",
+          "n_questions": 7,
+          "n_chunks": 43,
+          "avg_words_per_chunk": 339.9,
+          "mrr": 0.75,
+          "recall": 1.0,
+          "hit1": 0.5714,
+          "hits": 7
+        },
+        {
+          "doc": "doc4.pdf",
+          "n_questions": 8,
+          "n_chunks": 114,
+          "avg_words_per_chunk": 511.6,
+          "mrr": 0.875,
+          "recall": 0.875,
+          "hit1": 0.875,
+          "hits": 7
+        },
+        {
+          "doc": "doc40.pdf",
+          "n_questions": 5,
+          "n_chunks": 47,
+          "avg_words_per_chunk": 361.1,
+          "mrr": 0.9,
+          "recall": 1.0,
+          "hit1": 0.8,
+          "hits": 5
+        },
+        {
+          "doc": "doc41.pdf",
+          "n_questions": 9,
+          "n_chunks": 107,
+          "avg_words_per_chunk": 127.2,
+          "mrr": 0.5167,
+          "recall": 0.7778,
+          "hit1": 0.4444,
+          "hits": 7
+        },
+        {
+          "doc": "doc42.pdf",
+          "n_questions": 10,
+          "n_chunks": 26,
+          "avg_words_per_chunk": 68.2,
+          "mrr": 0.6417,
+          "recall": 0.9,
+          "hit1": 0.5,
+          "hits": 9
+        },
+        {
+          "doc": "doc43.pdf",
+          "n_questions": 3,
+          "n_chunks": 35,
+          "avg_words_per_chunk": 123.3,
+          "mrr": 1.0,
+          "recall": 1.0,
+          "hit1": 1.0,
+          "hits": 3
+        },
+        {
+          "doc": "doc44.pdf",
+          "n_questions": 8,
+          "n_chunks": 36,
+          "avg_words_per_chunk": 122.6,
+          "mrr": 0.2437,
+          "recall": 0.625,
+          "hit1": 0.0,
+          "hits": 5
+        },
+        {
+          "doc": "doc45.pdf",
+          "n_questions": 8,
+          "n_chunks": 141,
+          "avg_words_per_chunk": 170.9,
+          "mrr": 0.4792,
+          "recall": 0.75,
+          "hit1": 0.375,
+          "hits": 6
+        },
+        {
+          "doc": "doc46.pdf",
+          "n_questions": 8,
+          "n_chunks": 136,
+          "avg_words_per_chunk": 150.3,
+          "mrr": 0.8125,
+          "recall": 0.875,
+          "hit1": 0.75,
+          "hits": 7
+        },
+        {
+          "doc": "doc47.pdf",
+          "n_questions": 6,
+          "n_chunks": 51,
+          "avg_words_per_chunk": 364.7,
+          "mrr": 0.5889,
+          "recall": 0.8333,
+          "hit1": 0.5,
+          "hits": 5
+        },
+        {
+          "doc": "doc48.pdf",
+          "n_questions": 9,
+          "n_chunks": 176,
+          "avg_words_per_chunk": 177.8,
+          "mrr": 0.8333,
+          "recall": 1.0,
+          "hit1": 0.6667,
+          "hits": 9
+        },
+        {
+          "doc": "doc49.pdf",
+          "n_questions": 5,
+          "n_chunks": 11,
+          "avg_words_per_chunk": 317.4,
+          "mrr": 0.6167,
+          "recall": 1.0,
+          "hit1": 0.4,
+          "hits": 5
+        },
+        {
+          "doc": "doc5.pdf",
+          "n_questions": 7,
+          "n_chunks": 140,
+          "avg_words_per_chunk": 235.5,
+          "mrr": 0.5762,
+          "recall": 1.0,
+          "hit1": 0.2857,
+          "hits": 7
+        },
+        {
+          "doc": "doc50.pdf",
+          "n_questions": 9,
+          "n_chunks": 46,
+          "avg_words_per_chunk": 162.2,
+          "mrr": 0.7778,
+          "recall": 0.7778,
+          "hit1": 0.7778,
+          "hits": 7
+        },
+        {
+          "doc": "doc6.pdf",
+          "n_questions": 9,
+          "n_chunks": 8,
+          "avg_words_per_chunk": 151.0,
+          "mrr": 0.4444,
+          "recall": 0.8889,
+          "hit1": 0.1111,
+          "hits": 8
+        },
+        {
+          "doc": "doc7.pdf",
+          "n_questions": 6,
+          "n_chunks": 126,
+          "avg_words_per_chunk": 263.2,
+          "mrr": 0.5333,
+          "recall": 0.6667,
+          "hit1": 0.5,
+          "hits": 4
+        },
+        {
+          "doc": "doc8.pdf",
+          "n_questions": 10,
+          "n_chunks": 77,
+          "avg_words_per_chunk": 364.0,
+          "mrr": 0.8,
+          "recall": 1.0,
+          "hit1": 0.7,
+          "hits": 10
+        },
+        {
+          "doc": "doc9.pdf",
+          "n_questions": 9,
+          "n_chunks": 35,
+          "avg_words_per_chunk": 213.9,
+          "mrr": 0.5037,
+          "recall": 0.7778,
+          "hit1": 0.3333,
+          "hits": 7
+        }
+      ]
+    }
+  ]
+}

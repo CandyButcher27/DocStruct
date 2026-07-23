@@ -1,18 +1,19 @@
 """Fetch ~200 born-digital PDFs across 7 domains for the v2 benchmark dataset.
 
 Domains and sources:
-  arxiv      -- academic papers (arXiv API, continuation of existing doc*.pdf set)
+  arxiv      -- academic papers (arXiv API, 10 diverse categories)
   legal      -- US court opinions (CourtListener REST API, free)
-  financial  -- SEC EDGAR 10-K annual filings (EDGAR full-text search, free)
-  medical    -- PubMed Central open-access articles (PMC OA API, free)
-  technical  -- Apache/Linux Foundation project docs, open product manuals (direct URL list)
-  govt       -- Federal Register notices + EU policy PDFs (free)
-  textbook   -- OpenStax textbook chapters (CC-licensed, free)
+  financial  -- curated direct PDF URLs (investor-relations annual reports)
+  medical    -- PubMed Central open-access articles (PMC OA FTP / API)
+  technical  -- NIST docs, RFCs, hardware datasheets, open project manuals
+  govt       -- Federal Register, WHO, NIST policy PDFs
+  textbook   -- OpenStax CC-licensed textbooks
 
 Usage:
-  python scripts/fetch_dataset_v2.py                  # fetch everything
-  python scripts/fetch_dataset_v2.py --domain legal   # one domain only
-  python scripts/fetch_dataset_v2.py --dry-run        # print plan, no downloads
+  python scripts/fetch_dataset_v2.py                     # all domains
+  python scripts/fetch_dataset_v2.py --domain arxiv      # one domain
+  python scripts/fetch_dataset_v2.py --dry-run           # plan only
+  python scripts/fetch_dataset_v2.py --smoke             # 1 doc per domain
 """
 
 from __future__ import annotations
@@ -27,7 +28,6 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from typing import Optional
 
-RAW_DIR = os.path.join("data", "raw-pdfs")
 MANIFEST_V2 = os.path.join("reports", "dataset_manifest_v2.json")
 ATOM = "{http://www.w3.org/2005/Atom}"
 
@@ -41,16 +41,17 @@ DOMAIN_TARGETS = {
     "textbook":  10,
 }
 
-# ── helpers ──────────────────────────────────────────────────────────────────
+
+# ── helpers ───────────────────────────────────────────────────────────────────
 
 def _sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()[:16]
 
 
-def _next_index() -> int:
-    if not os.path.isdir(RAW_DIR):
+def _next_index(raw_dir: str) -> int:
+    if not os.path.isdir(raw_dir):
         return 1
-    nums = [int(m.group(1)) for f in os.listdir(RAW_DIR) if (m := re.match(r"doc(\d+)\.pdf$", f))]
+    nums = [int(m.group(1)) for f in os.listdir(raw_dir) if (m := re.match(r"doc(\d+)\.pdf$", f))]
     return max(nums, default=0) + 1
 
 
@@ -73,7 +74,7 @@ def _download(url: str, dest: str, delay: float = 2.0) -> Optional[bytes]:
         with urllib.request.urlopen(req, timeout=120) as r:
             data = r.read()
         if not data.startswith(b"%PDF"):
-            print(f"    skip {url} (not a PDF)")
+            print(f"    not a PDF ({len(data)} bytes) — skip")
             return None
         with open(dest, "wb") as fh:
             fh.write(data)
@@ -86,19 +87,10 @@ def _download(url: str, dest: str, delay: float = 2.0) -> Optional[bytes]:
 
 # ── arxiv ─────────────────────────────────────────────────────────────────────
 
-# Diverse arXiv categories: CS, stats, physics, bio, economics — ensures
-# varied vocabulary and PDF complexity (double-column, math-heavy, bio figures)
 ARXIV_PLAN = {
-    "cs.CL": 8,
-    "cs.LG": 7,
-    "cs.CV": 6,
-    "stat.ML": 5,
-    "q-bio.NC": 5,
-    "econ.EM": 5,
-    "physics.optics": 4,
-    "math.OC": 4,
-    "cs.RO": 3,
-    "astro-ph.CO": 3,
+    "cs.CL": 8, "cs.LG": 7, "cs.CV": 6, "stat.ML": 5,
+    "q-bio.NC": 5, "econ.EM": 5, "physics.optics": 4,
+    "math.OC": 4, "cs.RO": 3, "astro-ph.CO": 3,
 }
 
 
@@ -118,14 +110,14 @@ def _arxiv_entries(category: str, n: int) -> list:
         for link in entry.findall(f"{ATOM}link"):
             if link.get("title") == "pdf":
                 pdf_url = link.get("href")
-        out.append({"arxiv_id": arxiv_id, "title": title, "pdf_url": pdf_url, "category": category})
+        out.append({"arxiv_id": arxiv_id, "title": title, "pdf_url": pdf_url})
     return out
 
 
-def fetch_arxiv(n: int, idx: int, manifest: list, dry_run: bool) -> int:
+def fetch_arxiv(n: int, idx: int, raw_dir: str, manifest: list, dry_run: bool) -> int:
     print(f"\n[arxiv] target={n}")
     done = 0
-    seen_ids = {e.get("arxiv_id") for e in manifest}
+    seen = {e.get("arxiv_id") for e in manifest}
     for category, count in ARXIV_PLAN.items():
         if done >= n:
             break
@@ -138,222 +130,205 @@ def fetch_arxiv(n: int, idx: int, manifest: list, dry_run: bool) -> int:
         for e in entries:
             if done >= n:
                 break
-            if e["arxiv_id"] in seen_ids:
-                print(f"  skip {e['arxiv_id']} (duplicate)")
+            if e["arxiv_id"] in seen:
+                print(f"  skip {e['arxiv_id']} (dup)")
                 continue
             name = f"doc{idx}.pdf"
-            dest = os.path.join(RAW_DIR, name)
-            print(f"  {name} <- {e['arxiv_id']} [{category}]")
+            print(f"  {name} <- {e['arxiv_id']} [{category}] {e['title'][:50]}")
             if not dry_run:
-                data = _download(e["pdf_url"], dest, delay=3)
+                data = _download(e["pdf_url"], os.path.join(raw_dir, name), delay=3)
                 if data is None:
                     continue
                 manifest.append({"file": name, "domain": "arxiv", "source": "arxiv.org",
                                   "arxiv_id": e["arxiv_id"], "title": e["title"],
                                   "category": category, "sha256": _sha256(data)})
                 _save_manifest(manifest)
-            seen_ids.add(e["arxiv_id"])
+            seen.add(e["arxiv_id"])
             idx += 1
             done += 1
     return idx
 
 
 # ── legal ─────────────────────────────────────────────────────────────────────
-# CourtListener free API — US federal court opinions (PDF)
-# Mix of circuit courts for varied doc length and structural complexity
+# CourtListener REST API v4 — precedential US federal opinions with PDF
 
-COURTLISTENER_CLUSTERS = [
-    # (cluster_id, description)  — sample of landmark/interesting opinions
-    ("4214664", "9th Cir 2022"),  ("4123456", "2nd Cir 2022"),
-    ("4300000", "DC Cir 2023"),   ("4400000", "1st Cir 2023"),
-    ("4500000", "3rd Cir 2023"),  ("4600000", "4th Cir 2023"),
-    ("4700000", "5th Cir 2023"),  ("4800000", "6th Cir 2022"),
-    ("4900000", "7th Cir 2022"),  ("5000000", "8th Cir 2022"),
-    ("5100000", "10th Cir 2022"), ("5200000", "11th Cir 2023"),
-]
-# Use search API instead of hardcoded IDs for robustness
-COURTLISTENER_SEARCH = "https://www.courtlistener.com/api/rest/v3/search/?type=o&order_by=score+desc&stat_Precedential=on&filed_after=2020-01-01&filed_before=2024-01-01&format=json"
+CL_SEARCH = (
+    "https://www.courtlistener.com/api/rest/v4/search/"
+    "?type=o&order_by=score+desc&precedential_status=Published"
+    "&filed_after=2020-01-01&filed_before=2024-01-01"
+)
 
 
-def fetch_legal(n: int, idx: int, manifest: list, dry_run: bool) -> int:
+def fetch_legal(n: int, idx: int, raw_dir: str, manifest: list, dry_run: bool) -> int:
     print(f"\n[legal] target={n}")
     done = 0
-    page = 1
+    cursor = None
     while done < n:
-        url = f"{COURTLISTENER_SEARCH}&page={page}"
+        url = CL_SEARCH + ("&cursor=" + urllib.request.quote(cursor) if cursor else "")
         try:
             req = urllib.request.Request(url, headers={"User-Agent": "docstruct-bench/0.2"})
             with urllib.request.urlopen(req, timeout=30) as r:
-                data = json.loads(r.read())
+                payload = json.loads(r.read())
         except Exception as err:
-            print(f"  search failed: {err}")
+            print(f"  API failed: {err}")
             break
 
-        results = data.get("results", [])
+        results = payload.get("results", [])
         if not results:
             break
 
-        for opinion in results:
+        for op in results:
             if done >= n:
                 break
-            pdf_url = opinion.get("download_url") or ""
-            if not pdf_url.endswith(".pdf"):
+            # v4 returns cluster with opinions list; grab first opinion's PDF
+            opinions = op.get("opinions", [])
+            pdf_url = None
+            for o in opinions:
+                if o.get("download_url", "").endswith(".pdf"):
+                    pdf_url = o["download_url"]
+                    break
+            if not pdf_url:
                 continue
-            case_name = opinion.get("caseName", "unknown")
-            court = opinion.get("court", "")
+            case_name = op.get("case_name", "unknown")[:60]
+            court = op.get("court_id", "")
             name = f"doc{idx}.pdf"
-            dest = os.path.join(RAW_DIR, name)
-            print(f"  {name} <- {case_name[:60]} [{court}]")
+            print(f"  {name} <- {case_name} [{court}]")
             if not dry_run:
-                dl_data = _download(pdf_url, dest, delay=1.5)
-                if dl_data is None:
+                data = _download(pdf_url, os.path.join(raw_dir, name), delay=1.5)
+                if data is None:
                     continue
                 manifest.append({"file": name, "domain": "legal", "source": "courtlistener.com",
-                                  "case_name": case_name, "court": court, "pdf_url": pdf_url,
-                                  "sha256": _sha256(dl_data)})
+                                  "case_name": case_name, "court": court, "sha256": _sha256(data)})
                 _save_manifest(manifest)
             idx += 1
             done += 1
-        page += 1
+
+        cursor = payload.get("next")
+        if not cursor:
+            break
         time.sleep(1)
     return idx
 
 
 # ── financial ─────────────────────────────────────────────────────────────────
-# SEC EDGAR full-text search for 10-K filings — mix of industries
-# Heavy tables, standardized section structure (Item 1-9), borderless tables
+# Direct PDF annual reports from investor relations pages — reliable born-digital
+# EDGAR 10-Ks are HTML-primary; these are the actual PDF annual reports
 
-EDGAR_SEARCH = "https://efts.sec.gov/LATEST/search-index?q=%2210-K%22&dateRange=custom&startdt=2022-01-01&enddt=2024-01-01&forms=10-K"
-EDGAR_BASE = "https://www.sec.gov"
-
-# Diverse sectors: tech, pharma, energy, retail, finance, manufacturing
-EDGAR_QUERIES = [
-    ("technology", "10-K"),
-    ("pharmaceutical", "10-K"),
-    ("energy", "10-K"),
-    ("retail", "10-K"),
-    ("financial services", "10-K"),
-    ("manufacturing", "10-K"),
-    ("healthcare", "10-K"),
+FINANCIAL_PDFS = [
+    # Technology
+    ("https://s2.q4cdn.com/470004039/files/doc_earnings/2023/ar/2023-annual-report.pdf", "Apple 2023 Annual Report", "technology"),
+    ("https://s2.q4cdn.com/240708110/files/doc_financials/2023/ar/msft-20230630.pdf", "Microsoft FY2023 Annual Report", "technology"),
+    ("https://abc.xyz/assets/annual-reports/alphabet-annual-report-2023.pdf", "Alphabet 2023 Annual Report", "technology"),
+    ("https://s2.q4cdn.com/299287126/files/doc_financials/2023/ar/amzn-20231231.pdf", "Amazon 2023 Annual Report", "technology"),
+    ("https://investor.fb.com/annual-report/2022/doc/meta-2022-annual-report.pdf", "Meta 2022 Annual Report", "technology"),
+    # Pharmaceutical
+    ("https://www.pfizer.com/sites/default/files/investors/financial_reports/annual_reports/2023/index.html", "Pfizer 2023 AR", "pharma"),  # HTML, skip
+    ("https://s21.q4cdn.com/834003165/files/doc_financials/2023/ar/jnj-20231231.pdf", "J&J 2023 Annual Report", "pharma"),
+    ("https://www.abbvie.com/content/dam/abbvie-dotcom/uploads/PDFs/investors/2023-annual-report.pdf", "AbbVie 2023 Annual Report", "pharma"),
+    # Energy
+    ("https://corporate.exxonmobil.com/-/media/Global/Files/investor-relations/annual-report/ExxonMobil-2023-Annual-Report.pdf", "ExxonMobil 2023 Annual Report", "energy"),
+    ("https://chevroncorp.gcs-web.com/static-files/a2d0cc3c-5b93-4b1e-b7e4-6d3be5b4b745", "Chevron 2023 Annual Report", "energy"),
+    # Financial services
+    ("https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/annualreport-2023.pdf", "JPMorgan 2023 Annual Report", "finance"),
+    ("https://www.berkshirehathaway.com/2022ar/2022ar.pdf", "Berkshire 2022 Annual Report", "finance"),
+    ("https://s23.q4cdn.com/407969754/files/doc_financials/2023/ar/gs-2023-annual-report.pdf", "Goldman Sachs 2023 Annual Report", "finance"),
+    # Healthcare
+    ("https://s21.q4cdn.com/834003165/files/doc_financials/2023/ar/unh-20231231.pdf", "UnitedHealth 2023 Annual Report", "healthcare"),
+    # Retail/Consumer
+    ("https://s2.q4cdn.com/056532643/files/doc_financials/2024/ar/wmt-20240131.pdf", "Walmart FY2024 Annual Report", "retail"),
+    ("https://s2.q4cdn.com/710621382/files/doc_financials/2023/ar/tsla-20231231.pdf", "Tesla 2023 Annual Report", "auto"),
+    # Semiconductor
+    ("https://s21.q4cdn.com/463672886/files/doc_financials/2023/ar/nvda-20240128.pdf", "NVIDIA FY2024 Annual Report", "semiconductor"),
+    ("https://www.intel.com/content/dam/www/central-libraries/us/en/documents/2023-intel-annual-report.pdf", "Intel 2023 Annual Report", "semiconductor"),
+    # Manufacturing
+    ("https://s1.q4cdn.com/714491698/files/doc_financials/2023/ar/cat-2023-annual-report.pdf", "Caterpillar 2023 Annual Report", "manufacturing"),
+    ("https://s22.q4cdn.com/910638702/files/doc_financials/2023/ar/ge-2023-annual-report.pdf", "GE 2023 Annual Report", "manufacturing"),
 ]
 
+FINANCIAL_PDFS_CLEAN = [(u, t, s) for u, t, s in FINANCIAL_PDFS if not u.endswith(".html")]
 
-def fetch_financial(n: int, idx: int, manifest: list, dry_run: bool) -> int:
+
+def fetch_financial(n: int, idx: int, raw_dir: str, manifest: list, dry_run: bool) -> int:
     print(f"\n[financial] target={n}")
     done = 0
-    per_sector = max(1, n // len(EDGAR_QUERIES))
-
-    for sector, form in EDGAR_QUERIES:
+    for url, title, sector in FINANCIAL_PDFS_CLEAN[:n]:
         if done >= n:
             break
-        search_url = (
-            f"https://efts.sec.gov/LATEST/search-index?q=%22{urllib.request.quote(sector)}%22"
-            f"&forms={form}&dateRange=custom&startdt=2022-01-01&enddt=2024-06-01"
-        )
-        try:
-            req = urllib.request.Request(search_url, headers={"User-Agent": "docstruct-bench/0.2 research@example.com"})
-            with urllib.request.urlopen(req, timeout=30) as r:
-                data = json.loads(r.read())
-        except Exception as err:
-            print(f"  EDGAR search failed [{sector}]: {err}")
-            continue
-
-        hits = data.get("hits", {}).get("hits", [])
-        count = 0
-        for hit in hits:
-            if done >= n or count >= per_sector:
-                break
-            src = hit.get("_source", {})
-            file_date = src.get("file_date", "")
-            entity = src.get("entity_name", "unknown")
-            # Get the actual 10-K document URL
-            accession = src.get("accession_no", "").replace("-", "")
-            cik = str(src.get("entity_id", "")).zfill(10)
-            if not accession or not cik:
+        name = f"doc{idx}.pdf"
+        print(f"  {name} <- {title} [{sector}]")
+        if not dry_run:
+            data = _download(url, os.path.join(raw_dir, name), delay=2)
+            if data is None:
+                print(f"    NOTE: if URL is dead, manually download from investor-relations page")
                 continue
-            # Primary document is typically the 10-K htm; we need the PDF version
-            # Try filing index to find PDF
-            index_url = f"{EDGAR_BASE}/cgi-bin/browse-edgar?action=getcompany&CIK={cik}&type=10-K&dateb=&owner=include&count=1&output=atom"
-            name = f"doc{idx}.pdf"
-            dest = os.path.join(RAW_DIR, name)
-            print(f"  {name} <- {entity[:50]} [{sector}] {file_date}")
-            # Direct PDF link via EDGAR viewer
-            pdf_url = f"{EDGAR_BASE}/Archives/edgar/data/{cik.lstrip('0')}/{accession}/{accession}-index.htm"
-            # Try the annual report PDF if available — fall back to htm→pdf conversion note
-            # For now record and skip if no direct PDF
-            if not dry_run:
-                # EDGAR doesn't always have PDFs; try direct PDF in filing
-                filing_url = f"{EDGAR_BASE}/cgi-bin/browse-edgar?action=getcompany&CIK={cik}&type=10-K&dateb=&owner=include&count=1"
-                print(f"    (EDGAR PDF extraction — may need manual download for {entity})")
-                # Skip: EDGAR 10-Ks are primarily HTML; leave for manual or use alternative source
-                continue
-            idx += 1
-            done += 1
-            count += 1
-
-    # Better financial source: use direct PDF annual reports from investor relations pages
-    # These are more reliably PDF and structurally rich
-    DIRECT_FINANCIAL_PDFS = [
-        ("https://www.apple.com/newsroom/pdfs/FY2023_Annual_Report.pdf", "Apple 10-K 2023", "technology"),
-        ("https://ir.aboutamazon.com/annual-reports-proxies-and-shareholder-letters/annual-reports/2022/default.aspx", "Amazon AR 2022", "technology"),
-        # Add more as needed — these are stable public PDFs
-    ]
-
-    print(f"  [financial] EDGAR HTML-only issue — recommend manual curation of 10-K PDFs")
-    print(f"  Best source: download directly from SEC EDGAR 'View Filing' PDF links")
-    print(f"  Or use: https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=10-K&dateb=&owner=include&count=40&search_text=")
+            manifest.append({"file": name, "domain": "financial", "source": url,
+                              "title": title, "sector": sector, "sha256": _sha256(data)})
+            _save_manifest(manifest)
+        idx += 1
+        done += 1
+    if done < n:
+        print(f"  [financial] only {done}/{n} downloaded — supplement manually from:")
+        print(f"  https://www.sec.gov/cgi-bin/browse-edgar?action=getcurrent&type=10-K")
     return idx
 
 
 # ── medical ───────────────────────────────────────────────────────────────────
 # PubMed Central Open Access — free, varied medical/bio content
-# Stress-tests: tables with lab values, figures, clinical protocols
 
-PMC_SEARCH = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pmc&retmode=json&retmax={n}&term={query}+AND+open+access[filter]"
-PMC_FETCH = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pmc&rettype=pdf&id={pmc_id}"
+PMC_SEARCH = (
+    "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
+    "?db=pmc&retmode=json&retmax={n}&term={query}+AND+open+access[filter]"
+)
+PMC_FETCH = (
+    "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi"
+    "?db=pmc&rettype=pdf&retmode=file&id={pmc_id}"
+)
 
 MEDICAL_QUERIES = [
     "clinical trial randomized controlled",
     "systematic review meta-analysis",
-    "cardiovascular disease treatment",
-    "cancer immunotherapy outcomes",
-    "machine learning medical imaging",
+    "cardiovascular disease treatment outcomes",
+    "cancer immunotherapy response",
+    "machine learning medical imaging diagnosis",
     "COVID-19 long-term outcomes",
 ]
 
 
-def fetch_medical(n: int, idx: int, manifest: list, dry_run: bool) -> int:
+def fetch_medical(n: int, idx: int, raw_dir: str, manifest: list, dry_run: bool) -> int:
     print(f"\n[medical] target={n}")
     done = 0
-    per_query = max(1, n // len(MEDICAL_QUERIES))
+    seen = {e.get("pmc_id") for e in manifest if e.get("domain") == "medical"}
+    per_query = max(1, (n // len(MEDICAL_QUERIES)) + 2)
 
     for query in MEDICAL_QUERIES:
         if done >= n:
             break
-        search_url = PMC_SEARCH.format(n=per_query + 2, query=urllib.request.quote(query))
+        search_url = PMC_SEARCH.format(n=per_query, query=urllib.request.quote(query))
         try:
             req = urllib.request.Request(search_url, headers={"User-Agent": "docstruct-bench/0.2"})
             with urllib.request.urlopen(req, timeout=30) as r:
                 data = json.loads(r.read())
         except Exception as err:
-            print(f"  PMC search failed [{query[:30]}]: {err}")
+            print(f"  PMC search failed: {err}")
             continue
 
         ids = data.get("esearchresult", {}).get("idlist", [])
         for pmc_id in ids:
             if done >= n:
                 break
+            if pmc_id in seen:
+                continue
             pdf_url = PMC_FETCH.format(pmc_id=pmc_id)
             name = f"doc{idx}.pdf"
-            dest = os.path.join(RAW_DIR, name)
-            print(f"  {name} <- PMC{pmc_id} [{query[:30]}...]")
+            print(f"  {name} <- PMC{pmc_id} [{query[:35]}]")
             if not dry_run:
-                dl_data = _download(pdf_url, dest, delay=1)
-                if dl_data is None:
+                dl = _download(pdf_url, os.path.join(raw_dir, name), delay=1)
+                if dl is None:
                     continue
                 manifest.append({"file": name, "domain": "medical", "source": "pubmedcentral",
-                                  "pmc_id": pmc_id, "query": query, "sha256": _sha256(dl_data)})
+                                  "pmc_id": pmc_id, "query": query, "sha256": _sha256(dl)})
                 _save_manifest(manifest)
+            seen.add(pmc_id)
             idx += 1
             done += 1
         time.sleep(0.5)
@@ -361,74 +336,52 @@ def fetch_medical(n: int, idx: int, manifest: list, dry_run: bool) -> int:
 
 
 # ── technical ─────────────────────────────────────────────────────────────────
-# Open-source project documentation PDFs — numbered steps, lists, cross-refs
-# Linux kernel docs, Apache manuals, RFCs, hardware datasheets
 
 TECHNICAL_PDFS = [
-    # Linux kernel and POSIX docs
-    ("https://www.kernel.org/doc/html/latest/_downloads/8ef9b58e2b2e6aed3c32a1cb2c1c8ef6/kernel-doc-guide.pdf", "Linux Kernel Doc Guide"),
-    # Apache project manuals
-    ("https://downloads.apache.org/httpd/docs/httpd-docs-2.4.57.en.pdf", "Apache HTTPD Manual"),
-    # PostgreSQL documentation
-    ("https://www.postgresql.org/files/documentation/pdf/16/postgresql-16-A4.pdf", "PostgreSQL 16 Manual"),
-    # Python documentation
-    ("https://docs.python.org/3/archives/python-3.11.0-docs-pdf-a4.zip", "Python 3.11 Docs"),  # zip, skip
-    # RFC documents (IETF) — plain text structure, numbered sections
     ("https://www.rfc-editor.org/rfc/pdfrfc/rfc9110.txt.pdf", "RFC 9110 HTTP Semantics"),
     ("https://www.rfc-editor.org/rfc/pdfrfc/rfc8446.txt.pdf", "RFC 8446 TLS 1.3"),
     ("https://www.rfc-editor.org/rfc/pdfrfc/rfc7540.txt.pdf", "RFC 7540 HTTP/2"),
-    # Docker documentation
-    ("https://docs.docker.com/get-started/overview/", "Docker Overview"),  # HTML, skip
-    # Open hardware datasheets (Texas Instruments, STM)
+    ("https://www.rfc-editor.org/rfc/pdfrfc/rfc9000.txt.pdf", "RFC 9000 QUIC"),
+    ("https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.04162018.pdf", "NIST CSF 1.1"),
+    ("https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-53r5.pdf", "NIST SP 800-53r5"),
+    ("https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-63b.pdf", "NIST SP 800-63b Auth"),
+    ("https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-207.pdf", "NIST Zero Trust"),
+    ("https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf", "RP2040 Datasheet"),
+    ("https://datasheets.raspberrypi.com/raspberry-pi-5/raspberry-pi-5-product-brief.pdf", "RPi5 Product Brief"),
     ("https://www.ti.com/lit/ds/symlink/lm317.pdf", "TI LM317 Datasheet"),
     ("https://www.ti.com/lit/ds/symlink/ina219.pdf", "TI INA219 Datasheet"),
     ("https://www.st.com/resource/en/datasheet/stm32f103c8.pdf", "STM32F103 Datasheet"),
-    # USB specification (structured, table-heavy)
-    ("https://www.usb.org/sites/default/files/usb_20_20230901.zip", "USB 2.0 Spec"),  # zip, skip
-    # Wi-Fi Alliance documents
-    ("https://www.wi-fi.org/download.php?file=/sites/default/files/private/Wi-Fi_Easy_Connect_Specification_v3.0.pdf", "WiFi Easy Connect Spec"),
-    # NIST cybersecurity framework
-    ("https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.04162018.pdf", "NIST CSF 1.1"),
-    ("https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-53r5.pdf", "NIST SP 800-53"),
-    # IEEE standards samples (free)
-    ("https://standards.ieee.org/wp-content/uploads/import/documents/tutorials/eee_services.pdf", "IEEE Services Tutorial"),
-    # OpenAPI specification
-    ("https://spec.openapis.org/oas/v3.1.0", "OpenAPI 3.1"),  # HTML, skip
-    # Kubernetes docs
-    ("https://kubernetes.io/docs/concepts/", "K8s Concepts"),  # HTML, skip
-    # Real technical PDFs: Raspberry Pi hardware specs
-    ("https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf", "RP2040 Datasheet"),
-    ("https://datasheets.raspberrypi.com/raspberry-pi-5/raspberry-pi-5-product-brief.pdf", "RPi 5 Product Brief"),
-    # Arduino
-    ("https://content.arduino.cc/assets/UNO_V3_With_328P_schematic.pdf", "Arduino UNO Schematic"),
-    # GCC manual
     ("https://gcc.gnu.org/onlinedocs/gcc.pdf", "GCC Manual"),
-    # Git documentation
     ("https://git-scm.com/book/en/v2/book.pdf", "Pro Git Book"),
-    # Ansible docs
-    ("https://docs.ansible.com/ansible/2.9/pdf/ansible_2.9_user_guide.pdf", "Ansible User Guide"),
-    # Tensorflow guide
-    ("https://www.tensorflow.org/guide", "TF Guide"),  # HTML
+    ("https://www.postgresql.org/files/documentation/pdf/16/postgresql-16-A4.pdf", "PostgreSQL 16 Manual"),
+    ("https://downloads.apache.org/httpd/docs/httpd-docs-2.4.57.en.pdf", "Apache HTTPD Manual"),
+    ("https://www.sqlite.org/docsrc/doc/trunk/art/sqlite370_banner.gif", "SQLite Docs"),  # image, skip
+    ("https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Assigned_Numbers/out/en/Assigned_Numbers.pdf", "Bluetooth Assigned Numbers"),
+    ("https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.pdf", "MQTT v5.0 Spec"),
+    ("https://spec.graphql.org/October2021/GraphQL.pdf", "GraphQL Spec Oct 2021"),  # may 404
+    ("https://www.w3.org/TR/2023/REC-css-color-4-20230718/", "CSS Color 4"),  # HTML
+    ("https://www.ietf.org/archive/id/draft-ietf-quic-http-34.pdf", "HTTP/3 Draft"),
+    ("https://openocd.org/doc/pdf/openocd.pdf", "OpenOCD Manual"),
+    ("https://www.freedesktop.org/software/systemd/man/systemd.pdf", "systemd Manual"),  # may 404
 ]
 
-TECHNICAL_PDFS_CLEAN = [(url, title) for url, title in TECHNICAL_PDFS if not url.endswith(".zip") and not url.endswith("/")]
+TECHNICAL_PDFS_CLEAN = [(u, t) for u, t in TECHNICAL_PDFS if not u.endswith((".gif", "/"))]
 
 
-def fetch_technical(n: int, idx: int, manifest: list, dry_run: bool) -> int:
+def fetch_technical(n: int, idx: int, raw_dir: str, manifest: list, dry_run: bool) -> int:
     print(f"\n[technical] target={n}")
     done = 0
-    for url, title in TECHNICAL_PDFS_CLEAN[:n]:
+    for url, title in TECHNICAL_PDFS_CLEAN[:n + 5]:  # extra buffer for 404s
         if done >= n:
             break
         name = f"doc{idx}.pdf"
-        dest = os.path.join(RAW_DIR, name)
         print(f"  {name} <- {title}")
         if not dry_run:
-            dl_data = _download(url, dest, delay=2)
-            if dl_data is None:
+            data = _download(url, os.path.join(raw_dir, name), delay=2)
+            if data is None:
                 continue
             manifest.append({"file": name, "domain": "technical", "source": url,
-                              "title": title, "sha256": _sha256(dl_data)})
+                              "title": title, "sha256": _sha256(data)})
             _save_manifest(manifest)
         idx += 1
         done += 1
@@ -436,53 +389,40 @@ def fetch_technical(n: int, idx: int, manifest: list, dry_run: bool) -> int:
 
 
 # ── government ────────────────────────────────────────────────────────────────
-# Federal Register + EU policy — single-column dense prose, formal hierarchy
-# Stress-tests long-section detection and reference section skipping
 
 GOVT_PDFS = [
-    # Federal Register rules (dense, long)
-    ("https://www.federalregister.gov/documents/full_text/pdf/2023-00001.pdf", "Fed Register 2023-00001"),
-    ("https://www.federalregister.gov/documents/full_text/pdf/2023-10000.pdf", "Fed Register 2023-10000"),
-    ("https://www.federalregister.gov/documents/full_text/pdf/2022-27382.pdf", "Fed Register 2022-27382"),
-    ("https://www.federalregister.gov/documents/full_text/pdf/2023-04800.pdf", "Fed Register AI Policy"),
-    # FTC reports
-    ("https://www.ftc.gov/system/files/documents/reports/federal-trade-commission-report-2022/ftc-2022-annual-report.pdf", "FTC Annual Report 2022"),
-    # SEC reports
-    ("https://www.sec.gov/files/sec-2022-annual-report.pdf", "SEC Annual Report 2022"),
-    # NIST guidelines (already some in technical — include policy-facing ones here)
-    ("https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf", "NIST AI RMF"),
-    # EU AI Act (structured legislative document)
-    ("https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:52021PC0206", "EU AI Act Proposal"),
-    # White House AI EO
-    ("https://www.whitehouse.gov/wp-content/uploads/2023/10/Biden-Harris-Administration-Fact-Sheet-on-AI-EO.pdf", "WH AI EO Fact Sheet"),
-    # GAO technology reports
-    ("https://www.gao.gov/assets/gao-23-105980.pdf", "GAO AI Accountability"),
+    ("https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf", "NIST AI RMF 1.0"),
+    ("https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-2e2023.pdf", "NIST AI Adversarial ML"),
+    ("https://www.gao.gov/assets/gao-23-105980.pdf", "GAO AI Accountability Report"),
     ("https://www.gao.gov/assets/gao-21-519sp.pdf", "GAO Technology Assessment"),
-    # Congressional research service
+    ("https://www.gao.gov/assets/gao-24-106538.pdf", "GAO Generative AI Report"),
+    ("https://apps.who.int/iris/bitstream/handle/10665/341091/9789240021327-eng.pdf", "WHO AI Ethics Health"),
+    ("https://unesdoc.unesco.org/ark:/48223/pf0000381137.locale=en", "UNESCO AI Recommendation"),  # may 404
+    ("https://www.federalregister.gov/documents/full_text/pdf/2023-01055.pdf", "Fed Register 2023-01055"),
+    ("https://www.federalregister.gov/documents/full_text/pdf/2022-27382.pdf", "Fed Register 2022-27382"),
+    ("https://www.cisa.gov/sites/default/files/2023-11/AI_ROADMAP_508C.pdf", "CISA AI Roadmap"),
+    ("https://www.ftc.gov/system/files/ftc_gov/pdf/P201200_report_-_ai_and_algos_in_the_economy.pdf", "FTC AI Algorithms Report"),
     ("https://crsreports.congress.gov/product/pdf/R/R46795", "CRS AI Regulation"),
     ("https://crsreports.congress.gov/product/pdf/IF/IF11937", "CRS Machine Learning"),
-    # WHO health policy
-    ("https://apps.who.int/iris/bitstream/handle/10665/341091/9789240021327-eng.pdf", "WHO AI Ethics Health"),
-    # UNESCO AI recommendation
-    ("https://unesdoc.unesco.org/ark:/48223/pf0000381137/PDF/381137eng.pdf.multi", "UNESCO AI Recommendation"),
+    ("https://www.dhs.gov/sites/default/files/2023-09/23_0913_ia_ai-roadmap-final-508.pdf", "DHS AI Roadmap"),
+    ("https://www.whitehouse.gov/wp-content/uploads/2022/10/Blueprint-for-an-AI-Bill-of-Rights.pdf", "WH AI Bill of Rights"),
 ]
 
 
-def fetch_govt(n: int, idx: int, manifest: list, dry_run: bool) -> int:
+def fetch_govt(n: int, idx: int, raw_dir: str, manifest: list, dry_run: bool) -> int:
     print(f"\n[govt] target={n}")
     done = 0
-    for url, title in GOVT_PDFS[:n]:
+    for url, title in GOVT_PDFS[:n + 3]:
         if done >= n:
             break
         name = f"doc{idx}.pdf"
-        dest = os.path.join(RAW_DIR, name)
         print(f"  {name} <- {title}")
         if not dry_run:
-            dl_data = _download(url, dest, delay=2)
-            if dl_data is None:
+            data = _download(url, os.path.join(raw_dir, name), delay=2)
+            if data is None:
                 continue
             manifest.append({"file": name, "domain": "govt", "source": url,
-                              "title": title, "sha256": _sha256(dl_data)})
+                              "title": title, "sha256": _sha256(data)})
             _save_manifest(manifest)
         idx += 1
         done += 1
@@ -490,16 +430,14 @@ def fetch_govt(n: int, idx: int, manifest: list, dry_run: bool) -> int:
 
 
 # ── textbook ──────────────────────────────────────────────────────────────────
-# OpenStax CC-licensed textbooks — chapter/section/subsection hierarchy,
-# exercises, mixed content; stress-tests deep header hierarchy (h1/h2/h3)
 
 OPENSTAX_PDFS = [
     ("https://assets.openstax.org/oscms-prodcms/media/documents/UniversityPhysicsVolume1-WEB.pdf", "OpenStax University Physics Vol 1"),
     ("https://assets.openstax.org/oscms-prodcms/media/documents/Calculus-WEB.pdf", "OpenStax Calculus"),
     ("https://assets.openstax.org/oscms-prodcms/media/documents/Microbiology-WEB.pdf", "OpenStax Microbiology"),
-    ("https://assets.openstax.org/oscms-prodcms/media/documents/IntroductiontoSociology3e-WEB.pdf", "OpenStax Intro Sociology"),
+    ("https://assets.openstax.org/oscms-prodcms/media/documents/IntroductiontoSociology3e-WEB.pdf", "OpenStax Sociology"),
     ("https://assets.openstax.org/oscms-prodcms/media/documents/OrganicChemistry-WEB.pdf", "OpenStax Organic Chemistry"),
-    ("https://assets.openstax.org/oscms-prodcms/media/documents/IntroductiontoStatistics-WEB.pdf", "OpenStax Intro Statistics"),
+    ("https://assets.openstax.org/oscms-prodcms/media/documents/IntroductiontoStatistics-WEB.pdf", "OpenStax Statistics"),
     ("https://assets.openstax.org/oscms-prodcms/media/documents/AmericanGovernment3e-WEB.pdf", "OpenStax American Government"),
     ("https://assets.openstax.org/oscms-prodcms/media/documents/BusinessEthics-WEB.pdf", "OpenStax Business Ethics"),
     ("https://assets.openstax.org/oscms-prodcms/media/documents/Macroeconomics3e-WEB.pdf", "OpenStax Macroeconomics"),
@@ -507,21 +445,20 @@ OPENSTAX_PDFS = [
 ]
 
 
-def fetch_textbook(n: int, idx: int, manifest: list, dry_run: bool) -> int:
+def fetch_textbook(n: int, idx: int, raw_dir: str, manifest: list, dry_run: bool) -> int:
     print(f"\n[textbook] target={n}")
     done = 0
     for url, title in OPENSTAX_PDFS[:n]:
         if done >= n:
             break
         name = f"doc{idx}.pdf"
-        dest = os.path.join(RAW_DIR, name)
         print(f"  {name} <- {title}")
         if not dry_run:
-            dl_data = _download(url, dest, delay=3)
-            if dl_data is None:
+            data = _download(url, os.path.join(raw_dir, name), delay=3)
+            if data is None:
                 continue
             manifest.append({"file": name, "domain": "textbook", "source": url,
-                              "title": title, "sha256": _sha256(dl_data)})
+                              "title": title, "sha256": _sha256(data)})
             _save_manifest(manifest)
         idx += 1
         done += 1
@@ -543,36 +480,35 @@ FETCHERS = {
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Fetch diverse PDF dataset for DocStruct v2 benchmark")
-    parser.add_argument("--domain", default=None, help="single domain to fetch (default: all)")
-    parser.add_argument("--dry-run", action="store_true", help="print plan without downloading")
-    parser.add_argument("--out-dir", default=RAW_DIR)
+    parser.add_argument("--domain", default=None, choices=list(FETCHERS), help="single domain (default: all)")
+    parser.add_argument("--dry-run", action="store_true", help="print plan, no downloads")
+    parser.add_argument("--smoke", action="store_true", help="1 doc per domain (connectivity test)")
+    parser.add_argument("--out-dir", default=os.path.join("data", "raw-pdfs"))
     args = parser.parse_args()
 
-    global RAW_DIR
-    RAW_DIR = args.out_dir
-    os.makedirs(RAW_DIR, exist_ok=True)
+    raw_dir = args.out_dir
+    os.makedirs(raw_dir, exist_ok=True)
 
     manifest = _load_manifest()
-    idx = _next_index()
+    idx = _next_index(raw_dir)
     domains = [args.domain] if args.domain else list(DOMAIN_TARGETS)
 
-    print(f"Starting index: doc{idx}.pdf")
-    print(f"Domains: {domains}")
-    print(f"Dry run: {args.dry_run}")
+    print(f"Starting index : doc{idx}.pdf")
+    print(f"Domains        : {domains}")
+    print(f"Dry run        : {args.dry_run}")
+    print(f"Smoke test     : {args.smoke}")
+    print(f"Out dir        : {raw_dir}")
 
     for domain in domains:
-        if domain not in FETCHERS:
-            print(f"Unknown domain: {domain}")
-            continue
-        target = DOMAIN_TARGETS[domain]
-        idx = FETCHERS[domain](target, idx, manifest, args.dry_run)
+        target = 1 if args.smoke else DOMAIN_TARGETS[domain]
+        idx = FETCHERS[domain](target, idx, raw_dir, manifest, dry_run=args.dry_run)
 
-    if not args.dry_run:
-        print(f"\nmanifest: {len(manifest)} entries -> {MANIFEST_V2}")
-        domain_counts = {}
+    if not args.dry_run and not args.smoke:
+        counts = {}
         for e in manifest:
-            domain_counts[e.get("domain", "unknown")] = domain_counts.get(e.get("domain", "unknown"), 0) + 1
-        for d, c in sorted(domain_counts.items()):
+            counts[e.get("domain", "?")] = counts.get(e.get("domain", "?"), 0) + 1
+        print(f"\nmanifest: {len(manifest)} total -> {MANIFEST_V2}")
+        for d, c in sorted(counts.items()):
             print(f"  {d}: {c}")
 
 

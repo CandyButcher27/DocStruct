@@ -507,3 +507,62 @@ results with no error.
 **Ranked by expected ROI:** 7.1 (reranker) > 7.2 (diagnose worst docs) > 7.9 (report provenance) >
 7.12 (hybrid where) > 7.3 (overlap) > 7.4 (figures) > 7.6 (tiny chunks) > 7.7 (tables) >
 7.11 (header numbering) > 7.5 (confidence calibration) > 7.10 (embedding cache).
+
+---
+
+## 8. What DocStruct actually is
+
+Not a RAG framework. It's a **local, deterministic chunking/extraction library** with a thin
+retrieval layer (`indexing/`, `query/retriever.py`) and a benchmark harness (`eval/`) bolted on so
+the chunker can be measured against RAG baselines. The core contract (no LLM calls, same PDF in →
+same chunks out) lives entirely in geometry/model detection → fusion → reading order → chunking.
+Indexing/query/rerank exist to prove the chunks are retrieval-good, not as a product surface in
+their own right — `cli.py` exposes `run` (bare chunking) as the primary command; `index`/`query` are
+secondary/eval-support commands.
+
+## 9. Package legitimacy check (2026-07-23)
+
+Verified, not just read from the plan:
+- Installed editable, real package: `pip show docstruct` → v0.2.0, entry point `docstruct.cli:main`.
+  **Bug:** editable install metadata still points at `C:\...\projects\DocStruct` (pre-move path);
+  import still resolves correctly but the `docstruct.exe` console-script shim is broken (exit 1,
+  no output) — use `python -m` / `from docstruct.cli import main` instead until `pip install -e .`
+  is rerun from the current path.
+- `pytest -q` → **107/107 passed**.
+- `docstruct run` smoke-tested end to end on `data/raw-pdfs/doc1.pdf`: 22 pages → 180 blocks → 33
+  chunks, section paths attached, geometry-only mode (no model weights loaded). Real, working
+  pipeline, not vaporware.
+- First smoke-test attempt used `data/doc1_annotated.pdf` — that file is the *output* of
+  `docstruct visualize` (labels burned onto the page by `visualize.py:44`,
+  `f"{block.label}:{block.source.value}"`), not a source PDF. Extracting text from it pulled the
+  overlay label text in on top of the real content. That was a testing mistake on my part, not a
+  DocStruct bug — retracted.
+- **Real bug found on the clean PDF** (`doc1.pdf`, not the annotated one): several blocks have
+  doubled interior letters — `"Trannsfer may hhave many mmeanings ass well as appplication
+  doomains"`, `"preccipitation  mmm deww point  C"`, `"obsserved by Aiir Quality Monitoring
+  Staation"`. Confirmed document-specific, not systemic: `doc10.pdf` extracts cleanly through the
+  same code path. Likely cause: this PDF's font renders faux-bold via duplicate offset glyphs, and
+  `pdfplumber.extract_text()` (`docstruct/extraction/text_extractor.py:36`) isn't deduping the
+  overlap at this tolerance. Same failure family as **7.2** (doc44/doc19/doc17 MRR outliers) — worth
+  checking during that diagnosis pass rather than as a separate fix.
+
+## 10. Plan-vs-code audit (sections 1-6 above)
+
+What the plan proposed vs. what's actually in the repo right now:
+
+| Section | Proposed | Actual state |
+|---|---|---|
+| 1. Config flags | 6 new flags (`XY_CUT`, `SUPPRESS_CONTAINED`, `PREPEND_SECTION_PATH`, `POOLED_CORPUS`, `CONFIDENCE_WEIGHTED_RRF`, `RRF_CONFIDENCE_MULTIPLIER`) | Only `XY_CUT` exists (`config.py:42`), and it's `False` — commit `863bdda` shipped it, measured it worse than the legacy splitter, shipped it off by default. The other 5 flags were never added. |
+| 2. Recursive XY-Cut | New `docstruct/utils/xy_cut.py`, function `recursive_xy_cut(blocks, page_width, page_height)` | File exists but the real implementation diverged from the plan's pseudocode entirely — actual function is `xy_cut_order(blocks, page_width)`, different signature, own algorithm. Wired into `reading_order.py:52` behind `config.XY_CUT`. Has real tests (`test_xy_cut_reads_two_columns_in_order`, empty/single-block edge cases). Done, just not as drafted, and disabled. |
+| 3. Containment suppression | Call `suppress_contained()` in `run_pipeline()` after fusion | **Dead import.** `pipeline.py:20` imports `suppress_contained`/`suppress_table_contained` from `fusion/containment.py` — neither is ever called anywhere in the codebase (verified by grep across all `.py` files). The functions are implemented and presumably tested in isolation, but not wired in. `pipeline_mode` param (`model-only`/`geometry-only` bypass) also never landed — `run_pipeline()`'s only params are `pdf_path`, `model_detector`, `weights`, `cache_dir`. |
+| 4. Hybrid retrieval `where` filter | Make `_ensure_corpus`/`_hybrid` honour `where` for BM25 | **Done**, and further along than the plan draft — `retriever.py` docstring explicitly states both dense and hybrid modes honour `where` now, `_ensure_corpus` takes `where` and caches per filter key. |
+| 5. Section-path prepending in eval | `DocStructAdapter.chunk()` prepends `[Section: ...]` when `config.PREPEND_SECTION_PATH` | Not implemented. Current `docstruct/eval/adapters/docstruct_adapter.py` has no `pipeline_mode` param, no section-prepend logic, no config flag — matches the pre-plan version described in the diff, not the target. |
+| 5b. `pipeline_mode` adapter routing (`docstruct_geo`/`docstruct_model`) | Register ablation adapters in `eval/adapters/__init__.py` | Not implemented — depends on 3's `pipeline_mode` param, which doesn't exist either. |
+| 5c. Pooled-corpus indexing + bootstrap CI | `benchmark.py`: `compute_bootstrap_ci()`, `POOLED_CORPUS` branch in `benchmark_tool()` | Not implemented — no `bootstrap` or `POOLED_CORPUS` references anywhere in `eval/benchmark.py`. |
+| 5d. CLI benchmark flags (`--pooled`, `--bootstrap`, `--confidence-weighted`) | New argparse flags | Not implemented — not in `cli.py`. |
+| 6. XY-Cut verification test | `test_recursive_xy_cut_abstract_and_body` | Superseded — actual tests target `xy_cut_order`, not `recursive_xy_cut` (matches 2's divergence), but coverage intent is met. |
+| 7.1 Cross-encoder reranker | Flagged "declared but not wired" | **Now wired**, contradicting the plan text above — `query/retriever.py` (`_ensure_reranker`, `_rerank`, used in both dense/hybrid before top-k truncation) and `eval/benchmark.py` (`reranker_model` → `CrossEncoder` → passed into `benchmark_tool`) both use it live. Plan section 7.1 is stale; reclassify as done. |
+
+**Net:** reading-order and retrieval-filtering work (2, 4) shipped and is ahead of the plan.
+Fusion-side cleanup (3) is half-done — built, imported, never called. Eval/benchmark tooling (5, 5b,
+5c, 5d) is entirely unbuilt. 7.1 flipped from "not done" to done since the plan was written.

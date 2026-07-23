@@ -1,0 +1,422 @@
+[
+  {
+    "file": "doc51.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27377v1",
+    "title": "DanceOPD: On-Policy Generative Field Distillation",
+    "category": "cs.CL",
+    "sha256": "2545e43b4c4cfe52"
+  },
+  {
+    "file": "doc52.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27347v1",
+    "title": "Mapping Political-Elite Networks in Europe with a Multilingual Joint Entity-Relation Extraction Pipeline",
+    "category": "cs.CL",
+    "sha256": "ff4566d309cb1f17"
+  },
+  {
+    "file": "doc53.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27330v1",
+    "title": "Empowering GUI Agents via Autonomous Experience Exploration and Hindsight Experience Utilization for Task Planning",
+    "category": "cs.CL",
+    "sha256": "81030f5733f3d44e"
+  },
+  {
+    "file": "doc54.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27316v1",
+    "title": "LLM-Based Examination of Eligibility Criteria from Securities Prospectuses at the German Central Bank",
+    "category": "cs.CL",
+    "sha256": "71b96243e1104050"
+  },
+  {
+    "file": "doc55.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27314v1",
+    "title": "Beyond Surface Forms: A Comprehensive, Mechanism-Oriented Taxonomy of Indirect Linguistic Encoding for LLM-Based Coded Language Detection",
+    "category": "cs.CL",
+    "sha256": "bc3ed1a939d51bd7"
+  },
+  {
+    "file": "doc56.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27306v1",
+    "title": "Multilingual Reasoning Cascades Need More Context",
+    "category": "cs.CL",
+    "sha256": "34de8b83d1f7c4a6"
+  },
+  {
+    "file": "doc57.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27275v1",
+    "title": "How Surprising Is Historical Italian to Language Models? Tokenization Tax, Comprehension Tax, and a Simple Mitigation",
+    "category": "cs.CL",
+    "sha256": "2cc193697f10e7ec"
+  },
+  {
+    "file": "doc58.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27242v1",
+    "title": "The Geometry of Updates: Fisher Alignment at Vocabulary Scale",
+    "category": "cs.CL",
+    "sha256": "daa2d964f89ddb18"
+  },
+  {
+    "file": "doc59.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27369v1",
+    "title": "Reinforcement Learning without Ground-Truth Solutions can Improve LLMs",
+    "category": "cs.LG",
+    "sha256": "506212f309d35b42"
+  },
+  {
+    "file": "doc60.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27361v1",
+    "title": "Autoregressive Boltzmann Generators",
+    "category": "cs.LG",
+    "sha256": "8d79eb8e2f67404f"
+  },
+  {
+    "file": "doc61.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27359v1",
+    "title": "When are likely answers right? On Sequence Probability and Correctness in LLMs",
+    "category": "cs.LG",
+    "sha256": "f82dd94845fa5eeb"
+  },
+  {
+    "file": "doc62.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27354v1",
+    "title": "Error-Conditioned Neural Solvers",
+    "category": "cs.LG",
+    "sha256": "5d66632483eda4b2"
+  },
+  {
+    "file": "doc63.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27342v1",
+    "title": "Understanding Domain-Aware Distribution Alignment in Budgeted Entity Matching",
+    "category": "cs.LG",
+    "sha256": "0fedb058aad6db5e"
+  },
+  {
+    "file": "doc64.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27376v1",
+    "title": "Ask, Solve, Generate: Self-Evolving Unified Multimodal Understanding and Generation via Self-Consistency Rewards",
+    "category": "cs.CV",
+    "sha256": "5bb0b644d1bc340c"
+  },
+  {
+    "file": "doc65.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27374v1",
+    "title": "World Action Models Enable Continual Imitation Learning with Recurrent Generative Replays",
+    "category": "cs.CV",
+    "sha256": "b003b876ee0587bc"
+  },
+  {
+    "file": "doc66.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27373v1",
+    "title": "Paying More Attention to Visual Tokens in Self-Evolving Large Multimodal Models",
+    "category": "cs.CV",
+    "sha256": "9edfd90137dff3df"
+  },
+  {
+    "file": "doc67.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27372v1",
+    "title": "DnA: Denoising Attention for Visual Tasks",
+    "category": "cs.CV",
+    "sha256": "dd52c911bcd811b2"
+  },
+  {
+    "file": "doc68.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27371v1",
+    "title": "Don't Settle at the Mode! Mitigating Diversity Collapse in Pretrained Flow Models via Feature Self-Guidance",
+    "category": "cs.CV",
+    "sha256": "da6ae5bbc3fb973e"
+  },
+  {
+    "file": "doc69.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27349v1",
+    "title": "All you need is log",
+    "category": "stat.ML",
+    "sha256": "ef2529d53d8c3ae8"
+  },
+  {
+    "file": "doc70.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27298v1",
+    "title": "Fast algorithms for learning a Gaussian under halfspace truncation with optimal sample complexity",
+    "category": "stat.ML",
+    "sha256": "9318b7fa8efe024a"
+  },
+  {
+    "file": "doc71.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27269v1",
+    "title": "Ribbon: Scalable Approximation and Robust Uncertainty Quantification",
+    "category": "stat.ML",
+    "sha256": "327d213d88e45c46"
+  },
+  {
+    "file": "doc72.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.26733v1",
+    "title": "Surviving by Serving: Functional Relevance Drives Self-Organization in Complex Adaptive Systems",
+    "category": "q-bio.NC",
+    "sha256": "e934bd251b2a371c"
+  },
+  {
+    "file": "doc73.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.26448v1",
+    "title": "Closing the Loop to Discover Psychological Theories with an Automated Cognitive Scientist",
+    "category": "q-bio.NC",
+    "sha256": "7b1717d4c4707e5a"
+  },
+  {
+    "file": "doc74.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.26279v1",
+    "title": "Beyond Single-Source Cognitive Taskonomy:Multi-Source Task Relations through fMRI Transfer Learning",
+    "category": "q-bio.NC",
+    "sha256": "fe4441625977d6a3"
+  },
+  {
+    "file": "doc75.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.25874v1",
+    "title": "Topology-Dependent Emergence of Polychronous Neuronal Groups: A Recurrence-Plot Characterization",
+    "category": "q-bio.NC",
+    "sha256": "e6a15f4c0e937b75"
+  },
+  {
+    "file": "doc76.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.25826v1",
+    "title": "Weight geometry governs functional memory in complex systems",
+    "category": "q-bio.NC",
+    "sha256": "6e981b13008e910b"
+  },
+  {
+    "file": "doc77.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.26432v1",
+    "title": "Embedding Foundation Model Predictions in Discrete-Choice Models with Structural Guarantees",
+    "category": "econ.EM",
+    "sha256": "178bd657363aafc0"
+  },
+  {
+    "file": "doc78.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.25688v1",
+    "title": "Choosing What to Calibrate and What to Estimate in Structural Models",
+    "category": "econ.EM",
+    "sha256": "f32bbf08aeca19f5"
+  },
+  {
+    "file": "doc79.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.25292v1",
+    "title": "Time-Varying Model Averaging of Multi-layer Network Vector Autoregressions",
+    "category": "econ.EM",
+    "sha256": "acc32f2ac8a3a671"
+  },
+  {
+    "file": "doc80.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.24867v1",
+    "title": "Bounds for Standard Errors in Combined Data",
+    "category": "econ.EM",
+    "sha256": "c9750ef31e1dabe1"
+  },
+  {
+    "file": "doc81.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.24850v1",
+    "title": "Heterogeneous Peer Effects with Endogenous Network Formation",
+    "category": "econ.EM",
+    "sha256": "97ca12dc00b48cd8"
+  },
+  {
+    "file": "doc82.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27367v1",
+    "title": "Accessing both electrochemical SEIRA and SERS with ultrasensitive metamaterials for enhanced molecular identification",
+    "category": "physics.optics",
+    "sha256": "43c9e27f79292bf9"
+  },
+  {
+    "file": "doc83.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27218v1",
+    "title": "Plasmonic coated scatterers for tunable coherent perfect absorption",
+    "category": "physics.optics",
+    "sha256": "a1eabeb2df7a0991"
+  },
+  {
+    "file": "doc84.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27099v1",
+    "title": "Neural Networks for Inverse Design of Cascaded-Mode Near-Field Landscapes",
+    "category": "physics.optics",
+    "sha256": "65740f9b166db5d6"
+  },
+  {
+    "file": "doc85.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27043v1",
+    "title": "Observation of Non-Hermitian Skin Dynamics in the Liouvillian Regime",
+    "category": "physics.optics",
+    "sha256": "a3b9d774e5f5a605"
+  },
+  {
+    "file": "doc86.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27312v1",
+    "title": "A Verification Theorem for an Optimal Control Problem Governed by the Convective Brinkman--Forchheimer Equations",
+    "category": "math.OC",
+    "sha256": "749246ab0c3e2f4f"
+  },
+  {
+    "file": "doc87.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27260v1",
+    "title": "Conjecture About Arbitrary Even-Order Convexity of $w$-Optimization of the Split CIF",
+    "category": "math.OC",
+    "sha256": "850e61c3e8a6b666"
+  },
+  {
+    "file": "doc88.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27217v1",
+    "title": "CHAMB-GA: A Containerized HPC Scalable Microservice-Based Framework for Genetic Algorithms",
+    "category": "math.OC",
+    "sha256": "486c11bbeb102e18"
+  },
+  {
+    "file": "doc89.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27196v1",
+    "title": "Optimizing Accessibility and Maximum Travel Times in Transit Networks: The Hub Covering Location Problem",
+    "category": "math.OC",
+    "sha256": "863d568ce7104252"
+  },
+  {
+    "file": "doc90.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27375v1",
+    "title": "Scalable Behavior Cloning with Open Data, Training, and Evaluation",
+    "category": "cs.RO",
+    "sha256": "1c8bb93951c617c7"
+  },
+  {
+    "file": "doc91.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27355v1",
+    "title": "RouterVLA: Turning Smoke Tests into Supervision for Heterogeneous VLA Selection",
+    "category": "cs.RO",
+    "sha256": "cb3e19e52576ea0e"
+  },
+  {
+    "file": "doc92.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27311v1",
+    "title": "Massive Cosmological Correlators from Flat Space: a Laplace-Space Approach",
+    "category": "astro-ph.CO",
+    "sha256": "c5942c892385d4e3"
+  },
+  {
+    "file": "doc93.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27309v1",
+    "title": "Laplace Space for Cosmological Correlators",
+    "category": "astro-ph.CO",
+    "sha256": "4a21cdbfc275b0a9"
+  },
+  {
+    "file": "doc94.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2606.27290v1",
+    "title": "A solid unification of the dark sector",
+    "category": "astro-ph.CO",
+    "sha256": "965b1a3fee1b3399"
+  },
+  {
+    "file": "doc95.pdf",
+    "domain": "legal",
+    "source": "courtlistener.com",
+    "case_name": "unknown",
+    "court": "bap9",
+    "sha256": "6f391417928136b4"
+  },
+  {
+    "file": "doc96.pdf",
+    "domain": "financial",
+    "source": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/annualreport-2023.pdf",
+    "title": "JPMorgan 2023 Annual Report",
+    "sector": "finance",
+    "sha256": "bebb7c4abb278396"
+  },
+  {
+    "file": "doc97.pdf",
+    "domain": "financial",
+    "source": "https://www.berkshirehathaway.com/2022ar/2022ar.pdf",
+    "title": "Berkshire 2022 Annual Report",
+    "sector": "finance",
+    "sha256": "52138f7464c477b1"
+  }
+]

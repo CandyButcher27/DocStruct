@@ -3,65 +3,68 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-# Virtual Environments & Environments
+# Virtual environments & secrets
 .env
 .venv/
 env/
 venv/
 
-# IDE and Project Settings
+# IDE / OS
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
 
-
-# Testing and Coverage
+# Testing and coverage
 .pytest_cache/
 .coverage
 htmlcov/
-
-# Process Outputs
-outputs/
-results/*.csv
-results/*.json
-
-# Data — generated outputs and large binaries
-data/raw-pdfs/
-data/hybrid-outputs/
-data/model-outputs/
-data/markdown-outputs/
-data/v1/
-data/*.json
-hf_models/
-
-# Temporary Diagnostic Scripts (repo root only — keep tests/ tracked)
-/debug_*.py
-/run_*.py
-/test_*.py
-/check_*.py
-/_*.py
-*.tmp
-*.bak
-.claude
-CLaude.md
 
 # Packaging artifacts
 *.egg-info/
 build/
 dist/
 
-# Model weights (download separately)
-weights/
+# Logs and scratch
+*.log
+*.tmp
+*.bak
+output/
+outputs/
+_smoke*/
 
-# Annotation review sessions (bulky, embedded page images; final GT JSON is tracked)
+# Temporary diagnostic scripts (repo root only — tests/ stays tracked)
+/debug_*.py
+/run_*.py
+/test_*.py
+/check_*.py
+/_*.py
+
+# Local Claude Code settings (CLAUDE.md and memory/ ARE tracked)
+.claude/
+
+# Corpora and generated outputs — fetched with scripts/fetch_dataset_v2.py
+data/raw-pdfs/
+data/hybrid-outputs/
+data/model-outputs/
+data/markdown-outputs/
+data/doclaynet/
+data/v1/
+data/*.json
+data/*.pdf
+
+# Annotation review sessions (bulky, embed page images; final GT JSON is tracked)
 data/annotations/_sessions/
+
+# Model weights and HF snapshots (downloaded separately, see README)
+weights/
+hf_models/
+
+# Benchmark detector/block cache (regenerated on demand, ~100MB)
+.bench_cache/
 
 # graphify code-graph output
 graphify-out/
 
-# benchmark scratch
-_smoke*/
-
-# benchmark detector cache
-.bench_cache/
+# Personal working documents, not project artifacts
+interview_prep_*.md
