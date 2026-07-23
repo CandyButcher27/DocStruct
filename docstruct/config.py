@@ -91,6 +91,12 @@ GEOMETRY_CONFIDENCE = {
 MAX_CHUNK_TOKENS = 500
 CHUNK_OVERLAP_TOKENS = 75  # tail words carried into next chunk on token-limit flush
 HEADER_LEVELS = 3
+# Let an explicit section number ("3.2.1 Ablations") set the header's depth instead
+# of its font-size rank. Font size is a proxy for depth; a section number *is* the
+# depth, so where one exists there is nothing left to infer. Fixes documents that
+# set every heading at one size, or distinguish levels by weight rather than size —
+# a documented weakness of the font-rank-only approach. Deterministic, no model.
+HEADER_NUMBERING_LEVELS = True
 # A structural boundary (header/table/caption) only ends the running text chunk once
 # it holds at least this many words. Below the floor the boundary is crossed and the
 # buffer keeps accumulating, so a page of prose broken up by figures stays one chunk

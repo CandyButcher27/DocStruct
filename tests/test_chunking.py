@@ -205,3 +205,57 @@ def test_abstract_chunk_type():
     ]
     chunks = build_chunks(blocks)
     assert any(c.chunk_type == "abstract" for c in chunks)
+
+
+def test_section_number_overrides_font_rank():
+    """A document that marks depth by numbering, not by size.
+
+    All four headings share one font size, so the font-rank signal alone would
+    call every one of them level 1 and flatten the hierarchy completely.
+    """
+    blocks = [
+        _blk("a", "header", "3 Method", 0, font_size=12),
+        _blk("b", "header", "3.2 Setup", 1, font_size=12),
+        _blk("c", "header", "3.2.1 Ablations", 2, font_size=12),
+        _blk("d", "header", "4 Results", 3, font_size=12),
+    ]
+    levels = assign_header_levels(blocks)
+    assert [levels["a"], levels["b"], levels["c"], levels["d"]] == [1, 2, 3, 1]
+
+
+def test_font_rank_still_applies_to_unnumbered_headers():
+    blocks = [
+        _blk("a", "header", "Introduction", 0, font_size=18),
+        _blk("b", "header", "2.1 Related work", 1, font_size=18),
+        _blk("c", "header", "Background", 2, font_size=12),
+    ]
+    levels = assign_header_levels(blocks)
+    assert levels["a"] == 1      # unnumbered, largest size
+    assert levels["b"] == 2      # numbering wins over its (level-1) size
+    assert levels["c"] == 2      # unnumbered, second size rank
+
+
+def test_numbering_depth_ignores_non_headings():
+    from docstruct.chunking.hierarchy_builder import numbering_depth
+
+    assert numbering_depth("4 Experiments") == 1
+    assert numbering_depth("4.2. Setup") == 2
+    assert numbering_depth("  4.2.1 Ablation") == 3
+    assert numbering_depth("4.2.1.7.3 Very deep") == 3      # clamped to HEADER_LEVELS
+    assert numbering_depth("12") is None                    # a bare page number
+    assert numbering_depth("Introduction") is None
+    assert numbering_depth("") is None
+    assert numbering_depth(None) is None
+    assert numbering_depth("Section 3 covers this") is None  # not anchored
+
+
+def test_numbering_signal_can_be_switched_off(monkeypatch):
+    from docstruct import config
+
+    monkeypatch.setattr(config, "HEADER_NUMBERING_LEVELS", False)
+    blocks = [
+        _blk("a", "header", "3 Method", 0, font_size=12),
+        _blk("b", "header", "3.2 Setup", 1, font_size=12),
+    ]
+    levels = assign_header_levels(blocks)
+    assert levels["a"] == levels["b"] == 1
