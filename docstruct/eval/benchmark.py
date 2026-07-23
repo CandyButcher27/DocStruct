@@ -26,6 +26,7 @@ from typing import Dict, List, Optional
 
 from docstruct import config
 from docstruct.eval.adapters.base import ChunkAdapter, EvalChunk
+from docstruct.eval.coverage import raw_document_text, text_coverage
 from docstruct.eval.qa_generator import QAItem
 from docstruct.eval.relevance import is_relevant
 from docstruct.eval.stats import align_per_question, bootstrap_ci, paired_bootstrap
@@ -65,6 +66,10 @@ class ToolResult:
     # A tool can buy MRR with bigger chunks; this is what that costs downstream.
     context_words: float = 0.0
     mrr_per_kword: float = 0.0
+    # Extraction fidelity, measured against raw pdfplumber text — no gold, no LLM.
+    # The only quality signal here that is about extraction rather than retrieval.
+    coverage: float = 0.0
+    duplication: float = 0.0
     chunk_seconds: float = 0.0
     eval_seconds: float = 0.0
     errors: int = 0
@@ -97,6 +102,19 @@ def _rrf(rank_lists: List[List[int]], k: int = config.RRF_K) -> List[int]:
         for pos, idx in enumerate(lst):
             score[idx] = score.get(idx, 0.0) + 1.0 / (k + pos + 1)
     return sorted(score, key=lambda i: score[i], reverse=True)
+
+
+def _reference_text(pdf_path: str, cache: Dict[str, str]) -> str:
+    """Raw document text, extracted once and shared by every tool in the run."""
+    if pdf_path not in cache:
+        cache[pdf_path] = raw_document_text(pdf_path)
+    return cache[pdf_path]
+
+
+# Shared across `benchmark_tool` calls: the reference text is a property of the
+# PDF, not of the tool, so re-extracting it per tool is six times the work for
+# identical output.
+_REFERENCE_CACHE: Dict[str, str] = {}
 
 
 def _qa_by_doc(qa: List[QAItem]) -> Dict[str, List[QAItem]]:
@@ -256,11 +274,14 @@ def benchmark_tool(
 
         n_q = max(len(cases), 1)
         doc_avg_words = round(sum(len(t.split()) for t in texts) / max(len(chunks), 1), 1)
+        cov = text_coverage(texts, _reference_text(pdf, _REFERENCE_CACHE))
         doc_stat = {
             "doc": doc_id,
             "n_questions": len(cases),
             "n_chunks": len(chunks),
             "avg_words_per_chunk": doc_avg_words,
+            "coverage": cov["coverage"],
+            "duplication": cov["duplication"],
             "mrr": round(doc_rr / n_q, 4),
             "recall": round(doc_recall / n_q, 4),
             "hit1": round(doc_hit1 / n_q, 4),
@@ -294,6 +315,13 @@ def benchmark_tool(
     result.mrr_per_kword = round(result.mrr / (result.context_words / 1000.0), 4) if result.context_words else 0.0
     result.chunk_seconds = round(result.chunk_seconds, 2)
     result.eval_seconds = round(result.eval_seconds, 2)
+    # Plain mean over documents, not weighted by length: the question is "how much
+    # of a document does this tool keep", and a 60-page manual should not be able to
+    # hide a tool dropping half of a 4-page one.
+    covered = [d["coverage"] for d in result.per_doc if "coverage" in d]
+    duped = [d["duplication"] for d in result.per_doc if "duplication" in d]
+    result.coverage = round(sum(covered) / len(covered), 4) if covered else 0.0
+    result.duplication = round(sum(duped) / len(duped), 4) if duped else 0.0
     result.ci = {
         metric: list(bootstrap_ci([q[key] for q in result.per_question if key in q]))
         for metric, key in _METRIC_KEYS.items()

@@ -70,6 +70,40 @@ def _significance_section(results: List[ToolResult], reference: str) -> List[str
     return rows
 
 
+def _extraction_table(results: List[ToolResult]) -> List[str]:
+    """Extraction fidelity — the one quality axis here that is not about retrieval."""
+    if not any(r.coverage for r in results):
+        return []
+    rows = [
+        "## Extraction fidelity (no gold, no LLM)",
+        "",
+        "Measured against each PDF's own raw pdfplumber text, so the document is its "
+        "own ground truth. This is the only cross-tool quality signal in the report "
+        "that measures **extraction** rather than retrieval, and the only one "
+        "available for the whole corpus — hand-annotated detection boxes exist for "
+        "two documents.",
+        "",
+        "| Tool | Coverage | Duplication |",
+        "|---|---|---|",
+    ]
+    for r in sorted(results, key=lambda r: r.coverage, reverse=True):
+        star = " **(ours)**" if r.name.startswith("docstruct") else ""
+        rows += [f"| {r.name}{star} | {r.coverage} | {r.duplication} |"]
+    rows += [
+        "",
+        "- **Coverage** — fraction of the document's word *instances* that appear in "
+        "some chunk. This is where silent loss shows up and nowhere else: dropped "
+        "table rows, headings that end up in no chunk, skipped figures. Counted as a "
+        "multiset, so dropping every repeat of a term is not scored as covered.",
+        "- **Duplication** — chunk words divided by document words. Above 1.0 means "
+        "content is emitted more than once, inflating the index and letting two "
+        "chunks split the evidence for one query. Overlap raises it deliberately, so "
+        "read it as a cost next to coverage, not as a defect.",
+        "",
+    ]
+    return rows
+
+
 def _per_doc_table(result: ToolResult) -> List[str]:
     """Per-doc breakdown for one tool, sorted worst MRR first."""
     if not result.per_doc:
@@ -151,6 +185,7 @@ def render_markdown(results: List[ToolResult], meta: Dict) -> str:
         "",
         *_table(results),
         "",
+        *_extraction_table(results),
         *_significance_section(results, meta.get("reference", "docstruct")),
         "## How to read this",
         "",
