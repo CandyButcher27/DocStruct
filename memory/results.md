@@ -94,10 +94,10 @@ localises the entire difference to the column cut.
 
 | Report | What it is |
 |---|---|
-| `reports/v4_report.md` | **Current headline.** Five tools, 48 docs, 298 Q. |
+| `reports/v6_report.md` | **Current headline.** 92 docs, 558 Q, CIs + paired tests + coverage. |
+| `reports/v5_report.md` | 55 docs, superseded — scrambled two-column gold, do not cite. |
+| `reports/v4_report.md` | 48 docs / 298 Q, pre-significance. Superseded. |
 | `reports/rrf40_report.md` | Pre-work baseline: DocStruct 2nd at 0.6773. |
-| `reports/docstruct_v3_report.md` | Table-plaintext-fix era. |
-| `reports/baseline_report.md` | Original four-tool run. |
 | `reports/ablations/*.json` | Single-variable runs, with `overrides` + full `config` in each file. |
 | `reports/dataset_manifest_v2.json` | Provenance of the extended corpus (file, domain, source, sha256). |
 

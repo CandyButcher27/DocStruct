@@ -145,11 +145,12 @@ call a real difference insignificant.
 
 ### Baselines compared
 
-`langchain` (RecursiveCharacterTextSplitter), `pymupdf4llm`, `unstructured`,
-`docling`. Adapters live in `eval/adapters/`, all behind one
-`chunk(pdf_path) -> List[EvalChunk]` interface; `get_adapters()` silently skips
-any whose optional dependency is not installed and the report records which were
-skipped.
+Default set: `langchain` (RecursiveCharacterTextSplitter), `pymupdf4llm`,
+`unstructured`. `docling` is implemented but **out of `_ALL`** — 10× slower,
+OOM-crashes on some pages, always last; reach it with `--tools docling`. Adapters
+live in `eval/adapters/`, all behind one `chunk(pdf_path) -> List[EvalChunk]`
+interface; `get_adapters()` silently skips any whose optional dependency is not
+installed and the report records which were skipped.
 
 ### Single-detector ablation
 
