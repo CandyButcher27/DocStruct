@@ -753,3 +753,55 @@ a crash or hang), GitHub Actions CI, seeded CHANGELOG.
   behaviour.
 
 Full suite: 184 passed.
+
+## Stage 10 — Measurement session: cache bug, ablation sweep, corpus broadening
+
+The Fable batches (Stages 8–9) left ~14 features implemented but unmeasured. This
+stage is about turning them into measurements, and it opened with a bug that would
+have poisoned every one of those measurements.
+
+### The ablation cache was config-blind for the new flags
+
+`BlockCache` fingerprints config so a layout change invalidates the entry — but the
+fingerprint (`_LAYOUT_CONFIG_KEYS`) predated the new flags, and the geometry proposal
+cache was never config-aware at all. So an ablation toggling `DEDUPE_CHARS`,
+`MULTI_COLUMN`, `STRIP_PAGE_FURNITURE`, etc. would have reused **baseline** blocks and
+reported a false null on every gated feature. Caught before running the sweep.
+
+Fix (`a1aa345`): moved `layout_config_fingerprint` + `_LAYOUT_CONFIG_KEYS` into
+`cache/pdf_cache.py`, registered every new block-affecting flag, and made the geometry
+proposal cache key on the fingerprint (`config_aware = True`). The model (YOLO) cache
+is deliberately kept config-independent (`config_aware = False`) so the expensive
+inference is reused across ablations — the whole reason the sweep is affordable.
+Verified: flipping a flag changes the block + geo keys, model key stable. Chunking-only
+flags (`TABLE_SPLIT_ROWS`, `KEEP_REFERENCES`) stay out of the fingerprint by design.
+
+Lesson, now in `decisions.md`/`evaluation.md`/`architecture.md`: a config-fingerprinted
+cache is only as correct as its key list; any new block-affecting flag MUST be
+registered or its ablation is a false null.
+
+### The sweep
+
+`scripts/_sweep.sh`: baseline + 13 gated flags, each `scripts/ablate.py` on the 92-doc
+/558-q v6 gold against the warm `.bench_cache` (YOLO reused, geometry+populate+chunk
+recomputed per fingerprint). Smoke-tested first — 3 docs with cache 26 s, without cache
+271 s (YOLO on CPU is ~90 s/doc), which is exactly why the config-aware-cache fix
+matters. Running in background; winners get flipped to default-on with numbers in
+`results.md`.
+
+### Corpus broadening (roadmap #1) — unblocked
+
+Ollama cloud (`gpt-oss:120b`, `OLLAMA_API_KEY`) verified live — quota is no longer the
+blocker it was in Stage 7. `scripts/fetch_dataset_v2.py` across the six non-arXiv
+domains added ~20 docs (95 → 115); several sources rate-limited or 404'd, so it
+under-delivered the ~150 planned. `gen-qa` (Ollama) smoke-tested on doc100 — a Berkshire
+financial report — produced clean tool-agnostic gold from raw text (real spans, real
+financial-domain questions). Now generating gold for all 23 new docs into
+`data/qa/benchmark_qa_v7_extra.json`; a full multi-tool re-baseline on the broadened
+corpus follows once it lands.
+
+### Still queued (gated on the running jobs)
+
+Sweep → flip winners. gen-qa → merge gold + re-baseline. Then the remaining code work:
+§1.8 `ParseConfig`, §3.4 multi-page table merge, §4.3 SectionPath depth > 3 — none can
+touch core modules while the sweep's per-run subprocesses are re-importing from disk.
