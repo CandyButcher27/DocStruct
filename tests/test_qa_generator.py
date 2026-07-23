@@ -85,9 +85,12 @@ def test_sampled_segments_cover_the_whole_document():
 class _FakePage:
     """Minimal stand-in for a pdfplumber page: only what _column_gutter reads."""
 
-    def __init__(self, words, width=600.0, height=800.0):
+    def __init__(self, words, width=600.0, height=800.0, x0=0.0, top=0.0):
         self.width = width
         self.height = height
+        # A page's bbox does not have to start at the origin; a MediaBox offset
+        # shifts every coordinate and used to produce an out-of-bounds crop.
+        self.bbox = (x0, top, x0 + width, top + height)
         self._words = words
 
     def extract_words(self):
@@ -135,3 +138,15 @@ def test_too_few_words_to_infer_a_layout():
 
     assert _column_gutter(_FakePage(_cols(50, 320, n=3))) is None
     assert _column_gutter(_FakePage([])) is None
+
+
+def test_gutter_respects_a_page_with_an_offset_origin():
+    """MediaBox offsets shift every coordinate; a gutter must land inside the page."""
+    from docstruct.eval.qa_generator import _column_gutter
+
+    shifted = [{"x0": w["x0"] + 18, "x1": w["x1"] + 18} for w in _cols(50, 320)]
+    page = _FakePage(shifted, width=600.0, x0=18.0)
+    gutter = _column_gutter(page)
+    assert gutter is not None
+    assert page.bbox[0] < gutter < page.bbox[2]
+    assert 268 < gutter < 338

@@ -76,31 +76,37 @@ def _column_gutter(page) -> Optional[float]:
     if len(words) < _MIN_COLUMN_WORDS:
         return None
 
-    width = float(page.width or 0.0)
+    # Work in the page's own coordinate space. A page's bbox does not have to start
+    # at the origin — a MediaBox offset gives x0=18, and scanning 0..width then
+    # measures the wrong band and produces a crop the page rejects outright.
+    page_x0, _, page_x1, _ = page.bbox
+    width = float(page_x1 - page_x0)
     if width <= 0:
         return None
-    low, high = width * 0.35, width * 0.65
+    low, high = page_x0 + width * 0.35, page_x0 + width * 0.65
 
     # How many words straddle each 1-point vertical line. A gutter is where that
     # count bottoms out. Requiring it to be exactly zero fails on real papers:
     # a full-width equation, table or figure crosses the gutter on some page and
     # would veto the split for the entire page.
-    crossings = [0] * (int(width) + 1)
-    for word in words:
-        start = max(0, int(word["x0"]))
-        end = min(len(crossings) - 1, int(word["x1"]))
-        for x in range(start, end + 1):
-            crossings[x] += 1
+    crossings = [0] * (int(width) + 2)
 
-    middle = range(int(low), int(high) + 1)
-    best_x = min(middle, key=lambda x: crossings[x])
-    if crossings[best_x] > len(words) * _MAX_GUTTER_CROSSING_RATIO:
+    def bucket(x: float) -> int:
+        return min(max(int(x - page_x0), 0), len(crossings) - 1)
+
+    for word in words:
+        for i in range(bucket(word["x0"]), bucket(word["x1"]) + 1):
+            crossings[i] += 1
+
+    middle = range(bucket(low), bucket(high) + 1)
+    best = min(middle, key=lambda i: crossings[i])
+    if crossings[best] > len(words) * _MAX_GUTTER_CROSSING_RATIO:
         return None
 
     # Centre the split in the low-crossing band rather than at its first point.
-    threshold = crossings[best_x]
-    band = [x for x in middle if crossings[x] <= threshold]
-    return (band[0] + band[-1]) / 2.0
+    threshold = crossings[best]
+    band = [i for i in middle if crossings[i] <= threshold]
+    return page_x0 + (band[0] + band[-1]) / 2.0
 
 
 def _page_text(page) -> str:
@@ -108,9 +114,9 @@ def _page_text(page) -> str:
     gutter = _column_gutter(page)
     if gutter is None:
         return page.extract_text() or ""
-    height = page.height
-    left = page.crop((0, 0, gutter, height)).extract_text() or ""
-    right = page.crop((gutter, 0, page.width, height)).extract_text() or ""
+    x0, top, x1, bottom = page.bbox
+    left = page.crop((x0, top, gutter, bottom)).extract_text() or ""
+    right = page.crop((gutter, top, x1, bottom)).extract_text() or ""
     return f"{left}\n{right}"
 
 
