@@ -821,3 +821,46 @@ foreground cap. A 15-doc arXiv subset runs in ~3.3 min and reproduces a high bas
 **Decision:** no flag is flipped on this evidence. All gated features stay OFF (the
 honest default), `scripts/_sweep.sh` is committed for a capable machine, and effort
 moves to the measurement-independent code items (§1.8, §3.4, §4.3). See `results.md`.
+
+## Stage 11 — Measurement-independent code items (§3.4, §1.8, §4.3)
+
+With the sweep environment-blocked, the remaining Fable items that need no benchmark
+were built. No background jobs running, so core code was safe to touch.
+
+### §3.4 Multi-page table merge (gated, off)
+
+`merge_multipage_tables()` joins the last table on page N with the first on page N+1
+when their column counts match and their x-extents align within
+`MULTIPAGE_TABLE_X_TOLERANCE`, dropping a repeated header row. Runs after table
+population, before furniture/containment/chunking. Registered in the cache
+fingerprint (it changes block output). `MERGE_MULTIPAGE_TABLES = False`.
+**Ceiling (ponytail comment in code):** 2-page merges only — a 3+-page table joins
+its first two pages and leaves the rest, upgrade to a running merge if such tables
+show up in the broadened corpus.
+
+### §1.8 ParseConfig — pragmatic, not the full threaded refactor
+
+Fable's §1.8 asks for a frozen config object threaded through every function for
+thread-safety and non-mutating overrides. The full version is a sweep across every
+`config.*` read — high risk for a benefit (concurrent parses with *different* configs)
+that a deterministic research library rarely needs. Built the pragmatic version that
+delivers the two real asks with **zero call-site rewrites**:
+
+`config.override(**values)` — a context manager that sets module globals under a
+`threading.Lock` and restores them in a `finally`, validating unknown keys.
+`parse(config={...})` / `run_pipeline(config=...)` apply it for the call only, then
+re-enter with `config=None` so the existing body reads the overridden globals (and the
+cache fingerprint, which reads the same globals, keys correctly). No permanent global
+mutation; concurrent overridden parses serialize on the lock instead of racing.
+**Ceiling:** overridden parses serialize rather than running fully parallel — the
+accepted trade for not rewriting the pipeline. The full frozen-dataclass version
+remains a future branch if true parallel-with-different-configs is ever needed.
+
+### §4.3 SectionPath depth > 3 — deferred (YAGNI)
+
+Reworking `SectionPath` from `h1/h2/h3` fields to a property-backed `levels` list
+changes `dataclasses.asdict` output — it would break the chunk JSON format and the
+golden test — for a capability the arXiv corpus never exercises (headings rarely go
+past 3 levels). Fable itself says "do this when the corpus needs it, not before."
+Deferred; new code already keeps the numbering-depth clamp at `HEADER_LEVELS` so the
+cap does not spread.

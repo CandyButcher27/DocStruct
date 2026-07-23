@@ -89,7 +89,8 @@ their `[MEASURE]` rationale live in `config.py`:
   within each band, so column detection is unchanged everywhere else).
 - **Furniture:** `STRIP_PAGE_FURNITURE` (cross-page repeated header/footer removal).
 - **Tables:** `TABLE_TEXT_STRATEGY_FALLBACK` (borderless), `TABLE_SERIALIZATION`
-  = keyvalue, `TABLE_SPLIT_ROWS`, `TABLE_SETTINGS`.
+  = keyvalue, `TABLE_SPLIT_ROWS`, `TABLE_SETTINGS`, `MERGE_MULTIPAGE_TABLES`
+  (join a table split across a page break; 2-page ceiling).
 - **Hierarchy:** `HEADER_RANK_BY_WEIGHT` (bold as a depth signal; `Block.is_bold`).
 - **Containment:** `LABEL_AWARE_CONTAINMENT` (see below).
 - **References:** `KEEP_REFERENCES` (emit reference chunks, excluded from indexing).
@@ -128,6 +129,24 @@ stay out of the fingerprint by design — the cache exists to vary them cheaply.
 **Lesson:** a config-fingerprinted cache is only as correct as its key list; adding a
 block-affecting flag without registering it turns every ablation of it into a false
 null. Any new flag that changes block output must be added to `_LAYOUT_CONFIG_KEYS`.
+
+## Accepted pragmatic form over the "correct" heavy refactor
+
+### Per-parse config (§1.8) — locked override context, not a threaded config object
+`config.override(**values)` (a lock-guarded save/set/restore context manager) plus
+`parse(config={...})` / `run_pipeline(config=...)` give non-mutating, thread-safe
+per-call overrides with **zero call-site rewrites**. The full Fable proposal — a
+frozen `ParseConfig` threaded through every function — was not built: it is a large
+mechanical sweep for a benefit (concurrent parses with *different* configs running
+fully in parallel) a deterministic research library rarely needs. Accepted ceiling:
+overridden parses serialize on the config lock. Upgrade to the threaded object only if
+parallel-different-config throughput ever matters.
+
+### SectionPath depth > 3 (§4.3) — deferred, not built
+Reworking `SectionPath` to a property-backed `levels` list changes `asdict` output,
+breaking the chunk-JSON contract and the golden test, for depth the arXiv corpus never
+reaches. Fable agrees ("when the corpus needs it, not before"). New code keeps the
+numbering clamp at `HEADER_LEVELS` so the cap does not spread.
 
 ## Rejected on principle (not measurement)
 

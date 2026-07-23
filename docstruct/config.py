@@ -3,7 +3,40 @@
 No magic numbers live in detector or fusion code. Values marked ``# unvalidated``
 are inherited from the v0 prototype and have not yet been tuned against the
 annotated evaluation set.
+
+Per-parse overrides go through :func:`override` (used by ``parse(config=...)``): it
+temporarily sets module globals under a lock and restores them afterwards, so a
+caller's overrides never permanently mutate process-global state and two threads
+cannot interleave different configs. This is deliberately lighter than threading a
+frozen config object through every function — overridden parses serialize on the
+lock rather than running fully in parallel, which is the accepted ceiling.
 """
+
+from __future__ import annotations
+
+import contextlib
+import sys
+import threading
+
+_override_lock = threading.Lock()
+
+
+@contextlib.contextmanager
+def override(**values):
+    """Temporarily set config values for the duration of the block (thread-safe)."""
+    module = sys.modules[__name__]
+    unknown = [k for k in values if not hasattr(module, k)]
+    if unknown:
+        raise AttributeError(f"unknown config keys: {unknown}")
+    with _override_lock:
+        saved = {k: getattr(module, k) for k in values}
+        for k, v in values.items():
+            setattr(module, k, v)
+        try:
+            yield
+        finally:
+            for k, v in saved.items():
+                setattr(module, k, v)
 
 # --- Fusion: matching ---
 IOU_MATCH_THRESHOLD = 0.35
@@ -131,6 +164,12 @@ TABLE_SERIALIZATION = "plaintext"
 # row) instead of emitting one chunk many times MAX_CHUNK_TOKENS. [MEASURE — ~neutral
 # on arXiv, protective on financial docs]
 TABLE_SPLIT_ROWS = False
+# Merge a table continued across a page break into one chunk: the last table on page
+# N and the first on page N+1, when their column counts match and their x-extents
+# align within MULTIPAGE_TABLE_X_TOLERANCE x page_width, are joined (a repeated header
+# row dropped). [MEASURE — protective on reports/forms, ~neutral on arXiv]
+MERGE_MULTIPAGE_TABLES = False
+MULTIPAGE_TABLE_X_TOLERANCE = 0.1
 # Universal caption markers in prose documents (not a layout assumption).
 CAPTION_PREFIX_PATTERN = r"^\s*(figure|fig\.?|table|tab\.?|scheme|algorithm)\s*\.?\s*\d+"
 

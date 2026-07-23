@@ -26,7 +26,7 @@ every block becomes `unilateral_geometry`, nothing crashes, no network is touche
 | `docstruct/document.py` | The public `Document` view over a pipeline result | `docstruct.parse()` returns this; `.text/.markdown/.tables/.figures/.to_markdown()` |
 | `docstruct/errors.py` | Typed exception hierarchy + `open_pdf` context manager every PDF-open site routes through | `DocStructError`, `InvalidPDFError`, `EncryptedPDFError`, `EmptyDocumentError`, `open_pdf()` |
 | `docstruct/schema.py` | The entire data model — plain dataclasses, no Pydantic | `BoundingBox`, `Proposal`, `Block` (now incl. `is_bold`), `Chunk`, `SectionPath`, `Source` |
-| `docstruct/config.py` | Every numeric threshold in the system | — |
+| `docstruct/config.py` | Every numeric threshold; `override()` for lock-guarded per-parse overrides | `config.override(**values)` |
 | `docstruct/geometry/detector.py` | Rules-based layout detection from pdfplumber primitives (lines, words, rects, curves) | `detect(pdf_path) -> List[Proposal]` |
 | `docstruct/model/detector.py` | Optional YOLOv8 / DocLayNet vision detection; pixel→point transform lives here | `ModelDetector(weights).detect()` |
 | `docstruct/fusion/matcher.py` | Greedy IoU matching between the two proposal sets + priority NMS | `match_proposals(model, geometry)` |
@@ -36,7 +36,7 @@ every block becomes `unilateral_geometry`, nothing crashes, no network is touche
 | `docstruct/reading_order.py` | Column split (1/2 or k via `MULTI_COLUMN`, or band-then-column via `BAND_SPLIT`) + top→bottom ordering; caption→figure/table attachment | `assign_reading_order(blocks, page_width)` |
 | `docstruct/utils/xy_cut.py` | Recursive XY-cut ordering (off by default, `config.XY_CUT`) | `xy_cut_order(blocks, page_width)` |
 | `docstruct/extraction/text_extractor.py` | Block text via pdfplumber, font-size-scaled spacing; gated dedupe/dehyphen/NFKC cleaning; `is_bold` for headers | `populate_text(pdf, blocks, *, password, pdf)` |
-| `docstruct/extraction/table_extractor.py` | Table grids + plaintext/keyvalue/markdown rendering, borderless fallback, raw-text guard | `populate_tables(pdf, blocks, *, password, pdf)` |
+| `docstruct/extraction/table_extractor.py` | Table grids + plaintext/keyvalue/markdown rendering, borderless fallback, raw-text guard, gated multi-page merge | `populate_tables(...)`, `merge_multipage_tables(blocks)` |
 | `docstruct/extraction/furniture.py` | Cross-page running header/footer/page-number removal (gated `STRIP_PAGE_FURNITURE`) | `strip_page_furniture(blocks)` |
 | `docstruct/chunking/hierarchy_builder.py` | Header level assignment by font-size rank (+ optional bold, + numbering incl. appendix/Roman) | `assign_header_levels(blocks)` |
 | `docstruct/chunking/assembler.py` | Blocks → `Chunk[]`, section-path tracking, size floor/ceiling | `build_chunks(blocks, levels)` |
@@ -109,6 +109,7 @@ doc = docstruct.parse("paper.pdf")            # geometry-only, no model, no netw
 doc = docstruct.parse(pathlib.Path("p.pdf"))  # str | Path
 doc = docstruct.parse("paper.pdf", weights="weights/yolov8m-doclaynet.pt")
 doc = docstruct.parse("locked.pdf", password="secret")
+doc = docstruct.parse("p.pdf", config={"MIN_CHUNK_TOKENS": 300})  # per-call, no global mutation
 
 doc.text, doc.markdown, doc.pages(), doc.sections(), doc.chunks
 doc.chunks_of_type("table"); doc.tables; doc.figures

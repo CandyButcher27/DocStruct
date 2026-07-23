@@ -124,8 +124,10 @@ strategy on a borderless table; `TABLE_SETTINGS` threads tuning into find/extrac
 
 ## 5b. Post-extraction filtering — `extraction/furniture.py`, `fusion/containment.py`
 
-Two gated, deterministic passes run after population and before chunking, both
-default off:
+Three gated, deterministic passes run after population and before chunking, all
+default off. `merge_multipage_tables()` (`MERGE_MULTIPAGE_TABLES`) runs first — it
+joins the last table on page N with the first on page N+1 when column counts match and
+x-extents align (2-page ceiling). Then:
 
 - **`strip_page_furniture()`** (`STRIP_PAGE_FURNITURE`) — drops a page's top/bottom
   line when its digit-normalized text repeats at nearly the same y across

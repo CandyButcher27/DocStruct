@@ -174,6 +174,7 @@ def parse(
     weights: Optional[str] = None,
     cache_dir: Optional[str] = None,
     password: Optional[str] = None,
+    config: Optional[Dict[str, object]] = None,
 ) -> Document:
     """Parse a born-digital PDF into a :class:`Document`.
 
@@ -181,10 +182,14 @@ def parse(
     it the pipeline runs geometry-only, which needs no model and no network.
     ``cache_dir`` caches detector output and populated blocks by PDF content hash,
     so re-parsing an unchanged file is close to free. ``password`` unlocks an
-    encrypted PDF.
+    encrypted PDF. ``config`` is a mapping of ``config.py`` overrides applied only for
+    this call (thread-safe, no permanent global mutation), e.g.
+    ``parse("x.pdf", config={"MIN_CHUNK_TOKENS": 300})``.
     """
     from docstruct.pipeline import run_pipeline
 
     pdf_path = str(pdf_path)
-    result = run_pipeline(pdf_path, weights=weights, cache_dir=cache_dir, password=password)
+    result = run_pipeline(
+        pdf_path, weights=weights, cache_dir=cache_dir, password=password, config=config
+    )
     return Document(pdf_path, result.blocks, result.chunks, result.diagnostics)

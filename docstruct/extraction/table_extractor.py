@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from collections import defaultdict
 from typing import Dict, List
 
 from docstruct import config
@@ -118,6 +119,48 @@ def _grid_covers_region(rendered: str, raw: str) -> bool:
     if not raw_words:
         return True
     return len(rendered.split()) >= config.TABLE_GRID_MIN_COVERAGE * raw_words
+
+
+def _cols(grid: List[List[str]]) -> int:
+    return max((len(r) for r in grid), default=0)
+
+
+def merge_multipage_tables(blocks: List[Block]) -> List[Block]:
+    """Join a table split across a page break into one block (gated).
+
+    Merges the last table on page N with the first on page N+1 when their column
+    counts match and their x-extents align. A repeated header row on the continuation
+    is dropped. Runs after table population, before chunking.
+    """
+    # ponytail: 2-page merges only; a table spanning 3+ pages joins pairwise into the
+    # first two and leaves the rest — upgrade to a running merge if such tables appear.
+    if not config.MERGE_MULTIPAGE_TABLES:
+        return blocks
+
+    by_page: Dict[int, List[Block]] = defaultdict(list)
+    for b in blocks:
+        if b.label == "table" and b.table_data:
+            by_page[b.page_num].append(b)
+
+    drop: set = set()
+    tol = config.MULTIPAGE_TABLE_X_TOLERANCE
+    for page in sorted(by_page):
+        if page + 1 not in by_page:
+            continue
+        top = max(by_page[page], key=lambda b: b.reading_order)
+        bot = min(by_page[page + 1], key=lambda b: b.reading_order)
+        if top.block_id in drop or bot.block_id in drop:
+            continue
+        if _cols(top.table_data) != _cols(bot.table_data):
+            continue
+        pw = top.bbox.page_width or 1.0
+        if abs(top.bbox.x0 - bot.bbox.x0) / pw > tol or abs(top.bbox.x1 - bot.bbox.x1) / pw > tol:
+            continue
+        rows = bot.table_data[1:] if bot.table_data[:1] == top.table_data[:1] else bot.table_data
+        top.table_data = top.table_data + rows
+        top.text = serialize_table(top.table_data)
+        drop.add(bot.block_id)
+    return [b for b in blocks if b.block_id not in drop]
 
 
 def populate_tables(pdf_path: str, blocks: List[Block], *, password: str | None = None,

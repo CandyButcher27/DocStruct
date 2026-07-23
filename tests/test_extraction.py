@@ -77,3 +77,53 @@ def test_partial_grid_is_rejected_so_raw_text_wins():
 
 def test_empty_region_never_rejects_the_grid():
     assert _grid_covers_region("", "")
+
+
+def _tbl_block(bid, page, ro, grid, x0=50, x1=550):
+    from docstruct.schema import Block, ConfidenceBreakdown, Source
+    from tests.conftest import make_bbox
+    return Block(
+        bbox=make_bbox(x0, 0, x1, 200),
+        label="table",
+        confidence=ConfidenceBreakdown(0.0, 0.0, 0.8),
+        source=Source.UNILATERAL_GEOMETRY,
+        page_num=page, block_id=bid, reading_order=ro,
+        text=serialize_table(grid), table_data=grid,
+    )
+
+
+def test_multipage_table_merge_joins_and_drops_header(monkeypatch):
+    from docstruct import config
+    from docstruct.extraction.table_extractor import merge_multipage_tables
+    monkeypatch.setattr(config, "MERGE_MULTIPAGE_TABLES", True)
+    header = ["Quarter", "Revenue"]
+    top = _tbl_block("t0", 0, 0, [header, ["Q1", "1.0"], ["Q2", "2.0"]])
+    bot = _tbl_block("t1", 1, 1, [header, ["Q3", "3.0"]])  # header repeats
+    out = merge_multipage_tables([top, bot])
+    assert [b.block_id for b in out] == ["t0"]
+    assert out[0].table_data == [header, ["Q1", "1.0"], ["Q2", "2.0"], ["Q3", "3.0"]]
+
+
+def test_multipage_table_not_merged_when_columns_differ(monkeypatch):
+    from docstruct import config
+    from docstruct.extraction.table_extractor import merge_multipage_tables
+    monkeypatch.setattr(config, "MERGE_MULTIPAGE_TABLES", True)
+    top = _tbl_block("t0", 0, 0, [["A", "B"], ["1", "2"]])
+    bot = _tbl_block("t1", 1, 1, [["A", "B", "C"], ["1", "2", "3"]])
+    assert len(merge_multipage_tables([top, bot])) == 2
+
+
+def test_multipage_table_not_merged_when_x_misaligned(monkeypatch):
+    from docstruct import config
+    from docstruct.extraction.table_extractor import merge_multipage_tables
+    monkeypatch.setattr(config, "MERGE_MULTIPAGE_TABLES", True)
+    top = _tbl_block("t0", 0, 0, [["A", "B"], ["1", "2"]], x0=50, x1=250)
+    bot = _tbl_block("t1", 1, 1, [["A", "B"], ["3", "4"]], x0=350, x1=550)
+    assert len(merge_multipage_tables([top, bot])) == 2
+
+
+def test_multipage_table_merge_off_by_default():
+    from docstruct.extraction.table_extractor import merge_multipage_tables
+    top = _tbl_block("t0", 0, 0, [["A", "B"], ["1", "2"]])
+    bot = _tbl_block("t1", 1, 1, [["A", "B"], ["3", "4"]])
+    assert len(merge_multipage_tables([top, bot])) == 2

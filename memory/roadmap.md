@@ -37,14 +37,17 @@ hardening (typed errors, Path/password, scanned diagnostic, version single-sourc
 py.typed, CI, CHANGELOG) and ~14 config-gated deterministic features + 2 bug fixes.
 See `notes.md` Stages 8–9 and `decisions.md`. Remaining from that review:
 
-- **Run the gated-feature sweep** (14 runs, in progress) → flip winners ON, record in
-  `results.md`. The one action that converts the batch from "implemented" to "worth
-  keeping".
-- **§1.8 `ParseConfig`** — thread a frozen per-parse config object through the
-  pipeline so overrides don't mutate module globals (thread-safety). Its own
-  mechanical branch; not started.
-- **§3.4 multi-page table merge, §4.3 SectionPath depth > 3** — build when the
-  broadened corpus needs them.
+- **Run the gated-feature sweep** — attempted, **environment-blocked** (~69 min/run,
+  ~16 h total; long jobs killed hourly). `scripts/_sweep.sh` is ready for a capable
+  machine + the broadened corpus. No flag flipped on the low-power arXiv subset. See
+  `results.md`. This is the one open action that converts the batch to "worth keeping".
+- **§1.8 `ParseConfig`** — DONE (pragmatic): `config.override()` + `parse(config=...)`
+  give non-mutating, thread-safe per-parse overrides with zero call-site rewrites.
+  The full frozen-dataclass-threaded version is a future branch, only if
+  parallel-with-different-configs is ever needed. See `decisions.md`.
+- **§3.4 multi-page table merge** — DONE (gated `MERGE_MULTIPAGE_TABLES`, 2-page).
+- **§4.3 SectionPath depth > 3** — deferred (YAGNI): breaks chunk-JSON serialization
+  for a capability arXiv never exercises; build when a deep-hierarchy corpus lands.
 
 ## Lower value, well understood
 

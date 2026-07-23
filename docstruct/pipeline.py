@@ -13,6 +13,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
+from docstruct import config as _config
 from docstruct.errors import open_pdf
 from docstruct.schema import Block, Chunk
 from docstruct.geometry import detector as geometry_detector
@@ -21,7 +22,7 @@ from docstruct.fusion.fusion import fuse
 from docstruct.fusion.containment import suppress_text_in_tables
 from docstruct.reading_order import assign_reading_order
 from docstruct.extraction.text_extractor import populate_text
-from docstruct.extraction.table_extractor import populate_tables
+from docstruct.extraction.table_extractor import merge_multipage_tables, populate_tables
 from docstruct.extraction.furniture import strip_page_furniture
 from docstruct.chunking.hierarchy_builder import assign_header_levels
 from docstruct.chunking.assembler import build_chunks
@@ -62,6 +63,7 @@ def run_pipeline(
     cache_dir: Optional[str] = None,
     pipeline_mode: Optional[str] = None,
     password: Optional[str] = None,
+    config: Optional[Dict[str, object]] = None,
 ) -> PipelineResult:
     """Run the full pipeline on a single PDF.
 
@@ -77,6 +79,16 @@ def run_pipeline(
     """
     if pipeline_mode not in (None, "geometry-only", "model-only"):
         raise ValueError(f"unknown pipeline_mode: {pipeline_mode!r}")
+
+    # Per-parse config overrides: apply under the config lock, then re-enter with
+    # config=None so the body below reads the (temporarily) overridden globals. The
+    # cache fingerprint reads the same globals, so overrides key the cache correctly.
+    if config:
+        with _config.override(**config):
+            return run_pipeline(
+                pdf_path, model_detector=model_detector, weights=weights,
+                cache_dir=cache_dir, pipeline_mode=pipeline_mode, password=password,
+            )
 
     block_cache = None
     if cache_dir:
@@ -154,6 +166,7 @@ def run_pipeline(
     with open_pdf(pdf_path, password=password) as pdf:
         populate_text(pdf_path, all_blocks, pdf=pdf)
         populate_tables(pdf_path, all_blocks, pdf=pdf)
+    all_blocks = merge_multipage_tables(all_blocks)
     all_blocks = strip_page_furniture(all_blocks)
     all_blocks = suppress_text_in_tables(all_blocks)
 
