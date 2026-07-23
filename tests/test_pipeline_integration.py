@@ -33,3 +33,31 @@ def test_pipeline_chunks_have_section_metadata(result):
         assert chunk.chunk_type in {"text", "table", "figure_caption", "abstract", "references"}
         assert "h1" in chunk.metadata
         assert chunk.content.strip()
+
+
+def test_geometry_only_mode_ignores_weights():
+    """The ablation path must skip the model even when weights are available.
+
+    Passed a weights path it cannot load, `geometry-only` must never reach the
+    model at all — if it did, this would raise instead of returning blocks.
+    """
+    if not _PDFS:
+        pytest.skip("no sample PDFs available")
+    out = run_pipeline(_PDFS[0], weights="no/such/weights.pt", pipeline_mode="geometry-only")
+    assert out.diagnostics["mode"] == "geometry-only"
+    assert out.diagnostics["unmatched_model"] == 0
+    assert out.diagnostics["n_blocks"] > 0
+
+
+def test_model_only_mode_runs_no_geometry_pass():
+    """Without weights, model-only has no detector at all: zero blocks, no crash."""
+    if not _PDFS:
+        pytest.skip("no sample PDFs available")
+    out = run_pipeline(_PDFS[0], pipeline_mode="model-only")
+    assert out.diagnostics["unmatched_geometry"] == 0
+    assert out.diagnostics["n_blocks"] == 0
+
+
+def test_unknown_pipeline_mode_is_rejected():
+    with pytest.raises(ValueError):
+        run_pipeline("ignored.pdf", pipeline_mode="both")

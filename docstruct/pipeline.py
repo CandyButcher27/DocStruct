@@ -58,13 +58,32 @@ def run_pipeline(
     model_detector=None,
     weights: Optional[str] = None,
     cache_dir: Optional[str] = None,
+    pipeline_mode: Optional[str] = None,
 ) -> PipelineResult:
-    """Run the full pipeline on a single PDF."""
+    """Run the full pipeline on a single PDF.
+
+    ``pipeline_mode`` restricts which detectors contribute, for ablation:
+
+    - ``None`` (default) — both detectors, fused. Hybrid if ``weights`` is set.
+    - ``"geometry-only"`` — skip the model even when weights are available.
+    - ``"model-only"`` — skip the geometry pass; every block comes from the model.
+
+    This is the only way to answer "what is the vision model actually worth?",
+    which is the first question anyone asks about a two-detector design. It changes
+    nothing on the default path.
+    """
+    if pipeline_mode not in (None, "geometry-only", "model-only"):
+        raise ValueError(f"unknown pipeline_mode: {pipeline_mode!r}")
+
     block_cache = None
     if cache_dir:
         from docstruct.cache.block_cache import BlockCache
 
-        block_cache = BlockCache(cache_dir, weights if model_detector is None else None)
+        block_cache = BlockCache(
+            cache_dir,
+            weights if model_detector is None else None,
+            variant=pipeline_mode,
+        )
         hit = block_cache.get(pdf_path)
         if hit is not None and model_detector is None:
             cached_blocks, cached_diag = hit
@@ -78,23 +97,25 @@ def run_pipeline(
         from docstruct.cache.pdf_cache import ProposalCache
 
         geo_cache = ProposalCache(cache_dir)
-    geometry_props = _cached_detect(geometry_detector.detect, pdf_path, geo_cache)
+    geometry_props: list = []
+    if pipeline_mode != "model-only":
+        geometry_props = _cached_detect(geometry_detector.detect, pdf_path, geo_cache)
 
     model_props: list = []
     mode = "geometry-only"
     detector = model_detector
-    if detector is None and weights:
+    if detector is None and weights and pipeline_mode != "geometry-only":
         from docstruct.model.detector import ModelDetector
 
         detector = ModelDetector(weights)
-    if detector is not None:
+    if detector is not None and pipeline_mode != "geometry-only":
         model_cache = None
         if cache_dir and weights:
             from docstruct.cache.model_cache import ModelProposalCache
 
             model_cache = ModelProposalCache(cache_dir, weights)
         model_props = _cached_detect(detector.detect, pdf_path, model_cache)
-        mode = "hybrid"
+        mode = "model-only" if pipeline_mode == "model-only" else "hybrid"
 
     geo_by_page = _group_by_page(geometry_props)
     model_by_page = _group_by_page(model_props)

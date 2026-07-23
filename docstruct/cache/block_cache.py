@@ -100,9 +100,15 @@ def blocks_from_json(payload) -> List[Block]:
 class BlockCache:
     """JSON-on-disk cache of populated ``List[Block]`` plus its fusion diagnostics."""
 
-    def __init__(self, cache_dir: str, weights: Optional[str] = None) -> None:
+    def __init__(self, cache_dir: str, weights: Optional[str] = None,
+                 variant: Optional[str] = None) -> None:
         self.cache_dir = cache_dir
         self.mode = os.path.basename(weights) if weights else "geometry-only"
+        # A single-detector ablation run with the same weights produces different
+        # blocks from the hybrid run; without the variant in the key they collide
+        # and one silently serves the other's cached output.
+        if variant:
+            self.mode = f"{self.mode}.{variant}"
         os.makedirs(cache_dir, exist_ok=True)
 
     def _path(self, pdf_path: str) -> str:

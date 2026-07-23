@@ -15,14 +15,28 @@ def _section(chunk) -> str:
 class DocStructAdapter(ChunkAdapter):
     name = "docstruct"
 
-    def __init__(self, weights: Optional[str] = None, cache_dir: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        weights: Optional[str] = None,
+        cache_dir: Optional[str] = None,
+        pipeline_mode: Optional[str] = None,
+        name: Optional[str] = None,
+    ) -> None:
         self.weights = weights
         self.cache_dir = cache_dir
+        self.pipeline_mode = pipeline_mode
+        if name:
+            self.name = name
 
     def chunk(self, pdf_path: str) -> List[EvalChunk]:
         from docstruct.pipeline import run_pipeline
 
-        result = run_pipeline(pdf_path, weights=self.weights, cache_dir=self.cache_dir)
+        result = run_pipeline(
+            pdf_path,
+            weights=self.weights,
+            cache_dir=self.cache_dir,
+            pipeline_mode=self.pipeline_mode,
+        )
         return [
             EvalChunk(
                 id=c.chunk_id,

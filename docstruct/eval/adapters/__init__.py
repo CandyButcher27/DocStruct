@@ -22,6 +22,15 @@ def build_adapter(
 ) -> ChunkAdapter:
     if name == "docstruct":
         return DocStructAdapter(weights=weights, cache_dir=cache_dir)
+    # Single-detector ablations: same chunker, one detector removed. Not in _ALL —
+    # they answer "what is each detector worth?", which is a different question from
+    # the cross-tool leaderboard and would clutter it.
+    if name == "docstruct_geo":
+        return DocStructAdapter(weights=None, cache_dir=cache_dir,
+                                pipeline_mode="geometry-only", name="docstruct_geo")
+    if name == "docstruct_model":
+        return DocStructAdapter(weights=weights, cache_dir=cache_dir,
+                                pipeline_mode="model-only", name="docstruct_model")
     if name == "langchain":
         return LangChainAdapter()
     if name == "pymupdf4llm":
