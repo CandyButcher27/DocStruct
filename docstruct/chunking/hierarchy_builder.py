@@ -24,10 +24,13 @@ from typing import Dict, List, Optional
 from docstruct import config
 from docstruct.schema import Block
 
-# "3 Method", "3.2 Setup", "3.2.1 Ablation", and the same with a trailing dot.
-# Anchored and requiring following text, so a bare page number or a list marker
-# is not mistaken for a heading number.
-_NUMBERING_RE = re.compile(r"^\s*(\d+(?:\.\d+)*)\.?\s+\S")
+# "3 Method", "3.2 Setup", "3.2.1 Ablation"; appendix "A.", "A.1", "B.2.1"; and
+# Roman "IV.", "IX.1" (Roman numerals are just capital letters here). Anchored and
+# requiring following text, so a bare page number or list marker is not mistaken for
+# a heading number. The leading token is digits *or* capitals; a capital-letter token
+# must carry a dot ("A." / "A.1") to be accepted, so a sentence opening "A survey
+# of..." or an all-caps word like "ABSTRACT" is not read as a numbered heading.
+_NUMBERING_RE = re.compile(r"^\s*(?P<num>\d+|[A-Z]+)(?P<sub>(?:\.\d+)*)\.?\s+\S")
 
 
 def _size_signal(block: Block) -> float:
@@ -41,7 +44,15 @@ def numbering_depth(text: Optional[str]) -> Optional[int]:
     match = _NUMBERING_RE.match(text or "")
     if not match:
         return None
-    return min(match.group(1).count(".") + 1, config.HEADER_LEVELS)
+    num, sub = match.group("num"), match.group("sub")
+    # A capital-letter token with no ".N" sub-part must be a real appendix marker
+    # ("A."), not a sentence-opening "A". The regex already required a dot; guard the
+    # bare-letter-with-trailing-dot-but-no-subpart case here (that is depth 1, fine),
+    # but reject a lone capital token that slipped through with neither.
+    if num.isalpha() and not sub and not text.lstrip()[len(num):].startswith("."):
+        return None
+    depth = sub.count(".") + 1
+    return min(depth, config.HEADER_LEVELS)
 
 
 def assign_header_levels(blocks: List[Block]) -> Dict[str, int]:
@@ -50,9 +61,17 @@ def assign_header_levels(blocks: List[Block]) -> Dict[str, int]:
     if not headers:
         return {}
 
-    distinct = sorted({round(_size_signal(b), 1) for b in headers}, reverse=True)
-    size_to_level = {
-        size: min(idx + 1, config.HEADER_LEVELS) for idx, size in enumerate(distinct)
+    def _rank_key(block: Block):
+        size = round(_size_signal(block), 1)
+        if config.HEADER_RANK_BY_WEIGHT:
+            # Bold above regular at equal size: sort descending, so True must rank
+            # ahead of False -> key on the size then the weight, both reversed.
+            return (size, 1 if block.is_bold else 0)
+        return (size,)
+
+    distinct = sorted({_rank_key(b) for b in headers}, reverse=True)
+    key_to_level = {
+        key: min(idx + 1, config.HEADER_LEVELS) for idx, key in enumerate(distinct)
     }
 
     levels: Dict[str, int] = {}
@@ -60,6 +79,6 @@ def assign_header_levels(blocks: List[Block]) -> Dict[str, int]:
         numbered = numbering_depth(block.text) if config.HEADER_NUMBERING_LEVELS else None
         levels[block.block_id] = (
             numbered if numbered is not None
-            else size_to_level[round(_size_signal(block), 1)]
+            else key_to_level[_rank_key(block)]
         )
     return levels
