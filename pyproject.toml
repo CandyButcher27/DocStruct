@@ -28,7 +28,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-model = ["ultralytics>=8.0"]
+# ModelDetector rasterizes pages with PyMuPDF (fitz) before YOLO inference.
+model = ["ultralytics>=8.0", "pymupdf>=1.24"]
 retrieval = ["chromadb>=0.5", "sentence-transformers>=3.0"]
 viz = ["pymupdf>=1.24"]
 # The eval LLM client is stdlib-only (urllib against any OpenAI-compatible
@@ -58,6 +59,9 @@ Repository = "https://github.com/CandyButcher27/DocStruct"
 [tool.setuptools.packages.find]
 include = ["docstruct*"]
 exclude = ["tests*", "data*", "weights*"]
+
+[tool.setuptools.package-data]
+docstruct = ["py.typed"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
