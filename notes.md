@@ -303,3 +303,107 @@ Isolating this mattered. Run `04` mixed both changes; without run `05`
 (`TEXT_X_TOLERANCE_RATIO=0`, new relevance rule) the honest attribution was
 unavailable, and it would have been easy to credit a permissive metric for a real
 improvement.
+
+---
+
+## Stage 6 — Recursive XY-cut reading order: implemented, measured, turned off
+
+Plan §2. The legacy `detect_columns` splits a page into at most two columns by the
+largest gap between block **centres**. That is provably wrong for any page whose
+layout is not uniformly one- or two-column: a full-width title, abstract, table or
+figure sitting across a two-column body has its centre near the page middle, so it
+is assigned to whichever column wins and is read in the wrong place.
+
+Implemented recursive XY-cut in `docstruct/utils/xy_cut.py`. Two deliberate
+departures from the snippet in `implementation_plan.md`, which does not work as
+written:
+
+- Its `find_gaps` accepts a `limit` argument and never uses it, so *any* gap
+  triggers a split — including sub-point gaps between consecutive paragraphs. It
+  would Y-split down to single blocks on every page and degenerate into a plain
+  y-sort, destroying the column handling it exists to provide. Real thresholds are
+  required, and the cut must be **vertical-first**: on a two-column region the
+  horizontal paragraph gaps are genuine whitespace bands, and cutting on one
+  interleaves the two columns.
+- It tests membership with `b not in top_half` on `Block`, a non-frozen dataclass
+  with generated `__eq__` — that is a field-wise comparison, so two blocks with
+  equal fields collide, and it is O(n²) besides. Indices throughout instead.
+
+Six tests cover the cases that motivate it, including the full-width-title case the
+legacy splitter gets wrong. They pass.
+
+**And then it lost.**
+
+| | MRR | NDCG@5 | Recall@5 | Hit@1 | Chunks |
+|---|---|---|---|---|---|
+| legacy column split | **0.7457** | **0.7708** | 0.8859 | **0.6409** | 3070 |
+| `06_xycut` | 0.7356 | 0.7666 | 0.8859 | 0.6275 | 3132 |
+| `07_xycut_rowgap12` | 0.7356 | 0.7666 | 0.8859 | 0.6275 | 3132 |
+
+Recall is identical — the same content is reachable either way — but rank quality
+drops. Raising `XY_CUT_MIN_ROW_GAP` 4× produced **byte-identical results**, which
+localises the difference entirely to the column cut rather than the band cut: with
+vertical cuts tried first, row gaps almost never decide anything.
+
+**Turned off by default; code and tests kept.** It is the better algorithm on the
+layouts it was built for and the worse one on this corpus, and a corpus of arXiv
+two-column papers is exactly where the legacy heuristic's assumptions hold. Shipping
+it on would have been choosing the more elegant implementation over the measurement.
+`XY_CUT = True` enables it for anyone whose documents are less uniform.
+
+---
+
+## Final result
+
+Full five-tool run, 48 PDFs / 298 questions, identical embedder and retriever,
+only the chunker varying (`reports/v4_report.md`):
+
+| Rank | Tool | MRR | NDCG@5 | Recall@5 | Hit@1 | Avg words/chunk | Context words |
+|---|---|---|---|---|---|---|---|
+| 1 | **docstruct** | **0.7457** | **0.7708** | **0.8859** | **0.6409** | 355.2 | 2346 |
+| 2 | pymupdf4llm | 0.6941 | 0.7160 | 0.8356 | 0.6107 | 455.2 | 2576 |
+| 3 | unstructured | 0.6508 | 0.6766 | 0.7886 | 0.5638 | 85.2 | 549 |
+| 4 | langchain | 0.6493 | 0.6884 | 0.8221 | 0.5336 | 102.1 | 524 |
+| 5 | docling | 0.5652 | 0.5814 | 0.6577 | 0.4966 | 114.2 | 674 |
+
+DocStruct went from **0.6890 → 0.7457** and from second place to first on every
+quality metric, while returning **less** retrieved context per query than the tool
+it displaced. pymupdf4llm scored 0.6941 here against 0.6915 in the previous run, so
+the two runs are comparable and the gap is real movement rather than a changed
+measurement.
+
+Where the +0.0567 came from:
+
+| Change | MRR | Δ |
+|---|---|---|
+| baseline at HEAD | 0.6890 | — |
+| chunk-boundary floor + headers in bodies | 0.7319 | **+0.0429** |
+| font-scaled word-gap tolerance | 0.7457 | **+0.0138** |
+| whitespace-blind relevance | 0.7457 | 0.0000 |
+| recursive XY-cut | 0.7356 | −0.0101 (off) |
+
+### Things I am not claiming
+
+- **DocStruct does not win MRR/1k words.** unstructured (1.19) and langchain (1.24)
+  lead that column while ranking 3rd and 4th, because they retrieve very little
+  text. It is a tradeoff axis, not a ranking, and it is in the report precisely so
+  that "make chunks bigger" cannot be used as an unbounded exploit — including by me.
+- **`Chunk s` is not a fair speed column** in this run. Only the DocStruct adapter
+  uses `--cache-dir`, so its 2.16 s is cache-hit time against four tools measured
+  cold. Disclaimed in the report rather than quietly left in the table.
+- **The gold is LLM-generated and imperfect.** 7 of 9 spans DocStruct "missed" in
+  the Stage 0 audit are not in the raw PDF text at all. This penalises every tool
+  identically so the ranking holds, but it caps the absolute numbers.
+- **The corpus is arXiv-heavy.** Two-column born-digital papers. The XY-cut result
+  is the clearest evidence that corpus shape matters: the principled algorithm lost
+  to the heuristic precisely because the heuristic's assumptions hold here.
+
+### Left undone
+
+- §7.4 standalone figures produce no chunk — a figure with no caption is dropped.
+  Skipped: a metadata-only chunk adds index noise for content nobody queries, and
+  the benchmark cannot show a gain either way.
+- §7.5 confidence-formula calibration and §7.11 numbering-based header levels —
+  neither feeds retrieval today, so neither is measurable on the current benchmark.
+- Regenerating the gold Q&A from correctly-spaced text. The right fix for the
+  spacing mismatch; the whitespace-blind relevance rule is the cheap guard.

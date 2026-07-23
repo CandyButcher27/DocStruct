@@ -49,6 +49,11 @@ def sort_reading_order(blocks: List[Block], page_width: float) -> List[int]:
     if not blocks:
         return []
 
+    if config.XY_CUT:
+        from docstruct.utils.xy_cut import xy_cut_order
+
+        return xy_cut_order(blocks, page_width)
+
     ordered: List[int] = []
     for column in detect_columns(blocks, page_width):
         column.sort(key=lambda i: blocks[i].bbox.y0)

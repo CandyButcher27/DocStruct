@@ -29,8 +29,19 @@ CONFIDENCE_BOUNDS = {
 }
 
 # --- Reading order ---
-COLUMN_GAP_RATIO = 0.15
+COLUMN_GAP_RATIO = 0.15         # legacy centre-gap column split (XY_CUT = False)
 CAPTION_MAX_DISTANCE = 100.0
+# Recursive XY-cut: split a region at real whitespace bands and recurse, instead of
+# forcing every page into one or two centre-defined columns. It is the more
+# principled algorithm and it handles layouts the legacy split provably gets wrong
+# (a full-width title or table across a two-column body — see tests), but on this
+# corpus it measured *worse*: MRR 0.7356 vs 0.7457, Hit@1 0.6275 vs 0.6409, with
+# recall identical. Raising XY_CUT_MIN_ROW_GAP 4x changed nothing, so the delta is
+# entirely in column detection, not band detection. Off by default until there is a
+# corpus where it wins; the implementation and its tests stay. See notes.md Stage 6.
+XY_CUT = False
+XY_CUT_MIN_COLUMN_GAP_RATIO = 0.03  # gutter must span this fraction of page width
+XY_CUT_MIN_ROW_GAP = 3.0            # points of clear horizontal whitespace to cut on
 
 # --- Text extraction ---
 # pdfplumber inserts a space when the gap between two characters exceeds a

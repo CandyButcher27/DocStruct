@@ -70,3 +70,74 @@ def test_reading_order_assigned_sequentially():
     assign_reading_order(blocks, page_width=600)
     assert blocks[1].reading_order == 0  # higher on page
     assert blocks[0].reading_order == 1
+
+
+# --- recursive XY-cut ---
+
+def _b(bid, x0, y0, x1, y1):
+    from docstruct.schema import Block, ConfidenceBreakdown, Source
+    from tests.conftest import make_bbox
+
+    return Block(
+        bbox=make_bbox(x0, y0, x1, y1),
+        label="text",
+        confidence=ConfidenceBreakdown(0.0, 0.0, 0.8),
+        source=Source.UNILATERAL_GEOMETRY,
+        page_num=0,
+        block_id=bid,
+    )
+
+
+def _order(blocks, page_width=600.0):
+    from docstruct.utils.xy_cut import xy_cut_order
+
+    return [blocks[i].block_id for i in xy_cut_order(blocks, page_width)]
+
+
+def test_xy_cut_reads_two_columns_in_order():
+    blocks = [
+        _b("r1", 320, 100, 560, 200),
+        _b("l1", 40, 100, 280, 200),
+        _b("l2", 40, 220, 280, 320),
+        _b("r2", 320, 220, 560, 320),
+    ]
+    assert _order(blocks) == ["l1", "l2", "r1", "r2"]
+
+
+def test_full_width_title_precedes_both_columns():
+    """The case the legacy centre-gap split gets wrong."""
+    blocks = [
+        _b("left", 40, 120, 280, 400),
+        _b("right", 320, 120, 560, 400),
+        _b("title", 40, 20, 560, 90),
+    ]
+    assert _order(blocks) == ["title", "left", "right"]
+
+
+def test_full_width_block_splits_the_flow_around_it():
+    blocks = [
+        _b("l_top", 40, 40, 280, 140),
+        _b("r_top", 320, 40, 560, 140),
+        _b("wide", 40, 170, 560, 260),
+        _b("l_bot", 40, 300, 280, 400),
+        _b("r_bot", 320, 300, 560, 400),
+    ]
+    assert _order(blocks) == ["l_top", "r_top", "wide", "l_bot", "r_bot"]
+
+
+def test_single_column_is_top_to_bottom():
+    blocks = [_b("c", 40, 300, 560, 380), _b("a", 40, 40, 560, 120), _b("b", 40, 160, 560, 240)]
+    assert _order(blocks) == ["a", "b", "c"]
+
+
+def test_narrow_indent_is_not_treated_as_a_column_gutter():
+    blocks = [_b("a", 40, 40, 300, 120), _b("b", 306, 40, 560, 120)]
+    # 6pt gap on a 600pt page is 1%, below XY_CUT_MIN_COLUMN_GAP_RATIO
+    assert _order(blocks) == ["a", "b"]
+
+
+def test_empty_and_single_block():
+    from docstruct.utils.xy_cut import xy_cut_order
+
+    assert xy_cut_order([], 600.0) == []
+    assert xy_cut_order([_b("only", 0, 0, 10, 10)], 600.0) == [0]
