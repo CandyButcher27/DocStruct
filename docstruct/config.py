@@ -19,6 +19,15 @@ CONFIRMED_BBOX_IOU = 0.6
 # --- Fusion: disputed ---
 DISPUTED_MULTIPLIER = 0.85
 
+# --- Fusion: label-aware containment (§5.2) ---
+# Suppress a text block only when >= CONTAINMENT_MIN_RATIO of its area is inside a
+# table block whose serialized text already covers its words. The one case where
+# content provably exists twice; naive containment suppression lost 28% of content
+# (decisions.md), so every other nested case is left alone. Targets the benchmark's
+# 2.06x duplication. [MEASURE with duplication as primary readout, MRR as guard]
+LABEL_AWARE_CONTAINMENT = False
+CONTAINMENT_MIN_RATIO = 0.9
+
 # --- Fusion: unilateral scaling ---
 UNILATERAL_MODEL_SCALE = 0.75  # unvalidated
 UNILATERAL_GEOMETRY_SCALE = 0.60  # unvalidated

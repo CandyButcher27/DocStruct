@@ -17,7 +17,7 @@ from docstruct.schema import Block, Chunk
 from docstruct.geometry import detector as geometry_detector
 from docstruct.fusion.matcher import match_proposals
 from docstruct.fusion.fusion import fuse
-from docstruct.fusion.containment import suppress_contained, suppress_table_contained
+from docstruct.fusion.containment import suppress_text_in_tables
 from docstruct.reading_order import assign_reading_order
 from docstruct.extraction.text_extractor import populate_text
 from docstruct.extraction.table_extractor import populate_tables
@@ -150,6 +150,7 @@ def run_pipeline(
     populate_text(pdf_path, all_blocks, password=password)
     populate_tables(pdf_path, all_blocks, password=password)
     all_blocks = strip_page_furniture(all_blocks)
+    all_blocks = suppress_text_in_tables(all_blocks)
 
     levels = assign_header_levels(all_blocks)
     chunks = build_chunks(all_blocks, levels)
