@@ -140,7 +140,9 @@ def _cmd_benchmark(args) -> int:
     skipped = [n for n in (names or _ALL) if n not in adapters]
     print(f"tools: {list(adapters)}  skipped: {skipped}")
 
-    results = run_benchmark(adapters, pdfs, qa, top_k=args.top_k, cache_dir=args.cache_dir, rrf_k=args.rrf_k, reranker_model=args.rerank_model)
+    results = run_benchmark(adapters, pdfs, qa, top_k=args.top_k, cache_dir=args.cache_dir,
+                            rrf_k=args.rrf_k, reranker_model=args.rerank_model,
+                            reference=args.reference)
     meta = {
         "timestamp": now_iso(),
         "n_docs": len({q.source_doc for q in qa}),
@@ -148,6 +150,7 @@ def _cmd_benchmark(args) -> int:
         "llm_model": args.model or "gpt-oss:120b",
         "skipped": skipped,
         "rerank_model": args.rerank_model,
+        "reference": args.reference,
         "config": config_snapshot(),
     }
     write_report(results, meta, args.report_md, args.report_json)
@@ -229,6 +232,8 @@ def build_parser() -> argparse.ArgumentParser:
     b_p.add_argument("--cache-dir", default=None, help="reuse cached detector proposals from gen-qa")
     b_p.add_argument("--rrf-k", type=int, default=60, help="RRF k constant (default 60; lower weights top results more)")
     b_p.add_argument("--rerank-model", default=None, help="cross-encoder model for reranking (e.g. cross-encoder/ms-marco-MiniLM-L-6-v2)")
+    b_p.add_argument("--reference", default="docstruct",
+                     help="tool every other is paired-bootstrap tested against")
     b_p.set_defaults(func=_cmd_benchmark)
 
     return parser

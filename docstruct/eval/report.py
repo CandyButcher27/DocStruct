@@ -12,20 +12,61 @@ from docstruct import config
 from docstruct.eval.benchmark import ToolResult
 
 
+def _ci(result: ToolResult, metric: str) -> str:
+    bounds = result.ci.get(metric)
+    return f"[{bounds[0]}, {bounds[1]}]" if bounds else "—"
+
+
 def _table(results: List[ToolResult]) -> List[str]:
     k = config.BENCHMARK_TOP_K
     rows = [
-        f"| Rank | Tool | MRR (hybrid) | NDCG@{k} | Recall@{k} | Hit@1 | MRR (vector) | Hybrid lift | Chunks | Avg words/chunk | Context words | MRR/1k words | Chunk s | Errors |",
-        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
+        f"| Rank | Tool | MRR (hybrid) | MRR 95% CI | NDCG@{k} | Recall@{k} | Hit@1 | MRR (vector) | Hybrid lift | Chunks | Avg words/chunk | Context words | MRR/1k words | Chunk s | Errors |",
+        "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for i, r in enumerate(results, 1):
         star = " **(ours)**" if r.name == "docstruct" else ""
         lift = round(r.mrr - r.vec_mrr, 4)
         rows.append(
-            f"| {i} | {r.name}{star} | **{r.mrr}** | {r.ndcg} | {r.recall} | {r.hit1} | "
+            f"| {i} | {r.name}{star} | **{r.mrr}** | {_ci(r, 'mrr')} | {r.ndcg} | {r.recall} | {r.hit1} | "
             f"{r.vec_mrr} | {lift:+} | {r.n_chunks} | {r.mean_chunk_words} | "
             f"{r.context_words} | {r.mrr_per_kword} | {r.chunk_seconds} | {r.errors} |"
         )
+    return rows
+
+
+def _significance_section(results: List[ToolResult], reference: str) -> List[str]:
+    """Paired bootstrap of the reference tool against each baseline."""
+    compared = [r for r in results if r.vs_reference]
+    if not compared:
+        return []
+    rows = [
+        f"## Is the gap real? Paired bootstrap vs `{reference}`",
+        "",
+        f"Every tool answers the **same** questions, so the comparison is paired: one "
+        f"resample of question indices is applied to both tools, which cancels the "
+        f"between-question variance and isolates the difference between the chunkers. "
+        f"Positive Δ means `{reference}` is ahead. 10,000 resamples, seeded.",
+        "",
+        "Reading two overlapping marginal CIs as \"not significant\" is the standard "
+        "way to miss a consistent per-question difference — that is what this table "
+        "exists to prevent, in both directions.",
+        "",
+        f"| vs | Metric | Δ ({reference} − tool) | 95% CI of Δ | p | n paired | Verdict |",
+        "|---|---|---|---|---|---|---|",
+    ]
+    for r in compared:
+        for metric in ("mrr", "ndcg", "recall", "hit1"):
+            stat = r.vs_reference.get(metric)
+            if not stat:
+                continue
+            significant = stat["ci_low"] > 0 or stat["ci_high"] < 0
+            verdict = ("**significant**" if significant else "not significant")
+            rows.append(
+                f"| {r.name} | {metric.upper()} | {stat['diff']:+} | "
+                f"[{stat['ci_low']}, {stat['ci_high']}] | {stat['p_value']} | "
+                f"{stat['n']} | {verdict} |"
+            )
+    rows.append("")
     return rows
 
 
@@ -110,9 +151,13 @@ def render_markdown(results: List[ToolResult], meta: Dict) -> str:
         "",
         *_table(results),
         "",
+        *_significance_section(results, meta.get("reference", "docstruct")),
         "## How to read this",
         "",
         "- **MRR** — average reciprocal rank of the first chunk that contains the answer (higher = answers surface earlier).",
+        "- **MRR 95% CI** — percentile bootstrap over the per-question scores (10,000 "
+        "resamples, seeded). It is the uncertainty on *this tool's* number in isolation; "
+        "for comparing two tools use the paired table above, not CI overlap.",
         "- **Recall@k** — fraction of questions where the answer appears in the top-k.",
         "- **Hit@1** — fraction where the very first chunk already contains the answer.",
         "- **Avg words/chunk** — chunk granularity; huge chunks can inflate recall while hurting precision/precision-of-context.",

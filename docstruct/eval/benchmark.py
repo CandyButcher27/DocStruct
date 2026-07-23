@@ -28,8 +28,21 @@ from docstruct import config
 from docstruct.eval.adapters.base import ChunkAdapter, EvalChunk
 from docstruct.eval.qa_generator import QAItem
 from docstruct.eval.relevance import is_relevant
+from docstruct.eval.stats import align_per_question, bootstrap_ci, paired_bootstrap
 
 logger = logging.getLogger(__name__)
+
+# Reported metric -> the per-question field it averages. Everything statistical
+# derives from these; adding a metric here is all it takes to get it a CI and a
+# paired test.
+_METRIC_KEYS = {
+    "mrr": "hyb_rr",
+    "ndcg": "hyb_ndcg",
+    "recall": "hyb_recall",
+    "hit1": "hyb_hit1",
+    "vec_mrr": "vec_rr",
+    "context_words": "context_words",
+}
 
 
 @dataclass
@@ -57,6 +70,12 @@ class ToolResult:
     errors: int = 0
     per_question: List[dict] = field(default_factory=list)
     per_doc: List[dict] = field(default_factory=list)
+    # 95% bootstrap CI per metric, {"mrr": [lo, hi], ...}. A point estimate over a
+    # few hundred questions invites a comparison it cannot support on its own.
+    ci: Dict[str, List[float]] = field(default_factory=dict)
+    # Paired bootstrap of this tool against the reference tool, per metric.
+    # Empty on the reference tool itself.
+    vs_reference: Dict[str, dict] = field(default_factory=dict)
 
 
 def _score(retrieved_texts: List[str], answer_span: str, k: int):
@@ -222,9 +241,14 @@ def benchmark_tool(
             result.n_questions += 1
             doc_hits += int(hr[2] > 0)
             doc_rr += hr[0]; doc_recall += hr[2]; doc_hit1 += hr[1]
+            # Every metric is kept per question, not just RR: bootstrap CIs and
+            # the paired test need the raw per-question vector, and it cannot be
+            # recovered from an average after the fact.
             result.per_question.append(
                 {"doc": doc_id, "question": case.question,
-                 "vec_rr": round(vr[0], 4), "hyb_rr": round(hr[0], 4)}
+                 "vec_rr": round(vr[0], 4), "hyb_rr": round(hr[0], 4),
+                 "hyb_hit1": hr[1], "hyb_recall": hr[2], "hyb_ndcg": round(hr[3], 4),
+                 "context_words": sum(len(t.split()) for t in retrieved)}
             )
         eval_t = time.perf_counter() - t1
         result.eval_seconds += eval_t
@@ -270,8 +294,35 @@ def benchmark_tool(
     result.mrr_per_kword = round(result.mrr / (result.context_words / 1000.0), 4) if result.context_words else 0.0
     result.chunk_seconds = round(result.chunk_seconds, 2)
     result.eval_seconds = round(result.eval_seconds, 2)
+    result.ci = {
+        metric: list(bootstrap_ci([q[key] for q in result.per_question if key in q]))
+        for metric, key in _METRIC_KEYS.items()
+    }
 
     return result
+
+
+def compare_to_reference(results: List[ToolResult], reference: str) -> None:
+    """Attach a paired bootstrap of every tool against ``reference``, in place.
+
+    Paired because all tools answer the same questions. Comparing two marginal
+    CIs instead would routinely call a consistent per-question difference
+    insignificant purely because questions vary far more than tools do.
+    """
+    ref = next((r for r in results if r.name == reference), None)
+    if ref is None or not ref.per_question:
+        return
+    for result in results:
+        if result is ref or not result.per_question:
+            continue
+        stats: Dict[str, dict] = {}
+        for metric, key in _METRIC_KEYS.items():
+            ref_scores, other_scores = align_per_question(ref.per_question, result.per_question, key)
+            if not ref_scores:
+                continue
+            # Sign convention: positive means the reference tool is ahead.
+            stats[metric] = paired_bootstrap(ref_scores, other_scores)
+        result.vs_reference = stats
 
 
 def run_benchmark(
@@ -282,6 +333,7 @@ def run_benchmark(
     cache_dir: Optional[str] = None,
     rrf_k: int = config.RRF_K,
     reranker_model: Optional[str] = None,
+    reference: str = "docstruct",
 ) -> List[ToolResult]:
     """Benchmark every adapter, ranked by hybrid MRR. Embedder loaded once."""
     from sentence_transformers import SentenceTransformer
@@ -298,6 +350,9 @@ def run_benchmark(
         print(f"\n=== {name} ===", flush=True)
         results.append(benchmark_tool(adapter, pdf_paths, qa, embedder, top_k, cache_dir=cache_dir, rrf_k=rrf_k, reranker=reranker))
         r = results[-1]
-        print(f"  => MRR={r.mrr}  NDCG={r.ndcg}  Recall={r.recall}  Hit@1={r.hit1}  ({r.n_questions} questions)", flush=True)
+        lo, hi = r.ci.get("mrr", (0.0, 0.0))
+        print(f"  => MRR={r.mrr} [{lo}, {hi}]  NDCG={r.ndcg}  Recall={r.recall}  "
+              f"Hit@1={r.hit1}  ({r.n_questions} questions)", flush=True)
+    compare_to_reference(results, reference)
     results.sort(key=lambda r: r.mrr, reverse=True)
     return results
