@@ -115,6 +115,7 @@ def build_chunks(
     chunks: List[Chunk] = []
     buffer: List[Block] = []
     buffer_section: Optional[SectionPath] = None
+    ref_buffer: List[Block] = []
     counter = 0
 
     def emit(
@@ -221,12 +222,29 @@ def build_chunks(
 
         else:  # text
             if _in_references(section):
+                if config.KEEP_REFERENCES and (block.text or "").strip():
+                    ref_buffer.append(block)
                 continue
             buffer_append(block)
             if _token_count(buffer) >= config.MAX_CHUNK_TOKENS:
                 flush_text(keep_overlap=True)
 
     flush_text()
+
+    # References are dropped by default; when kept, emit them as their own chunks,
+    # sized like text chunks and attributed to the references section.
+    if ref_buffer:
+        ref_path = _snapshot(section) if _in_references(section) else SectionPath("References")
+        segment: List[Block] = []
+        for block in ref_buffer:
+            segment.append(block)
+            if _token_count(segment) >= config.MAX_CHUNK_TOKENS:
+                emit("references", "\n".join(b.text for b in segment if b.text),
+                     segment, section_path=ref_path)
+                segment = []
+        if segment:
+            emit("references", "\n".join(b.text for b in segment if b.text),
+                 segment, section_path=ref_path)
 
     # Tables and captions emit while the text buffer is still open, so chunks are
     # produced out of document order. Restore reading order and renumber, so

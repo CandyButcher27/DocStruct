@@ -55,8 +55,15 @@ class VectorStore:
 
             self.embedder = SentenceTransformer(embedding_model)
 
-    def index(self, chunks: List[Chunk], doc_id: Optional[str] = None) -> int:
-        """Embed and add chunks; returns the number indexed."""
+    def index(self, chunks: List[Chunk], doc_id: Optional[str] = None,
+              *, include_references: bool = False) -> int:
+        """Embed and add chunks; returns the number indexed.
+
+        Reference chunks (only present when ``config.KEEP_REFERENCES`` is set) are
+        excluded by default — they are for citation analysis, not retrieval.
+        """
+        if not include_references:
+            chunks = [c for c in chunks if c.chunk_type != "references"]
         if not chunks:
             return 0
         ids = [f"{doc_id}:{c.chunk_id}" if doc_id else c.chunk_id for c in chunks]
