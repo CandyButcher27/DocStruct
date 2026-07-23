@@ -216,6 +216,15 @@ def render_markdown(results: List[ToolResult], meta: Dict) -> str:
         "- Containment relevance can miss paraphrased answers — but it is applied **identically** to "
         "every tool, so the ranking stays fair.",
         "- Dataset is arXiv-heavy (born-digital prose); broader domains (legal/financial/manuals) are future work.",
+        "- **The gold reference reads two-column pages column-wise.** `page.extract_text()` "
+        "welds the two columns of every line together, which makes the reference text "
+        "unquotable and was silently rejecting correct gold. Splitting at a detected "
+        "gutter fixes that, and it has a consequence worth stating: a chunker that "
+        "interleaves columns can no longer contain a gold span contiguously. That is a "
+        "real quality difference — interleaved text is wrong text — but the gutter "
+        "heuristic is the same *kind* of heuristic DocStruct uses, so it favours "
+        "column-aware tools generally, ours included. Runs before this change are not "
+        "comparable with runs after it.",
         "- **Chunk s is not a fair speed comparison when `--cache-dir` is set.** Only the DocStruct "
         "adapter uses that cache (detector proposals and populated blocks, keyed by PDF hash), so on a "
         "warm cache its column reports cache-hit time while every other tool is measured cold. Compare "
