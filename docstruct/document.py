@@ -20,7 +20,8 @@ from __future__ import annotations
 
 import json
 from dataclasses import asdict
-from typing import Dict, Iterator, List, Optional
+from pathlib import Path
+from typing import Dict, Iterator, List, Optional, Union
 
 from docstruct.chunking.hierarchy_builder import assign_header_levels
 from docstruct.extraction.table_extractor import table_to_markdown
@@ -130,19 +131,22 @@ class Document:
 
 
 def parse(
-    pdf_path: str,
+    pdf_path: Union[str, Path],
     *,
     weights: Optional[str] = None,
     cache_dir: Optional[str] = None,
+    password: Optional[str] = None,
 ) -> Document:
     """Parse a born-digital PDF into a :class:`Document`.
 
     ``weights`` enables hybrid mode by pointing at DocLayNet YOLOv8 weights; without
     it the pipeline runs geometry-only, which needs no model and no network.
     ``cache_dir`` caches detector output and populated blocks by PDF content hash,
-    so re-parsing an unchanged file is close to free.
+    so re-parsing an unchanged file is close to free. ``password`` unlocks an
+    encrypted PDF.
     """
     from docstruct.pipeline import run_pipeline
 
-    result = run_pipeline(pdf_path, weights=weights, cache_dir=cache_dir)
+    pdf_path = str(pdf_path)
+    result = run_pipeline(pdf_path, weights=weights, cache_dir=cache_dir, password=password)
     return Document(pdf_path, result.blocks, result.chunks, result.diagnostics)

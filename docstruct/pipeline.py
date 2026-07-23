@@ -59,6 +59,7 @@ def run_pipeline(
     weights: Optional[str] = None,
     cache_dir: Optional[str] = None,
     pipeline_mode: Optional[str] = None,
+    password: Optional[str] = None,
 ) -> PipelineResult:
     """Run the full pipeline on a single PDF.
 
@@ -99,7 +100,9 @@ def run_pipeline(
         geo_cache = ProposalCache(cache_dir)
     geometry_props: list = []
     if pipeline_mode != "model-only":
-        geometry_props = _cached_detect(geometry_detector.detect, pdf_path, geo_cache)
+        geometry_props = _cached_detect(
+            lambda p: geometry_detector.detect(p, password=password), pdf_path, geo_cache
+        )
 
     model_props: list = []
     mode = "geometry-only"
@@ -143,17 +146,27 @@ def run_pipeline(
         ro_offset += len(blocks)
         all_blocks.extend(blocks)
 
-    populate_text(pdf_path, all_blocks)
-    populate_tables(pdf_path, all_blocks)
+    populate_text(pdf_path, all_blocks, password=password)
+    populate_tables(pdf_path, all_blocks, password=password)
 
     levels = assign_header_levels(all_blocks)
     chunks = build_chunks(all_blocks, levels)
+
+    pages_with_text = {b.page_num for b in all_blocks if (b.text or "").strip()}
+    likely_scanned = bool(pages) and len(pages_with_text) < len(pages) / 2
+    if likely_scanned:
+        logger.warning(
+            "%s: %d/%d pages have no extractable text — likely scanned/image-only; "
+            "run a deterministic OCR pass (e.g. ocrmypdf) before DocStruct.",
+            pdf_path, len(pages) - len(pages_with_text), len(pages),
+        )
 
     diagnostics = {
         "mode": mode,
         "pages": len(pages),
         "n_blocks": len(all_blocks),
         "n_chunks": len(chunks),
+        "likely_scanned": likely_scanned,
         **totals,
     }
     if block_cache is not None and model_detector is None:
