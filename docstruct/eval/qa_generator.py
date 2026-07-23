@@ -143,15 +143,15 @@ def generate_for_pdf(
     weights: Optional[str] = None,
     n: int = config.QA_PER_DOC,
     cache_dir: Optional[str] = None,
-    max_words: Optional[int] = None,
+    max_chars: Optional[int] = None,
 ) -> List[QAItem]:
     """Generate Q&A from full document text — tool-agnostic, no DocStruct bias.
 
-    Documents longer than ``max_words`` are split into consecutive segments and
-    the question budget is spread across them, so questions come from the whole
-    document rather than only the part that fit in one request. The limit is a
-    per-request one, not a context-window one: hosted providers reject oversized
-    request bodies well below the model's advertised context.
+    Documents larger than ``max_chars`` are split into consecutive segments and the
+    question budget is spread across them, so questions come from the whole document
+    rather than only the part that fit in one request. The limit is a per-minute
+    rate-limit budget, not a context window; see ``QA_MAX_CHARS_PER_REQUEST`` for
+    why it is measured in characters.
     """
     doc_id = os.path.basename(pdf_path)
     full_text = _extract_full_text(pdf_path)
@@ -159,19 +159,22 @@ def generate_for_pdf(
         logger.warning("no usable text in %s", doc_id)
         return []
 
-    budget = max_words or config.QA_MAX_WORDS_PER_REQUEST
-    words = full_text.split()
-    if len(words) <= budget:
+    budget = max_chars or config.QA_MAX_CHARS_PER_REQUEST
+    if len(full_text) <= budget:
         _pace()
         return _generate_from_text(full_text, doc_id, "fulldoc", client, n)
 
-    parts = -(-len(words) // budget)  # ceil
-    size = -(-len(words) // parts)    # even segments, none larger than budget
+    # Split on word boundaries into `parts` even segments, none over budget.
+    words = full_text.split()
+    parts = -(-len(full_text) // budget)  # ceil
+    size = -(-len(words) // parts)
     items: List[QAItem] = []
     for index, want in enumerate(_split_evenly(n, parts)):
         if want <= 0:
             continue
         segment = " ".join(words[index * size : (index + 1) * size])
+        if not segment:
+            continue
         _pace()
         items += _generate_from_text(segment, doc_id, f"part_{index}", client, want)
     return items

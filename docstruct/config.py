@@ -145,11 +145,19 @@ LLM_TIMEOUT = 120.0
 
 # --- Benchmark / eval ---
 QA_PER_DOC = 5                  # questions generated per document
-# Words of source text per gold-generation request. This is a *request-body* limit,
-# not a context-window one: hosted providers reject oversized bodies (GROQ returns
-# HTTP 413) far below the model's advertised 131k context. Longer documents are
-# split into consecutive segments and the question budget spread across them.
-QA_MAX_WORDS_PER_REQUEST = 4000
+# Characters of source text per gold-generation request. This is a *rate-limit*
+# budget, not a context-window one: hosted providers meter tokens per minute far
+# below the model's advertised context, and reject anything over the per-minute
+# allowance outright. Longer documents are split into consecutive segments and the
+# question budget spread across them.
+#
+# Measured in characters rather than words on purpose. Word count is a terrible
+# token proxy for scientific PDFs: a 3,641-word segment of an equation-heavy paper
+# tokenised to 12,228 tokens — 3.4 tokens/word, or under 2 characters per token —
+# where ordinary prose runs nearer 1.3. Budgeting by words meant every dense
+# document silently failed its whole request and lost its questions. At ~2 chars per
+# token worst case this leaves headroom under a 12k/min limit.
+QA_MAX_CHARS_PER_REQUEST = 14000
 # Shortest gold answer span to accept, in words. A one- or two-word span ("DanceOPD")
 # is contained by almost any chunk that mentions the topic, so it scores every tool
 # alike and destroys the benchmark's ability to discriminate between them. Weaker
