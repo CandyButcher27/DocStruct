@@ -50,6 +50,18 @@ XY_CUT_MIN_ROW_GAP = 3.0            # points of clear horizontal whitespace to c
 # run together ("IreneAmerini1,ElenaBalashova2"). Scaling the tolerance by font size
 # instead fixes small text without over-splitting large headings.
 TEXT_X_TOLERANCE_RATIO = 0.15
+# Collapse the duplicated offset glyphs that faux-bold rendering produces
+# ("Trannsfer hhave mmeanings") with pdfplumber's page.dedupe_chars before
+# extraction. Fixes the doubled-glyph bug on doc1. [MEASURE on doc1 + full ablation]
+DEDUPE_CHARS = False
+# Apply Unicode NFKC normalization and strip soft hyphens (U+00AD) so ligatures
+# ("fi"/"fl") and invisible hyphens stop breaking exact substring matching in
+# retrieval and in the benchmark's containment scoring. Gold is generated from raw
+# text, so normalize both sides or neither. [MEASURE]
+NORMALIZE_TEXT = False
+# Rejoin words split by a hard line-break hyphen ("trans-\nfer" -> "transfer"), the
+# same class of failure the x-tolerance fix addressed for spacing. [MEASURE]
+DEHYPHENATE = False
 
 # --- Geometry detector ---
 LINE_Y_TOLERANCE = 3.0          # words within this vertical gap share a line
@@ -64,6 +76,13 @@ GEOMETRY_CONFIDENCE_CEIL = 0.95
 FIGURE_MIN_AREA_RATIO = 0.03    # graphic cluster must cover >= this of page area
 FIGURE_CLUSTER_GAP = 10.0       # merge graphic primitives within this gap
 FIGURE_MAX_TEXT_OVERLAP = 0.10  # graphic cluster must be mostly text-free
+# Measure a figure's text-freeness by the fraction of the *figure's area* covered by
+# overlapping text lines, instead of (overlapping line count / all lines on the
+# page) — whose threshold drifts with page density (a sparse page fails a real
+# figure on one stray line; a dense page passes a figure that swallows many). Off
+# until the annotated detection set re-tunes FIGURE_MAX_TEXT_OVERLAP for the new,
+# density-independent semantics. [MEASURE via detection metrics before enabling]
+FIGURE_OVERLAP_BY_AREA = False
 TABLE_MIN_ROWS = 2
 # extract_tables() is ruled-line based: on a partly-ruled table it returns only the
 # ruled fragment. If the rendered grid holds less than this fraction of the words in

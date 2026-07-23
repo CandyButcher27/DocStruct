@@ -16,7 +16,7 @@ from typing import Any, Dict, List
 from docstruct import config
 from docstruct.errors import open_pdf
 from docstruct.schema import BoundingBox, Proposal
-from docstruct.utils.geometry import bbox_overlap
+from docstruct.utils.geometry import bbox_intersection_area, bbox_overlap
 
 _CAPTION_RE = re.compile(config.CAPTION_PREFIX_PATTERN, re.IGNORECASE)
 
@@ -247,13 +247,15 @@ def detect_page(page, page_num: int) -> List[Proposal]:
             continue
         if _in_table(bbox):
             continue
-        text_overlap = sum(
-            1
-            for l in lines
-            if bbox_overlap(bbox, _to_bbox(l.x0, l.top, l.x1, l.bottom, page)) > 0
-        )
-        if lines and text_overlap / max(len(lines), 1) > config.FIGURE_MAX_TEXT_OVERLAP:
-            continue
+        line_bboxes = [_to_bbox(l.x0, l.top, l.x1, l.bottom, page) for l in lines]
+        if config.FIGURE_OVERLAP_BY_AREA:
+            covered = sum(bbox_intersection_area(bbox, lb) for lb in line_bboxes)
+            if bbox.area > 0 and covered / bbox.area > config.FIGURE_MAX_TEXT_OVERLAP:
+                continue
+        else:
+            text_overlap = sum(1 for lb in line_bboxes if bbox_overlap(bbox, lb) > 0)
+            if lines and text_overlap / max(len(lines), 1) > config.FIGURE_MAX_TEXT_OVERLAP:
+                continue
         _add("figure", bbox, config.GEOMETRY_CONFIDENCE["figure"])
 
     return proposals
