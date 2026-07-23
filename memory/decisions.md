@@ -47,6 +47,20 @@ fixed-window chunking with extra steps — it wins by *becoming the thing DocStr
 exists to be an alternative to*, and it costs 59% more retrieved context to buy
 +0.027 MRR. **200/500 was chosen instead**, on the Pareto front.
 
+### Cross-boundary chunk overlap — measured, lost, stays off
+`OVERLAP_ON_BOUNDARY = False`. The plan argued for it on intuition: a new
+section's first chunk loses the last sentence of the previous one. Measured
+(`reports/ablations/08_overlap_on_boundary.json`, 48 docs / 298 questions) it is
+worse on every metric that moves — MRR 0.7432 vs 0.7457, NDCG 0.7658 vs 0.7708,
+Recall 0.8826 vs 0.8859, Hit@1 identical — at 86 more chunks and slightly more
+retrieved context.
+
+`MIN_CHUNK_TOKENS` is why. With the floor in place most boundaries are *crossed*
+rather than cut, so the stranded-opening case largely stopped happening. What the
+overlap does now is duplicate text into a chunk that competes with its own source
+for the same query; two chunks holding the answer do not outrank one, they split
+the evidence.
+
 ### Cross-encoder reranking as *the* fix for the benchmark gap
 It is wired in and available, but it is applied identically to every tool, so it
 lifts all of them and cannot close a relative gap. Same objection to tuning RRF
