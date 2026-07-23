@@ -407,3 +407,132 @@ Where the +0.0567 came from:
   neither feeds retrieval today, so neither is measurable on the current benchmark.
 - Regenerating the gold Q&A from correctly-spaced text. The right fix for the
   spacing mismatch; the whitespace-blind relevance rule is the cheap guard.
+
+---
+
+## Stage 7 — Shipping: hygiene, honest statistics, and a corpus that isn't all arXiv
+
+Goal for this pass: make the repository something that can be handed to a
+stranger, and make the headline claim survive being questioned.
+
+### 7.1 What was actually redundant
+
+`data/doclaynet/` — 200 page images and an annotations file, 84MB, tracked in git
+and referenced by **nothing** in the codebase (verified by grep across every `.py`
+and `.md`). Alongside it: `build/`, `*.egg-info/`, `output/`, two stray logs, and a
+tracked personal working document. All untracked, and `.gitignore` widened so they
+cannot return.
+
+Two things the old `.gitignore` got wrong and had hidden:
+
+- It ignored `.claude` and `CLaude.md` wholesale, which would have silently
+  swallowed a tracked `CLAUDE.md`. Narrowed to `.claude/`.
+- Its own comment claimed "final GT JSON is tracked" for `data/annotations/`.
+  It wasn't — the two hand-corrected detection ground-truth files had never been
+  added. They are the only detection gold that exists. Now tracked.
+
+`data/doclaynet/` stays in git *history*; excising it needs a rewrite that would
+break every existing clone, which is not a trade worth making for a repository
+this size.
+
+### 7.2 A memory/ folder, because the log had outgrown its job
+
+`notes.md` is chronological and `implementation_plan.md` is an audit; neither
+answers "what is the current state of X?" without reading all of it. Every session
+was re-deriving the same context.
+
+`CLAUDE.md` is now a router — the contract, six hard rules, and a table pointing at
+the right file. `memory/` holds the distilled state: architecture, pipeline stages,
+evaluation design, current results, conventions, roadmap, and **decisions**.
+
+`decisions.md` is the one that earns its place. XY-cut, containment suppression,
+breadcrumb injection and `MIN_CHUNK_TOKENS=600` were each built or seriously
+considered, each measured, and each rejected — three of them because they *lost*,
+one because it won for the wrong reason. Without that written down, they get
+re-proposed, and the second implementation costs as much as the first.
+
+### 7.3 The eval LLM client had never actually worked against GROQ
+
+Extending the corpus needed gold for 47 new documents, and turned up three
+separate faults in code that had only ever been exercised against one provider:
+
+- **GROQ was unusable.** Its Cloudflare front end rejects urllib's default
+  `Python-urllib/3.x` agent with error 1010 before the request reaches the API.
+  The provider was in `_PROVIDERS`, documented in the module docstring, and had
+  never served a single request. One header fixed it.
+- **Retries could not clear a rate limit.** GROQ reports per-minute token limits
+  as HTTP **413**, not 429, so keying off the status code is not enough — the
+  `Retry-After` header has to be honoured whenever it appears. Fixed 1.5s steps
+  never survive a 60-second window.
+- **Long documents lost their second half.** The splitter cut once, into halves,
+  against a fixed 60k-word budget. Anything past that was simply not sampled. Now
+  split into as many even segments as the budget requires, with the question
+  budget spread across them.
+
+Then two failures that were subtler, and mattered more:
+
+**Providers charge the *reserved* completion budget against the per-minute
+limit**, not the tokens actually generated. With `max_tokens` unset, that
+reservation is the model's full completion length — which alone can exceed the
+limit, producing a request that can never succeed however long it waits. That is
+what "failed after 6 attempts" meant. Capped at 1500 tokens, plus a 20s pace
+before each request so segments stop colliding with each other by construction.
+
+**Weak generators produce spans that quietly break the benchmark.** Switching
+generator produced answer spans like `"DanceOPD"` and `"plain velocity MSE loss"`.
+A two-word span is contained by almost every chunk that mentions the topic, so it
+scores every tool alike — it does not measure retrieval, it dilutes it. Prompting
+against it is not enough; the floor is enforced at validation
+(`QA_MIN_SPAN_WORDS = 6`). The existing 298-question set already satisfies it
+(min 7 words, mean 12.8), so nothing changed retroactively.
+
+### 7.4 Confidence intervals, and the mistake they are there to prevent
+
+The leaderboard was a column of point estimates over 298 questions. It invited
+exactly the question it could not answer: is +0.05 MRR real, or resampling noise?
+Every claim in the README rested on that.
+
+`eval/stats.py` adds two things. **Percentile bootstrap CIs** per metric, computed
+from the per-question scores — no normality assumption, which matters because
+per-question reciprocal rank is a spike at 0, a spike at 1, and a handful of
+discrete values in between. And a **paired bootstrap** of every tool against
+DocStruct.
+
+The pairing is the entire point. All tools answer the *same* questions, so one
+resample of question indices is applied to both sides, cancelling the
+between-question variance — which is much larger than the between-tool variance.
+Two tools can have heavily overlapping marginal CIs and still differ on nearly
+every question; "the CIs overlap, so it isn't significant" is the standard way to
+get that backwards. The report says so, next to the table.
+
+`benchmark_tool` now retains every metric per question rather than only reciprocal
+rank, because a per-question vector cannot be recovered from an average after the
+fact. Alignment is keyed on `(doc, question)`, not position: a tool that errors on
+a document leaves a hole, and positional pairing would then compare different
+questions and report the result with a straight face.
+
+Everything is seeded. A significance number that moves between runs of the same
+data is not evidence, and determinism is the contract this project sells.
+
+Verified on a deliberately underpowered 3-document / 16-question subset: DocStruct
++0.0135 MRR over langchain, CI [-0.205, 0.227], p = 0.90, reported as **not
+significant**. That is the feature working.
+
+### 7.5 The question the benchmark could not ask
+
+DocStruct's central design claim is that two independent detectors, fused
+deterministically, beat either alone. The benchmark had no way to test it:
+`run_pipeline` could not disable a detector, so "what is the vision model actually
+worth?" — the first thing anyone asks about a two-detector design — was
+unanswerable with the code as written.
+
+`pipeline_mode` (`geometry-only` / `model-only`) plus `docstruct_geo` and
+`docstruct_model` adapters, kept out of the default tool list because they answer
+a different question from the cross-tool leaderboard.
+
+The trap was in the cache. `BlockCache`'s key was (PDF, weights, layout config),
+so a geometry-only run *with weights present* hashed identically to the hybrid run
+and would have served the other's blocks — an ablation that measured nothing and
+looked like it worked. The mode is now part of the key. Tested by pointing
+geometry-only at a weights path that cannot load: if the model were reached it
+would raise rather than pass.
