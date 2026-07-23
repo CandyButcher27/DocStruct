@@ -29,12 +29,14 @@ matches the task before writing code:
 | [`memory/results.md`](memory/results.md) | You need to know what a config value is worth, or what the current numbers are |
 | [`memory/decisions.md`](memory/decisions.md) | Before proposing anything — it lists what was already tried and rejected, with measurements |
 | [`memory/roadmap.md`](memory/roadmap.md) | You are picking the next piece of work |
+| [`memory/measurement-environment.md`](memory/measurement-environment.md) | You are running the sweep/benchmark or gen-qa — GPU needs, why jobs got killed, how to resume |
 | [`memory/conventions.md`](memory/conventions.md) | Always — commit style, test policy, how to run things |
 
 `notes.md` is the chronological engineering log (what changed, what it measured,
-whether it was kept). `implementation_plan.md` is the standing plan-vs-code audit.
-`memory/` is the distilled, current-state version of both; when they disagree,
-`memory/` is the one that was updated last.
+whether it was kept). `to-do.md` (repo root) is the short "where we are / what's next"
+scratchpad. `implementation_plan.md` is the standing plan-vs-code audit. `memory/` is
+the distilled, current-state version; when they disagree, `memory/` is the one that
+was updated last.
 
 ## Hard rules for this repo
 
