@@ -125,12 +125,16 @@ degrades gracefully; nothing crashes and no network is touched.
 
 ```python
 import docstruct
+from pathlib import Path
 
 doc = docstruct.parse("paper.pdf")                       # geometry-only, offline
+doc = docstruct.parse(Path("paper.pdf"))                 # str or Path
 doc = docstruct.parse("paper.pdf", weights="weights/yolov8m-doclaynet.pt")
+doc = docstruct.parse("locked.pdf", password="secret")   # encrypted PDFs
 
 doc.text                      # whole document in reading order
 doc.markdown                  # headings, tables and captions preserved
+doc.to_markdown("paper.md")   # ...and write it to a file
 doc.pages()                   # {page_num: text}
 doc.sections()                # ["1. Introduction", "2. Method > 2.1 Setup", ...]
 doc.to_json("chunks.json")
@@ -139,6 +143,28 @@ for chunk in doc.chunks:      # retrieval-ready units
     print(chunk.chunk_type, chunk.section_path, chunk.content[:80])
 
 doc.chunks_of_type("table")   # table / text / figure_caption / abstract
+doc.tables                    # [(grid, page_num, section_path), ...]
+doc.figures                   # [(page_num, bbox), ...]
+```
+
+Failures raise a typed hierarchy so you never catch pdfminer internals:
+
+```python
+from docstruct import DocStructError, InvalidPDFError, EncryptedPDFError
+
+try:
+    doc = docstruct.parse("maybe.pdf")
+except EncryptedPDFError:
+    ...                       # wrong/no password
+except InvalidPDFError:
+    ...                       # corrupt, truncated, or not a PDF
+except DocStructError:
+    ...                       # any DocStruct failure
+
+# Scanned/image-only PDFs parse but flag themselves — DocStruct is born-digital
+# only; run a deterministic OCR pass (e.g. ocrmypdf) first.
+if doc.diagnostics.get("likely_scanned"):
+    ...
 ```
 
 `parse(..., cache_dir=".cache")` caches detector output and populated blocks by
@@ -169,7 +195,10 @@ otherwise avoids.
 
 ```bash
 docstruct run paper.pdf                                  # geometry-only
-docstruct run paper.pdf --weights weights/yolov8m-doclaynet.pt --json chunks.json
+docstruct run paper.pdf --weights weights/yolov8m-doclaynet.pt
+docstruct run paper.pdf --format md   --out paper.md     # convert to Markdown
+docstruct run paper.pdf --format text --out paper.txt    # ...or plain text
+docstruct run paper.pdf --format json --out chunks.json  # ...or chunk JSON
 
 docstruct index a.pdf b.pdf --db .chroma
 docstruct query "what baseline did they compare against?" --db .chroma --top-k 5
