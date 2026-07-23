@@ -11,7 +11,7 @@ from __future__ import annotations
 import logging
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional
+from typing import Callable, Dict, List, Optional
 
 from docstruct import config as _config
 from docstruct.errors import open_pdf
@@ -64,6 +64,7 @@ def run_pipeline(
     pipeline_mode: Optional[str] = None,
     password: Optional[str] = None,
     config: Optional[Dict[str, object]] = None,
+    on_page: Optional[Callable[[int, int], None]] = None,
 ) -> PipelineResult:
     """Run the full pipeline on a single PDF.
 
@@ -88,6 +89,7 @@ def run_pipeline(
             return run_pipeline(
                 pdf_path, model_detector=model_detector, weights=weights,
                 cache_dir=cache_dir, pipeline_mode=pipeline_mode, password=password,
+                on_page=on_page,
             )
 
     block_cache = None
@@ -143,7 +145,9 @@ def run_pipeline(
     id_counter = 0
     ro_offset = 0
 
-    for page_num in pages:
+    for page_index, page_num in enumerate(pages):
+        if on_page is not None:
+            on_page(page_index, len(pages))
         result = match_proposals(model_by_page.get(page_num, []), geo_by_page.get(page_num, []))
         for key in totals:
             totals[key] += result.diagnostics.get(key, 0)

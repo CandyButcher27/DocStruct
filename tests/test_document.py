@@ -120,3 +120,16 @@ def test_to_markdown_writes_file(tmp_path):
     md = _doc().to_markdown(str(out))
     assert out.read_text(encoding="utf-8") == md
     assert "# Introduction" in md
+
+
+def test_parse_on_page_callback_fires_per_page():
+    import os
+    import docstruct as _d
+    pdf = os.path.join(os.path.dirname(__file__), "..", "data", "raw-pdfs", "doc11.pdf")
+    if not os.path.exists(pdf):
+        return
+    seen = []
+    doc = _d.parse(pdf, on_page=lambda i, n: seen.append((i, n)))
+    assert seen and seen[0][0] == 0
+    assert all(n == seen[0][1] for _, n in seen)
+    assert [i for i, _ in seen] == list(range(len(seen)))

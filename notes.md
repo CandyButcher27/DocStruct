@@ -864,3 +864,9 @@ golden test — for a capability the arXiv corpus never exercises (headings rare
 past 3 levels). Fable itself says "do this when the corpus needs it, not before."
 Deferred; new code already keeps the numbering-depth clamp at `HEADER_LEVELS` so the
 cap does not spread.
+
+### §8 on_page progress callback
+
+`parse(on_page=fn)` / `run_pipeline(on_page=fn)` calls `fn(page_index, total)` per
+page during the fusion loop, for progress reporting on long documents. Threads
+through the config-override re-entry too.

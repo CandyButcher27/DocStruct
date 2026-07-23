@@ -110,6 +110,7 @@ doc = docstruct.parse(pathlib.Path("p.pdf"))  # str | Path
 doc = docstruct.parse("paper.pdf", weights="weights/yolov8m-doclaynet.pt")
 doc = docstruct.parse("locked.pdf", password="secret")
 doc = docstruct.parse("p.pdf", config={"MIN_CHUNK_TOKENS": 300})  # per-call, no global mutation
+doc = docstruct.parse("p.pdf", on_page=lambda i, n: print(f"{i+1}/{n}"))  # progress
 
 doc.text, doc.markdown, doc.pages(), doc.sections(), doc.chunks
 doc.chunks_of_type("table"); doc.tables; doc.figures

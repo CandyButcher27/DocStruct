@@ -22,7 +22,7 @@ import json
 import re
 from dataclasses import asdict
 from pathlib import Path
-from typing import Dict, Iterator, List, Optional, Tuple, Union
+from typing import Callable, Dict, Iterator, List, Optional, Tuple, Union
 
 from docstruct.chunking.hierarchy_builder import assign_header_levels
 from docstruct.extraction.table_extractor import table_to_markdown
@@ -175,6 +175,7 @@ def parse(
     cache_dir: Optional[str] = None,
     password: Optional[str] = None,
     config: Optional[Dict[str, object]] = None,
+    on_page: Optional[Callable[[int, int], None]] = None,
 ) -> Document:
     """Parse a born-digital PDF into a :class:`Document`.
 
@@ -190,6 +191,7 @@ def parse(
 
     pdf_path = str(pdf_path)
     result = run_pipeline(
-        pdf_path, weights=weights, cache_dir=cache_dir, password=password, config=config
+        pdf_path, weights=weights, cache_dir=cache_dir, password=password,
+        config=config, on_page=on_page,
     )
     return Document(pdf_path, result.blocks, result.chunks, result.diagnostics)
