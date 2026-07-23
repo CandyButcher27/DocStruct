@@ -1,0 +1,322 @@
+[
+  {
+    "question": "What purchase did Berkshire complete involving Coca-Cola shares?",
+    "answer_span": "Berkshire completed its seven-year purchase of the 400 million shares of Coca-Cola we now own.",
+    "source_doc": "doc100.pdf",
+    "source_chunk_id": "part_0",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How much was the cash dividend Berkshire received from Coke in 1994?",
+    "answer_span": "The cash dividend we received from Coke in 1994 was $75 million.",
+    "source_doc": "doc100.pdf",
+    "source_chunk_id": "part_0",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What percentage of its carpet yarn requirements did Shaw process in its own facilities during 2022?",
+    "answer_span": "During 2022, Shaw processed approximately 89% of its requirements for carpet yarn in its own yarn processing facilities.",
+    "source_doc": "doc100.pdf",
+    "source_chunk_id": "part_4",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Where are NetJets’ European operations based?",
+    "answer_span": "NetJets’ European operations are based in Lisbon, Portugal.",
+    "source_doc": "doc100.pdf",
+    "source_chunk_id": "part_4",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What was the percentage increase and resulting revenue for coal operating revenues in 2021?",
+    "answer_span": "Operating revenues from coal increased 21.5% to $3.2 billion in 2021",
+    "source_doc": "doc100.pdf",
+    "source_chunk_id": "part_7",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "When was Version 1.1 of the Cybersecurity Framework issued?",
+    "answer_span": "Version 1.1 of this Cybersecu was issued in February 2014.",
+    "source_doc": "doc101.pdf",
+    "source_chunk_id": "part_0",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How many parts does the Framework consist of?",
+    "answer_span": "The Framework consists of three parts: the Framework Core, the Implementation Tiers, and the Framework Profiles.",
+    "source_doc": "doc101.pdf",
+    "source_chunk_id": "part_0",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the Framework provide for internal and external stakeholders?",
+    "answer_span": "The Framework provides a common language for understanding, managing, and expressing cybersecurity risk to internal and external stakeholders.",
+    "source_doc": "doc101.pdf",
+    "source_chunk_id": "part_2",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How do the Functions relate to incident management and cybersecurity investments?",
+    "answer_span": "The Functions also align with existing methodologies for incident management and help show the impact of investments in cybersecurity.",
+    "source_doc": "doc101.pdf",
+    "source_chunk_id": "part_2",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What can an organization do with the information to improve cybersecurity?",
+    "answer_span": "The organization can use that information to develop an action plan to strengthen existing cybersecurity practices and reduce cybersecurity risk.",
+    "source_doc": "doc101.pdf",
+    "source_chunk_id": "part_4",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the publication say about its use by nongovernmental organizations?",
+    "answer_span": "This publication may be used by nongovernmental organizations on a voluntary basis",
+    "source_doc": "doc102.pdf",
+    "source_chunk_id": "part_0",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are the controls described in terms of flexibility and implementation?",
+    "answer_span": "The controls are flexible and customizable and implemented as part of an organization-wide process to manage risk.",
+    "source_doc": "doc102.pdf",
+    "source_chunk_id": "part_0",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What benefit do robust continuous monitoring programs provide regarding reauthorization?",
+    "answer_span": "Robust continuous monitoring programs reduce the need for separate reauthorization processes.",
+    "source_doc": "doc102.pdf",
+    "source_chunk_id": "part_24",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What role does the senior agency information security officer hold according to the document?",
+    "answer_span": "The senior agency information security officer is an organizational official.",
+    "source_doc": "doc102.pdf",
+    "source_chunk_id": "part_48",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What must organizations establish, maintain, and update regarding systems that handle personally identifiable information?",
+    "answer_span": "Establish, maintain, and update [Assignment: organization-defined frequency] an inventory of all systems, applications, and projects that process personally identifiable",
+    "source_doc": "doc102.pdf",
+    "source_chunk_id": "part_48",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What statement explains the status of the attached publication?",
+    "answer_span": "The attached publication has been withdrawn (archived), and is provided solely for historical purposes.",
+    "source_doc": "doc103.pdf",
+    "source_chunk_id": "part_0",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What minimum entropy must look-up secrets have according to the guidelines?",
+    "answer_span": "Look-up secrets SHALL have at least 20 bits of entropy.",
+    "source_doc": "doc103.pdf",
+    "source_chunk_id": "part_3",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How must verifiers store memorized secrets to protect them from offline attacks?",
+    "answer_span": "Verifiers SHALL store memorized secrets in a form that is resistant to offline attacks.",
+    "source_doc": "doc103.pdf",
+    "source_chunk_id": "part_3",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What must the verifier do to determine sensor and endpoint performance, integrity, and authenticity?",
+    "answer_span": "The verifier SHALL make a determination of sensor and endpoint performance, integrity, and authenticity.",
+    "source_doc": "doc103.pdf",
+    "source_chunk_id": "part_6",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What must the record created by the CSP contain regarding the authenticator?",
+    "answer_span": "The record created by the CSP SHALL contain the date and time the authenticator was bound to the account.",
+    "source_doc": "doc103.pdf",
+    "source_chunk_id": "part_6",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Who is responsible for development of this document?",
+    "answer_span": "The architecture subgroup is responsible for development of this document, but there are specific individuals who deserve recognition.",
+    "source_doc": "doc104.pdf",
+    "source_chunk_id": "part_0",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are authentication and authorization defined in the zero trust model?",
+    "answer_span": "Authentication and authorization (both subject and device) are discrete functions performed before a session to an enterprise resource is established.",
+    "source_doc": "doc104.pdf",
+    "source_chunk_id": "part_0",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the requirement for communication regarding network location?",
+    "answer_span": "All communication is secured regardless of network location.",
+    "source_doc": "doc104.pdf",
+    "source_chunk_id": "part_2",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the enterprise monitor and measure concerning assets?",
+    "answer_span": "The enterprise monitors and measures the integrity and security posture of all owned and associated assets.",
+    "source_doc": "doc104.pdf",
+    "source_chunk_id": "part_2",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What triggers a contextual TA to send an alert regarding a sudden increase in record access?",
+    "answer_span": "A contextual TA may send an alert if the access requests suddenly exceed 100 records in a day.",
+    "source_doc": "doc104.pdf",
+    "source_chunk_id": "part_5",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the disclaimer say about the design intent of Raspberry Pi products regarding hazardous environments?",
+    "answer_span": "Raspberry Pi products are not designed, manufactured or intended for use in hazardous environments requiring fail safe performance",
+    "source_doc": "doc105.pdf",
+    "source_chunk_id": "part_0",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What rights does RPL reserve concerning modifications to the resources?",
+    "answer_span": "RPL reserves the right to make any enhancements, improvements, corrections or any other modifications to the RESOURCES",
+    "source_doc": "doc105.pdf",
+    "source_chunk_id": "part_0",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What can the DMA do each clock cycle regarding read and write accesses?",
+    "answer_span": "The DMA can perform one read access and one write access, up to 32 bits in size, every clock cycle.",
+    "source_doc": "doc105.pdf",
+    "source_chunk_id": "part_19",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is a DMA channel configured and started?",
+    "answer_span": "The channel is configured and started by writing READ_ADDR, WRITE_ADDR, TRANS_COUNT and finally CTRL.",
+    "source_doc": "doc105.pdf",
+    "source_chunk_id": "part_19",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What happens to an instruction's execution time if it explicitly stalls, such as with the WAIT instruction?",
+    "answer_span": "Each instruction takes precisely one cycle, unless it explicitly stalls (such as the WAIT instruction).",
+    "source_doc": "doc105.pdf",
+    "source_chunk_id": "part_38",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What protection features does the LM317 include?",
+    "answer_span": "The LM317 includes current limiting, thermal overload protection, and safe operating area protection.",
+    "source_doc": "doc106.pdf",
+    "source_chunk_id": "part_0",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "When are capacitors typically required for the LM317?",
+    "answer_span": "Typically, no capacitors are needed unless the device is situated more than 6 inches from the input filter capacitors.",
+    "source_doc": "doc106.pdf",
+    "source_chunk_id": "part_0",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How many external resistors are needed to set the LM317's output voltage?",
+    "answer_span": "The device requires only two external resistors to set the output voltage.",
+    "source_doc": "doc106.pdf",
+    "source_chunk_id": "part_1",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What protection mechanisms are integrated into the LM317?",
+    "answer_span": "The LM317 includes current limiting, thermal overload protection, and safe operating area protection.",
+    "source_doc": "doc106.pdf",
+    "source_chunk_id": "part_1",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the recommended minimum value for the input bypass capacitor for stability?",
+    "answer_span": "Make sure this capacitor is 0.1μF or greater.",
+    "source_doc": "doc106.pdf",
+    "source_chunk_id": "part_2",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What type of device is the INA219 and what interface does it use?",
+    "answer_span": "The INA219 is a current shunt and power monitor with an I2C- or SMBUS-compatible interface.",
+    "source_doc": "doc107.pdf",
+    "source_chunk_id": "part_0",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the device monitor and what features does it include for measurement?",
+    "answer_span": "The device monitors both shunt voltage drop and bus supply voltage, with programmable conversion times and filtering.",
+    "source_doc": "doc107.pdf",
+    "source_chunk_id": "part_0",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What timeout does the INA219 include on its interface?",
+    "answer_span": "The INA219 includes a 28‑ms timeout on its interface to prevent locking up an",
+    "source_doc": "doc107.pdf",
+    "source_chunk_id": "part_1",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How can the master terminate data transfer according to the document?",
+    "answer_span": "The master may terminate data transfer by generating a Not-Acknowledge after receiving any data byte",
+    "source_doc": "doc107.pdf",
+    "source_chunk_id": "part_1",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the Shunt Voltage register store?",
+    "answer_span": "The Shunt Voltage register stores the current shunt voltage reading, V .",
+    "source_doc": "doc107.pdf",
+    "source_chunk_id": "part_2",
+    "page_num": -1,
+    "section_path": ""
+  }
+]

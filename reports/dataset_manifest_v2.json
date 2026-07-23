@@ -418,5 +418,148 @@
     "title": "Berkshire 2022 Annual Report",
     "sector": "finance",
     "sha256": "52138f7464c477b1"
+  },
+  {
+    "file": "doc98.pdf",
+    "domain": "legal",
+    "source": "courtlistener.com",
+    "case_name": "unknown",
+    "court": "bap9",
+    "sha256": "6f391417928136b4"
+  },
+  {
+    "file": "doc99.pdf",
+    "domain": "financial",
+    "source": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/annualreport-2023.pdf",
+    "title": "JPMorgan 2023 Annual Report",
+    "sector": "finance",
+    "sha256": "bebb7c4abb278396"
+  },
+  {
+    "file": "doc100.pdf",
+    "domain": "financial",
+    "source": "https://www.berkshirehathaway.com/2022ar/2022ar.pdf",
+    "title": "Berkshire 2022 Annual Report",
+    "sector": "finance",
+    "sha256": "52138f7464c477b1"
+  },
+  {
+    "file": "doc101.pdf",
+    "domain": "technical",
+    "source": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.04162018.pdf",
+    "title": "NIST CSF 1.1",
+    "sha256": "0f3ca796610ab024"
+  },
+  {
+    "file": "doc102.pdf",
+    "domain": "technical",
+    "source": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-53r5.pdf",
+    "title": "NIST SP 800-53r5",
+    "sha256": "fc63bcd61715d018"
+  },
+  {
+    "file": "doc103.pdf",
+    "domain": "technical",
+    "source": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-63b.pdf",
+    "title": "NIST SP 800-63b Auth",
+    "sha256": "ccfce7510a126793"
+  },
+  {
+    "file": "doc104.pdf",
+    "domain": "technical",
+    "source": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-207.pdf",
+    "title": "NIST Zero Trust",
+    "sha256": "0290d6ece2487428"
+  },
+  {
+    "file": "doc105.pdf",
+    "domain": "technical",
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf",
+    "title": "RP2040 Datasheet",
+    "sha256": "be56fbb75ba0ae9e"
+  },
+  {
+    "file": "doc106.pdf",
+    "domain": "technical",
+    "source": "https://www.ti.com/lit/ds/symlink/lm317.pdf",
+    "title": "TI LM317 Datasheet",
+    "sha256": "ae6ffbfc7e1c6be2"
+  },
+  {
+    "file": "doc107.pdf",
+    "domain": "technical",
+    "source": "https://www.ti.com/lit/ds/symlink/ina219.pdf",
+    "title": "TI INA219 Datasheet",
+    "sha256": "58004eda854d0747"
+  },
+  {
+    "file": "doc108.pdf",
+    "domain": "technical",
+    "source": "https://gcc.gnu.org/onlinedocs/gcc.pdf",
+    "title": "GCC Manual",
+    "sha256": "dd554d76d478c747"
+  },
+  {
+    "file": "doc109.pdf",
+    "domain": "technical",
+    "source": "https://www.postgresql.org/files/documentation/pdf/16/postgresql-16-A4.pdf",
+    "title": "PostgreSQL 16 Manual",
+    "sha256": "411bfdd2b0ddf368"
+  },
+  {
+    "file": "doc110.pdf",
+    "domain": "technical",
+    "source": "https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Assigned_Numbers/out/en/Assigned_Numbers.pdf",
+    "title": "Bluetooth Assigned Numbers",
+    "sha256": "f2433c9a281fba42"
+  },
+  {
+    "file": "doc111.pdf",
+    "domain": "technical",
+    "source": "https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.pdf",
+    "title": "MQTT v5.0 Spec",
+    "sha256": "e8f8e9d2467618d5"
+  },
+  {
+    "file": "doc112.pdf",
+    "domain": "technical",
+    "source": "https://openocd.org/doc/pdf/openocd.pdf",
+    "title": "OpenOCD Manual",
+    "sha256": "21b050a58b9bb9c4"
+  },
+  {
+    "file": "doc113.pdf",
+    "domain": "govt",
+    "source": "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf",
+    "title": "NIST AI RMF 1.0",
+    "sha256": "7576edb531d98488"
+  },
+  {
+    "file": "doc114.pdf",
+    "domain": "govt",
+    "source": "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-2e2023.pdf",
+    "title": "NIST AI Adversarial ML",
+    "sha256": "d1086f53a1634d67"
+  },
+  {
+    "file": "doc115.pdf",
+    "domain": "textbook",
+    "source": "https://assets.openstax.org/oscms-prodcms/media/documents/IntroductiontoSociology3e-WEB.pdf",
+    "title": "OpenStax Sociology",
+    "sha256": "53a8f3aa69fa54d3"
+  },
+  {
+    "file": "doc116.pdf",
+    "domain": "textbook",
+    "source": "https://assets.openstax.org/oscms-prodcms/media/documents/OrganicChemistry-WEB.pdf",
+    "title": "OpenStax Organic Chemistry",
+    "sha256": "69789257bf2c5fc5"
+  },
+  {
+    "file": "doc117.pdf",
+    "domain": "textbook",
+    "source": "https://assets.openstax.org/oscms-prodcms/media/documents/AmericanGovernment3e-WEB.pdf",
+    "title": "OpenStax American Government",
+    "sha256": "f794f133de7c6b39"
   }
 ]
