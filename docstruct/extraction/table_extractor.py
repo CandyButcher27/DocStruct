@@ -6,8 +6,7 @@ import re
 from typing import Dict, List
 
 from docstruct import config
-from docstruct.errors import open_pdf
-from docstruct.extraction.text_extractor import _text_kwargs
+from docstruct.extraction.text_extractor import _pdf_context, _text_kwargs
 from docstruct.schema import Block, BoundingBox
 
 
@@ -121,7 +120,8 @@ def _grid_covers_region(rendered: str, raw: str) -> bool:
     return len(rendered.split()) >= config.TABLE_GRID_MIN_COVERAGE * raw_words
 
 
-def populate_tables(pdf_path: str, blocks: List[Block], *, password: str | None = None) -> List[Block]:
+def populate_tables(pdf_path: str, blocks: List[Block], *, password: str | None = None,
+                    pdf=None) -> List[Block]:
     """Set ``table_data`` and serialized ``text`` on table blocks, in place."""
     by_page: Dict[int, List[Block]] = {}
     for block in blocks:
@@ -130,7 +130,7 @@ def populate_tables(pdf_path: str, blocks: List[Block], *, password: str | None 
     if not by_page:
         return blocks
 
-    with open_pdf(pdf_path, password=password) as pdf:
+    with _pdf_context(pdf_path, pdf, password) as pdf:
         for page_num, page_blocks in by_page.items():
             if page_num >= len(pdf.pages):
                 continue

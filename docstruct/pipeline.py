@@ -13,6 +13,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
+from docstruct.errors import open_pdf
 from docstruct.schema import Block, Chunk
 from docstruct.geometry import detector as geometry_detector
 from docstruct.fusion.matcher import match_proposals
@@ -147,8 +148,12 @@ def run_pipeline(
         ro_offset += len(blocks)
         all_blocks.extend(blocks)
 
-    populate_text(pdf_path, all_blocks, password=password)
-    populate_tables(pdf_path, all_blocks, password=password)
+    # Open the PDF once for both population passes instead of twice; pdfminer
+    # re-parses the whole document on every open, which dominates wall time on
+    # large files.
+    with open_pdf(pdf_path, password=password) as pdf:
+        populate_text(pdf_path, all_blocks, pdf=pdf)
+        populate_tables(pdf_path, all_blocks, pdf=pdf)
     all_blocks = strip_page_furniture(all_blocks)
     all_blocks = suppress_text_in_tables(all_blocks)
 

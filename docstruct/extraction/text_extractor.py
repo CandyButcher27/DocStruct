@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import re
 import statistics
 import unicodedata
@@ -10,6 +11,11 @@ from typing import Dict, List
 from docstruct import config
 from docstruct.errors import open_pdf
 from docstruct.schema import Block, BoundingBox
+
+
+def _pdf_context(pdf_path: str, pdf, password):
+    """Reuse an already-open pdfplumber PDF, or open one for the caller."""
+    return contextlib.nullcontext(pdf) if pdf is not None else open_pdf(pdf_path, password=password)
 
 _HYPHEN_BREAK_RE = re.compile(r"(\w)-\s*\n\s*(\w)")
 
@@ -71,13 +77,14 @@ def is_bold_region(page, bbox: BoundingBox) -> bool | None:
     return bold > len(fonts) / 2
 
 
-def populate_text(pdf_path: str, blocks: List[Block], *, password: str | None = None) -> List[Block]:
+def populate_text(pdf_path: str, blocks: List[Block], *, password: str | None = None,
+                  pdf=None) -> List[Block]:
     """Set ``text`` on text-bearing blocks and ``font_size`` on headers, in place."""
     by_page: Dict[int, List[Block]] = {}
     for block in blocks:
         by_page.setdefault(block.page_num, []).append(block)
 
-    with open_pdf(pdf_path, password=password) as pdf:
+    with _pdf_context(pdf_path, pdf, password) as pdf:
         for page_num, page_blocks in by_page.items():
             if page_num >= len(pdf.pages):
                 continue
