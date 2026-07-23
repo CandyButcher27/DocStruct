@@ -112,6 +112,16 @@ GEOMETRY_CONFIDENCE = {
     "caption": 0.70,
 }
 
+# Drop running headers/footers and page numbers by cross-page repetition: a page's
+# top-most or bottom-most line whose digit-normalized text repeats at nearly the same
+# y on at least FURNITURE_MIN_PAGES pages is furniture, not content. Deterministic,
+# document-global, no model. Catches furniture whatever detector labelled it, so it
+# needs no DocLayNet page-header/footer remap. [MEASURE — noise removal, plausible
+# retrieval gain and a definite doc.text/markdown quality gain]
+STRIP_PAGE_FURNITURE = False
+FURNITURE_MIN_PAGES = 3
+FURNITURE_Y_TOLERANCE = 10.0    # points; lines within this share a repetition band
+
 # --- Chunking ---
 # MIN/MAX were chosen by sweeping both against the retrieval benchmark. Raw MRR
 # climbs monotonically with chunk size all the way to MIN=600 (0.7584) — a

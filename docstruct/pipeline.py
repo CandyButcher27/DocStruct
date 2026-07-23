@@ -21,6 +21,7 @@ from docstruct.fusion.containment import suppress_contained, suppress_table_cont
 from docstruct.reading_order import assign_reading_order
 from docstruct.extraction.text_extractor import populate_text
 from docstruct.extraction.table_extractor import populate_tables
+from docstruct.extraction.furniture import strip_page_furniture
 from docstruct.chunking.hierarchy_builder import assign_header_levels
 from docstruct.chunking.assembler import build_chunks
 
@@ -148,6 +149,7 @@ def run_pipeline(
 
     populate_text(pdf_path, all_blocks, password=password)
     populate_tables(pdf_path, all_blocks, password=password)
+    all_blocks = strip_page_furniture(all_blocks)
 
     levels = assign_header_levels(all_blocks)
     chunks = build_chunks(all_blocks, levels)
