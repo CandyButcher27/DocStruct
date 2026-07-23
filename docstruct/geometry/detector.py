@@ -135,19 +135,38 @@ def _group_lines_into_blocks(
 
 
 def _cluster_graphics(boxes: List[tuple], gap: float) -> List[tuple]:
-    clusters: List[List[float]] = []
-    for x0, top, x1, bottom in boxes:
-        placed = False
-        for c in clusters:
-            if not (x1 < c[0] - gap or x0 > c[2] + gap or bottom < c[1] - gap or top > c[3] + gap):
-                c[0] = min(c[0], x0)
-                c[1] = min(c[1], top)
-                c[2] = max(c[2], x1)
-                c[3] = max(c[3], bottom)
-                placed = True
-                break
-        if not placed:
-            clusters.append([x0, top, x1, bottom])
+    """Merge graphic primitives whose boxes come within ``gap`` into figure regions.
+
+    Seeds one cluster per primitive, then repeatedly merges any two clusters that
+    are within ``gap`` until no pair is — a fixed point. A single greedy pass is
+    order-dependent and non-transitive: two clusters that only grow into overlap
+    after both have absorbed other primitives never merge, so figure fragmentation
+    would depend on primitive order in the PDF stream. The fixed point removes that.
+    """
+    clusters: List[List[float]] = [[x0, top, x1, bottom] for x0, top, x1, bottom in boxes]
+
+    def _near(a: List[float], b: List[float]) -> bool:
+        return not (
+            a[2] < b[0] - gap or a[0] > b[2] + gap
+            or a[3] < b[1] - gap or a[1] > b[3] + gap
+        )
+
+    merged = True
+    while merged:
+        merged = False
+        i = 0
+        while i < len(clusters):
+            j = i + 1
+            while j < len(clusters):
+                if _near(clusters[i], clusters[j]):
+                    a, b = clusters[i], clusters[j]
+                    a[0], a[1] = min(a[0], b[0]), min(a[1], b[1])
+                    a[2], a[3] = max(a[2], b[2]), max(a[3], b[3])
+                    clusters.pop(j)
+                    merged = True
+                else:
+                    j += 1
+            i += 1
     return [tuple(c) for c in clusters]
 
 

@@ -77,6 +77,18 @@ def test_cluster_graphics_merges_overlap_and_keeps_separate():
     assert len(clusters) == 2
 
 
+def test_cluster_graphics_merges_transitively_regardless_of_order():
+    # A and C do not touch each other; both touch B. B is ordered last, so a single
+    # greedy pass leaves A and C in separate clusters. The fixed-point merge must
+    # collapse all three into one.
+    a = (0, 0, 40, 40)
+    c = (60, 0, 100, 40)
+    b = (35, 0, 65, 40)  # bridges A and C, placed last
+    assert len(_cluster_graphics([a, c, b], gap=1.0)) == 1
+    # order independence: any permutation yields the same single cluster
+    assert len(_cluster_graphics([b, a, c], gap=1.0)) == 1
+
+
 def test_caption_regex():
     assert _CAPTION_RE.match("Figure 1: results")
     assert _CAPTION_RE.match("Table 2 Summary")
