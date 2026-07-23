@@ -7,7 +7,13 @@ from typing import Dict, List
 
 import pdfplumber
 
+from docstruct import config
 from docstruct.schema import Block, BoundingBox
+
+
+def _text_kwargs() -> dict:
+    ratio = config.TEXT_X_TOLERANCE_RATIO
+    return {"x_tolerance_ratio": ratio} if ratio else {}
 
 
 def _crop(page, bbox: BoundingBox):
@@ -27,7 +33,7 @@ def extract_text(page, bbox: BoundingBox) -> str:
     region = _crop(page, bbox)
     if region is None:
         return ""
-    return (region.extract_text() or "").strip()
+    return (region.extract_text(**_text_kwargs()) or "").strip()
 
 
 def median_font_size(page, bbox: BoundingBox) -> float | None:

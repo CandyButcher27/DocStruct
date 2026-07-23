@@ -2,9 +2,16 @@
 
 The benchmark gold is ``(question, answer_span)`` where ``answer_span`` is a
 verbatim snippet of source text. A retrieved chunk from ANY tool is judged
-relevant if it contains that span (normalized substring), with a token-overlap
-fallback for minor whitespace/hyphenation differences. This makes every tool
-comparable regardless of how it splits the document.
+relevant if it contains that span (normalized substring), with a whitespace-blind
+comparison and then a token-overlap fallback for hyphenation differences. This
+makes every tool comparable regardless of how it splits the document.
+
+Word spacing in a PDF is inferred, not stored: extractors decide where words break
+by measuring inter-character gaps, and they disagree, especially in small type. The
+gold spans carry whichever extractor's guesses were current when they were
+generated. Scoring spacing agreement would measure which tool matches the gold
+generator's tokenizer, not which tool retrieves the right content — so the
+containment check also runs with all whitespace removed from both sides.
 """
 
 from __future__ import annotations
@@ -22,12 +29,19 @@ def normalize_text(text: str) -> str:
     return _WS.sub(" ", text).strip().lower()
 
 
+def _despaced(text: str) -> str:
+    return _WS.sub("", normalize_text(text))
+
+
 def contains_verbatim(source: str, span: str) -> bool:
     """True if span is a (normalized) substring of source — used for QA validation."""
     span_n = normalize_text(span)
     if not span_n:
         return False
-    return span_n in normalize_text(source)
+    if span_n in normalize_text(source):
+        return True
+    # Same content, different word-break guesses ("IreneAmerini" vs "Irene Amerini").
+    return _despaced(span) in _despaced(source)
 
 
 def _token_overlap(span: str, chunk: str) -> float:

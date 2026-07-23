@@ -7,6 +7,7 @@ from typing import Dict, List
 import pdfplumber
 
 from docstruct import config
+from docstruct.extraction.text_extractor import _text_kwargs
 from docstruct.schema import Block, BoundingBox
 
 
@@ -95,7 +96,7 @@ def populate_tables(pdf_path: str, blocks: List[Block]) -> List[Block]:
             page = pdf.pages[page_num]
             for block in page_blocks:
                 region = _crop(page, block.bbox)
-                raw = (region.extract_text() or "").strip() if region is not None else ""
+                raw = (region.extract_text(**_text_kwargs()) or "").strip() if region is not None else ""
                 grid = extract_table(page, block.bbox)
                 if grid:
                     block.table_data = grid

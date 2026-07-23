@@ -26,3 +26,19 @@ def test_is_relevant_exact_then_overlap():
 
 def test_is_relevant_false_when_absent():
     assert not is_relevant("totally unrelated content here", "three baselines", min_overlap=0.6)
+
+
+def test_spacing_differences_do_not_change_relevance():
+    """Word breaks in a PDF are inferred, so extractors disagree on them."""
+    from docstruct.eval.relevance import is_relevant
+
+    gold = "IreneAmerini1,ElenaBalashova2,SaynaEbrahimi3"
+    better = "Irene Amerini1, Elena Balashova2, Sayna Ebrahimi3 organised the workshop"
+    assert is_relevant(better, gold)
+    assert is_relevant(gold, gold)
+
+
+def test_despacing_does_not_match_unrelated_text():
+    from docstruct.eval.relevance import is_relevant
+
+    assert not is_relevant("a completely different sentence about turbines", "IreneAmerini1")

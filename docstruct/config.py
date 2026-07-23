@@ -32,6 +32,14 @@ CONFIDENCE_BOUNDS = {
 COLUMN_GAP_RATIO = 0.15
 CAPTION_MAX_DISTANCE = 100.0
 
+# --- Text extraction ---
+# pdfplumber inserts a space when the gap between two characters exceeds a
+# tolerance. Its default is a flat 3pt, which is wider than the real inter-word gap
+# in small type, so author lines, footnotes and table cells come out with the words
+# run together ("IreneAmerini1,ElenaBalashova2"). Scaling the tolerance by font size
+# instead fixes small text without over-splitting large headings.
+TEXT_X_TOLERANCE_RATIO = 0.15
+
 # --- Geometry detector ---
 LINE_Y_TOLERANCE = 3.0          # words within this vertical gap share a line
 PARAGRAPH_GAP_FACTOR = 1.6      # line gap > factor * line_height breaks a block
