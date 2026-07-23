@@ -11,7 +11,7 @@ docstruct.cli` always works** and is what to use in scripts and docs.
 ## Commands
 
 ```bash
-.venv/Scripts/python.exe -m pytest -q                 # 107 tests, ~2.5 min
+.venv/Scripts/python.exe -m pytest -q                 # 119 tests, ~2.5 min
 
 python -m docstruct.cli run data/raw-pdfs/doc1.pdf    # geometry-only
 python -m docstruct.cli run paper.pdf --weights weights/yolov8m-doclaynet.pt --json out.json
@@ -47,7 +47,7 @@ Full benchmark invocation: see `evaluation.md`.
   are absent. The suite must stay green on a bare core install.
 - Non-trivial logic (a new branch, an algorithm, a parser) gets a test. Renames
   and config tweaks do not.
-- Current state: 107 passing, ~2.5 min warm (the block cache is why).
+- Current state: 119 passing, ~2.5 min warm (the block cache is why).
 
 ## Git workflow
 
