@@ -28,6 +28,11 @@ from docstruct.eval.relevance import contains_verbatim
 logger = logging.getLogger(__name__)
 
 _MIN_LINE_WORDS = 4
+_MIN_COLUMN_WORDS = 40      # too few words to trust a whitespace band as a gutter
+# A gutter may be crossed by this fraction of the page's words (a full-width
+# equation, table or figure) and still count as a gutter. Requiring zero crossings
+# vetoes the split on almost every real paper.
+_MAX_GUTTER_CROSSING_RATIO = 0.02
 
 _SYSTEM = (
     "You write evaluation questions for a document retrieval benchmark. "
@@ -52,6 +57,63 @@ class QAItem:
     section_path: str      # empty string for raw-text sourced items
 
 
+def _column_gutter(page) -> Optional[float]:
+    """x of a clear vertical whitespace band splitting the page into two columns.
+
+    ``page.extract_text()`` sorts words by (top, x), so on a two-column page it
+    welds the left and right column of every line into one string:
+    ``"tered activation a := a entering the head and error  Foreachtaskk,define..."``.
+    Nothing in that line is quotable, so gold generated from it is rejected as
+    non-verbatim even when the model copied it perfectly — and a chunker that reads
+    the columns correctly is scored as having lost the content.
+
+    Detection is deliberately crude and tool-independent: the widest word-free
+    vertical band near the middle of the page. It is not DocStruct's reading-order
+    logic and must not become it — the reference text has to stay independent of
+    the tool being measured.
+    """
+    words = page.extract_words()
+    if len(words) < _MIN_COLUMN_WORDS:
+        return None
+
+    width = float(page.width or 0.0)
+    if width <= 0:
+        return None
+    low, high = width * 0.35, width * 0.65
+
+    # How many words straddle each 1-point vertical line. A gutter is where that
+    # count bottoms out. Requiring it to be exactly zero fails on real papers:
+    # a full-width equation, table or figure crosses the gutter on some page and
+    # would veto the split for the entire page.
+    crossings = [0] * (int(width) + 1)
+    for word in words:
+        start = max(0, int(word["x0"]))
+        end = min(len(crossings) - 1, int(word["x1"]))
+        for x in range(start, end + 1):
+            crossings[x] += 1
+
+    middle = range(int(low), int(high) + 1)
+    best_x = min(middle, key=lambda x: crossings[x])
+    if crossings[best_x] > len(words) * _MAX_GUTTER_CROSSING_RATIO:
+        return None
+
+    # Centre the split in the low-crossing band rather than at its first point.
+    threshold = crossings[best_x]
+    band = [x for x in middle if crossings[x] <= threshold]
+    return (band[0] + band[-1]) / 2.0
+
+
+def _page_text(page) -> str:
+    """Page text with two-column layouts read left column first, then right."""
+    gutter = _column_gutter(page)
+    if gutter is None:
+        return page.extract_text() or ""
+    height = page.height
+    left = page.crop((0, 0, gutter, height)).extract_text() or ""
+    right = page.crop((gutter, 0, page.width, height)).extract_text() or ""
+    return f"{left}\n{right}"
+
+
 def _extract_full_text(pdf_path: str) -> str:
     """Concatenate all page text, stripping short noisy lines (headers/footers)."""
     import pdfplumber
@@ -59,8 +121,7 @@ def _extract_full_text(pdf_path: str) -> str:
     lines = []
     with pdfplumber.open(pdf_path) as pdf:
         for page in pdf.pages:
-            raw = page.extract_text() or ""
-            for line in raw.splitlines():
+            for line in _page_text(page).splitlines():
                 if len(line.split()) >= _MIN_LINE_WORDS:
                     lines.append(line)
     return "\n".join(lines)

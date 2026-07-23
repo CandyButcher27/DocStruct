@@ -80,3 +80,58 @@ def test_sampled_segments_cover_the_whole_document():
         assert picked == sorted(set(picked))
         assert all(0 <= i < total for i in picked)
         assert len(picked) <= min(total, 5)
+
+
+class _FakePage:
+    """Minimal stand-in for a pdfplumber page: only what _column_gutter reads."""
+
+    def __init__(self, words, width=600.0, height=800.0):
+        self.width = width
+        self.height = height
+        self._words = words
+
+    def extract_words(self):
+        return self._words
+
+
+def _cols(left_x, right_x, n=40):
+    """n words in each of two columns."""
+    return ([{"x0": left_x, "x1": left_x + 200} for _ in range(n)]
+            + [{"x0": right_x, "x1": right_x + 200} for _ in range(n)])
+
+
+def test_gutter_found_between_two_columns():
+    from docstruct.eval.qa_generator import _column_gutter
+
+    gutter = _column_gutter(_FakePage(_cols(50, 320)))
+    assert gutter is not None
+    assert 250 < gutter < 320
+
+
+def test_no_gutter_on_a_single_column_page():
+    from docstruct.eval.qa_generator import _column_gutter
+
+    full_width = [{"x0": 50, "x1": 550} for _ in range(80)]
+    assert _column_gutter(_FakePage(full_width)) is None
+
+
+def test_a_few_full_width_lines_do_not_veto_the_gutter():
+    """A full-width equation or table crosses the gutter on almost every paper."""
+    from docstruct.eval.qa_generator import _column_gutter
+
+    words = _cols(50, 320, n=100) + [{"x0": 50, "x1": 550} for _ in range(3)]
+    assert _column_gutter(_FakePage(words)) is not None
+
+
+def test_many_full_width_lines_do_veto_the_gutter():
+    from docstruct.eval.qa_generator import _column_gutter
+
+    words = _cols(50, 320, n=20) + [{"x0": 50, "x1": 550} for _ in range(20)]
+    assert _column_gutter(_FakePage(words)) is None
+
+
+def test_too_few_words_to_infer_a_layout():
+    from docstruct.eval.qa_generator import _column_gutter
+
+    assert _column_gutter(_FakePage(_cols(50, 320, n=3))) is None
+    assert _column_gutter(_FakePage([])) is None

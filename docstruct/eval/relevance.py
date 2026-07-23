@@ -28,11 +28,18 @@ _WS = re.compile(r"\s+")
 # "FA-ISS" and "FA‑ISS" as different strings rejects a correct verbatim span and
 # scores a chunk that contains the answer as a miss.
 _EQUIVALENTS = {
+    # Dashes: hyphen, non-breaking hyphen, figure/en/em dash, horizontal bar, minus.
     "‐": "-", "‑": "-", "‒": "-", "–": "-", "—": "-",
-    "―": "-", "−": "-", "­": "",
+    "―": "-", "−": "-",
+    "­": "",                                    # soft hyphen
+    # Quotes and primes.
     "‘": "'", "’": "'", "‛": "'", "′": "'",
     "“": '"', "”": '"', "„": '"',
-    " ": " ", " ": " ", " ": " ", "﻿": "",
+    # Space variants. The narrow no-break space (U+202F) in particular turns up in
+    # numbers rendered as "16 KB" and is invisible in a diff.
+    " ": " ", " ": " ", " ": " ", " ": " ", " ": " ",
+    " ": " ", " ": " ", "　": " ",
+    "​": "", "﻿": "",                      # zero-width, BOM
 }
 _EQUIV_TABLE = str.maketrans(_EQUIVALENTS)
 
