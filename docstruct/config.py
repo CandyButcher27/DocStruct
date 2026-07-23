@@ -19,6 +19,15 @@ CONFIRMED_BBOX_IOU = 0.6
 # --- Fusion: disputed ---
 DISPUTED_MULTIPLIER = 0.85
 
+# --- Fusion: label-aware containment (§5.2) ---
+# Suppress a text block only when >= CONTAINMENT_MIN_RATIO of its area is inside a
+# table block whose serialized text already covers its words. The one case where
+# content provably exists twice; naive containment suppression lost 28% of content
+# (decisions.md), so every other nested case is left alone. Targets the benchmark's
+# 2.06x duplication. [MEASURE with duplication as primary readout, MRR as guard]
+LABEL_AWARE_CONTAINMENT = False
+CONTAINMENT_MIN_RATIO = 0.9
+
 # --- Fusion: unilateral scaling ---
 UNILATERAL_MODEL_SCALE = 0.75  # unvalidated
 UNILATERAL_GEOMETRY_SCALE = 0.60  # unvalidated
@@ -30,6 +39,19 @@ CONFIDENCE_BOUNDS = {
 
 # --- Reading order ---
 COLUMN_GAP_RATIO = 0.15         # legacy centre-gap column split (XY_CUT = False)
+# Split on *every* centre gap wider than COLUMN_GAP_RATIO x page_width, yielding k
+# columns instead of exactly 1 or 2 (the single largest gap). Removes the structural
+# ceiling for 3-column layouts. Expected byte-identical on 1/2-column pages — the
+# arXiv corpus — so a change there is a bug. [MEASURE: assert no-op on current corpus]
+MULTI_COLUMN = False
+# Before column-splitting, cut the page into horizontal bands at full-width blocks (a
+# block wider than FULL_WIDTH_RATIO x page_width acts as a separator), then run the
+# existing column split within each band. Targets the one case the centre-gap
+# splitter provably gets wrong — a full-width title/table across a 2-column body —
+# without changing column detection globally the way XY-cut did (its measured loss).
+# [MEASURE — highest-value reading-order experiment given decisions.md]
+BAND_SPLIT = False
+FULL_WIDTH_RATIO = 0.7
 CAPTION_MAX_DISTANCE = 100.0
 # Recursive XY-cut: split a region at real whitespace bands and recurse, instead of
 # forcing every page into one or two centre-defined columns. It is the more
@@ -50,6 +72,18 @@ XY_CUT_MIN_ROW_GAP = 3.0            # points of clear horizontal whitespace to c
 # run together ("IreneAmerini1,ElenaBalashova2"). Scaling the tolerance by font size
 # instead fixes small text without over-splitting large headings.
 TEXT_X_TOLERANCE_RATIO = 0.15
+# Collapse the duplicated offset glyphs that faux-bold rendering produces
+# ("Trannsfer hhave mmeanings") with pdfplumber's page.dedupe_chars before
+# extraction. Fixes the doubled-glyph bug on doc1. [MEASURE on doc1 + full ablation]
+DEDUPE_CHARS = False
+# Apply Unicode NFKC normalization and strip soft hyphens (U+00AD) so ligatures
+# ("fi"/"fl") and invisible hyphens stop breaking exact substring matching in
+# retrieval and in the benchmark's containment scoring. Gold is generated from raw
+# text, so normalize both sides or neither. [MEASURE]
+NORMALIZE_TEXT = False
+# Rejoin words split by a hard line-break hyphen ("trans-\nfer" -> "transfer"), the
+# same class of failure the x-tolerance fix addressed for spacing. [MEASURE]
+DEHYPHENATE = False
 
 # --- Geometry detector ---
 LINE_Y_TOLERANCE = 3.0          # words within this vertical gap share a line
@@ -63,12 +97,40 @@ HEADER_BOLD_BONUS = 0.05        # confidence bump for bold headers
 GEOMETRY_CONFIDENCE_CEIL = 0.95
 FIGURE_MIN_AREA_RATIO = 0.03    # graphic cluster must cover >= this of page area
 FIGURE_CLUSTER_GAP = 10.0       # merge graphic primitives within this gap
+# Fixed-point graphic clustering is O(n^2) in primitives; a pathological page (1M
+# vector primitives) would hang. Above this count, skip figure clustering on the page
+# with a warning rather than stall. Well above any real document's per-page count.
+FIGURE_CLUSTER_MAX_PRIMITIVES = 5000
 FIGURE_MAX_TEXT_OVERLAP = 0.10  # graphic cluster must be mostly text-free
+# Measure a figure's text-freeness by the fraction of the *figure's area* covered by
+# overlapping text lines, instead of (overlapping line count / all lines on the
+# page) — whose threshold drifts with page density (a sparse page fails a real
+# figure on one stray line; a dense page passes a figure that swallows many). Off
+# until the annotated detection set re-tunes FIGURE_MAX_TEXT_OVERLAP for the new,
+# density-independent semantics. [MEASURE via detection metrics before enabling]
+FIGURE_OVERLAP_BY_AREA = False
 TABLE_MIN_ROWS = 2
 # extract_tables() is ruled-line based: on a partly-ruled table it returns only the
 # ruled fragment. If the rendered grid holds less than this fraction of the words in
 # the region, fall back to raw region text so no rows are silently dropped.
 TABLE_GRID_MIN_COVERAGE = 0.85
+# When ruled-line extraction finds no grid, retry with pdfplumber's text strategy so
+# borderless tables (the model detector finds them; ruled extraction can't structure
+# them) get a grid. The TABLE_GRID_MIN_COVERAGE guard still protects against a bad
+# grid replacing good raw text. [MEASURE + eyeball financial-domain PDFs]
+TABLE_TEXT_STRATEGY_FALLBACK = False
+# Extra settings forwarded to pdfplumber find_tables()/extract_tables() (snap/join
+# tolerance, etc.). Empty = pdfplumber defaults. A home for tuning the corpus reaches.
+TABLE_SETTINGS: dict = {}
+# Table chunk serialization: "plaintext" (space-joined rows, verbatim-substring
+# friendly, benchmark default) or "keyvalue" (header: cell pairs per row, answerable
+# for "what was X in Q3" lookups). [MEASURE — keyvalue likely needs table-targeted
+# gold; the substring benchmark penalizes breaking cell adjacency]
+TABLE_SERIALIZATION = "plaintext"
+# Split an oversized table into multiple row-segment chunks (repeating the header
+# row) instead of emitting one chunk many times MAX_CHUNK_TOKENS. [MEASURE — ~neutral
+# on arXiv, protective on financial docs]
+TABLE_SPLIT_ROWS = False
 # Universal caption markers in prose documents (not a layout assumption).
 CAPTION_PREFIX_PATTERN = r"^\s*(figure|fig\.?|table|tab\.?|scheme|algorithm)\s*\.?\s*\d+"
 
@@ -79,6 +141,16 @@ GEOMETRY_CONFIDENCE = {
     "figure": 0.60,
     "caption": 0.70,
 }
+
+# Drop running headers/footers and page numbers by cross-page repetition: a page's
+# top-most or bottom-most line whose digit-normalized text repeats at nearly the same
+# y on at least FURNITURE_MIN_PAGES pages is furniture, not content. Deterministic,
+# document-global, no model. Catches furniture whatever detector labelled it, so it
+# needs no DocLayNet page-header/footer remap. [MEASURE — noise removal, plausible
+# retrieval gain and a definite doc.text/markdown quality gain]
+STRIP_PAGE_FURNITURE = False
+FURNITURE_MIN_PAGES = 3
+FURNITURE_Y_TOLERANCE = 10.0    # points; lines within this share a repetition band
 
 # --- Chunking ---
 # MIN/MAX were chosen by sweeping both against the retrieval benchmark. Raw MRR
@@ -91,6 +163,11 @@ GEOMETRY_CONFIDENCE = {
 MAX_CHUNK_TOKENS = 500
 CHUNK_OVERLAP_TOKENS = 75  # tail words carried into next chunk on token-limit flush
 HEADER_LEVELS = 3
+# Rank header levels by (font size, bold) instead of font size alone, so a bold and a
+# regular heading at the same size become different levels (bold above). Weight is a
+# real depth signal the font-rank-only approach throws away. [MEASURE — changes only
+# section-path metadata, not scored content, but off until measured]
+HEADER_RANK_BY_WEIGHT = False
 # Let an explicit section number ("3.2.1 Ablations") set the header's depth instead
 # of its font-size rank. Font size is a proxy for depth; a section number *is* the
 # depth, so where one exists there is nothing left to infer. Fixes documents that
@@ -111,6 +188,11 @@ BREAK_TEXT_ON_CAPTION = False
 # section-path metadata. Without this, text that is laid out as a heading (titles,
 # author lines, run-in headers) exists in no chunk and can never be retrieved.
 INLINE_HEADER_TEXT = True
+# Emit reference/bibliography sections as chunk_type "references" instead of dropping
+# them (the default). Excluded from retrieval indexing by default; useful for
+# citation-analysis users. Makes the dead "references" enum value real. [MEASURE that
+# the False default stays best for retrieval]
+KEEP_REFERENCES = False
 # Carry CHUNK_OVERLAP_TOKENS across structural boundaries too, not only across
 # token-limit flushes. Measured (reports/ablations/08_overlap_on_boundary.json,
 # 48 docs / 298 questions): MRR 0.7432 vs 0.7457, NDCG 0.7658 vs 0.7708, Recall

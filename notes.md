@@ -655,3 +655,101 @@ under `--tools docling`.
 - **The gold generator changed between v4 and v6** (gpt-oss:120b throughout now,
   vs a v5 interim that mixed two models). v4/v5 numbers are not comparable to v6
   and are marked superseded in `memory/results.md`.
+
+## Stage 8 — PyPI-release hardening (Fable review, batch 1)
+
+Fable reviewed the whole pipeline (`fable_suggestions.md`). Its list is ~40 items
+across nine sections; most of the structural ones are marked **[MEASURE]** and are
+worthless until they clear `scripts/ablate.py` on a corpus that is not all arXiv —
+so they are staged, not landed here. This stage is the subset that changes *no chunk
+output at all*: packaging and the library-facing API. None of it can move a
+benchmark number, so none of it needed one.
+
+- **§1.1 version single-source.** `__init__.py` hard-coded `0.3.0` while
+  `pyproject.toml` said `0.4.0`. Now read from installed metadata
+  (`importlib.metadata.version`) with a dev fallback; `test_errors.py` asserts the
+  runtime version equals the `pyproject` version so they can never drift again.
+  (Editable installs must be reinstalled on a version bump for the metadata to
+  refresh — did that.)
+- **§1.2 `model` extra missing pymupdf.** `ModelDetector` imports `fitz` to
+  rasterize pages, but the extra only pulled `ultralytics`. Added `pymupdf>=1.24`.
+- **§1.3 typed exceptions.** New `docstruct/errors.py`:
+  `DocStructError` → `InvalidPDFError` / `EncryptedPDFError` / `EmptyDocumentError`,
+  plus one `open_pdf()` context manager that every `pdfplumber.open` site
+  (geometry detector, both extractors) now routes through. It translates the ragged
+  pdfminer surface — including the wrapped `PdfminerException` whose real cause hides
+  in `__context__` with an empty message — into these three. Callers no longer need
+  to import pdfminer internals to catch a bad file. Tested against zero-byte,
+  corrupt, and AES-256-encrypted fixtures.
+- **§1.4 scanned-PDF diagnostic.** A wordless image-only PDF used to return an empty
+  `Document` with no explanation. `run_pipeline` now sets
+  `diagnostics["likely_scanned"]` when a majority of pages yield no extractable text
+  and logs a warning pointing at `ocrmypdf`. No OCR in the pipeline — that stays a
+  documented pre-processing step (contract).
+- **§1.5 logging hygiene.** `NullHandler` on the `docstruct` logger so importing the
+  library never spams a host app that has not configured logging.
+- **§1.6 `py.typed`.** Added the marker + `package-data` so the annotations in
+  `schema.py` are actually visible to downstream type checkers.
+- **§1.7 input flexibility (partial).** `parse()` now takes `str | Path` and a
+  `password=` that threads through `run_pipeline` → detector/extractors →
+  `pdfplumber.open`. Left `pages=` for later: it needs page-index remapping through
+  the detectors, extractors and cache keys, which is real work for a speculative
+  feature.
+- **§8 re-exports.** `run_pipeline` and `PipelineResult` are the documented
+  diagnostics surface; they are now in `__all__`, alongside the error classes.
+
+Deferred deliberately: §1.8 `ParseConfig` (its own mechanical branch), §1.9 CI, and
+every §2–§5 correctness/structural item — those are behind config flags and must be
+ablated before being kept on, which is blocked on the same corpus grind as Stage 7.
+
+Full suite: 149 passed (143 + 6 new in `test_errors.py`), no regressions.
+
+## Stage 9 — Fable review, batches 2–4 (bugs, gated features, hardening)
+
+Continued from Stage 8. Everything here either changes no default output (config-
+gated, default off) or is a deterministic correctness fix covered by unit tests, so
+none of it needed a benchmark to land — and the ones that *would* move a benchmark
+number are gated off precisely because they haven't cleared `scripts/ablate.py` yet.
+The contract stays intact: default `docstruct.parse` output is byte-identical except
+for the two deterministic bug fixes below, and the golden test pins that.
+
+**Deterministic bug fixes (default on):**
+- `_cluster_graphics` merges to a fixed point — figure regions were order-dependent
+  and non-transitive (two clusters that only grew into overlap never merged).
+- Proposal matching is confidence-ordered — a low-conf model box could steal the
+  geometry box a higher-conf box needed.
+
+**Config-gated, default off — each carries its `[MEASURE]` justification in
+`config.py` and must clear `scripts/ablate.py` against `memory/results.md` before its
+flag is flipped on:**
+- Text quality: `DEDUPE_CHARS`, `DEHYPHENATE`, `NORMALIZE_TEXT` (NFKC + soft hyphen).
+- Figures: `FIGURE_OVERLAP_BY_AREA` (density-independent text-overlap semantics).
+- Reading order: `MULTI_COLUMN` (k-column), `BAND_SPLIT` (band-then-column — the
+  middle path between the legacy splitter and the measured-worse XY-cut).
+- Furniture: `STRIP_PAGE_FURNITURE` (cross-page repeated header/footer removal).
+- Tables: `TABLE_TEXT_STRATEGY_FALLBACK` (borderless), `TABLE_SERIALIZATION`
+  (keyvalue), `TABLE_SPLIT_ROWS`, `TABLE_SETTINGS`.
+- Hierarchy: `HEADER_RANK_BY_WEIGHT` (bold as a depth signal, `is_bold` on Block).
+- Containment: `LABEL_AWARE_CONTAINMENT` (the safe text-in-table subset only).
+- `KEEP_REFERENCES` (emit reference chunks, excluded from indexing by default).
+
+**Landed on by default (no scored-content change):** appendix/Roman section
+numbering; the `FIGURE_CLUSTER_MAX_PRIMITIVES` cap; open-the-PDF-once perf.
+
+**Hardening:** golden determinism tripwire (chunk hash of doc11), malformed-PDF
+fuzz corpus (zero-byte / corrupt / truncated → typed error or empty Document, never
+a crash or hang), GitHub Actions CI, seeded CHANGELOG.
+
+**Deferred deliberately, with reasons:**
+- §1.8 `ParseConfig` — a frozen per-parse config threaded through every module. The
+  review itself calls it "its own branch, purely mechanical"; it is a sweep across
+  every `config.*` read and does not belong bundled with feature work. Not started.
+- §3.4 multi-page table merge, §4.3 `SectionPath` depth > 3 — build when the corpus
+  needs them; designed-around, not built.
+- §5.3 confidence calibration, §6.1 corpus broadening, §6.2 structure-targeted gold
+  — data tasks blocked on annotation tooling and LLM quota (same blocker as Stage 7),
+  not code.
+- §8 PyPI README / mkdocs site, `on_page` progress callback — doc/UX work, not
+  behaviour.
+
+Full suite: 184 passed.

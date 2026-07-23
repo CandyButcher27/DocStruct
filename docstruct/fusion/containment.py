@@ -14,7 +14,9 @@ from __future__ import annotations
 
 from typing import List
 
+from docstruct import config
 from docstruct.schema import Block, BoundingBox
+from docstruct.utils.geometry import bbox_intersection_area
 
 
 def _is_contained(inner: BoundingBox, outer: BoundingBox) -> bool:
@@ -43,6 +45,42 @@ def suppress_table_contained(blocks: List[Block]) -> List[Block]:
         for j in range(n):
             if j != i and blocks[j].label != "table" and _is_contained(blocks[j].bbox, block.bbox):
                 to_drop.add(j)
+    return [b for i, b in enumerate(blocks) if i not in to_drop]
+
+
+def suppress_text_in_tables(blocks: List[Block]) -> List[Block]:
+    """Drop a text block that is mostly inside a table whose text already covers it.
+
+    The one containment case where content demonstrably exists twice: a text block
+    (typically a model proposal) sitting inside a table region whose serialized text
+    already holds the same words. Every other nested case is left alone — naive
+    suppression measured a 28% content loss (decisions.md). Runs after text/table
+    population, so table text is available. Gated by LABEL_AWARE_CONTAINMENT.
+    """
+    if not config.LABEL_AWARE_CONTAINMENT or len(blocks) <= 1:
+        return blocks
+
+    tables = [b for b in blocks if b.label == "table"]
+    if not tables:
+        return blocks
+
+    to_drop: set[int] = set()
+    for i, block in enumerate(blocks):
+        if block.label != "text" or not (block.text or "").strip():
+            continue
+        area = block.bbox.area
+        if area <= 0:
+            continue
+        words = set((block.text or "").split())
+        for table in tables:
+            contained = bbox_intersection_area(block.bbox, table.bbox) / area
+            if contained < config.CONTAINMENT_MIN_RATIO:
+                continue
+            table_words = set((table.text or "").split())
+            covered = len(words & table_words) / max(len(words), 1)
+            if covered >= config.TABLE_GRID_MIN_COVERAGE:
+                to_drop.add(i)
+                break
     return [b for i, b in enumerate(blocks) if i not in to_drop]
 
 

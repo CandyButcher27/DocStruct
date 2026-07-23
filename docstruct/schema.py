@@ -85,6 +85,7 @@ class Block:
     text: str | None = None
     table_data: list[list[str]] | None = None
     font_size: float | None = None
+    is_bold: bool | None = None
 
 
 @dataclass

@@ -249,6 +249,20 @@ def test_numbering_depth_ignores_non_headings():
     assert numbering_depth("Section 3 covers this") is None  # not anchored
 
 
+def test_numbering_depth_appendix_and_roman():
+    from docstruct.chunking.hierarchy_builder import numbering_depth
+
+    assert numbering_depth("A. Notation") == 1
+    assert numbering_depth("A.1 Proof") == 2
+    assert numbering_depth("B.2.1 Details") == 3
+    assert numbering_depth("IV. Results") == 1
+    assert numbering_depth("IX.1 Corollary") == 2
+    # guards against false positives
+    assert numbering_depth("A survey of methods") is None
+    assert numbering_depth("ABSTRACT") is None
+    assert numbering_depth("We propose") is None
+
+
 def test_numbering_signal_can_be_switched_off(monkeypatch):
     from docstruct import config
 
@@ -259,3 +273,81 @@ def test_numbering_signal_can_be_switched_off(monkeypatch):
     ]
     levels = assign_header_levels(blocks)
     assert levels["a"] == levels["b"] == 1
+
+
+def test_table_split_rows_emits_multiple_chunks_with_header(monkeypatch):
+    from docstruct import config
+    from docstruct.extraction.table_extractor import serialize_table
+    monkeypatch.setattr(config, "TABLE_SPLIT_ROWS", True)
+    monkeypatch.setattr(config, "MAX_CHUNK_TOKENS", 6)
+    grid = [["Quarter", "Revenue"]] + [[f"Q{i}", f"{i}.0"] for i in range(1, 9)]
+    tbl = Block(
+        bbox=make_bbox(0, 0, 100, 200),
+        label="table",
+        confidence=ConfidenceBreakdown(0.0, 0.0, 0.8),
+        source=Source.UNILATERAL_GEOMETRY,
+        page_num=0,
+        block_id="tb",
+        reading_order=0,
+        text=serialize_table(grid),
+        table_data=grid,
+    )
+    chunks = [c for c in build_chunks([tbl]) if c.chunk_type == "table"]
+    assert len(chunks) > 1
+    assert all(c.content.startswith("Quarter") for c in chunks)
+
+
+def test_table_not_split_when_disabled():
+    from docstruct.extraction.table_extractor import serialize_table
+    grid = [["Quarter", "Revenue"]] + [[f"Q{i}", f"{i}.0"] for i in range(1, 30)]
+    tbl = Block(
+        bbox=make_bbox(0, 0, 100, 200),
+        label="table",
+        confidence=ConfidenceBreakdown(0.0, 0.0, 0.8),
+        source=Source.UNILATERAL_GEOMETRY,
+        page_num=0,
+        block_id="tb",
+        reading_order=0,
+        text=serialize_table(grid),
+        table_data=grid,
+    )
+    chunks = [c for c in build_chunks([tbl]) if c.chunk_type == "table"]
+    assert len(chunks) == 1
+
+
+def test_header_rank_by_weight_separates_bold_from_regular(monkeypatch):
+    from docstruct import config
+    from docstruct.chunking.hierarchy_builder import assign_header_levels
+    monkeypatch.setattr(config, "HEADER_RANK_BY_WEIGHT", True)
+    monkeypatch.setattr(config, "HEADER_NUMBERING_LEVELS", False)
+    bold = _blk("b", "header", "Bold Heading", 0, font_size=12)
+    reg = _blk("r", "header", "Regular Heading", 1, font_size=12)
+    bold.is_bold, reg.is_bold = True, False
+    levels = assign_header_levels([bold, reg])
+    assert levels["b"] < levels["r"]  # bold ranks above regular at equal size
+
+
+def test_header_rank_by_weight_off_collapses_equal_size(monkeypatch):
+    from docstruct import config
+    from docstruct.chunking.hierarchy_builder import assign_header_levels
+    monkeypatch.setattr(config, "HEADER_NUMBERING_LEVELS", False)
+    bold = _blk("b", "header", "Bold", 0, font_size=12)
+    reg = _blk("r", "header", "Regular", 1, font_size=12)
+    bold.is_bold, reg.is_bold = True, False
+    levels = assign_header_levels([bold, reg])
+    assert levels["b"] == levels["r"]  # default: size only
+
+
+def test_references_kept_as_chunks_when_enabled(monkeypatch):
+    from docstruct import config
+    monkeypatch.setattr(config, "KEEP_REFERENCES", True)
+    blocks = [
+        _blk("h", "header", "References", 0, font_size=14),
+        _blk("r1", "text", "[1] Some citation 2020", 1),
+        _blk("r2", "text", "[2] Another citation 2021", 2),
+    ]
+    chunks = build_chunks(blocks)
+    refs = [c for c in chunks if c.chunk_type == "references"]
+    assert len(refs) == 1
+    assert "[1] Some citation 2020" in refs[0].content
+    assert "[2] Another citation 2021" in refs[0].content

@@ -62,6 +62,33 @@ def _token_count(blocks: List[Block]) -> int:
     return sum(len((b.text or "").split()) for b in blocks)
 
 
+def _table_segments(block: Block) -> List[str]:
+    """Rendered text for a table block: one string, or several when TABLE_SPLIT_ROWS
+    splits an oversized table by rows (repeating the header row per segment)."""
+    text = block.text or ""
+    grid = block.table_data
+    if not (config.TABLE_SPLIT_ROWS and grid and len(grid) > 2):
+        return [text] if text.strip() else []
+    if len(text.split()) <= config.MAX_CHUNK_TOKENS:
+        return [text]
+
+    from docstruct.extraction.table_extractor import serialize_table
+
+    header, body = grid[0], grid[1:]
+    segments: List[str] = []
+    current: List[List[str]] = [header]
+    for row in body:
+        trial = current + [row]
+        if len(current) > 1 and len(serialize_table(trial).split()) > config.MAX_CHUNK_TOKENS:
+            segments.append(serialize_table(current))
+            current = [header, row]
+        else:
+            current = trial
+    if len(current) > 1:
+        segments.append(serialize_table(current))
+    return segments or ([text] if text.strip() else [])
+
+
 def _snapshot(section: SectionPath) -> SectionPath:
     return SectionPath(section.h1, section.h2, section.h3)
 
@@ -88,6 +115,7 @@ def build_chunks(
     chunks: List[Chunk] = []
     buffer: List[Block] = []
     buffer_section: Optional[SectionPath] = None
+    ref_buffer: List[Block] = []
     counter = 0
 
     def emit(
@@ -177,7 +205,8 @@ def build_chunks(
             if config.BREAK_TEXT_ON_TABLE:
                 boundary_flush()
             if not _in_references(section):
-                emit("table", block.text or "", [block])
+                for segment in _table_segments(block):
+                    emit("table", segment, [block])
 
         elif block.label == "caption":
             if config.BREAK_TEXT_ON_CAPTION:
@@ -193,12 +222,29 @@ def build_chunks(
 
         else:  # text
             if _in_references(section):
+                if config.KEEP_REFERENCES and (block.text or "").strip():
+                    ref_buffer.append(block)
                 continue
             buffer_append(block)
             if _token_count(buffer) >= config.MAX_CHUNK_TOKENS:
                 flush_text(keep_overlap=True)
 
     flush_text()
+
+    # References are dropped by default; when kept, emit them as their own chunks,
+    # sized like text chunks and attributed to the references section.
+    if ref_buffer:
+        ref_path = _snapshot(section) if _in_references(section) else SectionPath("References")
+        segment: List[Block] = []
+        for block in ref_buffer:
+            segment.append(block)
+            if _token_count(segment) >= config.MAX_CHUNK_TOKENS:
+                emit("references", "\n".join(b.text for b in segment if b.text),
+                     segment, section_path=ref_path)
+                segment = []
+        if segment:
+            emit("references", "\n".join(b.text for b in segment if b.text),
+                 segment, section_path=ref_path)
 
     # Tables and captions emit while the text buffer is still open, so chunks are
     # produced out of document order. Restore reading order and renumber, so

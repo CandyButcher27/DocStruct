@@ -19,12 +19,21 @@ like a text-extraction library rather than like its internals.
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import asdict
-from typing import Dict, Iterator, List, Optional
+from pathlib import Path
+from typing import Dict, Iterator, List, Optional, Tuple, Union
 
 from docstruct.chunking.hierarchy_builder import assign_header_levels
 from docstruct.extraction.table_extractor import table_to_markdown
-from docstruct.schema import Block, Chunk
+from docstruct.schema import Block, BoundingBox, Chunk, SectionPath
+
+_MD_ESCAPE_RE = re.compile(r"([#|*_`])")
+
+
+def _escape_md(text: str) -> str:
+    """Escape Markdown control characters in body text so they render literally."""
+    return _MD_ESCAPE_RE.sub(r"\\\1", text)
 
 
 class Document:
@@ -73,18 +82,48 @@ class Document:
         levels = assign_header_levels(self.blocks)
         parts: List[str] = []
         for block in self._ordered_blocks:
+            if block.label == "figure":
+                bb = block.bbox
+                parts.append(
+                    f"![figure](page={block.page_num} "
+                    f"bbox={bb.x0:.0f},{bb.y0:.0f},{bb.x1:.0f},{bb.y1:.0f})"
+                )
+                continue
             body = (block.text or "").strip()
             if not body:
                 continue
             if block.label == "header":
-                parts.append("#" * levels.get(block.block_id, 3) + " " + body)
+                parts.append("#" * levels.get(block.block_id, 3) + " " + _escape_md(body))
             elif block.label == "caption":
-                parts.append(f"*{body}*")
+                parts.append(f"*{_escape_md(body)}*")
             elif block.label == "table":
-                parts.append(table_to_markdown(block.table_data) if block.table_data else body)
+                parts.append(table_to_markdown(block.table_data) if block.table_data else _escape_md(body))
             else:
-                parts.append(body)
+                parts.append(_escape_md(body))
         return "\n\n".join(parts)
+
+    def to_markdown(self, path: Optional[str] = None) -> str:
+        """Return :attr:`markdown`, optionally writing it to ``path``."""
+        md = self.markdown
+        if path:
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write(md)
+        return md
+
+    @property
+    def tables(self) -> List[Tuple[Optional[List[List[str]]], int, SectionPath]]:
+        """``(grid, page_num, section_path)`` for every table chunk."""
+        by_id = {b.block_id: b for b in self.blocks}
+        out = []
+        for chunk in self.chunks_of_type("table"):
+            block = by_id.get(chunk.source_block_ids[0]) if chunk.source_block_ids else None
+            out.append((block.table_data if block else None, chunk.page_num, chunk.section_path))
+        return out
+
+    @property
+    def figures(self) -> List[Tuple[int, BoundingBox]]:
+        """``(page_num, bbox)`` for every detected figure block, in reading order."""
+        return [(b.page_num, b.bbox) for b in self._ordered_blocks if b.label == "figure"]
 
     def pages(self) -> Dict[int, str]:
         """Plain text per page number, in reading order within each page."""
@@ -130,19 +169,22 @@ class Document:
 
 
 def parse(
-    pdf_path: str,
+    pdf_path: Union[str, Path],
     *,
     weights: Optional[str] = None,
     cache_dir: Optional[str] = None,
+    password: Optional[str] = None,
 ) -> Document:
     """Parse a born-digital PDF into a :class:`Document`.
 
     ``weights`` enables hybrid mode by pointing at DocLayNet YOLOv8 weights; without
     it the pipeline runs geometry-only, which needs no model and no network.
     ``cache_dir`` caches detector output and populated blocks by PDF content hash,
-    so re-parsing an unchanged file is close to free.
+    so re-parsing an unchanged file is close to free. ``password`` unlocks an
+    encrypted PDF.
     """
     from docstruct.pipeline import run_pipeline
 
-    result = run_pipeline(pdf_path, weights=weights, cache_dir=cache_dir)
+    pdf_path = str(pdf_path)
+    result = run_pipeline(pdf_path, weights=weights, cache_dir=cache_dir, password=password)
     return Document(pdf_path, result.blocks, result.chunks, result.diagnostics)

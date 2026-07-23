@@ -26,6 +26,17 @@ def bbox_overlap(bbox1: BoundingBox, bbox2: BoundingBox) -> float:
     return intersection_area / union_area
 
 
+def bbox_intersection_area(bbox1: BoundingBox, bbox2: BoundingBox) -> float:
+    """Area of the overlap between two boxes (0.0 when disjoint)."""
+    x_left = max(bbox1.x0, bbox2.x0)
+    y_top = max(bbox1.y0, bbox2.y0)
+    x_right = min(bbox1.x1, bbox2.x1)
+    y_bottom = min(bbox1.y1, bbox2.y1)
+    if x_right <= x_left or y_bottom <= y_top:
+        return 0.0
+    return (x_right - x_left) * (y_bottom - y_top)
+
+
 def merge_bboxes(bboxes: List[BoundingBox]) -> BoundingBox:
     """Smallest box enclosing all inputs; page dims taken from the first box."""
     if not bboxes:

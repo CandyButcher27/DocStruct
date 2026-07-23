@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 import argparse
-import dataclasses
-import json
 import os
 import sys
 from typing import Optional, Sequence
@@ -18,26 +16,37 @@ def _section_label(section) -> str:
 
 
 def _cmd_run(args) -> int:
-    result = run_pipeline(args.pdf, weights=args.weights, cache_dir=args.cache_dir)
-    diag = result.diagnostics
+    import docstruct
+
+    doc = docstruct.parse(args.pdf, weights=args.weights, cache_dir=args.cache_dir)
+    diag = doc.diagnostics
     print(
         f"[{diag['mode']}] pages={diag['pages']} blocks={diag['n_blocks']} "
         f"chunks={diag['n_chunks']} "
         f"(matched={diag['matched']}, uni_model={diag['unmatched_model']}, "
         f"uni_geo={diag['unmatched_geometry']})"
     )
-    for chunk in result.chunks[: args.limit]:
+    for chunk in doc.chunks[: args.limit]:
         preview = chunk.content.replace("\n", " ")
         if len(preview) > 90:
             preview = preview[:90] + "..."
         print(f"  [{chunk.chunk_type}] {_section_label(chunk.section_path)} "
               f"(p{chunk.page_num}): {preview}")
 
+    # Back-compat: --json is an alias for --format json --out <path>.
+    out, fmt = args.out, args.format
     if args.json:
-        payload = [dataclasses.asdict(c) for c in result.chunks]
-        with open(args.json, "w", encoding="utf-8") as fh:
-            json.dump(payload, fh, indent=2, ensure_ascii=False)
-        print(f"wrote {len(payload)} chunks -> {args.json}")
+        out, fmt = args.json, "json"
+    if out:
+        if fmt == "md":
+            payload = doc.to_markdown()
+        elif fmt == "text":
+            payload = doc.text
+        else:
+            payload = doc.to_json()
+        with open(out, "w", encoding="utf-8") as fh:
+            fh.write(payload)
+        print(f"wrote {fmt} -> {out}")
     return 0
 
 
@@ -177,7 +186,10 @@ def build_parser() -> argparse.ArgumentParser:
     run_p.add_argument("pdf", help="path to a born-digital PDF")
     run_p.add_argument("--weights", default=None, help="YOLOv8 weights to enable hybrid mode")
     run_p.add_argument("--cache-dir", default=None, help="cache detector proposals here")
-    run_p.add_argument("--json", default=None, help="write all chunks to this JSON file")
+    run_p.add_argument("--json", default=None, help="(deprecated) alias for --format json --out")
+    run_p.add_argument("--format", choices=("json", "md", "text"), default="json",
+                       help="output format for --out")
+    run_p.add_argument("--out", default=None, help="write converted output to this file")
     run_p.add_argument("--limit", type=int, default=15, help="chunks to preview")
     run_p.set_defaults(func=_cmd_run)
 

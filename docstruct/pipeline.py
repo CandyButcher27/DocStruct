@@ -13,14 +13,16 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
+from docstruct.errors import open_pdf
 from docstruct.schema import Block, Chunk
 from docstruct.geometry import detector as geometry_detector
 from docstruct.fusion.matcher import match_proposals
 from docstruct.fusion.fusion import fuse
-from docstruct.fusion.containment import suppress_contained, suppress_table_contained
+from docstruct.fusion.containment import suppress_text_in_tables
 from docstruct.reading_order import assign_reading_order
 from docstruct.extraction.text_extractor import populate_text
 from docstruct.extraction.table_extractor import populate_tables
+from docstruct.extraction.furniture import strip_page_furniture
 from docstruct.chunking.hierarchy_builder import assign_header_levels
 from docstruct.chunking.assembler import build_chunks
 
@@ -59,6 +61,7 @@ def run_pipeline(
     weights: Optional[str] = None,
     cache_dir: Optional[str] = None,
     pipeline_mode: Optional[str] = None,
+    password: Optional[str] = None,
 ) -> PipelineResult:
     """Run the full pipeline on a single PDF.
 
@@ -99,7 +102,9 @@ def run_pipeline(
         geo_cache = ProposalCache(cache_dir)
     geometry_props: list = []
     if pipeline_mode != "model-only":
-        geometry_props = _cached_detect(geometry_detector.detect, pdf_path, geo_cache)
+        geometry_props = _cached_detect(
+            lambda p: geometry_detector.detect(p, password=password), pdf_path, geo_cache
+        )
 
     model_props: list = []
     mode = "geometry-only"
@@ -143,17 +148,33 @@ def run_pipeline(
         ro_offset += len(blocks)
         all_blocks.extend(blocks)
 
-    populate_text(pdf_path, all_blocks)
-    populate_tables(pdf_path, all_blocks)
+    # Open the PDF once for both population passes instead of twice; pdfminer
+    # re-parses the whole document on every open, which dominates wall time on
+    # large files.
+    with open_pdf(pdf_path, password=password) as pdf:
+        populate_text(pdf_path, all_blocks, pdf=pdf)
+        populate_tables(pdf_path, all_blocks, pdf=pdf)
+    all_blocks = strip_page_furniture(all_blocks)
+    all_blocks = suppress_text_in_tables(all_blocks)
 
     levels = assign_header_levels(all_blocks)
     chunks = build_chunks(all_blocks, levels)
+
+    pages_with_text = {b.page_num for b in all_blocks if (b.text or "").strip()}
+    likely_scanned = bool(pages) and len(pages_with_text) < len(pages) / 2
+    if likely_scanned:
+        logger.warning(
+            "%s: %d/%d pages have no extractable text — likely scanned/image-only; "
+            "run a deterministic OCR pass (e.g. ocrmypdf) before DocStruct.",
+            pdf_path, len(pages) - len(pages_with_text), len(pages),
+        )
 
     diagnostics = {
         "mode": mode,
         "pages": len(pages),
         "n_blocks": len(all_blocks),
         "n_chunks": len(chunks),
+        "likely_scanned": likely_scanned,
         **totals,
     }
     if block_cache is not None and model_detector is None:

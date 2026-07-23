@@ -1,7 +1,19 @@
 import math
 
-from docstruct.utils.geometry import bbox_overlap, bbox_center, merge_bboxes
+from docstruct.utils.geometry import (
+    bbox_center,
+    bbox_intersection_area,
+    bbox_overlap,
+    merge_bboxes,
+)
 from tests.conftest import make_bbox
+
+
+def test_intersection_area():
+    a = make_bbox(0, 0, 10, 10)
+    b = make_bbox(5, 5, 15, 15)
+    assert bbox_intersection_area(a, b) == 25
+    assert bbox_intersection_area(a, make_bbox(20, 20, 30, 30)) == 0.0
 
 
 def test_area_width_height():

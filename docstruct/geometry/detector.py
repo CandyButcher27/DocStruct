@@ -8,18 +8,19 @@ figure detection. Coordinates are top-left (pdfplumber ``top``/``bottom``).
 
 from __future__ import annotations
 
+import logging
 import re
 import statistics
 from dataclasses import dataclass
 from typing import Any, Dict, List
 
-import pdfplumber
-
 from docstruct import config
+from docstruct.errors import open_pdf
 from docstruct.schema import BoundingBox, Proposal
-from docstruct.utils.geometry import bbox_overlap
+from docstruct.utils.geometry import bbox_intersection_area, bbox_overlap
 
 _CAPTION_RE = re.compile(config.CAPTION_PREFIX_PATTERN, re.IGNORECASE)
+_log = logging.getLogger(__name__)
 
 
 @dataclass
@@ -82,14 +83,23 @@ def _split_columns(lines: List[_Line], page_width: float) -> List[List[_Line]]:
         (idx, center(ordered[idx]) - center(ordered[idx - 1]))
         for idx in range(1, len(ordered))
     ]
-    split_index, max_gap = max(gaps, key=lambda g: g[1])
+    min_gap = page_width * config.COLUMN_GAP_RATIO
 
-    if max_gap < page_width * config.COLUMN_GAP_RATIO:
+    if config.MULTI_COLUMN:
+        cut_indices = [idx for idx, gap in gaps if gap >= min_gap]
+    else:
+        split_index, max_gap = max(gaps, key=lambda g: g[1])
+        cut_indices = [split_index] if max_gap >= min_gap else []
+
+    if not cut_indices:
         return [lines]
 
-    left = ordered[:split_index]
-    right = ordered[split_index:]
-    columns = [left, right]
+    columns = []
+    start = 0
+    for idx in cut_indices:
+        columns.append(ordered[start:idx])
+        start = idx
+    columns.append(ordered[start:])
     columns.sort(key=lambda col: sum((l.x0 + l.x1) / 2 for l in col) / len(col))
     return columns
 
@@ -136,19 +146,38 @@ def _group_lines_into_blocks(
 
 
 def _cluster_graphics(boxes: List[tuple], gap: float) -> List[tuple]:
-    clusters: List[List[float]] = []
-    for x0, top, x1, bottom in boxes:
-        placed = False
-        for c in clusters:
-            if not (x1 < c[0] - gap or x0 > c[2] + gap or bottom < c[1] - gap or top > c[3] + gap):
-                c[0] = min(c[0], x0)
-                c[1] = min(c[1], top)
-                c[2] = max(c[2], x1)
-                c[3] = max(c[3], bottom)
-                placed = True
-                break
-        if not placed:
-            clusters.append([x0, top, x1, bottom])
+    """Merge graphic primitives whose boxes come within ``gap`` into figure regions.
+
+    Seeds one cluster per primitive, then repeatedly merges any two clusters that
+    are within ``gap`` until no pair is — a fixed point. A single greedy pass is
+    order-dependent and non-transitive: two clusters that only grow into overlap
+    after both have absorbed other primitives never merge, so figure fragmentation
+    would depend on primitive order in the PDF stream. The fixed point removes that.
+    """
+    clusters: List[List[float]] = [[x0, top, x1, bottom] for x0, top, x1, bottom in boxes]
+
+    def _near(a: List[float], b: List[float]) -> bool:
+        return not (
+            a[2] < b[0] - gap or a[0] > b[2] + gap
+            or a[3] < b[1] - gap or a[1] > b[3] + gap
+        )
+
+    merged = True
+    while merged:
+        merged = False
+        i = 0
+        while i < len(clusters):
+            j = i + 1
+            while j < len(clusters):
+                if _near(clusters[i], clusters[j]):
+                    a, b = clusters[i], clusters[j]
+                    a[0], a[1] = min(a[0], b[0]), min(a[1], b[1])
+                    a[2], a[3] = max(a[2], b[2]), max(a[3], b[3])
+                    clusters.pop(j)
+                    merged = True
+                else:
+                    j += 1
+            i += 1
     return [tuple(c) for c in clusters]
 
 
@@ -174,7 +203,7 @@ def detect_page(page, page_num: int) -> List[Proposal]:
 
     # Tables first; their region masks out text and graphics.
     table_boxes: List[BoundingBox] = []
-    for table in page.find_tables():
+    for table in page.find_tables(config.TABLE_SETTINGS or None):
         if len(table.rows) < config.TABLE_MIN_ROWS:
             continue
         x0, top, x1, bottom = table.bbox
@@ -223,28 +252,36 @@ def detect_page(page, page_num: int) -> List[Proposal]:
         (g["x0"], g["top"], g["x1"], g["bottom"])
         for g in (page.images + page.curves + page.rects + page.lines)
     ]
+    if len(graphic_boxes) > config.FIGURE_CLUSTER_MAX_PRIMITIVES:
+        _log.warning(
+            "page %d: %d graphic primitives exceeds cap %d; skipping figure clustering",
+            page_num, len(graphic_boxes), config.FIGURE_CLUSTER_MAX_PRIMITIVES,
+        )
+        graphic_boxes = []
     for x0, top, x1, bottom in _cluster_graphics(graphic_boxes, config.FIGURE_CLUSTER_GAP):
         bbox = _to_bbox(x0, top, x1, bottom, page)
         if bbox.area < page_area * config.FIGURE_MIN_AREA_RATIO:
             continue
         if _in_table(bbox):
             continue
-        text_overlap = sum(
-            1
-            for l in lines
-            if bbox_overlap(bbox, _to_bbox(l.x0, l.top, l.x1, l.bottom, page)) > 0
-        )
-        if lines and text_overlap / max(len(lines), 1) > config.FIGURE_MAX_TEXT_OVERLAP:
-            continue
+        line_bboxes = [_to_bbox(l.x0, l.top, l.x1, l.bottom, page) for l in lines]
+        if config.FIGURE_OVERLAP_BY_AREA:
+            covered = sum(bbox_intersection_area(bbox, lb) for lb in line_bboxes)
+            if bbox.area > 0 and covered / bbox.area > config.FIGURE_MAX_TEXT_OVERLAP:
+                continue
+        else:
+            text_overlap = sum(1 for lb in line_bboxes if bbox_overlap(bbox, lb) > 0)
+            if lines and text_overlap / max(len(lines), 1) > config.FIGURE_MAX_TEXT_OVERLAP:
+                continue
         _add("figure", bbox, config.GEOMETRY_CONFIDENCE["figure"])
 
     return proposals
 
 
-def detect(pdf_path: str) -> List[Proposal]:
+def detect(pdf_path: str, *, password: str | None = None) -> List[Proposal]:
     """Detect layout proposals across every page of a PDF."""
     proposals: List[Proposal] = []
-    with pdfplumber.open(pdf_path) as pdf:
+    with open_pdf(pdf_path, password=password) as pdf:
         for page_num, page in enumerate(pdf.pages):
             proposals.extend(detect_page(page, page_num))
     return proposals

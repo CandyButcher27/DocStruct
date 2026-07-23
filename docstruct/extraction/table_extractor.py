@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
+import re
 from typing import Dict, List
 
-import pdfplumber
-
 from docstruct import config
-from docstruct.extraction.text_extractor import _text_kwargs
+from docstruct.extraction.text_extractor import _pdf_context, _text_kwargs
 from docstruct.schema import Block, BoundingBox
 
 
@@ -21,12 +20,18 @@ def _crop(page, bbox: BoundingBox):
     return page.crop((x0, top, x1, bottom))
 
 
+_TEXT_STRATEGY = {"vertical_strategy": "text", "horizontal_strategy": "text"}
+
+
 def extract_table(page, bbox: BoundingBox) -> List[List[str]] | None:
     """Return the largest table grid found inside a bbox, or None."""
     region = _crop(page, bbox)
     if region is None:
         return None
-    tables = region.extract_tables()
+    tables = region.extract_tables(config.TABLE_SETTINGS or None)
+    if not tables and config.TABLE_TEXT_STRATEGY_FALLBACK:
+        # Borderless table: no ruled grid. Retry with the text-alignment strategy.
+        tables = region.extract_tables({**config.TABLE_SETTINGS, **_TEXT_STRATEGY})
     if not tables:
         return None
     best = max(tables, key=lambda t: len(t) * (len(t[0]) if t else 0))
@@ -66,6 +71,41 @@ def table_to_plaintext(grid: List[List[str]]) -> str:
     return "\n".join("  ".join(cell for cell in row if cell) for row in grid)
 
 
+def _looks_like_header(row: List[str]) -> bool:
+    """Row 0 is a plausible header when every non-empty cell is non-numeric."""
+    cells = [c for c in row if c]
+    return bool(cells) and not any(re.search(r"\d", c) for c in cells)
+
+
+def table_to_keyvalue(grid: List[List[str]]) -> str:
+    """Render body rows as ``header: cell; ...`` pairs using row 0 as headers.
+
+    Keeps a value's column identity ("Q3 revenue: 4.5") that space-joined rows lose,
+    which is what makes a table chunk answerable for "what was X in Q3". Falls back to
+    plaintext when row 0 is not a plausible header.
+    """
+    if not grid or len(grid) < 2 or not _looks_like_header(grid[0]):
+        return table_to_plaintext(grid)
+    headers = grid[0]
+    lines = []
+    for row in grid[1:]:
+        pairs = [
+            f"{headers[i]}: {cell}" if i < len(headers) and headers[i] else cell
+            for i, cell in enumerate(row)
+            if cell
+        ]
+        if pairs:
+            lines.append("; ".join(pairs))
+    return "\n".join(lines)
+
+
+def serialize_table(grid: List[List[str]]) -> str:
+    """Render a grid to chunk text using the configured serialization."""
+    if config.TABLE_SERIALIZATION == "keyvalue":
+        return table_to_keyvalue(grid)
+    return table_to_plaintext(grid)
+
+
 def _grid_covers_region(rendered: str, raw: str) -> bool:
     """Did the extracted grid keep most of the words actually in the region?
 
@@ -80,7 +120,8 @@ def _grid_covers_region(rendered: str, raw: str) -> bool:
     return len(rendered.split()) >= config.TABLE_GRID_MIN_COVERAGE * raw_words
 
 
-def populate_tables(pdf_path: str, blocks: List[Block]) -> List[Block]:
+def populate_tables(pdf_path: str, blocks: List[Block], *, password: str | None = None,
+                    pdf=None) -> List[Block]:
     """Set ``table_data`` and serialized ``text`` on table blocks, in place."""
     by_page: Dict[int, List[Block]] = {}
     for block in blocks:
@@ -89,7 +130,7 @@ def populate_tables(pdf_path: str, blocks: List[Block]) -> List[Block]:
     if not by_page:
         return blocks
 
-    with pdfplumber.open(pdf_path) as pdf:
+    with _pdf_context(pdf_path, pdf, password) as pdf:
         for page_num, page_blocks in by_page.items():
             if page_num >= len(pdf.pages):
                 continue
@@ -100,7 +141,7 @@ def populate_tables(pdf_path: str, blocks: List[Block]) -> List[Block]:
                 grid = extract_table(page, block.bbox)
                 if grid:
                     block.table_data = grid
-                    rendered = table_to_plaintext(grid)
+                    rendered = serialize_table(grid)
                     # Prefer the structured render, but never at the cost of losing rows.
                     block.text = rendered if _grid_covers_region(rendered, raw) else raw
                 elif raw:
