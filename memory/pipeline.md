@@ -109,7 +109,32 @@ the raw region text and falls back to raw text below
 
 Tables serialize as **plaintext rows**, not Markdown, for chunk content;
 `table_to_markdown()` exists and is used by `Document.markdown`, which is a
-human-reading surface rather than a retrieval one.
+human-reading surface rather than a retrieval one. `serialize_table()` dispatches on
+`TABLE_SERIALIZATION` — `plaintext` (default) or the gated `keyvalue` (header: cell
+pairs, answerable for "what was X in Q3").
+
+Both extractors take an optional `pdf=` so `run_pipeline` opens the PDF **once** for
+both passes (pdfminer re-parses on every open — this was a real wall-time cost).
+Both also take `password=`.
+
+Gated text-cleaning passes (`_clean_text`, all default off): `DEDUPE_CHARS`
+(faux-bold doubled glyphs), `DEHYPHENATE` (line-break hyphens), `NORMALIZE_TEXT`
+(NFKC + soft hyphen). `TABLE_TEXT_STRATEGY_FALLBACK` retries pdfplumber's text
+strategy on a borderless table; `TABLE_SETTINGS` threads tuning into find/extract.
+
+## 5b. Post-extraction filtering — `extraction/furniture.py`, `fusion/containment.py`
+
+Two gated, deterministic passes run after population and before chunking, both
+default off:
+
+- **`strip_page_furniture()`** (`STRIP_PAGE_FURNITURE`) — drops a page's top/bottom
+  line when its digit-normalized text repeats at nearly the same y across
+  `FURNITURE_MIN_PAGES` pages. Removes running headers/footers/page numbers whatever
+  detector labelled them, so no DocLayNet page-header/footer remap is needed.
+- **`suppress_text_in_tables()`** (`LABEL_AWARE_CONTAINMENT`) — the one safe
+  containment case: a text block ≥90% inside a table whose serialized text already
+  covers its words. The naive containment helpers (`suppress_contained`,
+  `suppress_table_contained`) that cost 28% content are no longer wired in.
 
 ## 6. Header levels — `chunking/hierarchy_builder.py`
 
@@ -117,13 +142,14 @@ Two deterministic, document-local signals — no hardcoded section names, no reg
 on "Introduction".
 
 1. **Section numbering** (`HEADER_NUMBERING_LEVELS`, default on). "3 Method" → 1,
-   "3.2 Setup" → 2, "3.2.1 Ablations" → 3. Where a heading carries a number, that
-   number *states* its depth, so it wins outright. The regex is anchored and
-   requires text after the number, so a bare page number or list marker does not
-   qualify.
+   "3.2 Setup" → 2, "3.2.1 Ablations" → 3, plus appendix (`A.`, `A.1`, `B.2.1`) and
+   Roman (`IV.`, `IX.1`) — guarded so `A survey of...` and all-caps words do not
+   qualify. Where a heading carries a number, that number *states* its depth, so it
+   wins outright. The regex is anchored and requires text after the number.
 2. **Font-size rank**, for unnumbered headings: largest distinct size → level 1,
    clamped at `HEADER_LEVELS = 3`. Falls back to bbox height when `font_size` is
-   missing.
+   missing. Gated `HEADER_RANK_BY_WEIGHT` ranks by (size, bold) using `Block.is_bold`
+   so bold and regular headings at one size become distinct levels.
 
 Numbering was added because font size alone collapses the hierarchy entirely on
 documents that set every heading at one size, and misassigns levels on documents

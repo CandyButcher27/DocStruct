@@ -186,6 +186,20 @@ Two details that matter:
   adapter is re-run between stages. The full multi-tool benchmark is re-run once
   at the end of a work pass to confirm.
 
+**The adapter cache is only correct because it fingerprints config.** The block and
+geometry-proposal caches key on `layout_config_fingerprint()` (`cache/pdf_cache.py`),
+so a config override in an ablation invalidates them. The Fable-review batch exposed
+the failure mode: new block-affecting flags were *not* in `_LAYOUT_CONFIG_KEYS`, so
+their ablations reused baseline blocks and measured a false null. **Any new flag that
+changes block output must be registered there.** The model (YOLO) cache is
+deliberately config-independent so inference is reused across ablations. To ablate
+config that changes blocks safely, the flag must be in the fingerprint — otherwise
+run with `--cache-dir ""` (correct but re-runs YOLO, ~90 s/doc).
+
+**Gated-feature sweep (Fable review):** `scripts/_sweep.sh` runs baseline + 13 gated
+flags on the 92-doc/558-q v6 gold against the warm `.bench_cache`. Winners get their
+flag flipped to default-on and the numbers recorded in `results.md`.
+
 ## Report provenance
 
 `eval/report.py::config_snapshot()` dumps every uppercase `config` value into

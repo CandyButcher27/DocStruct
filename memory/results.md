@@ -3,6 +3,12 @@
 **Update this file whenever a benchmark or ablation runs.** It is the reference
 any "did this help?" question should be answered from.
 
+> **In progress (2026-07 Fable session):** a 14-run gated-feature sweep (baseline +
+> 13 flags) is running on the v6 corpus; results and any flag flips land here when it
+> completes. Corpus broadening beyond arXiv is also running (Ollama cloud gold). Until
+> both land, the headline below is the arXiv-only v6 baseline and every gated flag in
+> `decisions.md` is unproven.
+
 ## Current headline (`reports/v6_report.md`)
 
 92 born-digital PDFs, 558 LLM-generated Q&A, identical embedder and retriever for

@@ -11,12 +11,12 @@ Ranked by expected value. Everything here has been audited against the actual co
    the one that could *invalidate* current conclusions rather than incrementally
    improve them.
 
-   **Status: unblocked in code, blocked on quota.** 47 further PDFs are fetched
-   and the generator faults that made bulk gold impossible are all fixed (see
-   `notes.md` §7.3, §7.7). What stopped it is a free tier's 100,000 tokens **per
-   day** — roughly seven papers. Resuming needs either a paid tier or several days
-   of running `gen-qa`, which resumes per document and can be left to grind.
-   Nothing in the codebase needs to change first.
+   **Status: IN PROGRESS (2026-07 Fable session).** Quota is no longer the blocker —
+   Ollama cloud (`gpt-oss:120b`, `OLLAMA_API_KEY`) is verified live and has room. A
+   background fetch of the six non-arXiv domains (legal/financial/medical/technical/
+   govt/textbook, ~150 docs via `scripts/fetch_dataset_v2.py`) is running. Next:
+   `gen-qa` on the new docs via Ollama, then re-baseline `results.md`. Until that
+   lands, every number stays arXiv-only.
 
 2. **Regenerate gold from correctly-spaced text.** The whitespace-blind relevance
    rule is a cheap guard around a mismatch whose real fix is regenerating the
@@ -30,10 +30,26 @@ Ranked by expected value. Everything here has been audited against the actual co
    confidence-weighted retrieval ranking, which is otherwise built on untuned
    numbers. Needs more than two annotated documents first.
 
+## In flight — Fable review (2026-07)
+
+Two batches landed on branch `feat/pypi-hardening` (merged to main): PyPI-release
+hardening (typed errors, Path/password, scanned diagnostic, version single-source,
+py.typed, CI, CHANGELOG) and ~14 config-gated deterministic features + 2 bug fixes.
+See `notes.md` Stages 8–9 and `decisions.md`. Remaining from that review:
+
+- **Run the gated-feature sweep** (14 runs, in progress) → flip winners ON, record in
+  `results.md`. The one action that converts the batch from "implemented" to "worth
+  keeping".
+- **§1.8 `ParseConfig`** — thread a frozen per-parse config object through the
+  pipeline so overrides don't mutate module globals (thread-safety). Its own
+  mechanical branch; not started.
+- **§3.4 multi-page table merge, §4.3 SectionPath depth > 3** — build when the
+  broadened corpus needs them.
+
 ## Lower value, well understood
 
-6. **Table size cap.** Tables are atomic with no size guard, so a table exceeding
-   `MAX_CHUNK_TOKENS` produces an oversized outlier chunk. No observed failure yet.
+6. **Table size cap.** DONE (gated) — `TABLE_SPLIT_ROWS` splits an oversized table
+   into header-repeating row segments. Off pending the sweep.
 
 8. **Embedding cache across benchmark reruns.** Would speed up retrieval-only
    changes; does nothing for chunking changes, which legitimately re-chunk. The
@@ -46,8 +62,9 @@ Ranked by expected value. Everything here has been audited against the actual co
 
 - Single-detector ablation (`pipeline_mode`, `docstruct_geo` / `docstruct_model`).
 - Bootstrap CIs and a paired significance test on every benchmark report.
-- Numbering-pattern header levels (`HEADER_NUMBERING_LEVELS`).
+- Numbering-pattern header levels (`HEADER_NUMBERING_LEVELS`); appendix/Roman too.
 - Cross-boundary overlap: measured, lost, stays off — see `decisions.md`.
+- PyPI-release hardening batch (typed errors, Path/password, py.typed, CI, ...).
 
 ## Explicitly not planned
 

@@ -24,11 +24,14 @@ where the legacy heuristic's assumptions hold. It is the better algorithm on
 layouts it was built for and the worse one here. **Enable it for less uniform
 corpora; do not delete it.**
 
-### Containment suppression — enabled, caused 28% content loss, reverted
-`fusion/containment.py`. `suppress_contained` and `suppress_table_contained` are
-implemented, imported by `pipeline.py`, and never called. Wiring them in dropped
-28% of content. Before re-enabling, first explain *which* nested regions are real
-duplicates versus real content, because the naive version cannot tell.
+### Containment suppression — naive version caused 28% content loss, reverted
+`fusion/containment.py`. The naive `suppress_contained` / `suppress_table_contained`
+dropped 28% of content and are no longer imported by `pipeline.py` (kept in the
+module, unit-tested, unused). The *label-aware* successor `suppress_text_in_tables`
+(gated `LABEL_AWARE_CONTAINMENT`, default off) answers the "which nested regions are
+real duplicates" question with the one provably-safe case: a text block ≥90% inside a
+table whose serialized text already covers its words. Targets the benchmark's 2.06×
+duplication; every other nested case is still left alone. Awaiting the sweep.
 
 ### Section-path breadcrumb injection into chunk text — reverted
 Prepending `[Section: h1 > h2]` to chunk bodies. Reverted in `c11e091`.
@@ -67,6 +70,64 @@ lifts all of them and cannot close a relative gap. Same objection to tuning RRF
 `k`. Both are retrieval-side knobs; the gap was a chunking problem.
 
 ---
+
+## Landed config-gated, default OFF — implemented, awaiting ablation (Fable review)
+
+The Fable review (`fable_suggestions.md`, notes.md Stages 8–9) produced a batch of
+deterministic, no-LLM features. Each is **implemented, unit-tested, and gated to a
+`config.py` flag that defaults OFF**, so default `parse()` output is byte-identical
+and the 184-test suite is the guard. None may be flipped ON until it clears
+`scripts/ablate.py` against `results.md` — the measure-before-keeping rule. Flags and
+their `[MEASURE]` rationale live in `config.py`:
+
+- **Text quality:** `DEDUPE_CHARS` (faux-bold doubled glyphs, the doc1 bug),
+  `DEHYPHENATE` (line-break hyphens), `NORMALIZE_TEXT` (NFKC + soft hyphen).
+- **Figures:** `FIGURE_OVERLAP_BY_AREA` (density-independent text-overlap test).
+- **Reading order:** `MULTI_COLUMN` (k-column, expected no-op on 2-col arXiv),
+  `BAND_SPLIT` (band-then-column — the middle path between the legacy splitter and
+  the measured-worse XY-cut; band-cut only at full-width blocks, legacy column split
+  within each band, so column detection is unchanged everywhere else).
+- **Furniture:** `STRIP_PAGE_FURNITURE` (cross-page repeated header/footer removal).
+- **Tables:** `TABLE_TEXT_STRATEGY_FALLBACK` (borderless), `TABLE_SERIALIZATION`
+  = keyvalue, `TABLE_SPLIT_ROWS`, `TABLE_SETTINGS`.
+- **Hierarchy:** `HEADER_RANK_BY_WEIGHT` (bold as a depth signal; `Block.is_bold`).
+- **Containment:** `LABEL_AWARE_CONTAINMENT` (see below).
+- **References:** `KEEP_REFERENCES` (emit reference chunks, excluded from indexing).
+
+The 14-run sweep measuring all of these on the 92-doc/558-q v6 corpus is what
+`results.md` will record; until then treat every flag as unproven.
+
+## Landed ON — deterministic correctness (no measurement needed to keep)
+
+- **Fixed-point graphic clustering.** `_cluster_graphics` did one greedy pass, so
+  clusters that grew into overlap after both absorbed primitives never merged —
+  figure regions depended on primitive order in the PDF stream. Now iterates to a
+  fixed point; order-independent. Unit test bridges two non-touching boxes through a
+  third placed last.
+- **Confidence-ordered proposal matching.** `_greedy_match` iterated model proposals
+  in raw detector order; a low-conf box could claim the geometry box a higher-conf
+  box needed. Now sorted by descending confidence (proposal_id tie-break).
+- **Appendix / Roman section numbering.** Heading-number regex extended from
+  digits-only to `A.`/`A.1`/`B.2.1` and `IV.`/`IX.1`, guarded so `A survey of...` and
+  all-caps words are not read as numbered. Changes only section-path metadata.
+- **Graphic-primitive cap** (`FIGURE_CLUSTER_MAX_PRIMITIVES`) so a pathological page
+  skips the O(n²) merge with a warning instead of hanging.
+
+## The ablation cache was silently config-blind for new flags — fixed
+
+The block cache fingerprinted config, but only over the *original* `_LAYOUT_CONFIG_
+KEYS`; the geometry proposal cache was not config-aware at all. So an ablation that
+toggled any new flag reused baseline blocks and would have **measured a false null on
+every gated feature above**. Fixed before running the sweep: moved the fingerprint
+into `cache/pdf_cache.py`, registered every new block-affecting flag, and made the
+geometry proposal cache key on it. The model (YOLO) proposal cache is deliberately
+kept config-independent (`config_aware = False`) so expensive inference is still
+reused across ablations. Chunking-only flags (`TABLE_SPLIT_ROWS`, `KEEP_REFERENCES`)
+stay out of the fingerprint by design — the cache exists to vary them cheaply.
+
+**Lesson:** a config-fingerprinted cache is only as correct as its key list; adding a
+block-affecting flag without registering it turns every ablation of it into a false
+null. Any new flag that changes block output must be added to `_LAYOUT_CONFIG_KEYS`.
 
 ## Rejected on principle (not measurement)
 
@@ -129,11 +190,15 @@ is what makes chunking ablations affordable.
   `UNILATERAL_GEOMETRY_SCALE` and both `CONFIDENCE_BOUNDS` entries have never been
   calibrated. Nothing that consumes them (e.g. confidence-weighted RRF) should be
   trusted until they are.
-- **Header levels from font size alone.** See `pipeline.md` §6. Not measurable on
-  the current benchmark, so not scheduled.
+- **Header levels from font size alone.** See `pipeline.md` §6. A gated fix exists —
+  `HEADER_RANK_BY_WEIGHT` ranks by (size, bold) using the new `Block.is_bold` — off
+  until the sweep shows it moves anything. Appendix/Roman numbering (landed ON) also
+  chips at this: an explicit number states depth where font size only proxies it.
 - **Doubled interior letters on some PDFs** (`"Trannsfer may hhave many
   mmeanings"` in doc1). Document-specific, not systemic — doc10 extracts cleanly
-  through the same code path. Likely faux-bold rendered as duplicate offset glyphs
-  that pdfplumber does not dedupe at this tolerance.
+  through the same code path. Faux-bold rendered as duplicate offset glyphs that
+  pdfplumber does not dedupe at this tolerance. A gated fix now exists —
+  `DEDUPE_CHARS` calls `page.dedupe_chars(tolerance=1)` before extraction — off until
+  ablated on doc1 + the full corpus (see the gated-features section above).
 - **`data/doclaynet/` is in git history** (84MB, unreferenced). Untracked now;
   removing it from history needs a rewrite that would break existing clones.
