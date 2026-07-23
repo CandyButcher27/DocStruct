@@ -131,6 +131,16 @@ def _pace() -> None:
         time.sleep(config.QA_REQUEST_PACING_SECONDS)
 
 
+def _spread(total: int, take: int) -> List[int]:
+    """``take`` indices spread evenly over ``range(total)``, first and last included."""
+    if take >= total:
+        return list(range(total))
+    if take <= 1:
+        return [0]
+    step = (total - 1) / (take - 1)
+    return sorted({int(round(i * step)) for i in range(take)})
+
+
 def _split_evenly(total: int, parts: int) -> List[int]:
     """Distribute ``total`` questions over ``parts`` segments, remainder first."""
     base, extra = divmod(total, parts)
@@ -164,20 +174,27 @@ def generate_for_pdf(
         _pace()
         return _generate_from_text(full_text, doc_id, "fulldoc", client, n)
 
-    # Split on word boundaries into `parts` even segments, none over budget.
+    # Split on word boundaries into segments no larger than the budget, then sample
+    # at most `n` of them spread evenly across the document. Requesting every
+    # segment of a long paper costs a rate-limited request each for no extra gold,
+    # while requesting only the first few would draw all of a document's questions
+    # from its introduction.
     words = full_text.split()
     parts = -(-len(full_text) // budget)  # ceil
     size = -(-len(words) // parts)
+    sampled = _spread(parts, min(parts, n))
+
     items: List[QAItem] = []
-    for index, want in enumerate(_split_evenly(n, parts)):
-        if want <= 0:
-            continue
+    for index, want in zip(sampled, _split_evenly(n, len(sampled))):
         segment = " ".join(words[index * size : (index + 1) * size])
         if not segment:
             continue
         _pace()
-        items += _generate_from_text(segment, doc_id, f"part_{index}", client, want)
-    return items
+        # Ask for two even where the split allocates one. Spans are rejected for
+        # being short, paraphrased or not verbatim, so a request for exactly one
+        # question routinely yields zero and the segment contributes nothing.
+        items += _generate_from_text(segment, doc_id, f"part_{index}", client, max(want, 2))
+    return items[:n]
 
 
 def save_qa(items: List[QAItem], path: str) -> None:

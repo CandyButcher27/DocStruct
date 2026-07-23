@@ -64,3 +64,19 @@ def test_qa_roundtrip(tmp_path):
     save_qa(items, str(p))
     loaded = load_qa(str(p))
     assert loaded == items
+
+
+def test_sampled_segments_cover_the_whole_document():
+    """Questions must not all come from a long paper's introduction."""
+    from docstruct.eval.qa_generator import _spread
+
+    assert _spread(3, 5) == [0, 1, 2]        # fewer segments than wanted: take all
+    assert _spread(9, 5) == [0, 2, 4, 6, 8]  # spread, both ends included
+    assert _spread(9, 2) == [0, 8]
+    assert _spread(9, 1) == [0]
+    assert _spread(1, 5) == [0]
+    for total in range(1, 30):
+        picked = _spread(total, 5)
+        assert picked == sorted(set(picked))
+        assert all(0 <= i < total for i in picked)
+        assert len(picked) <= min(total, 5)
