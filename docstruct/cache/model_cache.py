@@ -16,7 +16,14 @@ def _safe_tag(weights: str) -> str:
 
 
 class ModelProposalCache(ProposalCache):
-    """Proposal cache whose namespace encodes the model weights used."""
+    """Proposal cache whose namespace encodes the model weights used.
+
+    Model (YOLO) inference does not read the layout config the geometry detector
+    does, so the key stays config-independent — the expensive inference is reused
+    across config ablations instead of being needlessly recomputed.
+    """
+
+    config_aware = False
 
     def __init__(self, cache_dir: str, weights: str) -> None:
         super().__init__(cache_dir)

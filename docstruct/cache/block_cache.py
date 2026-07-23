@@ -12,65 +12,13 @@ silently serving stale blocks.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import os
 from dataclasses import asdict
 from typing import List, Optional
 
-from docstruct import config
-from docstruct.cache.pdf_cache import file_hash
+from docstruct.cache.pdf_cache import file_hash, layout_config_fingerprint
 from docstruct.schema import Block, BoundingBox, ConfidenceBreakdown, Source
-
-# Config keys that affect block production. Chunking keys are deliberately absent —
-# they are what the cache exists to let us vary cheaply.
-_LAYOUT_CONFIG_KEYS = (
-    "IOU_MATCH_THRESHOLD",
-    "NMS_IOU_THRESHOLD",
-    "CONFIRMED_BASE",
-    "CONFIRMED_MODEL_BOOST",
-    "CONFIRMED_AGREEMENT_BOOST",
-    "CONFIRMED_BBOX_MODEL_CONF",
-    "CONFIRMED_BBOX_IOU",
-    "DISPUTED_MULTIPLIER",
-    "UNILATERAL_MODEL_SCALE",
-    "UNILATERAL_GEOMETRY_SCALE",
-    "CONFIDENCE_BOUNDS",
-    "COLUMN_GAP_RATIO",
-    "CAPTION_MAX_DISTANCE",
-    "XY_CUT",
-    "XY_CUT_MIN_COLUMN_GAP_RATIO",
-    "XY_CUT_MIN_ROW_GAP",
-    "LINE_Y_TOLERANCE",
-    "PARAGRAPH_GAP_FACTOR",
-    "HEADER_SIZE_RATIO",
-    "HEADER_MAX_LINES",
-    "HEADER_MAX_WORDS",
-    "BOLD_FONT_MARKERS",
-    "HEADER_BOLD_BONUS",
-    "GEOMETRY_CONFIDENCE_CEIL",
-    "GEOMETRY_CONFIDENCE",
-    "FIGURE_MIN_AREA_RATIO",
-    "FIGURE_CLUSTER_GAP",
-    "FIGURE_MAX_TEXT_OVERLAP",
-    "TABLE_MIN_ROWS",
-    "TABLE_GRID_MIN_COVERAGE",
-    "TEXT_X_TOLERANCE_RATIO",
-    "CAPTION_PREFIX_PATTERN",
-    "MODEL_DPI",
-    "MODEL_CONF_THRESHOLD",
-    "DOCLAYNET_LABEL_MAP",
-)
-
-
-def layout_config_fingerprint() -> str:
-    """Short hash of every config value that can change block output."""
-    payload = json.dumps(
-        {k: getattr(config, k, None) for k in _LAYOUT_CONFIG_KEYS},
-        sort_keys=True,
-        default=str,
-    )
-    return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:12]
 
 
 def blocks_to_json(blocks: List[Block]) -> str:
