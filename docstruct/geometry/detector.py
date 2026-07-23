@@ -13,9 +13,8 @@ import statistics
 from dataclasses import dataclass
 from typing import Any, Dict, List
 
-import pdfplumber
-
 from docstruct import config
+from docstruct.errors import open_pdf
 from docstruct.schema import BoundingBox, Proposal
 from docstruct.utils.geometry import bbox_overlap
 
@@ -241,10 +240,10 @@ def detect_page(page, page_num: int) -> List[Proposal]:
     return proposals
 
 
-def detect(pdf_path: str) -> List[Proposal]:
+def detect(pdf_path: str, *, password: str | None = None) -> List[Proposal]:
     """Detect layout proposals across every page of a PDF."""
     proposals: List[Proposal] = []
-    with pdfplumber.open(pdf_path) as pdf:
+    with open_pdf(pdf_path, password=password) as pdf:
         for page_num, page in enumerate(pdf.pages):
             proposals.extend(detect_page(page, page_num))
     return proposals

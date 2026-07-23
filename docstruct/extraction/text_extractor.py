@@ -5,9 +5,8 @@ from __future__ import annotations
 import statistics
 from typing import Dict, List
 
-import pdfplumber
-
 from docstruct import config
+from docstruct.errors import open_pdf
 from docstruct.schema import Block, BoundingBox
 
 
@@ -45,13 +44,13 @@ def median_font_size(page, bbox: BoundingBox) -> float | None:
     return round(statistics.median(sizes), 2) if sizes else None
 
 
-def populate_text(pdf_path: str, blocks: List[Block]) -> List[Block]:
+def populate_text(pdf_path: str, blocks: List[Block], *, password: str | None = None) -> List[Block]:
     """Set ``text`` on text-bearing blocks and ``font_size`` on headers, in place."""
     by_page: Dict[int, List[Block]] = {}
     for block in blocks:
         by_page.setdefault(block.page_num, []).append(block)
 
-    with pdfplumber.open(pdf_path) as pdf:
+    with open_pdf(pdf_path, password=password) as pdf:
         for page_num, page_blocks in by_page.items():
             if page_num >= len(pdf.pages):
                 continue
