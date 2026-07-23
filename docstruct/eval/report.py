@@ -136,6 +136,14 @@ def render_markdown(results: List[ToolResult], meta: Dict) -> str:
         "- Containment relevance can miss paraphrased answers — but it is applied **identically** to "
         "every tool, so the ranking stays fair.",
         "- Dataset is arXiv-heavy (born-digital prose); broader domains (legal/financial/manuals) are future work.",
+        "- **Chunk s is not a fair speed comparison when `--cache-dir` is set.** Only the DocStruct "
+        "adapter uses that cache (detector proposals and populated blocks, keyed by PDF hash), so on a "
+        "warm cache its column reports cache-hit time while every other tool is measured cold. Compare "
+        "wall-clock only from a run with no `--cache-dir`, or against `meta.docstruct_cold_chunk_seconds` "
+        "if present.",
+        "- **MRR/1k words is a tradeoff axis, not a ranking.** It necessarily favours tools that emit "
+        "very small chunks and therefore retrieve very little text, regardless of whether they rank well. "
+        "Read it next to MRR, not instead of it.",
         "- This is a **signal/baseline**, not the Phase-2 public benchmark (50 PDFs, 200 human-checked Q&A).",
         "",
     ]
