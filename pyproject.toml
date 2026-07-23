@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "docstruct"
-version = "0.3.0"
+version = "0.4.0"
 description = "Local, deterministic, structure-aware PDF text extraction and chunking for RAG"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -31,7 +31,9 @@ dependencies = [
 model = ["ultralytics>=8.0"]
 retrieval = ["chromadb>=0.5", "sentence-transformers>=3.0"]
 viz = ["pymupdf>=1.24"]
-eval = ["groq>=0.11"]
+# The eval LLM client is stdlib-only (urllib against any OpenAI-compatible
+# endpoint), so gold generation needs no extra package — only an API key.
+eval = []
 benchmark = ["langchain-text-splitters>=0.3", "pymupdf4llm>=0.0.17", "rank-bm25>=0.2"]
 benchmark-heavy = ["unstructured[pdf]>=0.15", "docling>=2.0"]
 dev = ["pytest>=8.0"]
@@ -40,7 +42,6 @@ all = [
     "chromadb>=0.5",
     "sentence-transformers>=3.0",
     "pymupdf>=1.24",
-    "groq>=0.11",
     "langchain-text-splitters>=0.3",
     "pymupdf4llm>=0.0.17",
     "rank-bm25>=0.2",
