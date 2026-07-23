@@ -17,7 +17,17 @@ Typical use::
 
 from __future__ import annotations
 
+import logging
+from importlib.metadata import PackageNotFoundError, version
+
 from docstruct.document import Document, parse
+from docstruct.errors import (
+    DocStructError,
+    EmptyDocumentError,
+    EncryptedPDFError,
+    InvalidPDFError,
+)
+from docstruct.pipeline import PipelineResult, run_pipeline
 from docstruct.schema import (
     Block,
     BoundingBox,
@@ -28,10 +38,20 @@ from docstruct.schema import (
     Source,
 )
 
-__version__ = "0.3.0"
+# Single source of truth is the installed package metadata (pyproject version).
+# The fallback covers running from a source tree that was never installed.
+try:
+    __version__ = version("docstruct")
+except PackageNotFoundError:  # pragma: no cover - source-tree-only path
+    __version__ = "0.0.0.dev0"
+
+# Library logging hygiene: never emit unless the host app configures handlers.
+logging.getLogger("docstruct").addHandler(logging.NullHandler())
 
 __all__ = [
     "parse",
+    "run_pipeline",
+    "PipelineResult",
     "Document",
     "Block",
     "BoundingBox",
@@ -40,5 +60,9 @@ __all__ = [
     "Proposal",
     "SectionPath",
     "Source",
+    "DocStructError",
+    "InvalidPDFError",
+    "EncryptedPDFError",
+    "EmptyDocumentError",
     "__version__",
 ]
