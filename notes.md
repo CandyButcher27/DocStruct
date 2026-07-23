@@ -703,3 +703,53 @@ every §2–§5 correctness/structural item — those are behind config flags an
 ablated before being kept on, which is blocked on the same corpus grind as Stage 7.
 
 Full suite: 149 passed (143 + 6 new in `test_errors.py`), no regressions.
+
+## Stage 9 — Fable review, batches 2–4 (bugs, gated features, hardening)
+
+Continued from Stage 8. Everything here either changes no default output (config-
+gated, default off) or is a deterministic correctness fix covered by unit tests, so
+none of it needed a benchmark to land — and the ones that *would* move a benchmark
+number are gated off precisely because they haven't cleared `scripts/ablate.py` yet.
+The contract stays intact: default `docstruct.parse` output is byte-identical except
+for the two deterministic bug fixes below, and the golden test pins that.
+
+**Deterministic bug fixes (default on):**
+- `_cluster_graphics` merges to a fixed point — figure regions were order-dependent
+  and non-transitive (two clusters that only grew into overlap never merged).
+- Proposal matching is confidence-ordered — a low-conf model box could steal the
+  geometry box a higher-conf box needed.
+
+**Config-gated, default off — each carries its `[MEASURE]` justification in
+`config.py` and must clear `scripts/ablate.py` against `memory/results.md` before its
+flag is flipped on:**
+- Text quality: `DEDUPE_CHARS`, `DEHYPHENATE`, `NORMALIZE_TEXT` (NFKC + soft hyphen).
+- Figures: `FIGURE_OVERLAP_BY_AREA` (density-independent text-overlap semantics).
+- Reading order: `MULTI_COLUMN` (k-column), `BAND_SPLIT` (band-then-column — the
+  middle path between the legacy splitter and the measured-worse XY-cut).
+- Furniture: `STRIP_PAGE_FURNITURE` (cross-page repeated header/footer removal).
+- Tables: `TABLE_TEXT_STRATEGY_FALLBACK` (borderless), `TABLE_SERIALIZATION`
+  (keyvalue), `TABLE_SPLIT_ROWS`, `TABLE_SETTINGS`.
+- Hierarchy: `HEADER_RANK_BY_WEIGHT` (bold as a depth signal, `is_bold` on Block).
+- Containment: `LABEL_AWARE_CONTAINMENT` (the safe text-in-table subset only).
+- `KEEP_REFERENCES` (emit reference chunks, excluded from indexing by default).
+
+**Landed on by default (no scored-content change):** appendix/Roman section
+numbering; the `FIGURE_CLUSTER_MAX_PRIMITIVES` cap; open-the-PDF-once perf.
+
+**Hardening:** golden determinism tripwire (chunk hash of doc11), malformed-PDF
+fuzz corpus (zero-byte / corrupt / truncated → typed error or empty Document, never
+a crash or hang), GitHub Actions CI, seeded CHANGELOG.
+
+**Deferred deliberately, with reasons:**
+- §1.8 `ParseConfig` — a frozen per-parse config threaded through every module. The
+  review itself calls it "its own branch, purely mechanical"; it is a sweep across
+  every `config.*` read and does not belong bundled with feature work. Not started.
+- §3.4 multi-page table merge, §4.3 `SectionPath` depth > 3 — build when the corpus
+  needs them; designed-around, not built.
+- §5.3 confidence calibration, §6.1 corpus broadening, §6.2 structure-targeted gold
+  — data tasks blocked on annotation tooling and LLM quota (same blocker as Stage 7),
+  not code.
+- §8 PyPI README / mkdocs site, `on_page` progress callback — doc/UX work, not
+  behaviour.
+
+Full suite: 184 passed.
