@@ -97,6 +97,10 @@ HEADER_BOLD_BONUS = 0.05        # confidence bump for bold headers
 GEOMETRY_CONFIDENCE_CEIL = 0.95
 FIGURE_MIN_AREA_RATIO = 0.03    # graphic cluster must cover >= this of page area
 FIGURE_CLUSTER_GAP = 10.0       # merge graphic primitives within this gap
+# Fixed-point graphic clustering is O(n^2) in primitives; a pathological page (1M
+# vector primitives) would hang. Above this count, skip figure clustering on the page
+# with a warning rather than stall. Well above any real document's per-page count.
+FIGURE_CLUSTER_MAX_PRIMITIVES = 5000
 FIGURE_MAX_TEXT_OVERLAP = 0.10  # graphic cluster must be mostly text-free
 # Measure a figure's text-freeness by the fraction of the *figure's area* covered by
 # overlapping text lines, instead of (overlapping line count / all lines on the

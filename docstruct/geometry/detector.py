@@ -8,6 +8,7 @@ figure detection. Coordinates are top-left (pdfplumber ``top``/``bottom``).
 
 from __future__ import annotations
 
+import logging
 import re
 import statistics
 from dataclasses import dataclass
@@ -19,6 +20,7 @@ from docstruct.schema import BoundingBox, Proposal
 from docstruct.utils.geometry import bbox_intersection_area, bbox_overlap
 
 _CAPTION_RE = re.compile(config.CAPTION_PREFIX_PATTERN, re.IGNORECASE)
+_log = logging.getLogger(__name__)
 
 
 @dataclass
@@ -250,6 +252,12 @@ def detect_page(page, page_num: int) -> List[Proposal]:
         (g["x0"], g["top"], g["x1"], g["bottom"])
         for g in (page.images + page.curves + page.rects + page.lines)
     ]
+    if len(graphic_boxes) > config.FIGURE_CLUSTER_MAX_PRIMITIVES:
+        _log.warning(
+            "page %d: %d graphic primitives exceeds cap %d; skipping figure clustering",
+            page_num, len(graphic_boxes), config.FIGURE_CLUSTER_MAX_PRIMITIVES,
+        )
+        graphic_boxes = []
     for x0, top, x1, bottom in _cluster_graphics(graphic_boxes, config.FIGURE_CLUSTER_GAP):
         bbox = _to_bbox(x0, top, x1, bottom, page)
         if bbox.area < page_area * config.FIGURE_MIN_AREA_RATIO:
