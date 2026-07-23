@@ -58,36 +58,48 @@ other change combined.
 
 ## Benchmark
 
-48 born-digital PDFs, 298 LLM-generated Q&A pairs. The embedder and both
+92 born-digital PDFs, 558 LLM-generated Q&A pairs. The embedder and both
 retrievers are **held constant across every tool** — only the chunker varies — so
 the table measures chunking quality and nothing else.
 
-| Rank | Tool | MRR | NDCG@5 | Recall@5 | Hit@1 | Avg words/chunk | Context words |
-|---|---|---|---|---|---|---|---|
-| 1 | **docstruct** | **0.7457** | **0.7708** | **0.8859** | **0.6409** | 355.2 | 2346 |
-| 2 | pymupdf4llm | 0.6941 | 0.7160 | 0.8356 | 0.6107 | 455.2 | 2576 |
-| 3 | unstructured | 0.6508 | 0.6766 | 0.7886 | 0.5638 | 85.2 | 549 |
-| 4 | langchain | 0.6493 | 0.6884 | 0.8221 | 0.5336 | 102.1 | 524 |
-| 5 | docling | 0.5652 | 0.5814 | 0.6577 | 0.4966 | 114.2 | 674 |
+| Rank | Tool | MRR | 95% CI | NDCG@5 | Recall@5 | Hit@1 | Avg words/chunk | Context words |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **docstruct** | **0.8203** | [0.794, 0.846] | **0.832** | **0.9427** | **0.7401** | 339.0 | 2404 |
+| 2 | docstruct (geometry-only) | 0.7760 | [0.747, 0.804] | 0.7988 | 0.9283 | 0.6756 | 335.0 | 2570 |
+| 3 | pymupdf4llm | 0.7646 | [0.736, 0.793] | 0.7897 | 0.9194 | 0.6577 | 443.1 | 2662 |
+| 4 | langchain | 0.7009 | [0.669, 0.734] | 0.7284 | 0.8477 | 0.5986 | 106.3 | 505 |
+| 5 | unstructured | 0.6948 | [0.662, 0.727] | 0.7271 | 0.8561 | 0.5920 | 84.5 | 549 |
 
-**Context words** is the text actually handed to the generator per query, summed
-over the retrieved top-5. It is in the table on purpose: a containment-based
-relevance metric always rewards emitting bigger chunks, so "make chunks bigger" is
-an unbounded way to buy MRR — including for us. Reporting the price makes that
-visible in the same table it would improve. DocStruct leads on every quality
-metric *and* returns less text per query than the tool it displaced.
+DocStruct's lead over every external tool is **statistically significant** on MRR,
+NDCG and Hit@1 (paired bootstrap, p from 0.0008 to 0.0001). The CIs and a full
+paired-difference table are generated into every report — a point estimate over a
+few hundred questions cannot by itself say whether a gap is real, and comparing
+overlapping CIs is the standard way to get that wrong.
 
-DocStruct does **not** lead on MRR per 1000 context words; the small-chunk tools
-do, because they retrieve very little. That column is a tradeoff axis, not a
-ranking.
+**Does the vision model earn its place?** The `geometry-only` row is the same
+chunker with the vision model switched off. It scores 0.7760 against the hybrid's
+0.8203 — **+0.0443 MRR, p = 0.0026, significant**. (An earlier run on flawed gold
+put this gap at +0.009 and not significant; fixing a two-column extraction bug in
+the *reference* text — see `notes.md` — is what surfaced the real effect. The
+ablation existed precisely to be able to ask this question, and to catch it being
+answered wrong.)
 
-Reports carry **95% bootstrap confidence intervals** per metric and a **paired
-bootstrap test** of each baseline against DocStruct, because a point estimate over
-a few hundred questions cannot by itself say whether a gap is real.
+**Context words** is the text handed to the generator per query, summed over the
+retrieved top-5. It is in the table on purpose: a containment relevance metric
+always rewards bigger chunks, so "make chunks bigger" is an unbounded way to buy
+MRR — including for us. DocStruct leads every quality metric *and* returns less
+context per query than pymupdf4llm.
 
-Full run, per-document breakdowns and the config snapshot that produced them:
-[`reports/v4_report.md`](reports/v4_report.md). How the numbers got there, including
-what was tried and lost: [`notes.md`](notes.md).
+What DocStruct does **not** win: raw extraction coverage. langchain preserves 100%
+of the document's words (it splits raw text and drops nothing); DocStruct keeps
+~82% and has the highest duplication (2.06×, from inline headers and separately
+emitted table chunks). DocStruct wins *retrieval*, not raw preservation — the
+report's extraction-fidelity table states this without spin.
+
+Full run with per-document breakdowns, the paired-significance table, extraction
+fidelity, and the config snapshot that produced it:
+[`reports/v6_report.md`](reports/v6_report.md). How the numbers got there, and what
+was tried and abandoned: [`notes.md`](notes.md).
 
 ## Install
 
@@ -218,8 +230,11 @@ Two independent layers in `docstruct.eval`:
 - **Detection** — per-class precision/recall/F1 and confidence-ranked **mAP@0.5**
   against ground-truth boxes. Build ground truth with
   `docstruct export-annotations` + `tools/annotate.html`.
-- **Retrieval** — **MRR / NDCG@k / Recall@k / Hit@1**, plus context cost, over
-  LLM-generated Q&A, against four other chunkers.
+- **Retrieval** — **MRR / NDCG@k / Recall@k / Hit@1**, plus context cost and
+  bootstrap significance, over LLM-generated Q&A, against the other chunkers.
+- **Extraction fidelity** — coverage and duplication against the raw PDF text.
+  No gold, no LLM; the document is its own reference. This is the one cross-tool
+  signal that measures extraction rather than retrieval.
 
 The gold is `(question, verbatim answer_span)` generated from each PDF's **raw
 text** — never from DocStruct chunks, which would inflate DocStruct's own score.
@@ -233,8 +248,8 @@ the identical rule.
 python scripts/fetch_dataset_v2.py                       # fetch the corpus
 
 python -m docstruct.cli gen-qa data/raw-pdfs/*.pdf \
-  --out data/qa/benchmark_qa.json --per-doc 5 \
-  --weights weights/yolov8m-doclaynet.pt --cache-dir .bench_cache
+  --out data/qa/benchmark_qa.json --per-doc 10 \
+  --provider ollama --model gpt-oss:120b
 
 python -m docstruct.cli benchmark \
   --pdfs-dir data/raw-pdfs --qa data/qa/benchmark_qa.json \
@@ -244,7 +259,14 @@ python -m docstruct.cli benchmark \
 
 Both commands resume where they left off. `gen-qa` needs an API key for an
 OpenAI-compatible endpoint (`OLLAMA_API_KEY` or `GROQ_API_KEY` in `.env`) — the
-**only** place this project talks to an LLM.
+**only** place this project talks to an LLM. The default tool set is
+docstruct + pymupdf4llm + langchain + unstructured; `docling` is available via
+`--tools` but excluded by default (10× slower, no change to the ranking). Add
+`docstruct_geo` / `docstruct_model` to `--tools` for the single-detector
+ablation.
+
+Extraction fidelity on its own, chunking only:
+`python scripts/coverage_report.py`.
 
 To measure a single chunking change without re-running the unaffected baselines:
 
@@ -263,9 +285,10 @@ python scripts/ablate.py --name min300 --set MIN_CHUNK_TOKENS=300
 - Geometry-only hierarchy is font-driven, so it can conflate title / author /
   section headers; the model resolves these semantically.
 - Rotated and margin text is filtered out of the reading flow.
-- The benchmark corpus is **arXiv-heavy** born-digital prose. Broader domains
-  (legal, financial, medical, manuals) are actively being added; until they land,
-  read every number above as measured on two-column academic papers.
+- The benchmark corpus is **arXiv-heavy** born-digital prose (92 papers). A
+  seven-domain fetcher (`scripts/fetch_dataset_v2.py`) exists to broaden it —
+  legal, financial, medical, manuals — but those documents are not yet in the
+  scored set; read every number above as measured on two-column academic papers.
 - The gold Q&A is LLM-generated. It measures the tool-vs-tool delta well but is
   weaker than human-judged relevance as an absolute claim.
 

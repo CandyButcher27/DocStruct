@@ -588,3 +588,70 @@ are validated verbatim against raw document text, both are tool-agnostic, and
 every tool answers every question, so the tool-vs-tool comparison is unaffected.
 Span-length distributions match closely (mean 12.8 vs 12.7 words), which is the
 property that would actually distort scoring if it drifted.
+
+### 7.8 The finale: 92 docs, 558 questions, and a null result that wasn't
+
+The corpus finally reached 92 documents / 558 questions once the column-aware
+reference extraction landed and gold generation moved wholesale to `gpt-oss:120b`
+on Ollama (the better generator, and the one that wrote the original 298).
+
+Full run, five tools (`reports/v6_report.md`), hybrid retriever, top-5:
+
+| Tool | MRR | 95% CI | Hit@1 | Coverage |
+|---|---|---|---|---|
+| **docstruct** | **0.8203** | [0.794, 0.846] | **0.7401** | 0.817 |
+| docstruct_geo | 0.7760 | [0.747, 0.804] | 0.6756 | 0.822 |
+| pymupdf4llm | 0.7646 | [0.736, 0.793] | 0.6577 | 0.768 |
+| langchain | 0.7009 | [0.669, 0.734] | 0.5986 | 1.000 |
+| unstructured | 0.6948 | [0.662, 0.727] | 0.5920 | 0.833 |
+
+DocStruct's lead over every external tool is significant on MRR/NDCG/Hit@1
+(p 0.0008 → 0.0001). That part is the expected result at more than double the
+question count of v4.
+
+**The part that matters is a correction of my own earlier claim.** In Stage 7.5 I
+added the single-detector ablation and, on the v5 gold, it said the vision model
+was worth +0.0092 MRR at p = 0.64 — not significant. I wrote that up as a genuine
+finding: "the expensive half of this architecture doesn't pay for itself." It was
+wrong, and it was wrong for a reason worth recording.
+
+The v5 gold was built on `page.extract_text()`, which sorts words by (top, x) and
+so welds the left and right column of every two-column line into one string. Gold
+drawn from those lines is unquotable, so it was silently rejected — and the
+rejected questions were disproportionately the ones about dense two-column body
+text, which is exactly where a vision model beats a geometry heuristic. The broken
+measurement was suppressing the very signal the ablation was meant to detect.
+
+With column-aware reference text (§7.7's fix, extended here to a proper gutter
+detector) the same ablation on v6 gives **+0.0443 MRR, 95% CI [0.016, 0.073],
+p = 0.0026, and Hit@1 +0.0645, p = 0.003.** The vision model pays for itself, and
+significantly. Five times the effect the broken run showed.
+
+Two lessons, both already baked into the tooling rather than just noted:
+
+1. The ablation path and the paired test did their job twice over — first by
+   letting the question be asked at all, then by making the reversal legible
+   instead of a silent number change. A leaderboard of point estimates would have
+   shown +0.009 then +0.044 and given no reason to trust either.
+2. A retrieval benchmark is only as good as its gold, and gold generated from
+   scrambled text fails *toward* a specific conclusion, not at random. The
+   coverage metric (§ "extraction fidelity") and the column-aware reference both
+   exist now so this class of error is visible rather than load-bearing.
+
+Also dropped docling from the default tool set. It runs 10× slower than anything
+else, OOM-crashes on some pages, and is invariably last; keeping it in the default
+loop cost most of every run's wall time to reconfirm a fixed result. Still there
+under `--tools docling`.
+
+### What I am not claiming, v6 edition
+
+- **DocStruct does not win extraction coverage.** langchain keeps 100% of the
+  document's words by splitting raw text and dropping nothing; DocStruct keeps
+  81.7% and duplicates the most (2.06×, inline headers plus separate table
+  chunks). It wins retrieval, which is a different and — for RAG — more useful
+  thing, but the coverage table says so plainly.
+- **The corpus is still arXiv-heavy.** 92 born-digital two-column papers. The
+  seven-domain fetcher exists; those documents are not yet scored.
+- **The gold generator changed between v4 and v6** (gpt-oss:120b throughout now,
+  vs a v5 interim that mixed two models). v4/v5 numbers are not comparable to v6
+  and are marked superseded in `memory/results.md`.
