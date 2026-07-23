@@ -21,6 +21,35 @@ Only two documents are annotated so far; this layer is under-invested relative t
 Layer 2 and is the reason `# unvalidated` constants in `config.py` stay
 unvalidated.
 
+## Layer 1b — Extraction fidelity (`coverage.py`) — no gold needed
+
+The detection layer above needs hand-annotated boxes and has two documents.
+Coverage needs nothing: the PDF is its own ground truth, so it runs on the whole
+corpus and on any corpus.
+
+- **coverage** — fraction of the document's word *instances* present in some
+  chunk. Silent loss shows up here and nowhere else. Both extraction bugs this
+  project has found (partly-ruled tables dropping unruled rows; headings that
+  lived in no chunk) would have moved this number long before a retrieval metric
+  noticed.
+- **duplication** — chunk words over document words. Above 1.0 means content is
+  emitted more than once, inflating the index and letting two chunks split the
+  evidence for one query.
+
+Two things that would be easy to get wrong:
+
+- Counted as a **multiset**. A set-based version scores a tool that drops every
+  repeat of a term as perfect.
+- The reference is raw **pdfplumber defaults**, never DocStruct's tuned extraction
+  settings. Scoring against our own extraction hands DocStruct the metric.
+
+Neither number ranks tools on its own — a tool reaches coverage 1.0 by emitting
+the whole document as one chunk, which is the exact failure the retrieval
+benchmark exists to catch. Read it beside the leaderboard.
+
+Standalone runner (chunking only, no embedder or retriever):
+`python scripts/coverage_report.py --limit-docs 20`.
+
 ## Layer 2 — Retrieval quality (`benchmark.py`) — the one that matters
 
 This is the headline number and the thing every chunking change is measured on.
