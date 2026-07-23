@@ -150,6 +150,12 @@ QA_MAX_WORDS_PER_REQUEST = 4000
 # generators drift toward exactly those spans regardless of the prompt, so the floor
 # is enforced at validation rather than trusted to instruction-following.
 QA_MIN_SPAN_WORDS = 6
+# Seconds to wait before each gold-generation request. One segment of a paper is
+# most of a free-tier minute's token allowance, so consecutive requests collide by
+# construction; pacing up front is cheaper than a rejected request plus the
+# provider's Retry-After, and it stops long runs from exhausting the retry ceiling
+# in the middle of a document. Set to 0 for a provider with headroom.
+QA_REQUEST_PACING_SECONDS = 20.0
 BENCHMARK_TOP_K = 5
 RELEVANCE_MIN_OVERLAP = 0.6     # token-overlap fallback when answer span isn't an exact substring
 # Hybrid retrieval (BM25 lexical + dense vector, fused by Reciprocal Rank Fusion)

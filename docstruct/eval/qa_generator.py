@@ -8,8 +8,9 @@ The LLM sees the whole document and writes N (question, verbatim_answer_span)
 pairs. Each span is validated as a substring of the raw document text, so any
 tool that preserves that content can score a hit.
 
-If a document exceeds the token budget, it is split into halves and N/2 pairs
-are generated from each half.
+A document larger than one request's budget is split into consecutive segments
+and the question budget is spread across them, so questions come from the whole
+document rather than only the part that fit.
 """
 
 from __future__ import annotations
@@ -17,6 +18,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import time
 from dataclasses import asdict, dataclass
 from typing import List, Optional
 
@@ -73,6 +75,13 @@ def _generate_from_text(text: str, doc_id: str, chunk_id: str, client, n: int) -
                 {"role": "user", "content": f'Document:\n"""\n{text}\n"""'},
             ],
             temperature=0.2,
+            # Providers charge the *reserved* completion budget against the
+            # per-minute token limit, not the tokens actually generated. Left
+            # unset that reservation is the model's full completion length, which
+            # alone can exceed the limit and make a request that can never
+            # succeed however long it waits. A few hundred words of JSON is all
+            # this call ever needs.
+            max_tokens=1500,
             # Bulk gold generation runs straight into per-minute token limits; each
             # retry sleeps for the provider's Retry-After, so the budget is measured
             # in rate-limit windows to wait out, not in transient network blips.
@@ -109,6 +118,19 @@ def _generate_from_text(text: str, doc_id: str, chunk_id: str, client, n: int) -
     return items
 
 
+def _pace() -> None:
+    """Wait before a generation request rather than bursting into a rate limit.
+
+    One segment of a paper is most of a free-tier minute's token allowance, so
+    consecutive requests collide by construction. Waiting up front is cheaper than
+    a rejected request plus the provider's Retry-After, and it stops a long run
+    from exhausting the retry ceiling partway through a document — which silently
+    costs that document its questions.
+    """
+    if config.QA_REQUEST_PACING_SECONDS > 0:
+        time.sleep(config.QA_REQUEST_PACING_SECONDS)
+
+
 def _split_evenly(total: int, parts: int) -> List[int]:
     """Distribute ``total`` questions over ``parts`` segments, remainder first."""
     base, extra = divmod(total, parts)
@@ -140,6 +162,7 @@ def generate_for_pdf(
     budget = max_words or config.QA_MAX_WORDS_PER_REQUEST
     words = full_text.split()
     if len(words) <= budget:
+        _pace()
         return _generate_from_text(full_text, doc_id, "fulldoc", client, n)
 
     parts = -(-len(words) // budget)  # ceil
@@ -149,6 +172,7 @@ def generate_for_pdf(
         if want <= 0:
             continue
         segment = " ".join(words[index * size : (index + 1) * size])
+        _pace()
         items += _generate_from_text(segment, doc_id, f"part_{index}", client, want)
     return items
 
