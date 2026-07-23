@@ -259,3 +259,43 @@ def test_numbering_signal_can_be_switched_off(monkeypatch):
     ]
     levels = assign_header_levels(blocks)
     assert levels["a"] == levels["b"] == 1
+
+
+def test_table_split_rows_emits_multiple_chunks_with_header(monkeypatch):
+    from docstruct import config
+    from docstruct.extraction.table_extractor import serialize_table
+    monkeypatch.setattr(config, "TABLE_SPLIT_ROWS", True)
+    monkeypatch.setattr(config, "MAX_CHUNK_TOKENS", 6)
+    grid = [["Quarter", "Revenue"]] + [[f"Q{i}", f"{i}.0"] for i in range(1, 9)]
+    tbl = Block(
+        bbox=make_bbox(0, 0, 100, 200),
+        label="table",
+        confidence=ConfidenceBreakdown(0.0, 0.0, 0.8),
+        source=Source.UNILATERAL_GEOMETRY,
+        page_num=0,
+        block_id="tb",
+        reading_order=0,
+        text=serialize_table(grid),
+        table_data=grid,
+    )
+    chunks = [c for c in build_chunks([tbl]) if c.chunk_type == "table"]
+    assert len(chunks) > 1
+    assert all(c.content.startswith("Quarter") for c in chunks)
+
+
+def test_table_not_split_when_disabled():
+    from docstruct.extraction.table_extractor import serialize_table
+    grid = [["Quarter", "Revenue"]] + [[f"Q{i}", f"{i}.0"] for i in range(1, 30)]
+    tbl = Block(
+        bbox=make_bbox(0, 0, 100, 200),
+        label="table",
+        confidence=ConfidenceBreakdown(0.0, 0.0, 0.8),
+        source=Source.UNILATERAL_GEOMETRY,
+        page_num=0,
+        block_id="tb",
+        reading_order=0,
+        text=serialize_table(grid),
+        table_data=grid,
+    )
+    chunks = [c for c in build_chunks([tbl]) if c.chunk_type == "table"]
+    assert len(chunks) == 1

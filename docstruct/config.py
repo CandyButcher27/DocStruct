@@ -101,6 +101,23 @@ TABLE_MIN_ROWS = 2
 # ruled fragment. If the rendered grid holds less than this fraction of the words in
 # the region, fall back to raw region text so no rows are silently dropped.
 TABLE_GRID_MIN_COVERAGE = 0.85
+# When ruled-line extraction finds no grid, retry with pdfplumber's text strategy so
+# borderless tables (the model detector finds them; ruled extraction can't structure
+# them) get a grid. The TABLE_GRID_MIN_COVERAGE guard still protects against a bad
+# grid replacing good raw text. [MEASURE + eyeball financial-domain PDFs]
+TABLE_TEXT_STRATEGY_FALLBACK = False
+# Extra settings forwarded to pdfplumber find_tables()/extract_tables() (snap/join
+# tolerance, etc.). Empty = pdfplumber defaults. A home for tuning the corpus reaches.
+TABLE_SETTINGS: dict = {}
+# Table chunk serialization: "plaintext" (space-joined rows, verbatim-substring
+# friendly, benchmark default) or "keyvalue" (header: cell pairs per row, answerable
+# for "what was X in Q3" lookups). [MEASURE — keyvalue likely needs table-targeted
+# gold; the substring benchmark penalizes breaking cell adjacency]
+TABLE_SERIALIZATION = "plaintext"
+# Split an oversized table into multiple row-segment chunks (repeating the header
+# row) instead of emitting one chunk many times MAX_CHUNK_TOKENS. [MEASURE — ~neutral
+# on arXiv, protective on financial docs]
+TABLE_SPLIT_ROWS = False
 # Universal caption markers in prose documents (not a layout assumption).
 CAPTION_PREFIX_PATTERN = r"^\s*(figure|fig\.?|table|tab\.?|scheme|algorithm)\s*\.?\s*\d+"
 

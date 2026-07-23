@@ -62,6 +62,33 @@ def _token_count(blocks: List[Block]) -> int:
     return sum(len((b.text or "").split()) for b in blocks)
 
 
+def _table_segments(block: Block) -> List[str]:
+    """Rendered text for a table block: one string, or several when TABLE_SPLIT_ROWS
+    splits an oversized table by rows (repeating the header row per segment)."""
+    text = block.text or ""
+    grid = block.table_data
+    if not (config.TABLE_SPLIT_ROWS and grid and len(grid) > 2):
+        return [text] if text.strip() else []
+    if len(text.split()) <= config.MAX_CHUNK_TOKENS:
+        return [text]
+
+    from docstruct.extraction.table_extractor import serialize_table
+
+    header, body = grid[0], grid[1:]
+    segments: List[str] = []
+    current: List[List[str]] = [header]
+    for row in body:
+        trial = current + [row]
+        if len(current) > 1 and len(serialize_table(trial).split()) > config.MAX_CHUNK_TOKENS:
+            segments.append(serialize_table(current))
+            current = [header, row]
+        else:
+            current = trial
+    if len(current) > 1:
+        segments.append(serialize_table(current))
+    return segments or ([text] if text.strip() else [])
+
+
 def _snapshot(section: SectionPath) -> SectionPath:
     return SectionPath(section.h1, section.h2, section.h3)
 
@@ -177,7 +204,8 @@ def build_chunks(
             if config.BREAK_TEXT_ON_TABLE:
                 boundary_flush()
             if not _in_references(section):
-                emit("table", block.text or "", [block])
+                for segment in _table_segments(block):
+                    emit("table", segment, [block])
 
         elif block.label == "caption":
             if config.BREAK_TEXT_ON_CAPTION:

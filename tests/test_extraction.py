@@ -1,8 +1,32 @@
 import pytest
 
 from docstruct import config
-from docstruct.extraction.table_extractor import _grid_covers_region, table_to_plaintext
+from docstruct.extraction.table_extractor import (
+    _grid_covers_region,
+    serialize_table,
+    table_to_keyvalue,
+    table_to_plaintext,
+)
 from docstruct.extraction.text_extractor import _clean_text
+
+
+def test_table_to_keyvalue_pairs_headers_with_cells():
+    grid = [["Quarter", "Revenue"], ["Q3", "4.5"], ["Q4", "5.1"]]
+    kv = table_to_keyvalue(grid).splitlines()
+    assert kv == ["Quarter: Q3; Revenue: 4.5", "Quarter: Q4; Revenue: 5.1"]
+
+
+def test_table_to_keyvalue_falls_back_when_no_header():
+    grid = [["1", "2"], ["3", "4"]]  # numeric row 0 -> not a header
+    assert table_to_keyvalue(grid) == table_to_plaintext(grid)
+
+
+def test_serialize_table_honors_config(monkeypatch):
+    from docstruct import config
+    grid = [["Quarter", "Revenue"], ["Q3", "4.5"]]
+    assert serialize_table(grid) == table_to_plaintext(grid)
+    monkeypatch.setattr(config, "TABLE_SERIALIZATION", "keyvalue")
+    assert serialize_table(grid) == table_to_keyvalue(grid)
 
 
 @pytest.fixture

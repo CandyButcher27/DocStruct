@@ -201,7 +201,7 @@ def detect_page(page, page_num: int) -> List[Proposal]:
 
     # Tables first; their region masks out text and graphics.
     table_boxes: List[BoundingBox] = []
-    for table in page.find_tables():
+    for table in page.find_tables(config.TABLE_SETTINGS or None):
         if len(table.rows) < config.TABLE_MIN_ROWS:
             continue
         x0, top, x1, bottom = table.bbox
