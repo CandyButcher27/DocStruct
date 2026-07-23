@@ -139,6 +139,17 @@ LLM_TIMEOUT = 120.0
 
 # --- Benchmark / eval ---
 QA_PER_DOC = 5                  # questions generated per document
+# Words of source text per gold-generation request. This is a *request-body* limit,
+# not a context-window one: hosted providers reject oversized bodies (GROQ returns
+# HTTP 413) far below the model's advertised 131k context. Longer documents are
+# split into consecutive segments and the question budget spread across them.
+QA_MAX_WORDS_PER_REQUEST = 4000
+# Shortest gold answer span to accept, in words. A one- or two-word span ("DanceOPD")
+# is contained by almost any chunk that mentions the topic, so it scores every tool
+# alike and destroys the benchmark's ability to discriminate between them. Weaker
+# generators drift toward exactly those spans regardless of the prompt, so the floor
+# is enforced at validation rather than trusted to instruction-following.
+QA_MIN_SPAN_WORDS = 6
 BENCHMARK_TOP_K = 5
 RELEVANCE_MIN_OVERLAP = 0.6     # token-overlap fallback when answer span isn't an exact substring
 # Hybrid retrieval (BM25 lexical + dense vector, fused by Reciprocal Rank Fusion)

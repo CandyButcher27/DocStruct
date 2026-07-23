@@ -100,8 +100,11 @@ def _cmd_gen_qa(args) -> int:
     from docstruct.llm.client import LLMClient
     from docstruct.eval.qa_generator import generate_for_pdf, save_qa, load_qa
 
-    client = LLMClient(model=args.model) if args.model else LLMClient()
-    print(f"generating Q&A with model '{client.model}' ...", flush=True)
+    kwargs = {"provider": args.provider}
+    if args.model:
+        kwargs["model"] = args.model
+    client = LLMClient(**kwargs)
+    print(f"generating Q&A with '{args.provider}' model '{client.model}' ...", flush=True)
 
     # Resume: keep questions already saved, skip documents already done.
     all_items = load_qa(args.out) if os.path.exists(args.out) else []
@@ -209,6 +212,8 @@ def build_parser() -> argparse.ArgumentParser:
     g_p.add_argument("--weights", default=None, help="weights for hybrid chunking")
     g_p.add_argument("--per-doc", type=int, default=5, help="questions per document")
     g_p.add_argument("--model", default=None, help="LLM model id (default gpt-oss:120b)")
+    g_p.add_argument("--provider", default="ollama", choices=("ollama", "groq"),
+                     help="OpenAI-compatible provider to generate gold with")
     g_p.add_argument("--cache-dir", default=None, help="cache detector proposals (reused by benchmark)")
     g_p.set_defaults(func=_cmd_gen_qa)
 

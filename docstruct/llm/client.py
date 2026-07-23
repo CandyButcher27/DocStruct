@@ -22,10 +22,36 @@ from typing import List, Optional
 from docstruct import config
 from docstruct.utils.env import load_dotenv
 
+_USER_AGENT = "docstruct-eval/0.4 (+https://github.com/CandyButcher27/DocStruct)"
+
 _PROVIDERS = {
     "ollama": {"base_url": "https://ollama.com", "key_env": "OLLAMA_API_KEY", "base_env": "OLLAMA_BASE_URL"},
     "groq": {"base_url": "https://api.groq.com/openai", "key_env": "GROQ_API_KEY", "base_env": "GROQ_BASE_URL"},
 }
+
+
+_MAX_BACKOFF = 300.0
+
+
+def _backoff_seconds(err: Exception, attempt: int) -> float:
+    """How long to wait before retrying.
+
+    Token-per-minute limits are the normal failure mode when generating gold in
+    bulk, and providers signal them with a ``Retry-After`` in seconds. GROQ
+    reports them as HTTP 413 ("Request too large ... on tokens per minute"), not
+    429, so keying off the status code alone is not enough — honour the header
+    whenever one is present. Fixed 1.5s steps never clear a 60-second window and
+    just burn the retry budget.
+    """
+    retry_after = getattr(err, "headers", None)
+    if retry_after is not None:
+        raw = retry_after.get("retry-after")
+        if raw:
+            try:
+                return min(float(raw) + 1.0, _MAX_BACKOFF)
+            except ValueError:
+                pass
+    return 1.5 * (attempt + 1)
 
 
 def available(provider: str = "ollama") -> bool:
@@ -79,6 +105,10 @@ class LLMClient:
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
+            # GROQ sits behind Cloudflare, which rejects urllib's default
+            # "Python-urllib/3.x" agent with error 1010 before the request ever
+            # reaches the API. Any ordinary agent string gets through.
+            "User-Agent": _USER_AGENT,
         }
 
         last_err: Optional[Exception] = None
@@ -90,7 +120,7 @@ class LLMClient:
                 return body["choices"][0]["message"]["content"]
             except (urllib.error.URLError, urllib.error.HTTPError, KeyError, TimeoutError) as err:
                 last_err = err
-                time.sleep(1.5 * (attempt + 1))
+                time.sleep(_backoff_seconds(err, attempt))
         raise RuntimeError(f"LLM request failed after {retries} attempts: {last_err}")
 
     def chat_json(self, messages: List[dict], **kwargs) -> dict:
