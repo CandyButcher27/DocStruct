@@ -1,4 +1,30 @@
+import pytest
+
+from docstruct import config
 from docstruct.extraction.table_extractor import _grid_covers_region, table_to_plaintext
+from docstruct.extraction.text_extractor import _clean_text
+
+
+@pytest.fixture
+def _restore_config():
+    saved = (config.DEHYPHENATE, config.NORMALIZE_TEXT)
+    yield
+    config.DEHYPHENATE, config.NORMALIZE_TEXT = saved
+
+
+def test_clean_text_is_noop_by_default():
+    assert _clean_text("trans-\nfer ﬁle") == "trans-\nfer ﬁle"
+
+
+def test_clean_text_dehyphenates_when_enabled(_restore_config):
+    config.DEHYPHENATE = True
+    assert _clean_text("trans-\nfer") == "transfer"
+
+
+def test_clean_text_normalizes_ligatures_and_soft_hyphens(_restore_config):
+    config.NORMALIZE_TEXT = True
+    assert _clean_text("ﬁle") == "file"          # fi ligature -> "fi"
+    assert _clean_text("soft" + chr(0x00AD) + "hyphen") == "softhyphen"
 
 
 def test_table_to_plaintext_joins_cells_per_row():

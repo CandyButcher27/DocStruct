@@ -2,17 +2,30 @@
 
 from __future__ import annotations
 
+import re
 import statistics
+import unicodedata
 from typing import Dict, List
 
 from docstruct import config
 from docstruct.errors import open_pdf
 from docstruct.schema import Block, BoundingBox
 
+_HYPHEN_BREAK_RE = re.compile(r"(\w)-\s*\n\s*(\w)")
+
 
 def _text_kwargs() -> dict:
     ratio = config.TEXT_X_TOLERANCE_RATIO
     return {"x_tolerance_ratio": ratio} if ratio else {}
+
+
+def _clean_text(text: str) -> str:
+    """Apply the gated, deterministic text-normalization passes to extracted text."""
+    if config.DEHYPHENATE:
+        text = _HYPHEN_BREAK_RE.sub(r"\1\2", text)
+    if config.NORMALIZE_TEXT:
+        text = unicodedata.normalize("NFKC", text).replace(chr(0x00AD), "")
+    return text
 
 
 def _crop(page, bbox: BoundingBox):
@@ -23,6 +36,8 @@ def _crop(page, bbox: BoundingBox):
     if x1 <= x0 or bottom <= top:
         return None
     region = page.crop((x0, top, x1, bottom))
+    if config.DEDUPE_CHARS:
+        region = region.dedupe_chars(tolerance=1)
     # Exclude rotated/vertical glyphs so margin text doesn't pollute block text.
     return region.filter(lambda obj: obj.get("upright", True))
 
@@ -32,7 +47,7 @@ def extract_text(page, bbox: BoundingBox) -> str:
     region = _crop(page, bbox)
     if region is None:
         return ""
-    return (region.extract_text(**_text_kwargs()) or "").strip()
+    return _clean_text((region.extract_text(**_text_kwargs()) or "").strip())
 
 
 def median_font_size(page, bbox: BoundingBox) -> float | None:
