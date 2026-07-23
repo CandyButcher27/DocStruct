@@ -75,13 +75,7 @@ def _generate_from_text(text: str, doc_id: str, chunk_id: str, client, n: int) -
                 {"role": "user", "content": f'Document:\n"""\n{text}\n"""'},
             ],
             temperature=0.2,
-            # Providers charge the *reserved* completion budget against the
-            # per-minute token limit, not the tokens actually generated. Left
-            # unset that reservation is the model's full completion length, which
-            # alone can exceed the limit and make a request that can never
-            # succeed however long it waits. A few hundred words of JSON is all
-            # this call ever needs.
-            max_tokens=1500,
+            max_tokens=config.QA_MAX_COMPLETION_TOKENS,
             # Bulk gold generation runs straight into per-minute token limits; each
             # retry sleeps for the provider's Retry-After, so the budget is measured
             # in rate-limit windows to wait out, not in transient network blips.
