@@ -1,0 +1,274 @@
+% ---------------------------------------------------------------
+% WARNING — UNVERIFIED FIELDS.
+% Entries whose author list reads {Anonymous}, or "and others", or that were
+% reconstructed from search results rather than the official record, MUST be
+% checked against the arXiv/DOI landing page before submission. Known-shaky:
+% pdfparsingcomparative2024 (author guessed), zhang2025ocrhindersrag (author list
+% incomplete), ouyang2025omnidocbench / li2025readoc (co-authors elided), and every
+% {Anonymous} 2025-2026 chunking entry.
+% ---------------------------------------------------------------
+% DocStruct paper bibliography
+% Grouped: RAG foundations | parsing benchmarks | layout datasets |
+%          chunking evaluation | end-to-end parse x chunk x RAG | retrieval
+% ---------------------------------------------------------------
+
+% ---------- RAG foundations ----------
+
+@inproceedings{lewis2020rag,
+  title     = {Retrieval-Augmented Generation for Knowledge-Intensive {NLP} Tasks},
+  author    = {Lewis, Patrick and Perez, Ethan and Piktus, Aleksandra and Petroni, Fabio and
+               Karpukhin, Vladimir and Goyal, Naman and K{\"u}ttler, Heinrich and Lewis, Mike and
+               Yih, Wen-tau and Rockt{\"a}schel, Tim and Riedel, Sebastian and Kiela, Douwe},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2020}
+}
+
+% ---------- Parser / conversion fidelity ----------
+
+@inproceedings{ouyang2025omnidocbench,
+  title     = {{OmniDocBench}: Benchmarking Diverse {PDF} Document Parsing with Comprehensive Annotations},
+  author    = {Ouyang, Linke and others},
+  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year      = {2025},
+  note      = {arXiv:2412.07626}
+}
+
+@inproceedings{li2025readoc,
+  title     = {{READoc}: A Unified Benchmark for Realistic Document Structured Extraction},
+  author    = {Li, Zichao and others},
+  booktitle = {Findings of the Association for Computational Linguistics (ACL)},
+  year      = {2025},
+  note      = {arXiv:2409.05137}
+}
+
+@article{auer2024docling,
+  title   = {Docling Technical Report},
+  author  = {Auer, Christoph and Lysak, Maksym and Nassar, Ahmed and others},
+  journal = {arXiv preprint arXiv:2408.09869},
+  year    = {2024}
+}
+
+@article{livathinos2025docling,
+  title   = {Docling: An Efficient Open-Source Toolkit for {AI}-driven Document Conversion},
+  author  = {Livathinos, Nikolaos and Auer, Christoph and Lysak, Maksym and others},
+  journal = {arXiv preprint arXiv:2501.17887},
+  year    = {2025}
+}
+
+@article{pdfparsingcomparative2024,
+  title   = {A Comparative Study of {PDF} Parsing Tools Across Diverse Document Categories},
+  author  = {Bast, Hannah and others},
+  journal = {arXiv preprint arXiv:2410.09871},
+  year    = {2024}
+}
+
+@article{meuschke2023benchmark,
+  title   = {A Benchmark of {PDF} Information Extraction Tools using a Multi-Task and
+             Multi-Domain Evaluation Framework for Academic Documents},
+  author  = {Meuschke, Norman and Jagdale, Apurva and Spinde, Timo and Mitrovi{\'c}, Jelena and Gipp, Bela},
+  journal = {arXiv preprint arXiv:2303.09957},
+  year    = {2023}
+}
+
+% ---------- Layout analysis datasets ----------
+
+@inproceedings{pfitzmann2022doclaynet,
+  title     = {{DocLayNet}: A Large Human-Annotated Dataset for Document-Layout Segmentation},
+  author    = {Pfitzmann, Birgit and Auer, Christoph and Dolfi, Michele and Nassar, Ahmed S. and Staar, Peter W. J.},
+  booktitle = {Proceedings of the 28th ACM SIGKDD Conference on Knowledge Discovery and Data Mining (KDD)},
+  year      = {2022},
+  doi       = {10.1145/3534678.3539043}
+}
+
+@inproceedings{zhong2019publaynet,
+  title     = {{PubLayNet}: Largest Dataset Ever for Document Layout Analysis},
+  author    = {Zhong, Xu and Tang, Jianbin and Jimeno-Yepes, Antonio},
+  booktitle = {International Conference on Document Analysis and Recognition (ICDAR)},
+  year      = {2019},
+  note      = {arXiv:1908.07836}
+}
+
+@inproceedings{li2020docbank,
+  title     = {{DocBank}: A Benchmark Dataset for Document Layout Analysis},
+  author    = {Li, Minghao and Xu, Yiheng and Cui, Lei and Huang, Shaohan and Wei, Furu and
+               Li, Zhoujun and Zhou, Ming},
+  booktitle = {International Conference on Computational Linguistics (COLING)},
+  year      = {2020},
+  note      = {arXiv:2006.01038}
+}
+
+@inproceedings{smock2022pubtables,
+  title     = {{PubTables-1M}: Towards Comprehensive Table Extraction from Unstructured Documents},
+  author    = {Smock, Brandon and Pesala, Rohith and Abraham, Robin},
+  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year      = {2022},
+  note      = {arXiv:2110.00061}
+}
+
+@article{chi2019scitsr,
+  title   = {Complicated Table Structure Recognition},
+  author  = {Chi, Zewen and Huang, Heyan and Xu, Heng-Da and Yu, Houjin and Yin, Wanxuan and Mao, Xian-Ling},
+  journal = {arXiv preprint arXiv:1908.04729},
+  year    = {2019}
+}
+
+% ---------- Chunking strategy evaluation ----------
+
+@techreport{smith2024chunking,
+  title       = {Evaluating Chunking Strategies for Retrieval},
+  author      = {Smith, Brandon and Troynikov, Anton},
+  institution = {Chroma},
+  year        = {2024},
+  url         = {https://research.trychroma.com/evaluating-chunking}
+}
+
+@article{jimeno2024financialchunking,
+  title   = {Financial Report Chunking for Effective Retrieval Augmented Generation},
+  author  = {Jimeno-Yepes, Antonio and You, Yao and Milczek, Jan and Laverde, Sebastian and Li, Renyu},
+  journal = {arXiv preprint arXiv:2402.05131},
+  year    = {2024}
+}
+
+@article{qu2024chunkingsurvey,
+  title   = {Is Semantic Chunking Worth the Computational Cost?},
+  author  = {Qu, Renyi and Tu, Ruixuan and Bao, Forrest Sheng},
+  journal = {arXiv preprint arXiv:2410.13070},
+  year    = {2024}
+}
+
+@article{duarte2024lumberchunker,
+  title   = {{LumberChunker}: Long-Form Narrative Document Segmentation},
+  author  = {Duarte, Andr{\'e} V. and Marques, Jo{\~a}o and Grac{\,c}a, Miguel and Freire, Miguel and
+             Li, Lei and Oliveira, Arlindo L.},
+  journal = {arXiv preprint arXiv:2406.17526},
+  year    = {2024}
+}
+
+@article{chunkingqa2026,
+  title   = {A Systematic Analysis of Chunking Strategies for Reliable Question Answering},
+  author  = {{Anonymous}},
+  journal = {arXiv preprint arXiv:2601.14123},
+  year    = {2026}
+}
+
+@article{rethinkingchunksize2025,
+  title   = {Rethinking Chunk Size for Long-Document Retrieval: A Multi-Dataset Analysis},
+  author  = {{Anonymous}},
+  journal = {arXiv preprint arXiv:2505.21700},
+  year    = {2025}
+}
+
+@article{chunkingcost2026,
+  title   = {Chunking Methods on Retrieval-Augmented Generation --
+             Effectiveness Evaluation Against Computational Cost and Limitations},
+  author  = {{Anonymous}},
+  journal = {arXiv preprint arXiv:2606.00881},
+  year    = {2026}
+}
+
+@article{reconstructingcontext2025,
+  title   = {Reconstructing Context: Evaluating Advanced Chunking Strategies for Retrieval-Augmented Generation},
+  author  = {{Anonymous}},
+  journal = {arXiv preprint arXiv:2504.19754},
+  year    = {2025}
+}
+
+@article{topochunker2026,
+  title   = {{TopoChunker}: Topology-Aware Agentic Document Chunking Framework},
+  author  = {{Anonymous}},
+  journal = {arXiv preprint arXiv:2603.18409},
+  year    = {2026}
+}
+
+@article{structuredtabularchunking2026,
+  title   = {Structure-Aware Chunking for Tabular Data in Retrieval-Augmented Generation},
+  author  = {{Anonymous}},
+  journal = {arXiv preprint arXiv:2605.00318},
+  year    = {2026}
+}
+
+@article{multidocfusion2026,
+  title   = {{MultiDocFusion}: Hierarchical and Multimodal Chunking Pipeline for Enhanced {RAG}
+             on Long Industrial Documents},
+  author  = {{Anonymous}},
+  journal = {arXiv preprint arXiv:2604.12352},
+  year    = {2026}
+}
+
+% ---------- End-to-end: parsing x chunking x RAG ----------
+
+@inproceedings{elbachyr2026empirical,
+  title     = {Empirical Evaluation of {PDF} Parsing and Chunking for Financial Question Answering with {RAG}},
+  author    = {El Bachyr, Omar and Song, Yewei and Ezzini, Saad and Klein, Jacques and
+               Bissyand{\'e}, Tegawend{\'e} F. and Zilali, Anas and Ble, Ulrick and Goujon, Anne},
+  booktitle = {Proceedings of the IEEE/ACM 48th International Conference on Software Engineering:
+               Software Engineering in Practice (ICSE-SEIP)},
+  year      = {2026},
+  doi       = {10.1145/3786583.3786911},
+  note      = {arXiv:2604.12047}
+}
+
+@inproceedings{zhang2025ocrhindersrag,
+  title     = {{OCR} Hinders {RAG}: Evaluating the Cascading Impact of {OCR} on Retrieval-Augmented Generation},
+  author    = {Zhang, Junyuan and Others},
+  booktitle = {IEEE/CVF International Conference on Computer Vision (ICCV)},
+  year      = {2025},
+  note      = {arXiv:2412.02592}
+}
+
+@article{islam2023financebench,
+  title   = {{FinanceBench}: A New Benchmark for Financial Question Answering},
+  author  = {Islam, Pranab and Kannappan, Anand and Kiela, Douwe and Qian, Rebecca and
+             Scherrer, Nino and Vidgen, Bertie},
+  journal = {arXiv preprint arXiv:2311.11944},
+  year    = {2023}
+}
+
+@inproceedings{ma2024mmlongbenchdoc,
+  title     = {{MMLongBench-Doc}: Benchmarking Long-context Document Understanding with Visualizations},
+  author    = {Ma, Yubo and others},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS) Datasets and Benchmarks Track},
+  year      = {2024},
+  note      = {arXiv:2407.01523}
+}
+
+% ---------- Retrieval machinery ----------
+
+@inproceedings{cormack2009rrf,
+  title     = {Reciprocal Rank Fusion Outperforms {Condorcet} and Individual Rank Learning Methods},
+  author    = {Cormack, Gordon V. and Clarke, Charles L. A. and Buettcher, Stefan},
+  booktitle = {Proceedings of the 32nd International ACM SIGIR Conference},
+  year      = {2009}
+}
+
+@article{robertson2009bm25,
+  title   = {The Probabilistic Relevance Framework: {BM25} and Beyond},
+  author  = {Robertson, Stephen and Zaragoza, Hugo},
+  journal = {Foundations and Trends in Information Retrieval},
+  volume  = {3},
+  number  = {4},
+  pages   = {333--389},
+  year    = {2009}
+}
+
+@inproceedings{reimers2019sbert,
+  title     = {Sentence-{BERT}: Sentence Embeddings using {Siamese} {BERT}-Networks},
+  author    = {Reimers, Nils and Gurevych, Iryna},
+  booktitle = {Proceedings of EMNLP-IJCNLP},
+  year      = {2019}
+}
+
+@inproceedings{jarvelin2002ndcg,
+  title     = {Cumulated Gain-Based Evaluation of {IR} Techniques},
+  author    = {J{\"a}rvelin, Kalervo and Kek{\"a}l{\"a}inen, Jaana},
+  booktitle = {ACM Transactions on Information Systems},
+  year      = {2002}
+}
+
+@book{efron1993bootstrap,
+  title     = {An Introduction to the Bootstrap},
+  author    = {Efron, Bradley and Tibshirani, Robert J.},
+  publisher = {Chapman \& Hall},
+  year      = {1993}
+}
+</content>
