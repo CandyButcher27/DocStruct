@@ -258,9 +258,11 @@ def build_parser() -> argparse.ArgumentParser:
     b_p.add_argument("--cache-dir", default=None, help="reuse cached detector proposals from gen-qa")
     b_p.add_argument("--rrf-k", type=int, default=60, help="RRF k constant (default 60; lower weights top results more)")
     b_p.add_argument("--rerank-model", default=None, help="cross-encoder model for reranking (e.g. cross-encoder/ms-marco-MiniLM-L-6-v2)")
-    b_p.add_argument("--relevance", default="span", choices=["span", "region"],
+    b_p.add_argument("--relevance", default="span", choices=["span", "region", "page"],
                      help="span: gold marks a verbatim sentence (our generated corpora). "
-                          "region: gold marks the surrounding block (FinanceBench).")
+                          "region: gold marks the surrounding block (FinanceBench). "
+                          "page: gold is written against a normalised parse, so only the "
+                          "evidence page id is trustworthy (OHR-Bench).")
     b_p.add_argument("--reference", default="docstruct",
                      help="tool every other is paired-bootstrap tested against")
     b_p.set_defaults(func=_cmd_benchmark)

@@ -28,7 +28,7 @@ from docstruct import config
 from docstruct.eval.adapters.base import ChunkAdapter, EvalChunk
 from docstruct.eval.coverage import raw_document_text, text_coverage
 from docstruct.eval.qa_generator import QAItem
-from docstruct.eval.relevance import get_relevance
+from docstruct.eval.relevance import PAGE_MODES, get_relevance
 from docstruct.eval.stats import align_per_question, bootstrap_ci, paired_bootstrap
 
 logger = logging.getLogger(__name__)
@@ -83,9 +83,16 @@ class ToolResult:
     vs_reference: Dict[str, dict] = field(default_factory=dict)
 
 
-def _score(retrieved_texts: List[str], answer_span: str, k: int, relevant=None):
+def _score(retrieved_keys: List, gold, k: int, relevant=None):
+    """Rank metrics for one question.
+
+    `retrieved_keys` is whatever the active relevance rule compares against — chunk
+    text for the text modes, the chunk's page list for `page` — and `gold` is the
+    matching side of the comparison. Keeping the pairing in the caller means the
+    metric maths below never has to know which mode is running.
+    """
     relevant = relevant or get_relevance("span")
-    flags = [relevant(t, answer_span) for t in retrieved_texts[:k]]
+    flags = [relevant(key, gold) for key in retrieved_keys[:k]]
     rr = next((1.0 / (i + 1) for i, f in enumerate(flags) if f), 0.0)
     hit1 = 1.0 if flags and flags[0] else 0.0
     recall = 1.0 if any(flags) else 0.0
@@ -94,6 +101,22 @@ def _score(retrieved_texts: List[str], answer_span: str, k: int, relevant=None):
     idcg = sum(1.0 / math.log2(i + 2) for i in range(n_rel)) if n_rel else 0.0
     ndcg = dcg / idcg if idcg > 0 else 0.0
     return rr, hit1, recall, ndcg
+
+
+def _pages_of(chunk: EvalChunk) -> List[int]:
+    """0-based pages a chunk drew from, from whichever key the adapter filled.
+
+    Adapters disagree: some know a single page, some a span of pages, and
+    Unstructured counts from 1 while pdfplumber and DocStruct count from 0. The
+    normalisation belongs here rather than in five adapters, because an off-by-one
+    would silently halve every page-mode score instead of failing.
+    """
+    meta = chunk.metadata or {}
+    pages = meta.get("pages")
+    if pages is None:
+        page = meta.get("page")
+        pages = [] if page is None else [page]
+    return [int(p) for p in pages if p is not None]
 
 
 def _rrf(rank_lists: List[List[int]], k: int = config.RRF_K) -> List[int]:
@@ -162,6 +185,7 @@ def benchmark_tool(
     from docstruct.indexing.vector_store import VectorStore
 
     relevant = get_relevance(relevance)
+    by_page = relevance in PAGE_MODES
     by_doc = _qa_by_doc(qa)
     docs_with_qa = [p for p in pdf_paths if os.path.basename(p) in by_doc]
     n_total = len(docs_with_qa)
@@ -225,6 +249,13 @@ def benchmark_tool(
 
         texts = [c.text for c in chunks]
         index_texts = texts
+        # Pages each chunk drew from, 0-based. A chunk straddling a page break
+        # legitimately answers for both pages, so this is a list, not a scalar.
+        chunk_pages = [_pages_of(c) for c in chunks]
+        if by_page and not any(chunk_pages):
+            raise RuntimeError(
+                f"{adapter.name} emits no page metadata; --relevance page cannot score it"
+            )
         result.n_chunks += len(chunks)
         total_words += sum(len(t.split()) for t in texts)
         print(f"  [{adapter.name}] {doc_id}: {len(chunks)} chunks ({chunk_t:.1f}s), embedding...", flush=True)
@@ -255,8 +286,10 @@ def benchmark_tool(
 
             retrieved = [texts[i] for i in hyb_order]
             total_context_words += sum(len(t.split()) for t in retrieved)
-            vr = _score([texts[i] for i in vec_order[:top_k]], case.answer_span, top_k, relevant)
-            hr = _score(retrieved, case.answer_span, top_k, relevant)
+            gold = case.page_num if by_page else case.answer_span
+            keys = chunk_pages if by_page else texts
+            vr = _score([keys[i] for i in vec_order[:top_k]], gold, top_k, relevant)
+            hr = _score([keys[i] for i in hyb_order], gold, top_k, relevant)
             for i in range(4):
                 v[i] += vr[i]; h[i] += hr[i]
             result.n_questions += 1

@@ -20,9 +20,22 @@ _GOLDEN_PDF = os.path.join(_PDF_DIR, "doc11.pdf")
 # lands; an accidental flip is the whole point of this test.
 _GOLDEN_N_CHUNKS = 4
 _GOLDEN_SHA = "8b4c376ab5e9e2605ab0d26c3307a57bbc63162effb011823d450202d2f25923"
+# The corpus is gitignored and rebuilt by scripts/fetch_dataset_v2.py, which
+# assigns docN.pdf sequentially — so "doc11.pdf" is not a stable identity, it is
+# whatever the eleventh fetch happened to land. A rebuild silently repoints this
+# test at a different paper, and the mismatch then reads as a chunking regression.
+# Pin the input by content: a different PDF skips, only a real output change fails.
+_GOLDEN_PDF_SHA = "e37e2df1c9b0dcb2e9b9d64bbd9d13c6a4bbb2f6c4b1a8e6ab4e5cd7e2a86f1b"
+
+
+def _file_sha(path: str) -> str:
+    with open(path, "rb") as fh:
+        return hashlib.sha256(fh.read()).hexdigest()
+
 
 pytestmark = pytest.mark.skipif(
-    not os.path.exists(_GOLDEN_PDF), reason="corpus PDF not present"
+    not os.path.exists(_GOLDEN_PDF) or _file_sha(_GOLDEN_PDF) != _GOLDEN_PDF_SHA,
+    reason="golden corpus PDF absent or replaced by a corpus rebuild",
 )
 
 

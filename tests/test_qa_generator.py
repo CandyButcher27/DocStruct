@@ -150,3 +150,30 @@ def test_gutter_respects_a_page_with_an_offset_origin():
     assert gutter is not None
     assert page.bbox[0] < gutter < page.bbox[2]
     assert 268 < gutter < 338
+
+
+def test_load_qa_ignores_extra_provenance_fields(tmp_path):
+    # Gold converted from a public corpus carries fields the benchmark does not
+    # consume. They belong in the file (for slicing results by evidence type), so
+    # the loader must not reject them.
+    import json
+
+    from docstruct.eval.qa_generator import load_qa
+
+    path = tmp_path / "gold.json"
+    path.write_text(json.dumps([{
+        "question": "What is the par value per share?",
+        "answer_span": "Common Stock, Par Value $ .01 Per Share",
+        "source_doc": "finance__3M_2023Q2_10Q.pdf",
+        "source_chunk_id": "0ae9e2e6",
+        "page_num": 0,
+        "section_path": "",
+        "answer": "$0.01",
+        "evidence_source": "table",
+        "domain": "finance",
+    }]), encoding="utf-8")
+
+    items = load_qa(str(path))
+    assert len(items) == 1
+    assert items[0].answer_span.startswith("Common Stock")
+    assert not hasattr(items[0], "evidence_source")

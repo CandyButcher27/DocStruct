@@ -20,6 +20,7 @@ import logging
 import os
 import time
 from dataclasses import asdict, dataclass
+from dataclasses import fields as dataclass_fields
 from typing import List, Optional
 
 from docstruct import config
@@ -265,5 +266,14 @@ def save_qa(items: List[QAItem], path: str) -> None:
 
 
 def load_qa(path: str) -> List[QAItem]:
+    """Load gold, ignoring fields `QAItem` does not declare.
+
+    Gold converted from a public corpus carries provenance the benchmark does not
+    consume — OHR-Bench brings `evidence_source` (text/table/equation), `domain`
+    and the reference answer, all of which are worth keeping in the file for
+    slicing results afterwards. Being strict here would force the converter to
+    throw that away at write time, which is the wrong place to lose it.
+    """
+    fields = {f.name for f in dataclass_fields(QAItem)}
     with open(path, "r", encoding="utf-8") as fh:
-        return [QAItem(**d) for d in json.load(fh)]
+        return [QAItem(**{k: v for k, v in d.items() if k in fields}) for d in json.load(fh)]

@@ -125,10 +125,44 @@ def is_relevant_region(chunk_text: str, region: str, min_overlap: float | None =
     return _overlap_coefficient(chunk_text, region) >= min_overlap
 
 
-# Relevance rules the benchmark can be run under. `span` is for gold that marks a
-# verbatim sentence-level answer (our generated corpora); `region` is for gold that
-# marks the surrounding block (FinanceBench and most human-annotated corpora).
-RELEVANCE_MODES = {"span": is_relevant, "region": is_relevant_region}
+def is_relevant_page(chunk_pages, evidence_page: int) -> bool:
+    """True if the chunk draws on the page the evidence lives on. Text-free.
+
+    Required for gold whose spans are written against a *normalized parse* rather
+    than the PDF's own text layer. OHR-Bench is the case that forced this: its
+    `evidence_context` comes from human-corrected `gt_text`, which is reflowed and
+    dehyphenated, so only **1.5%** of its spans appear verbatim in raw pdfplumber
+    output. Every text-comparison rule then scores near-noise — the token-overlap
+    fallback fires around its threshold roughly independently of chunking quality,
+    which compresses the tools together and looks like a null result rather than a
+    broken metric.
+
+    Page identity survives any amount of reflowing, and it is how OHR-Bench frames
+    its own evaluation. The cost is granularity: a chunk is credited for being on
+    the right page, not for containing the answer, so this mode cannot distinguish
+    two chunkers that both cover the page. Report it as page-level Recall@k, never
+    as if it were containment.
+
+    `chunk_pages` is whatever pages the chunk drew from — a chunk that straddles a
+    page break legitimately answers for both. All page numbers are 0-based.
+    """
+    if chunk_pages is None:
+        return False
+    if isinstance(chunk_pages, int):
+        chunk_pages = (chunk_pages,)
+    return int(evidence_page) in {int(p) for p in chunk_pages}
+
+
+# Relevance rules the benchmark can be run under:
+#   span   — gold marks a verbatim sentence-level answer (our generated corpora)
+#   region — gold marks the surrounding block (FinanceBench)
+#   page   — gold is written against a normalized parse, so only the page id is
+#            trustworthy (OHR-Bench)
+RELEVANCE_MODES = {"span": is_relevant, "region": is_relevant_region, "page": is_relevant_page}
+
+# Modes scored on page identity rather than chunk text. The benchmark has to hand
+# these the chunk's pages instead of its text.
+PAGE_MODES = frozenset({"page"})
 
 
 def get_relevance(mode: str):

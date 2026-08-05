@@ -105,4 +105,16 @@ def test_get_relevance_rejects_an_unknown_mode():
     assert get_relevance("span") is is_relevant
     assert get_relevance("region") is is_relevant_region
     with pytest.raises(ValueError):
-        get_relevance("page")
+        get_relevance("paragraph")
+
+
+def test_page_relevance_matches_any_page_the_chunk_drew_from():
+    from docstruct.eval.relevance import is_relevant_page
+
+    assert is_relevant_page([4], 4)
+    assert is_relevant_page([3, 4], 4)          # chunk straddling a page break
+    assert is_relevant_page(4, 4)               # scalar tolerated
+    assert not is_relevant_page([3, 5], 4)
+    # No page metadata must never count as a hit; the benchmark refuses the run.
+    assert not is_relevant_page([], 4)
+    assert not is_relevant_page(None, 4)

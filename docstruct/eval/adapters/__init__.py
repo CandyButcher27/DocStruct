@@ -45,6 +45,12 @@ def build_adapter(
     if name == "docling":
         from docstruct.eval.adapters.docling_adapter import DoclingAdapter
         return DoclingAdapter()
+    if name == "llamaindex":
+        from docstruct.eval.adapters.llamaindex_adapter import LlamaIndexAdapter
+        return LlamaIndexAdapter()
+    if name == "llamaindex_semantic":
+        from docstruct.eval.adapters.llamaindex_adapter import LlamaIndexSemanticAdapter
+        return LlamaIndexSemanticAdapter()
     raise ValueError(f"unknown adapter: {name}")
 
 

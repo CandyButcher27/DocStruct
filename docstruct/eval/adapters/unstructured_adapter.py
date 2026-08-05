@@ -27,6 +27,16 @@ class UnstructuredAdapter(ChunkAdapter):
         out: List[EvalChunk] = []
         for i, c in enumerate(chunks):
             text = getattr(c, "text", "") or ""
-            if text.strip():
-                out.append(EvalChunk(id=f"un_{i}", text=text))
+            if not text.strip():
+                continue
+            # Unstructured numbers pages from 1; every other adapter and the gold
+            # count from 0. chunk_by_title merges elements, so take the pages of
+            # the originals where they survive.
+            meta = getattr(c, "metadata", None)
+            pages = set()
+            for el in (getattr(meta, "orig_elements", None) or [c]):
+                n = getattr(getattr(el, "metadata", None), "page_number", None)
+                if n is not None:
+                    pages.add(int(n) - 1)
+            out.append(EvalChunk(id=f"un_{i}", text=text, metadata={"pages": sorted(pages)}))
         return out

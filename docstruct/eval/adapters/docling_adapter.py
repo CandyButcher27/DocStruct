@@ -36,6 +36,14 @@ class DoclingAdapter(ChunkAdapter):
         out: List[EvalChunk] = []
         for i, ch in enumerate(self._chunker.chunk(doc)):
             text = getattr(ch, "text", "") or ""
-            if text.strip():
-                out.append(EvalChunk(id=f"dl_{i}", text=text))
+            if not text.strip():
+                continue
+            # Docling carries provenance per doc item; page_no is 1-based.
+            pages = set()
+            for item in (getattr(getattr(ch, "meta", None), "doc_items", None) or []):
+                for prov in (getattr(item, "prov", None) or []):
+                    n = getattr(prov, "page_no", None)
+                    if n is not None:
+                        pages.add(int(n) - 1)
+            out.append(EvalChunk(id=f"dl_{i}", text=text, metadata={"pages": sorted(pages)}))
         return out
