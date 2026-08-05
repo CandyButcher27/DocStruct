@@ -60,11 +60,15 @@ was updated last.
    way; a bare number is a regression waiting to happen.
 6. **Every stage ends in a commit, and `notes.md` gets the entry.** The log is the
    product of this project as much as the code is.
-7. **Gold must be tool-agnostic, and preferably not ours.** Never generate Q&A from
+7. **Every corpus needs its relevance rule checked before it is trusted.** Not the
+   span *length* — the span *reachability*. Ask: is this gold findable in raw PDF
+   text at all, and is it findable equally for a tool that chunks small? Both
+   external corpora failed a naive assumption here, in opposite directions.
+8. **Gold must be tool-agnostic, and preferably not ours.** Never generate Q&A from
    the output of a tool being benchmarked. Prefer a public human-annotated corpus
    (FinanceBench first — see `memory/benchmark-datasets.md`) over LLM-generated gold
    for any headline number in the paper.
-8. **Report the losses.** Coverage 0.817 vs LangChain's 1.00, duplication 2.06, no
+9. **Report the losses.** Coverage 0.817 vs LangChain's 1.00, duplication 2.06, no
    parse-fidelity number, born-digital only. These belong in the main table, not an
    appendix. `memory/related-work.md` keeps the list of who beats us where.
 
@@ -78,10 +82,28 @@ above are its source of truth — update them, then the draft.
 ## Running things
 
 ```bash
-.venv/Scripts/python.exe -m pytest -q          # 143 tests, ~3 min
+.venv/Scripts/python.exe -m pytest -q          # 201 tests, ~3 min
 python -m docstruct.cli run data/raw-pdfs/doc1.pdf
 python scripts/ablate.py --name try --set MIN_CHUNK_TOKENS=300
+
+# corpora (all self-fetching, so they work on Colab too)
+python scripts/fetch_ohrbench.py --limit 3     # primary external corpus
+python scripts/fetch_financebench.py --limit 2
 ```
+
+**Relevance mode is not optional — pick it per corpus, or the leaderboard lies.**
+
+| Corpus | Mode | Because |
+|---|---|---|
+| internal (`benchmark_qa_v*`) | `span` | gold marks a verbatim sentence |
+| FinanceBench | `region` | gold marks a ~167-word block; `span` fails in proportion to how *small* a tool chunks (74% of regions unreachable for unstructured, 11% for us) and hands us an unearned win |
+| OHR-Bench | `page` | gold is written against their normalised `gt_text`; only **1.5%** of spans appear verbatim in raw PDF text, so every text rule scores noise |
+
+**Before any GPU session, run the 3-document smoke.** Five failures this session were
+invisible to a green test suite and only surfaced by running the real CLI: a missing
+`unstructured-inference`, `QAItem(**d)` rejecting external gold, `--relevance page`
+absent from argparse choices, a silently-unapplied adapter patch, and `ultralytics`
+shipping a top-level `tests` package that shadows ours.
 
 Always use the project `.venv`. The `docstruct` console-script shim can be stale
 after the project directory moves — `python -m docstruct.cli` always works.

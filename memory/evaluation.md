@@ -129,6 +129,23 @@ measured in isolation and changes DocStruct's score by exactly 0.0000, which is
 the point: it is a guard against measuring tokenizer agreement, not a thumb on
 the scale.
 
+### Relevance modes (`--relevance span|region|page`)
+
+One rule does not fit three corpora, and picking the wrong one produces a
+plausible-looking leaderboard rather than an obvious failure.
+
+| Mode | Compares | Use for | Known bias |
+|---|---|---|---|
+| `span` (default) | chunk text contains the gold sentence | our generated gold | fails in proportion to how *small* a tool chunks when gold is block-level |
+| `region` | Szymkiewicz–Simpson overlap, normalised by the smaller set | FinanceBench | tolerant of size mismatch in both directions; threshold `RELEVANCE_REGION_MIN_OVERLAP` still unvalidated |
+| `page` | chunk's pages contain the evidence page | OHR-Bench | coarse — credits being on the page, not containing the answer. Favours one-chunk-per-page tools (`pymupdf4llm`) by construction, and penalises any tool that drops back matter (DocStruct drops references) |
+
+`page` needs every adapter to report the pages a chunk drew from. `_pages_of()` in
+`benchmark.py` normalises that: Unstructured and Docling count pages from 1, everyone
+else from 0, and LangChain/LlamaIndex concatenate before splitting so their adapters
+recover page spans by character offset. **The benchmark aborts if an adapter emits no
+page metadata** rather than scoring it zero — a silent zero would read as a result.
+
 ### Metrics
 
 - **MRR** — reciprocal rank of the first chunk containing the answer.

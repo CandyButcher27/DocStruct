@@ -44,6 +44,8 @@ every block becomes `unilateral_geometry`, nothing crashes, no network is touche
 | `docstruct/indexing/vector_store.py` | sentence-transformers → ChromaDB | `VectorStore` |
 | `docstruct/query/retriever.py` | Dense / hybrid (BM25 + RRF) retrieval, optional cross-encoder rerank | `Retriever` |
 | `docstruct/eval/` | Detection metrics, retrieval metrics, cross-tool benchmark, gold Q&A generation | see `evaluation.md` |
+| `docstruct/eval/adapters/` | Seven baselines: docstruct(+geo/model), langchain, pymupdf4llm, unstructured, docling, llamaindex, llamaindex_semantic. All emit `metadata["pages"]` | `get_adapters()` |
+| `docstruct/llm/client.py` | OpenAI-compatible chat client. Providers: ollama (default), groq, openai. Adapts payloads the endpoint rejects on parameter grounds rather than carrying a model table | `LLMClient(provider=...)` |
 | `docstruct/visualize.py` | Annotated-PDF overlay of detected blocks (PyMuPDF) | `render_annotated()` |
 | `docstruct/cli.py` | `run`, `index`, `query`, `visualize`, `export-annotations`, `gen-qa`, `benchmark` | `main()` |
 
