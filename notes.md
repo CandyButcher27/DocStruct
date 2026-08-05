@@ -925,3 +925,52 @@ are still unverified — do not submit on those.
 
 **Environment note:** the project `.venv` is absent from the working directory;
 only the system Python is on PATH. Recreate before any test or benchmark run.
+
+## Stage 13 — FinanceBench on CPU: what the smoke runs found (2026-08-06)
+
+Environment rebuilt first: the project `.venv`, `weights/yolov8m-doclaynet.pt`
+(52 MB, `hantian/yolo-doclaynet`) and the whole of `data/raw-pdfs/` had not
+survived the directory move. Venv and weights are back; **the internal corpus is
+still missing** and needs `scripts/fetch_dataset_v2.py` before v6 can be reproduced.
+
+**`--relevance span|region` (`relevance.py`, `benchmark.py`, `cli.py`).** Public
+human-annotated gold marks a *block*, not a sentence. The assumption going in was
+that containment would score ~0 on FinanceBench for everyone; that was wrong, and
+the truth is worse. Measured over all 189 evidence regions (median 167 words), the
+share each tool is structurally too small to contain: pymupdf4llm 3%, docstruct
+11%, langchain 68%, unstructured 74%. Containment fails *in proportion to how small
+a tool chunks*, so the default rule would have handed DocStruct a large unearned
+win on a leaderboard that looked entirely plausible. `region` mode scores by
+Szymkiewicz–Simpson overlap coefficient (normalise by the smaller set), so
+containment either way scores 1.0.
+
+The first implementation of that mode was a **no-op** — it reused span mode's own
+token-overlap ratio with a stricter threshold. That ratio is capped by the very
+size mismatch it is meant to tolerate, so no threshold could fix it; the unit test
+caught it. `RELEVANCE_REGION_MIN_OVERLAP = 0.7` remains a guess, marked unvalidated.
+
+**All five adapters verified on a 15-page arXiv PDF.** `unstructured` needed
+`pip install unstructured-inference` — `unstructured[pdf]` does not pull it in this
+resolution and `partition_pdf` imports it at module load even under
+`strategy="fast"`. **Not yet added to `pyproject.toml`'s `benchmark-heavy` extra**;
+the Colab run will hit the same failure until it is. Measured chunk sizes
+(unstructured 101 w, langchain 99 w, pymupdf4llm 404 w) track the corpus means used
+in the fairness calculation above, which is a useful independent check on it.
+
+**The headline finding.** On `3M_2018_10K` (160 pages), hybrid vs geometry-only:
+
+| | chunks | mean | table chunks | time |
+|---|---|---|---|---|
+| docstruct | 384 | 397 w | **122** | 367.7 s (2.30 s/page) |
+| docstruct_geo | 169 | 529 w | **4** | 168.5 s (1.05 s/page) |
+
+**30× more tables.** SEC tables are borderless and `find_tables()` is ruled-line
+based. arXiv papers rule their tables, so an arXiv-only evaluation has been
+systematically under-selling the vision detector: on arXiv it is worth +0.044 MRR,
+here it is the difference between representing the document and not. This is the
+strongest single argument for the two-detector design the project has produced, and
+it arrived from changing the corpus, not the code — which is the same lesson the
+XY-cut result taught.
+
+Also corrects the stale `~90 s/doc` YOLO figure in `measurement-environment.md`:
+measured 2.30 s/page (~35 s on a 15-page paper) with ultralytics 8.4.115.

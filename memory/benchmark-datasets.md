@@ -111,25 +111,29 @@ seen the data.
 
 Measured on the two smoke-test filings:
 
-| | 3M_2018_10K | 3M_2022_10K |
-|---|---|---|
-| pages | **160** | **252** |
-| geometry-only parse | 199 s (**1.24 s/page**) | — |
-| chunks | 169 (mean 529 w) | — |
-| **table chunks** | **4** | — |
+Pages: 3M_2018_10K **160**, 3M_2022_10K **252**. On `3M_2018_10K`, both pipeline
+modes, same machine (CPU, `weights/yolov8m-doclaynet.pt`):
 
-Two consequences.
+| | chunks | mean | **table chunks** | time | per page |
+|---|---|---|---|---|---|
+| `docstruct` (hybrid) | 384 | 397 w | **122** | 367.7 s | 2.30 s |
+| `docstruct_geo` | 169 | 529 w | **4** | 168.5 s | 1.05 s |
 
-**Four table chunks in a 160-page 10-K.** SEC filings are mostly financial tables,
-and they are **borderless** — pdfplumber's `find_tables()` is ruled-line based and
-cannot see them. Our arXiv corpus never exposed this because papers rule their
-tables. FinanceBench therefore cannot be run geometry-only in good faith; it needs
-the model detector. That is not a setback — it is the strongest available evidence
-for the hybrid design, and it belongs in the paper.
+**The vision detector finds 30× more tables on this document.** SEC filings are
+mostly financial tables and they are **borderless**; pdfplumber's `find_tables()`
+is ruled-line based and cannot see them. Our arXiv corpus never exposed this
+because papers rule their tables — which is exactly why an arXiv-only evaluation
+was under-selling the hybrid design. On arXiv the vision model is worth +0.044 MRR;
+here it is the difference between representing the document and not.
+
+Two consequences: FinanceBench cannot be run geometry-only in good faith, and the
+`docstruct_geo` ablation row will look far worse on this corpus than on ours.
+That is a result, not a bug — expect it, and report it.
 
 **Scale.** 84 docs × ~180 pages ≈ **15,000 pages**, against ~1,100 for the entire
-92-doc arXiv corpus — **13×**. Geometry alone is ~5 CPU-hours; with YOLO on CPU it
-is not runnable. GPU is required for this corpus, not merely faster.
+92-doc arXiv corpus — **13×**. At the measured 2.30 s/page that is ~9.6 CPU-hours
+for the DocStruct adapter alone, before the four baselines and all the embedding.
+GPU is required for this corpus, not merely faster.
 
 ## Migration plan (cheap first)
 
