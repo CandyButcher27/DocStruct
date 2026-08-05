@@ -36,7 +36,10 @@ viz = ["pymupdf>=1.24"]
 # endpoint), so gold generation needs no extra package — only an API key.
 eval = []
 benchmark = ["langchain-text-splitters>=0.3", "pymupdf4llm>=0.0.17", "rank-bm25>=0.2"]
-benchmark-heavy = ["unstructured[pdf]>=0.15", "docling>=2.0"]
+# unstructured-inference is listed explicitly: the `[pdf]` extra does not pull it
+# in current resolutions, and `partition_pdf` imports it at module load even under
+# strategy="fast", so the adapter dies with ModuleNotFoundError without it.
+benchmark-heavy = ["unstructured[pdf]>=0.15", "unstructured-inference>=0.7", "docling>=2.0"]
 dev = ["pytest>=8.0"]
 all = [
     "ultralytics>=8.0",
