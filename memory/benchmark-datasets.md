@@ -39,14 +39,46 @@ metric families we care about: page-level Recall@k (what `2604.12047` reports, s
 we are directly comparable) and token-level IoU/Recall (what Chroma reports).
 And it is the corpus our closest competitor used — head-to-head on their turf.
 
-**The catch, and how to handle it:** the evidence is a ~1.3k-char region, so our
-current containment rule ("chunk contains the span") will fail for nearly every
-question — a 500-word chunk cannot contain a 6k-char region. Relevance must be
-redefined for this corpus:
+### The catch — measured 2026-08-06, and it is a fairness problem, not a plumbing one
 
-- **Primary:** a retrieved chunk is relevant if `chunk.page_num == evidence_page_num`. Page-level, matches D1, unambiguous.
-- **Secondary:** token-level overlap between chunk and `evidence_text` (Chroma-style IoU / recall), which credits partial evidence coverage properly and is strictly more informative.
-- Do **not** reuse `relevance.py`'s substring rule here unmodified. It would report near-zero for every tool and look like a bug.
+The evidence is a page *region*, so the containment rule has to be reconsidered.
+The first guess — "containment will score ~0 for everyone" — is **wrong**, and the
+truth is worse. Measured over all 189 evidence spans:
+
+| | words |
+|---|---|
+| min / p25 / median / p75 / max | 11 / 80 / **167** / 234 / 678 |
+
+Against each tool's mean chunk size, the fraction of gold regions **too large to be
+contained** by that tool's chunks:
+
+| Tool | mean chunk | regions it structurally cannot contain |
+|---|---|---|
+| unstructured | 84 w | **74%** |
+| langchain | 106 w | **68%** |
+| docstruct | 339 w | 11% |
+| pymupdf4llm | 443 w | 3% |
+
+So span-mode containment does not fail uniformly — it fails *in proportion to how
+small a tool's chunks are*. Running FinanceBench under the default relevance rule
+would hand DocStruct a large win it did not earn, and the result would look
+plausible rather than broken. This is the same "bigger chunks buy score" trap the
+`MRR/1k` column exists to expose, in its most dangerous form yet.
+
+**Therefore `--relevance region` is mandatory on this corpus** (shipped
+2026-08-06). It scores by Szymkiewicz–Simpson overlap coefficient —
+$|A \cap B| / \min(|A|,|B|)$ — so containment in *either* direction scores 1.0 and
+a 100-word chunk sitting inside a 400-word evidence block is not punished for the
+size mismatch. Oracle check on `3M_2018_10K` (169 chunks, geometry-only): both gold
+regions reach overlap 0.99–1.00, so the signal is there and the threshold
+(`RELEVANCE_REGION_MIN_OVERLAP = 0.7`) has room — but it is still `# unvalidated`
+and must be swept on the full corpus.
+
+Page-metadata matching (`chunk.page_num == evidence_page_num`) is the protocol
+`arXiv:2604.12047` uses and was deliberately **not** implemented: it needs every
+adapter to attribute chunks to pages, and the LangChain baseline concatenates page
+text before splitting, so its chunks straddle pages by construction. Revisit only
+if a direct numeric comparison with that paper becomes necessary.
 
 ### DocLayNet val split (detection layer)
 
@@ -75,13 +107,38 @@ seen the data.
 - **MMLongBench-Doc** (`arXiv:2407.01523`, 1,091 QA / 135 PDFs, avg 47.5 pages) and **DocBench** — real PDFs with QA, but framed for long-context VLMs; a chunker comparison there fights the framing.
 - Anything image-only or OCR-heavy — out of contract.
 
+### The other measured surprise: these documents are nothing like our corpus
+
+Measured on the two smoke-test filings:
+
+| | 3M_2018_10K | 3M_2022_10K |
+|---|---|---|
+| pages | **160** | **252** |
+| geometry-only parse | 199 s (**1.24 s/page**) | — |
+| chunks | 169 (mean 529 w) | — |
+| **table chunks** | **4** | — |
+
+Two consequences.
+
+**Four table chunks in a 160-page 10-K.** SEC filings are mostly financial tables,
+and they are **borderless** — pdfplumber's `find_tables()` is ruled-line based and
+cannot see them. Our arXiv corpus never exposed this because papers rule their
+tables. FinanceBench therefore cannot be run geometry-only in good faith; it needs
+the model detector. That is not a setback — it is the strongest available evidence
+for the hybrid design, and it belongs in the paper.
+
+**Scale.** 84 docs × ~180 pages ≈ **15,000 pages**, against ~1,100 for the entire
+92-doc arXiv corpus — **13×**. Geometry alone is ~5 CPU-hours; with YOLO on CPU it
+is not runnable. GPU is required for this corpus, not merely faster.
+
 ## Migration plan (cheap first)
 
-1. **Fetch script** — `scripts/fetch_financebench.py`: pull the 150-row JSONL + the 84 PDFs from GitHub, write `data/qa/financebench.json` in our gold schema (`{doc, question, answer_span, page_num, evidence_type}`), plus a manifest with sha256 like `dataset_manifest_v2.json`. **Smoke-test on 2 documents before pulling 84.**
-2. **Relevance mode** — add a `--relevance page|span|token` switch to the benchmark. `span` is today's behaviour and stays the default for our internal gold; `page` and `token` unlock FinanceBench. This is the only non-trivial code change in the migration.
+1. **Fetch script** — `scripts/fetch_financebench.py` (done, smoke-tested on 2 docs).
+2. **Relevance mode** — `--relevance span|region` (done 2026-08-06, 3 unit tests). `span` stays the default for our internal gold; `region` is required for FinanceBench, see above.
 3. **Baselines** — same tool set (langchain, pymupdf4llm, unstructured, docstruct, docstruct_geo) plus **ClusterSemanticChunker** from `chunking_evaluation` so a semantic baseline exists.
-4. **Run on GPU** (Colab, per `measurement-environment.md`) — 84 PDFs × 5 tools is smaller than the current 92-doc run, so it should fit inside one session.
-5. **Report both corpora.** FinanceBench = external validity; our v7 corpus = statistical power (558 q, paired bootstrap) and every ablation.
+4. **Sweep `RELEVANCE_REGION_MIN_OVERLAP`** before trusting any leaderboard from this corpus. It is currently a guess.
+5. **Run on GPU** (Colab, per `measurement-environment.md`). Note this is a *bigger* job than the current 92-doc run, not a smaller one — 13× the pages.
+6. **Report both corpora.** FinanceBench = external validity; our v7 corpus = statistical power (558 q, paired bootstrap) and every ablation.
 
 ## Rule this file exists to protect
 

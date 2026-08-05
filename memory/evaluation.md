@@ -111,6 +111,15 @@ escalating comparisons:
 2. **Whitespace-blind** substring — both sides with all whitespace removed.
 3. Token-overlap fallback at `RELEVANCE_MIN_OVERLAP = 0.6`.
 
+That is `--relevance span`, the default, and it assumes gold marks a *sentence-level*
+answer. Public human-annotated corpora mark a **block** instead, and the same rule
+applied to block gold silently rigs the comparison — the fraction of FinanceBench
+evidence regions a tool's chunks are structurally too small to contain runs from
+**3% (pymupdf4llm)** to **74% (unstructured)**, so containment rewards whoever
+chunks biggest. `--relevance region` scores by Szymkiewicz–Simpson overlap
+coefficient instead, normalising by the smaller side so containment either way
+scores 1.0. Use it for any block-level gold; see `benchmark-datasets.md`.
+
 Rule 2 exists for a specific reason. Word spacing in a PDF is *inferred*, not
 stored; extractors measure inter-character gaps and disagree, and the gold spans
 carry whichever guesses the generator made. Without rule 2 a chunker that gets
