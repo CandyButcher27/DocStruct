@@ -974,3 +974,37 @@ XY-cut result taught.
 
 Also corrects the stale `~90 s/doc` YOLO figure in `measurement-environment.md`:
 measured 2.30 s/page (~35 s on a 15-page paper) with ultralytics 8.4.115.
+
+## Stage 14 — OHR-Bench investigated; it is the corpus (2026-08-06)
+
+The internal scraper under-delivered twice (40, then 68 of a planned ~150) with 82
+dead sources, and it carries a real bug: it dedupes against the committed manifest
+rather than the disk, so a wiped `data/raw-pdfs/` can never rebuild. Rather than
+keep repairing it, went back to the dataset survey and actually downloaded the
+candidate instead of reading its abstract.
+
+**OHR-Bench is much more than the survey credited.** Three artefacts: 1,261 PDFs,
+a v1 parquet carrying 5,039 QA, a v2 parquet carrying human-verified `gt_text` for
+all 8,561 pages, and a retrieval bundle that includes MinerU and Qwen2.5-VL parses
+of the same pages. QA lives **only** in v1; v2 has no `qas` column.
+
+Filtered to what we can actually use — has QA, multi-page domain, born-digital —
+it is **95 documents, 3,787 pages, 3,558 QA across law (60), manual (15), finance
+(10), academic (10)**, and **all 95 are born-digital**. Law and manual are exactly
+the domains the scraper has never managed to deliver.
+
+The property that decides it: **evidence is span-level, median 25 words**, only 1.3%
+larger than LangChain's mean chunk. So `--relevance span` is fair here, with none of
+the size bias that made `region` mode mandatory on FinanceBench — and there are 24×
+more questions. `evidence_source` is typed (text 2,666 / table 847 / equation 45),
+so the 24% table slice measures table handling directly for the first time.
+
+Corpus set is now OHR-Bench (primary), FinanceBench (head-to-head with
+`arXiv:2604.12047`), internal arXiv (ablations). Three provenances, which is more
+than either closest competitor reports.
+
+Also this session: `openai` provider added for gold generation, defaulting to
+gpt-4.1 rather than gpt-5 because that family accepts only temperature 1 and gold is
+generated at 0 for reproducibility. On a like-for-like single document gpt-4.1 kept
+2 of 6 pairs against gpt-oss:120b's 3 of 6 — **no quality argument for switching
+generators**, only a speed one.

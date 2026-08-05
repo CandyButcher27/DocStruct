@@ -1,402 +1,15 @@
 [
   {
-    "file": "doc51.pdf",
+    "file": "doc1.pdf",
     "domain": "arxiv",
     "source": "arxiv.org",
-    "arxiv_id": "2606.27377v1",
-    "title": "DanceOPD: On-Policy Generative Field Distillation",
+    "arxiv_id": "2608.04010v1",
+    "title": "ParVL: Parallel Scaling and Expandable Compute Allocation for Multimodal LLMs",
     "category": "cs.CL",
-    "sha256": "2545e43b4c4cfe52"
+    "sha256": "880c3dc72cb9d0f6"
   },
   {
-    "file": "doc52.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27347v1",
-    "title": "Mapping Political-Elite Networks in Europe with a Multilingual Joint Entity-Relation Extraction Pipeline",
-    "category": "cs.CL",
-    "sha256": "ff4566d309cb1f17"
-  },
-  {
-    "file": "doc53.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27330v1",
-    "title": "Empowering GUI Agents via Autonomous Experience Exploration and Hindsight Experience Utilization for Task Planning",
-    "category": "cs.CL",
-    "sha256": "81030f5733f3d44e"
-  },
-  {
-    "file": "doc54.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27316v1",
-    "title": "LLM-Based Examination of Eligibility Criteria from Securities Prospectuses at the German Central Bank",
-    "category": "cs.CL",
-    "sha256": "71b96243e1104050"
-  },
-  {
-    "file": "doc55.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27314v1",
-    "title": "Beyond Surface Forms: A Comprehensive, Mechanism-Oriented Taxonomy of Indirect Linguistic Encoding for LLM-Based Coded Language Detection",
-    "category": "cs.CL",
-    "sha256": "bc3ed1a939d51bd7"
-  },
-  {
-    "file": "doc56.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27306v1",
-    "title": "Multilingual Reasoning Cascades Need More Context",
-    "category": "cs.CL",
-    "sha256": "34de8b83d1f7c4a6"
-  },
-  {
-    "file": "doc57.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27275v1",
-    "title": "How Surprising Is Historical Italian to Language Models? Tokenization Tax, Comprehension Tax, and a Simple Mitigation",
-    "category": "cs.CL",
-    "sha256": "2cc193697f10e7ec"
-  },
-  {
-    "file": "doc58.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27242v1",
-    "title": "The Geometry of Updates: Fisher Alignment at Vocabulary Scale",
-    "category": "cs.CL",
-    "sha256": "daa2d964f89ddb18"
-  },
-  {
-    "file": "doc59.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27369v1",
-    "title": "Reinforcement Learning without Ground-Truth Solutions can Improve LLMs",
-    "category": "cs.LG",
-    "sha256": "506212f309d35b42"
-  },
-  {
-    "file": "doc60.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27361v1",
-    "title": "Autoregressive Boltzmann Generators",
-    "category": "cs.LG",
-    "sha256": "8d79eb8e2f67404f"
-  },
-  {
-    "file": "doc61.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27359v1",
-    "title": "When are likely answers right? On Sequence Probability and Correctness in LLMs",
-    "category": "cs.LG",
-    "sha256": "f82dd94845fa5eeb"
-  },
-  {
-    "file": "doc62.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27354v1",
-    "title": "Error-Conditioned Neural Solvers",
-    "category": "cs.LG",
-    "sha256": "5d66632483eda4b2"
-  },
-  {
-    "file": "doc63.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27342v1",
-    "title": "Understanding Domain-Aware Distribution Alignment in Budgeted Entity Matching",
-    "category": "cs.LG",
-    "sha256": "0fedb058aad6db5e"
-  },
-  {
-    "file": "doc64.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27376v1",
-    "title": "Ask, Solve, Generate: Self-Evolving Unified Multimodal Understanding and Generation via Self-Consistency Rewards",
-    "category": "cs.CV",
-    "sha256": "5bb0b644d1bc340c"
-  },
-  {
-    "file": "doc65.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27374v1",
-    "title": "World Action Models Enable Continual Imitation Learning with Recurrent Generative Replays",
-    "category": "cs.CV",
-    "sha256": "b003b876ee0587bc"
-  },
-  {
-    "file": "doc66.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27373v1",
-    "title": "Paying More Attention to Visual Tokens in Self-Evolving Large Multimodal Models",
-    "category": "cs.CV",
-    "sha256": "9edfd90137dff3df"
-  },
-  {
-    "file": "doc67.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27372v1",
-    "title": "DnA: Denoising Attention for Visual Tasks",
-    "category": "cs.CV",
-    "sha256": "dd52c911bcd811b2"
-  },
-  {
-    "file": "doc68.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27371v1",
-    "title": "Don't Settle at the Mode! Mitigating Diversity Collapse in Pretrained Flow Models via Feature Self-Guidance",
-    "category": "cs.CV",
-    "sha256": "da6ae5bbc3fb973e"
-  },
-  {
-    "file": "doc69.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27349v1",
-    "title": "All you need is log",
-    "category": "stat.ML",
-    "sha256": "ef2529d53d8c3ae8"
-  },
-  {
-    "file": "doc70.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27298v1",
-    "title": "Fast algorithms for learning a Gaussian under halfspace truncation with optimal sample complexity",
-    "category": "stat.ML",
-    "sha256": "9318b7fa8efe024a"
-  },
-  {
-    "file": "doc71.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27269v1",
-    "title": "Ribbon: Scalable Approximation and Robust Uncertainty Quantification",
-    "category": "stat.ML",
-    "sha256": "327d213d88e45c46"
-  },
-  {
-    "file": "doc72.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.26733v1",
-    "title": "Surviving by Serving: Functional Relevance Drives Self-Organization in Complex Adaptive Systems",
-    "category": "q-bio.NC",
-    "sha256": "e934bd251b2a371c"
-  },
-  {
-    "file": "doc73.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.26448v1",
-    "title": "Closing the Loop to Discover Psychological Theories with an Automated Cognitive Scientist",
-    "category": "q-bio.NC",
-    "sha256": "7b1717d4c4707e5a"
-  },
-  {
-    "file": "doc74.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.26279v1",
-    "title": "Beyond Single-Source Cognitive Taskonomy:Multi-Source Task Relations through fMRI Transfer Learning",
-    "category": "q-bio.NC",
-    "sha256": "fe4441625977d6a3"
-  },
-  {
-    "file": "doc75.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.25874v1",
-    "title": "Topology-Dependent Emergence of Polychronous Neuronal Groups: A Recurrence-Plot Characterization",
-    "category": "q-bio.NC",
-    "sha256": "e6a15f4c0e937b75"
-  },
-  {
-    "file": "doc76.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.25826v1",
-    "title": "Weight geometry governs functional memory in complex systems",
-    "category": "q-bio.NC",
-    "sha256": "6e981b13008e910b"
-  },
-  {
-    "file": "doc77.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.26432v1",
-    "title": "Embedding Foundation Model Predictions in Discrete-Choice Models with Structural Guarantees",
-    "category": "econ.EM",
-    "sha256": "178bd657363aafc0"
-  },
-  {
-    "file": "doc78.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.25688v1",
-    "title": "Choosing What to Calibrate and What to Estimate in Structural Models",
-    "category": "econ.EM",
-    "sha256": "f32bbf08aeca19f5"
-  },
-  {
-    "file": "doc79.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.25292v1",
-    "title": "Time-Varying Model Averaging of Multi-layer Network Vector Autoregressions",
-    "category": "econ.EM",
-    "sha256": "acc32f2ac8a3a671"
-  },
-  {
-    "file": "doc80.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.24867v1",
-    "title": "Bounds for Standard Errors in Combined Data",
-    "category": "econ.EM",
-    "sha256": "c9750ef31e1dabe1"
-  },
-  {
-    "file": "doc81.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.24850v1",
-    "title": "Heterogeneous Peer Effects with Endogenous Network Formation",
-    "category": "econ.EM",
-    "sha256": "97ca12dc00b48cd8"
-  },
-  {
-    "file": "doc82.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27367v1",
-    "title": "Accessing both electrochemical SEIRA and SERS with ultrasensitive metamaterials for enhanced molecular identification",
-    "category": "physics.optics",
-    "sha256": "43c9e27f79292bf9"
-  },
-  {
-    "file": "doc83.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27218v1",
-    "title": "Plasmonic coated scatterers for tunable coherent perfect absorption",
-    "category": "physics.optics",
-    "sha256": "a1eabeb2df7a0991"
-  },
-  {
-    "file": "doc84.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27099v1",
-    "title": "Neural Networks for Inverse Design of Cascaded-Mode Near-Field Landscapes",
-    "category": "physics.optics",
-    "sha256": "65740f9b166db5d6"
-  },
-  {
-    "file": "doc85.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27043v1",
-    "title": "Observation of Non-Hermitian Skin Dynamics in the Liouvillian Regime",
-    "category": "physics.optics",
-    "sha256": "a3b9d774e5f5a605"
-  },
-  {
-    "file": "doc86.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27312v1",
-    "title": "A Verification Theorem for an Optimal Control Problem Governed by the Convective Brinkman--Forchheimer Equations",
-    "category": "math.OC",
-    "sha256": "749246ab0c3e2f4f"
-  },
-  {
-    "file": "doc87.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27260v1",
-    "title": "Conjecture About Arbitrary Even-Order Convexity of $w$-Optimization of the Split CIF",
-    "category": "math.OC",
-    "sha256": "850e61c3e8a6b666"
-  },
-  {
-    "file": "doc88.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27217v1",
-    "title": "CHAMB-GA: A Containerized HPC Scalable Microservice-Based Framework for Genetic Algorithms",
-    "category": "math.OC",
-    "sha256": "486c11bbeb102e18"
-  },
-  {
-    "file": "doc89.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27196v1",
-    "title": "Optimizing Accessibility and Maximum Travel Times in Transit Networks: The Hub Covering Location Problem",
-    "category": "math.OC",
-    "sha256": "863d568ce7104252"
-  },
-  {
-    "file": "doc90.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27375v1",
-    "title": "Scalable Behavior Cloning with Open Data, Training, and Evaluation",
-    "category": "cs.RO",
-    "sha256": "1c8bb93951c617c7"
-  },
-  {
-    "file": "doc91.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27355v1",
-    "title": "RouterVLA: Turning Smoke Tests into Supervision for Heterogeneous VLA Selection",
-    "category": "cs.RO",
-    "sha256": "cb3e19e52576ea0e"
-  },
-  {
-    "file": "doc92.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27311v1",
-    "title": "Massive Cosmological Correlators from Flat Space: a Laplace-Space Approach",
-    "category": "astro-ph.CO",
-    "sha256": "c5942c892385d4e3"
-  },
-  {
-    "file": "doc93.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27309v1",
-    "title": "Laplace Space for Cosmological Correlators",
-    "category": "astro-ph.CO",
-    "sha256": "4a21cdbfc275b0a9"
-  },
-  {
-    "file": "doc94.pdf",
-    "domain": "arxiv",
-    "source": "arxiv.org",
-    "arxiv_id": "2606.27290v1",
-    "title": "A solid unification of the dark sector",
-    "category": "astro-ph.CO",
-    "sha256": "965b1a3fee1b3399"
-  },
-  {
-    "file": "doc95.pdf",
+    "file": "doc2.pdf",
     "domain": "legal",
     "source": "courtlistener.com",
     "case_name": "unknown",
@@ -404,162 +17,529 @@
     "sha256": "6f391417928136b4"
   },
   {
-    "file": "doc96.pdf",
-    "domain": "financial",
-    "source": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/annualreport-2023.pdf",
-    "title": "JPMorgan 2023 Annual Report",
-    "sector": "finance",
-    "sha256": "bebb7c4abb278396"
-  },
-  {
-    "file": "doc97.pdf",
-    "domain": "financial",
-    "source": "https://www.berkshirehathaway.com/2022ar/2022ar.pdf",
-    "title": "Berkshire 2022 Annual Report",
-    "sector": "finance",
-    "sha256": "52138f7464c477b1"
-  },
-  {
-    "file": "doc98.pdf",
-    "domain": "legal",
-    "source": "courtlistener.com",
-    "case_name": "unknown",
-    "court": "bap9",
-    "sha256": "6f391417928136b4"
-  },
-  {
-    "file": "doc99.pdf",
-    "domain": "financial",
-    "source": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/annualreport-2023.pdf",
-    "title": "JPMorgan 2023 Annual Report",
-    "sector": "finance",
-    "sha256": "bebb7c4abb278396"
-  },
-  {
-    "file": "doc100.pdf",
-    "domain": "financial",
-    "source": "https://www.berkshirehathaway.com/2022ar/2022ar.pdf",
-    "title": "Berkshire 2022 Annual Report",
-    "sector": "finance",
-    "sha256": "52138f7464c477b1"
-  },
-  {
-    "file": "doc101.pdf",
+    "file": "doc3.pdf",
     "domain": "technical",
     "source": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.04162018.pdf",
     "title": "NIST CSF 1.1",
     "sha256": "0f3ca796610ab024"
   },
   {
-    "file": "doc102.pdf",
-    "domain": "technical",
-    "source": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-53r5.pdf",
-    "title": "NIST SP 800-53r5",
-    "sha256": "fc63bcd61715d018"
-  },
-  {
-    "file": "doc103.pdf",
-    "domain": "technical",
-    "source": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-63b.pdf",
-    "title": "NIST SP 800-63b Auth",
-    "sha256": "ccfce7510a126793"
-  },
-  {
-    "file": "doc104.pdf",
-    "domain": "technical",
-    "source": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-207.pdf",
-    "title": "NIST Zero Trust",
-    "sha256": "0290d6ece2487428"
-  },
-  {
-    "file": "doc105.pdf",
-    "domain": "technical",
-    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf",
-    "title": "RP2040 Datasheet",
-    "sha256": "be56fbb75ba0ae9e"
-  },
-  {
-    "file": "doc106.pdf",
-    "domain": "technical",
-    "source": "https://www.ti.com/lit/ds/symlink/lm317.pdf",
-    "title": "TI LM317 Datasheet",
-    "sha256": "ae6ffbfc7e1c6be2"
-  },
-  {
-    "file": "doc107.pdf",
-    "domain": "technical",
-    "source": "https://www.ti.com/lit/ds/symlink/ina219.pdf",
-    "title": "TI INA219 Datasheet",
-    "sha256": "58004eda854d0747"
-  },
-  {
-    "file": "doc108.pdf",
-    "domain": "technical",
-    "source": "https://gcc.gnu.org/onlinedocs/gcc.pdf",
-    "title": "GCC Manual",
-    "sha256": "dd554d76d478c747"
-  },
-  {
-    "file": "doc109.pdf",
-    "domain": "technical",
-    "source": "https://www.postgresql.org/files/documentation/pdf/16/postgresql-16-A4.pdf",
-    "title": "PostgreSQL 16 Manual",
-    "sha256": "411bfdd2b0ddf368"
-  },
-  {
-    "file": "doc110.pdf",
-    "domain": "technical",
-    "source": "https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Assigned_Numbers/out/en/Assigned_Numbers.pdf",
-    "title": "Bluetooth Assigned Numbers",
-    "sha256": "f2433c9a281fba42"
-  },
-  {
-    "file": "doc111.pdf",
-    "domain": "technical",
-    "source": "https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.pdf",
-    "title": "MQTT v5.0 Spec",
-    "sha256": "e8f8e9d2467618d5"
-  },
-  {
-    "file": "doc112.pdf",
-    "domain": "technical",
-    "source": "https://openocd.org/doc/pdf/openocd.pdf",
-    "title": "OpenOCD Manual",
-    "sha256": "21b050a58b9bb9c4"
-  },
-  {
-    "file": "doc113.pdf",
+    "file": "doc4.pdf",
     "domain": "govt",
     "source": "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf",
     "title": "NIST AI RMF 1.0",
     "sha256": "7576edb531d98488"
   },
   {
-    "file": "doc114.pdf",
+    "file": "doc5.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.04009v1",
+    "title": "SocietyBench: Forecasting Counterfactual Social-World Evolution",
+    "category": "cs.CL",
+    "sha256": "ae4f33ee31fd6fad"
+  },
+  {
+    "file": "doc6.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.04007v1",
+    "title": "TurnSight: Turn-Level Hindsight Self-Distillation for Tool-Integrated Reasoning",
+    "category": "cs.CL",
+    "sha256": "7bb16d89b6689203"
+  },
+  {
+    "file": "doc7.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.04003v1",
+    "title": "PAST-Bench: Benchmarking the Foundations of Recursive Self-Improvement in Personal Agents",
+    "category": "cs.CL",
+    "sha256": "12fd35dffe14cb65"
+  },
+  {
+    "file": "doc8.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03999v1",
+    "title": "Agogic: Performance-Timed Music Tokens for LLM-Native Text-to-Symbolic-Music Generation",
+    "category": "cs.CL",
+    "sha256": "0d7ece9683932ad9"
+  },
+  {
+    "file": "doc9.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03994v1",
+    "title": "When Attention Goes Blind: Numerical Failure in ALiBi Positional Encodings",
+    "category": "cs.CL",
+    "sha256": "2551624c95844f5e"
+  },
+  {
+    "file": "doc10.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03984v1",
+    "title": "string2string Studio: An Interactive, In-Browser Platform for String-to-String Algorithms",
+    "category": "cs.CL",
+    "sha256": "4b3edb3cc1ab48e6"
+  },
+  {
+    "file": "doc11.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03928v1",
+    "title": "Robust Low-Tubal-Rank Tensor Completion under Cross-Concentrated Sampling",
+    "category": "stat.ML",
+    "sha256": "ecc9867c4c6e5a45"
+  },
+  {
+    "file": "doc12.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03566v1",
+    "title": "Divide-and-Conquer: Towards Generalizable Amortized Bayesian Inference for the Drift Diffusion Model",
+    "category": "stat.ML",
+    "sha256": "e527ee1384f11614"
+  },
+  {
+    "file": "doc13.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03881v1",
+    "title": "Difference-in-differences with \"bad controls\"",
+    "category": "econ.EM",
+    "sha256": "6eaa0c1a5ec38e5b"
+  },
+  {
+    "file": "doc14.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03847v1",
+    "title": "Identification and Information after Nuisance Projection",
+    "category": "econ.EM",
+    "sha256": "c1de66eb61962be4"
+  },
+  {
+    "file": "doc15.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.02943v1",
+    "title": "Bandwidth-Free Inference for Recursive Nonlinear Impulse Response Functions",
+    "category": "econ.EM",
+    "sha256": "71f88725af6a321c"
+  },
+  {
+    "file": "doc16.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03995v1",
+    "title": "Refraction laws in spatio-temporal media",
+    "category": "physics.optics",
+    "sha256": "99727219a7c1a433"
+  },
+  {
+    "file": "doc17.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03985v1",
+    "title": "Can crystal symmetry reshape ENZ photonics?: Opinion",
+    "category": "physics.optics",
+    "sha256": "c65098f3fae4bfc0"
+  },
+  {
+    "file": "doc18.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03957v1",
+    "title": "Modulation in degree of cross-polarization at Young's interferometer illuminated by non-uniformly polarized electromagnetic fields",
+    "category": "physics.optics",
+    "sha256": "6d992fdd05630bbf"
+  },
+  {
+    "file": "doc19.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03933v1",
+    "title": "Simulation-Based Neural Policies for Portfolio Choice: Architecture, Training, and Interpretability",
+    "category": "math.OC",
+    "sha256": "ce319d194e0a7a0a"
+  },
+  {
+    "file": "doc20.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03931v1",
+    "title": "A Robust Chance Constrained Approach to Surgery Scheduling",
+    "category": "math.OC",
+    "sha256": "a991dfd49fddeb46"
+  },
+  {
+    "file": "doc21.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03916v1",
+    "title": "Trajectory inference via Acceleration Matching",
+    "category": "math.OC",
+    "sha256": "5e634e13a4c8578a"
+  },
+  {
+    "file": "doc22.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03846v1",
+    "title": "Sliding Methods for Hölder-Smooth Convex--Concave Minimax Optimization with Bilinear Coupling",
+    "category": "math.OC",
+    "sha256": "6c6aed8f52d6363e"
+  },
+  {
+    "file": "doc23.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.04005v1",
+    "title": "Cosmology in the Einstein Telescope era: comparing traditional and simulation-based methods for population inference",
+    "category": "astro-ph.CO",
+    "sha256": "59207f27ea12fd0f"
+  },
+  {
+    "file": "doc24.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03876v1",
+    "title": "Fisher Forecasting for the DESC with $\\texttt{Augur}$",
+    "category": "astro-ph.CO",
+    "sha256": "35de6a9fcf3c0205"
+  },
+  {
+    "file": "doc25.pdf",
+    "domain": "financial",
+    "source": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/annualreport-2023.pdf",
+    "title": "JPMorgan 2023 Annual Report",
+    "sector": "finance",
+    "sha256": "bebb7c4abb278396"
+  },
+  {
+    "file": "doc26.pdf",
+    "domain": "technical",
+    "source": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.04162018.pdf",
+    "title": "NIST CSF 1.1",
+    "sha256": "0f3ca796610ab024"
+  },
+  {
+    "file": "doc27.pdf",
+    "domain": "technical",
+    "source": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-53r5.pdf",
+    "title": "NIST SP 800-53r5",
+    "sha256": "fc63bcd61715d018"
+  },
+  {
+    "file": "doc28.pdf",
+    "domain": "technical",
+    "source": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-63b.pdf",
+    "title": "NIST SP 800-63b Auth",
+    "sha256": "ccfce7510a126793"
+  },
+  {
+    "file": "doc29.pdf",
+    "domain": "technical",
+    "source": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-207.pdf",
+    "title": "NIST Zero Trust",
+    "sha256": "0290d6ece2487428"
+  },
+  {
+    "file": "doc30.pdf",
+    "domain": "technical",
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf",
+    "title": "RP2040 Datasheet",
+    "sha256": "be56fbb75ba0ae9e"
+  },
+  {
+    "file": "doc31.pdf",
+    "domain": "technical",
+    "source": "https://www.ti.com/lit/ds/symlink/lm317.pdf",
+    "title": "TI LM317 Datasheet",
+    "sha256": "ae6ffbfc7e1c6be2"
+  },
+  {
+    "file": "doc32.pdf",
+    "domain": "technical",
+    "source": "https://www.ti.com/lit/ds/symlink/ina219.pdf",
+    "title": "TI INA219 Datasheet",
+    "sha256": "58004eda854d0747"
+  },
+  {
+    "file": "doc33.pdf",
+    "domain": "technical",
+    "source": "https://www.postgresql.org/files/documentation/pdf/16/postgresql-16-A4.pdf",
+    "title": "PostgreSQL 16 Manual",
+    "sha256": "411bfdd2b0ddf368"
+  },
+  {
+    "file": "doc34.pdf",
+    "domain": "technical",
+    "source": "https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Assigned_Numbers/out/en/Assigned_Numbers.pdf",
+    "title": "Bluetooth Assigned Numbers",
+    "sha256": "9bed9591e49a1420"
+  },
+  {
+    "file": "doc35.pdf",
+    "domain": "technical",
+    "source": "https://openocd.org/doc/pdf/openocd.pdf",
+    "title": "OpenOCD Manual",
+    "sha256": "9c41e3275b0c0daf"
+  },
+  {
+    "file": "doc36.pdf",
+    "domain": "govt",
+    "source": "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf",
+    "title": "NIST AI RMF 1.0",
+    "sha256": "7576edb531d98488"
+  },
+  {
+    "file": "doc37.pdf",
     "domain": "govt",
     "source": "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-2e2023.pdf",
     "title": "NIST AI Adversarial ML",
     "sha256": "d1086f53a1634d67"
   },
   {
-    "file": "doc115.pdf",
+    "file": "doc38.pdf",
     "domain": "textbook",
     "source": "https://assets.openstax.org/oscms-prodcms/media/documents/IntroductiontoSociology3e-WEB.pdf",
     "title": "OpenStax Sociology",
     "sha256": "53a8f3aa69fa54d3"
   },
   {
-    "file": "doc116.pdf",
+    "file": "doc39.pdf",
     "domain": "textbook",
     "source": "https://assets.openstax.org/oscms-prodcms/media/documents/OrganicChemistry-WEB.pdf",
     "title": "OpenStax Organic Chemistry",
     "sha256": "69789257bf2c5fc5"
   },
   {
-    "file": "doc117.pdf",
+    "file": "doc40.pdf",
     "domain": "textbook",
     "source": "https://assets.openstax.org/oscms-prodcms/media/documents/AmericanGovernment3e-WEB.pdf",
     "title": "OpenStax American Government",
     "sha256": "f794f133de7c6b39"
+  },
+  {
+    "file": "doc41.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03991v1",
+    "title": "Perceptual Anchoring: Prototype-Guided Text Calibration for Training-free Open-Vocabulary Semantic Segmentation",
+    "category": "cs.CV",
+    "sha256": "1e53a1190906d630"
+  },
+  {
+    "file": "doc42.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03974v1",
+    "title": "JoyAI-Video-Edit: Real-Time Open-Ended Video Editing with Autoregressive Diffusion",
+    "category": "cs.CV",
+    "sha256": "b8ddd995d51b0716"
+  },
+  {
+    "file": "doc43.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03971v1",
+    "title": "UniWorld-Design: From Pixel Generation to Layer-Native Design",
+    "category": "cs.CV",
+    "sha256": "b8bebb386e5d8b81"
+  },
+  {
+    "file": "doc44.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03937v1",
+    "title": "Progressive Learning of a Diffusion-based Inpainting Model for Separating Overlapped Fingerprints",
+    "category": "cs.CV",
+    "sha256": "da2326438a2a778b"
+  },
+  {
+    "file": "doc45.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03181v1",
+    "title": "Persistent homology broadens the controllable subspace in human structural connectomes",
+    "category": "q-bio.NC",
+    "sha256": "8049d2b9e8808295"
+  },
+  {
+    "file": "doc46.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03000v1",
+    "title": "A Landau-Ginzburg Phenomenology of Sleep-Stage Transitions",
+    "category": "q-bio.NC",
+    "sha256": "5b7b2ef6cd72cc34"
+  },
+  {
+    "file": "doc47.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.02704v1",
+    "title": "Predictive Set Theory: A Generative Framework for Cognitive Architecture with Operationalized Core Mechanisms",
+    "category": "q-bio.NC",
+    "sha256": "a1ab0286a6861dfc"
+  },
+  {
+    "file": "doc48.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03938v1",
+    "title": "Bimanual Manipulation Within an 8 GB Budget: Zero-Copy Sensing and Quantized ACT on an Entry-Level Jetson",
+    "category": "cs.RO",
+    "sha256": "db3e857ce0978380"
+  },
+  {
+    "file": "doc49.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03924v1",
+    "title": "ETA: A New Agentic Paradigm for Embodied Tasks",
+    "category": "cs.RO",
+    "sha256": "b50ded7501500dc9"
+  },
+  {
+    "file": "doc50.pdf",
+    "domain": "arxiv",
+    "source": "arxiv.org",
+    "arxiv_id": "2608.03981v1",
+    "title": "A Tale of Two Couplings: Bayesian Selection in the Interacting Dark Sector",
+    "category": "astro-ph.CO",
+    "sha256": "71e6b89d1575b08b"
+  },
+  {
+    "file": "doc51.pdf",
+    "domain": "legal",
+    "source": "courtlistener.com",
+    "case_name": "unknown",
+    "court": "bap9",
+    "sha256": "6f391417928136b4"
+  },
+  {
+    "file": "doc52.pdf",
+    "domain": "financial",
+    "source": "https://www.jpmorganchase.com/content/dam/jpmc/jpmorgan-chase-and-co/investor-relations/documents/annualreport-2023.pdf",
+    "title": "JPMorgan 2023 Annual Report",
+    "sector": "finance",
+    "sha256": "bebb7c4abb278396"
+  },
+  {
+    "file": "doc53.pdf",
+    "domain": "financial",
+    "source": "https://www.berkshirehathaway.com/2022ar/2022ar.pdf",
+    "title": "Berkshire 2022 Annual Report",
+    "sector": "finance",
+    "sha256": "52138f7464c477b1"
+  },
+  {
+    "file": "doc54.pdf",
+    "domain": "technical",
+    "source": "https://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.04162018.pdf",
+    "title": "NIST CSF 1.1",
+    "sha256": "0f3ca796610ab024"
+  },
+  {
+    "file": "doc55.pdf",
+    "domain": "technical",
+    "source": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-53r5.pdf",
+    "title": "NIST SP 800-53r5",
+    "sha256": "fc63bcd61715d018"
+  },
+  {
+    "file": "doc56.pdf",
+    "domain": "technical",
+    "source": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-63b.pdf",
+    "title": "NIST SP 800-63b Auth",
+    "sha256": "ccfce7510a126793"
+  },
+  {
+    "file": "doc57.pdf",
+    "domain": "technical",
+    "source": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-207.pdf",
+    "title": "NIST Zero Trust",
+    "sha256": "0290d6ece2487428"
+  },
+  {
+    "file": "doc58.pdf",
+    "domain": "technical",
+    "source": "https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf",
+    "title": "RP2040 Datasheet",
+    "sha256": "be56fbb75ba0ae9e"
+  },
+  {
+    "file": "doc59.pdf",
+    "domain": "technical",
+    "source": "https://www.ti.com/lit/ds/symlink/ina219.pdf",
+    "title": "TI INA219 Datasheet",
+    "sha256": "58004eda854d0747"
+  },
+  {
+    "file": "doc60.pdf",
+    "domain": "technical",
+    "source": "https://gcc.gnu.org/onlinedocs/gcc.pdf",
+    "title": "GCC Manual",
+    "sha256": "f6a704c6392674d7"
+  },
+  {
+    "file": "doc61.pdf",
+    "domain": "technical",
+    "source": "https://www.postgresql.org/files/documentation/pdf/16/postgresql-16-A4.pdf",
+    "title": "PostgreSQL 16 Manual",
+    "sha256": "411bfdd2b0ddf368"
+  },
+  {
+    "file": "doc62.pdf",
+    "domain": "technical",
+    "source": "https://www.bluetooth.com/wp-content/uploads/Files/Specification/HTML/Assigned_Numbers/out/en/Assigned_Numbers.pdf",
+    "title": "Bluetooth Assigned Numbers",
+    "sha256": "9bed9591e49a1420"
+  },
+  {
+    "file": "doc63.pdf",
+    "domain": "technical",
+    "source": "https://docs.oasis-open.org/mqtt/mqtt/v5.0/os/mqtt-v5.0-os.pdf",
+    "title": "MQTT v5.0 Spec",
+    "sha256": "e8f8e9d2467618d5"
+  },
+  {
+    "file": "doc64.pdf",
+    "domain": "technical",
+    "source": "https://openocd.org/doc/pdf/openocd.pdf",
+    "title": "OpenOCD Manual",
+    "sha256": "9c41e3275b0c0daf"
+  },
+  {
+    "file": "doc65.pdf",
+    "domain": "govt",
+    "source": "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-1.pdf",
+    "title": "NIST AI RMF 1.0",
+    "sha256": "7576edb531d98488"
+  },
+  {
+    "file": "doc66.pdf",
+    "domain": "govt",
+    "source": "https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.100-2e2023.pdf",
+    "title": "NIST AI Adversarial ML",
+    "sha256": "d1086f53a1634d67"
+  },
+  {
+    "file": "doc67.pdf",
+    "domain": "textbook",
+    "source": "https://assets.openstax.org/oscms-prodcms/media/documents/IntroductiontoSociology3e-WEB.pdf",
+    "title": "OpenStax Sociology",
+    "sha256": "53a8f3aa69fa54d3"
+  },
+  {
+    "file": "doc68.pdf",
+    "domain": "textbook",
+    "source": "https://assets.openstax.org/oscms-prodcms/media/documents/OrganicChemistry-WEB.pdf",
+    "title": "OpenStax Organic Chemistry",
+    "sha256": "69789257bf2c5fc5"
   }
 ]

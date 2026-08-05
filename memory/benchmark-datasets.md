@@ -91,6 +91,56 @@ DocLayNet, so its val split measures the model detector's fit, not generalizatio
 (b) reporting geometry-only vs hybrid detection quality, where geometry has never
 seen the data.
 
+### OHR-Bench — promoted to Tier 1, measured 2026-08-06
+
+Investigated properly rather than from the abstract, and it is the best corpus
+available to this project. `arXiv:2412.02592`, ICCV 2025, CC-BY-4.0, research-only.
+
+**What it ships** (three separate artefacts, all on the HF repo):
+
+| File | Size | Contents |
+|---|---|---|
+| `pdfs.zip` | 1.5 GB | **1,261 PDFs**, 7 domains |
+| `OHR-Bench.parquet` (v1) | 35 MB | per-page rows + **`qas`** — 638 docs, 5,039 QA |
+| `OHR-Bench_v2.parquet` | 160 MB | per-page `gt_text` + noise variants for **all 1,261 docs / 8,561 pages**. **No `qas` column** — QA lives only in v1 |
+| `retrieval.zip` | 126 MB | per-doc parsed text under `gt/`, plus **MinerU and Qwen2.5-VL parses** of the same documents |
+
+**The usable retrieval corpus, after every filter** (has QA ∩ multi-page domain ∩
+born-digital), measured not assumed:
+
+| | |
+|---|---|
+| documents | **95** — law 60, manual 15, finance 10, academic 10 |
+| pages | **3,787** (median 6–11 per doc) |
+| QA pairs | **3,558** |
+| born-digital | **95 of 95** — every QA-bearing document in these four domains has a text layer |
+
+**Why this beats FinanceBench as the primary external corpus:**
+
+- **Evidence is span-level: median 25 words** (p25 16, p75 39, max 405). Only 1.3%
+  exceed LangChain's mean chunk, so `--relevance span` is *fair* here — none of the
+  size-bias that forced `region` mode on FinanceBench.
+- **3,558 questions against FinanceBench's 150**, and four domains against one.
+- **3,787 pages against ~15,000** — actually runnable, ~2.4 h CPU at the measured
+  2.30 s/page, minutes on a GPU.
+- **`evidence_source` is typed**: text 2,666 / table 847 / equation 45. A 24%
+  table-sourced slice measures table handling directly, which nothing else we have does.
+- **`gt_text` per page is human-verified**, so parse-fidelity metrics (edit distance,
+  vocabulary F1) become possible — the family-A gap listed as a flat limitation.
+- `retrieval.zip` carries **MinerU and Qwen2.5-VL parses of the same pages**, i.e.
+  competitor output for free.
+
+**Integration traps:**
+
+- Domain names differ between v1 parquet and the zip: v1 says `paper`/`notes`, the
+  zip and v2 say `academic`/`administration`. v2 matches the zip directly.
+- The other three domains (`news` 279, `textbook` 504, `administration` 146) are
+  overwhelmingly **single-page** documents. Per-document retrieval over one page is
+  trivial and would inflate every tool equally — exclude them, and say why.
+- `academic/` contains DUDE-derived files, a scanned-document source. They survive
+  the born-digital filter here only because none of them carries QA in the four
+  target domains; re-check if the corpus is ever widened.
+
 ## Tier 2 — adopt if the paper needs the breadth
 
 | Dataset | id | What it gives | Cost / caveat |
@@ -134,6 +184,26 @@ That is a result, not a bug — expect it, and report it.
 92-doc arXiv corpus — **13×**. At the measured 2.30 s/page that is ~9.6 CPU-hours
 for the DocStruct adapter alone, before the four baselines and all the embedding.
 GPU is required for this corpus, not merely faster.
+
+## Corpus set for the paper (decided 2026-08-06)
+
+| Corpus | Role | Gold | Relevance mode |
+|---|---|---|---|
+| **OHR-Bench** (95 docs / 3,558 QA / 4 domains) | **primary** — breadth, span-level human gold, table-typed evidence, parse-fidelity GT | human | `span` |
+| **FinanceBench** (84 docs / 150 QA) | head-to-head with `arXiv:2604.12047` on their own corpus | human | `region` (mandatory, see above) |
+| internal arXiv corpus | ablations and statistical power; the only span-level gold we control end to end | LLM | `span` |
+
+Three corpora with three different provenances is more than either closest
+competitor reports. **The internal scraper is no longer worth repairing**: it has
+under-delivered twice (40 then 68 documents against a planned ~150) and 82 of its
+sources are dead — OpenStax returns 403, the RFC editor 404. Published datasets give
+more documents, better gold and citable provenance, which was the point.
+
+Known scraper bug, if it is ever revived: `fetch_dataset_v2.py` dedupes against the
+committed manifest (`seen = {e.get("arxiv_id") for e in manifest}`) rather than
+against the disk, so once `data/raw-pdfs/` is wiped it refuses to re-download
+anything the manifest still lists. Pruning the manifest to files that exist is the
+workaround; checking `os.path.exists` is the fix.
 
 ## Migration plan (cheap first)
 
