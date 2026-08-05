@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDF Parsing Papers and Datasets</title>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;line-height:1.45;margin:24px;color:#111}
+h1,h2{margin:0.2em 0 0.5em}
+p{margin:0.5em 0 1em}
+table{border-collapse:collapse;width:100%;margin:14px 0 24px}
+th,td{border:1px solid #ccc;padding:8px;vertical-align:top;text-align:left}
+th{background:#f4f6f8}
+small{color:#555}
+ul{margin-top:0.4em}
+.code{font-family:Consolas,monospace;background:#f7f7f7;padding:2px 4px;border-radius:4px}
+</style>
+</head>
+<body>
+<h1>PDF Parsing Papers and Datasets</h1>
+<p>This page collects the main PDF parser comparison papers, the metrics they use, and whether the datasets are labeled digital PDFs with selectable text.</p>
+
+<h2>Paper table</h2>
+<table>
+<thead><tr><th>Paper</th><th>Metric(s)</th><th>Link</th></tr></thead>
+<tbody>
+<tr><td>A Comparative Study of PDF Parsing Tools Across Diverse Document Categories</td><td>Precision, Recall, F1, BLEU-4, Local Alignment, IoU/Jaccard for table detection</td><td><a href="https://arxiv.org/html/2410.09871v1">arXiv HTML</a></td></tr>
+<tr><td>A Benchmark of PDF Information Extraction Tools using a Multi-Task and Multi-Domain Evaluation Framework for Academic Documents</td><td>Precision, Recall, F1, Accuracy, token-level similarity / Levenshtein-style evaluation</td><td><a href="https://arxiv.org/abs/2303.09957">arXiv</a></td></tr>
+<tr><td>OmniDocBench: Benchmarking Diverse PDF Document Parsing with Comprehensive Annotations</td><td>EDS, TEDS, KTDS, F1, vocabulary F1, normalized edit-distance-style metrics</td><td><a href="https://arxiv.org/html/2412.07626v1">arXiv HTML</a></td></tr>
+<tr><td>READOC: A Unified Benchmark for Realistic Document Structured Extraction</td><td>EDS, TEDS, KTDS, vocabulary F1</td><td><a href="https://aclanthology.org/2025.findings-acl.1128.pdf">ACL PDF</a></td></tr>
+<tr><td>A Benchmark and Evaluation for Text Extraction from PDF</td><td>Text extraction benchmark metrics; quality-focused evaluation across systems</td><td><a href="https://ad-publications.cs.uni-freiburg.de/benchmark.pdf">PDF</a></td></tr>
+<tr><td>Complicated Table Structure Recognition</td><td>Precision, Recall, F1; macro-averaged and micro-averaged scores</td><td><a href="https://arxiv.org/pdf/1908.04729v2.pdf">arXiv PDF</a></td></tr>
+<tr><td>PubLayNet: largest dataset ever for document layout analysis</td><td>Layout detection metrics used in evaluation</td><td><a href="https://arxiv.org/abs/1908.07836">arXiv</a></td></tr>
+<tr><td>DocBank: A Benchmark Dataset for Document Layout Analysis</td><td>Layout analysis benchmark metrics</td><td><a href="https://arxiv.org/abs/2006.01038">arXiv</a></td></tr>
+<tr><td>PubTables-1M: Towards comprehensive table extraction from unstructured documents</td><td>Table detection, table structure recognition, functional analysis metrics</td><td><a href="https://arxiv.org/abs/2110.00061">arXiv</a></td></tr>
+</tbody>
+</table>
+
+<h2>Datasets and selectable text</h2>
+<p><strong>Clearly yes:</strong> DocLayNet, DocBank, PubLayNet, PubTables-1M, SciTSR, READOC-arXiv. These are labeled and digital-born, and the PDF text is selectable or derived from embedded source text.</p>
+<p><strong>Likely yes, but verify release format:</strong> OmniDocBench, READOC-GitHub, READOC-Zenodo, TableBank, FinTabNet, TabLeX family.</p>
+<p><strong>Usually not ideal for selectable-text PDF parser benchmarking:</strong> image-only or OCR-heavy datasets, and scanned-document corpora.</p>
+
+<h2>Quick shortlist</h2>
+<ul>
+<li>PubLayNet</li>
+<li>DocBank</li>
+<li>DocLayNet</li>
+<li>PubTables-1M</li>
+<li>SciTSR</li>
+<li>READOC-arXiv</li>
+</ul>
+
+<p><small>Sources include the paper pages and dataset pages referenced in the linked table above.</small></p>
+</body>
+</html>
