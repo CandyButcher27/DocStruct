@@ -27,6 +27,7 @@ matches the task before writing code:
 | [`memory/pipeline.md`](memory/pipeline.md) | You are changing detection, fusion, reading order, extraction or chunking |
 | [`memory/evaluation.md`](memory/evaluation.md) | You are touching `eval/`, running benchmarks, or adding a metric |
 | [`memory/related-work.md`](memory/related-work.md) | You are writing the paper, positioning against competitors, or asked "has this been done?" |
+| [`memory/paper-structure-survey.md`](memory/paper-structure-survey.md) | You are editing `paper/` — how comparable papers are *organised*, venue conventions, and the edit list for the draft |
 | [`memory/benchmark-datasets.md`](memory/benchmark-datasets.md) | You need a public corpus, or are touching gold generation / the FinanceBench migration |
 | [`memory/metrics-justification.md`](memory/metrics-justification.md) | You are adding, renaming or defending a metric — says which are standard and which are ours |
 | [`memory/results.md`](memory/results.md) | You need to know what a config value is worth, or what the current numbers are |
