@@ -41,6 +41,27 @@ Working scratchpad for the Fable-review work. Durable detail lives in `notes.md`
 
 3. **Then** the gated flags become generalizable beyond arXiv; re-run the sweep on v7.
 
+## Paper track (opened 2026-08-05)
+
+Research memory: `memory/related-work.md`, `memory/benchmark-datasets.md`,
+`memory/metrics-justification.md`. Draft: `paper/main.tex` + `paper/refs.bib`.
+
+4. **FinanceBench run** — the single highest-value item. `scripts/fetch_financebench.py`
+   works (smoke-tested on 2 docs); run without `--limit` for all 84, then benchmark.
+   Blocked on: a `--relevance page|span|token` switch in `eval/benchmark.py`
+   (FinanceBench evidence is a ~1.2k-char page region, so chunk containment can't
+   score it). Public human gold kills the "you wrote your own exam" objection.
+5. **Semantic baseline** — add `ClusterSemanticChunker` (`chunking_evaluation` pkg)
+   to the tool set. Reviewers will ask why no semantic chunker is in the comparison.
+6. **Token-level IoU / Precision_Ω** (Chroma TR metric set) — replaces the homemade
+   "MRR per 1k context words" with the citable equivalent.
+7. **Rename Hit@1 → Precision@1** in the report, matching `arXiv:2604.12047`.
+8. **DocLayNet val split** for the detection layer, replacing the 2 hand-annotated
+   docs; also the only cheap path to calibrating the `# unvalidated` fusion constants.
+9. **Verify `refs.bib`** — several author lists are placeholders (see file header).
+10. **`.venv` is missing from the project dir** (only `python` on PATH). Recreate
+    before any test/benchmark run: `python -m venv .venv && .venv/Scripts/pip install -e ".[dev]"`.
+
 ## Deferred (with reasons — see decisions.md/roadmap.md)
 
 - §4.3 deeper SectionPath — breaks chunk-JSON for depth arXiv never reaches (YAGNI).

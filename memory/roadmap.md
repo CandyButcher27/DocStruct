@@ -5,6 +5,17 @@ Ranked by expected value. Everything here has been audited against the actual co
 
 ## Next up
 
+0. **Adopt FinanceBench as the external corpus** (added 2026-08-05, paper track).
+   Supersedes item 1 as the cheapest way to break arXiv homogeneity *and* removes
+   the "LLM-generated gold" objection at the same time: 150 human-annotated
+   questions / 84 born-digital SEC filings, public, table-heavy, and the corpus our
+   closest competitor (`arXiv:2604.12047`) used. `scripts/fetch_financebench.py` is
+   written and smoke-tested; the only code work is a `--relevance page|span|token`
+   switch in the benchmark, because FinanceBench evidence is a page region rather
+   than a sentence span. See `benchmark-datasets.md` and `related-work.md`.
+   Item 1 below stays valuable (558 paired questions is statistical power
+   FinanceBench's 150 cannot match) but is no longer the *first* move.
+
 1. **Broaden the corpus beyond arXiv.** Every number in `results.md` comes from
    born-digital two-column papers, and the XY-cut result proves corpus shape
    decides which algorithm wins. This is the highest-value open item because it is

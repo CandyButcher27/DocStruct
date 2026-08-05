@@ -26,6 +26,9 @@ matches the task before writing code:
 | [`memory/architecture.md`](memory/architecture.md) | You need the module map, data model, or where a responsibility lives |
 | [`memory/pipeline.md`](memory/pipeline.md) | You are changing detection, fusion, reading order, extraction or chunking |
 | [`memory/evaluation.md`](memory/evaluation.md) | You are touching `eval/`, running benchmarks, or adding a metric |
+| [`memory/related-work.md`](memory/related-work.md) | You are writing the paper, positioning against competitors, or asked "has this been done?" |
+| [`memory/benchmark-datasets.md`](memory/benchmark-datasets.md) | You need a public corpus, or are touching gold generation / the FinanceBench migration |
+| [`memory/metrics-justification.md`](memory/metrics-justification.md) | You are adding, renaming or defending a metric — says which are standard and which are ours |
 | [`memory/results.md`](memory/results.md) | You need to know what a config value is worth, or what the current numbers are |
 | [`memory/decisions.md`](memory/decisions.md) | Before proposing anything — it lists what was already tried and rejected, with measurements |
 | [`memory/roadmap.md`](memory/roadmap.md) | You are picking the next piece of work |
@@ -56,6 +59,20 @@ was updated last.
    way; a bare number is a regression waiting to happen.
 6. **Every stage ends in a commit, and `notes.md` gets the entry.** The log is the
    product of this project as much as the code is.
+7. **Gold must be tool-agnostic, and preferably not ours.** Never generate Q&A from
+   the output of a tool being benchmarked. Prefer a public human-annotated corpus
+   (FinanceBench first — see `memory/benchmark-datasets.md`) over LLM-generated gold
+   for any headline number in the paper.
+8. **Report the losses.** Coverage 0.817 vs LangChain's 1.00, duplication 2.06, no
+   parse-fidelity number, born-digital only. These belong in the main table, not an
+   appendix. `memory/related-work.md` keeps the list of who beats us where.
+
+## The paper
+
+A first draft lives in `paper/` (`main.tex` + `refs.bib`, plain `article` class so
+it builds anywhere). `\todo{}` marks open work; `refs.bib` has a header listing the
+entries whose author lists are still unverified. The three research memory files
+above are its source of truth — update them, then the draft.
 
 ## Running things
 

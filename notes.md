@@ -870,3 +870,58 @@ cap does not spread.
 `parse(on_page=fn)` / `run_pipeline(on_page=fn)` calls `fn(page_index, total)` per
 page during the fusion loop, for progress reporting on long documents. Threads
 through the config-override re-entry too.
+
+## Stage 12 — Literature sweep, metric audit, paper draft (2026-08-05)
+
+No pipeline code changed. This stage is about where the project stands against
+published work, and what has to be true before any of it can be submitted.
+
+**Literature sweep.** Seeded from `pdf_parsing_papers.html`, extended by search.
+Four adjacent literatures, only one of which is our competition: parser fidelity
+(OmniDocBench, READoc, Docling/MinerU/Marker), layout datasets (DocLayNet,
+PubLayNet, DocBank, PubTables-1M), chunking evaluation on plain text (Chroma TR,
+LumberChunker, the 2025–26 systematic studies), and end-to-end parse×chunk×RAG —
+where DocStruct actually lives. Nearest published neighbours: El Bachyr et al.
+(ICSE-SEIP 2026, `arXiv:2604.12047`) and OHR-Bench (ICCV 2025). Written up in
+`memory/related-work.md`, including a table of the axes where competitors beat us.
+
+**The gap we can own.** Nobody evaluates a *deterministic layout-aware* chunker
+against generic splitters with the embedder and retriever held fixed on public
+PDFs. El Bachyr et al. vary six parsers × six chunkers × four retrievers on
+FinanceBench and have **no structure-aware chunker in the grid**; the chunking
+literature runs on plain text with no layout at all. Also unreported anywhere:
+coverage/duplication (what the chunker silently drops) and determinism.
+
+**Metric audit** (`memory/metrics-justification.md`). The retrieval layer is fully
+standard and matches the closest competitor one-for-one (MRR, nDCG@k, Recall@k,
+Hit@1 — which should be *renamed* Precision@1, the field's name for it). The cost
+layer is homemade: `MRR/1k context words` is our independent reinvention of
+Chroma's token-level **IoU**, and should be demoted in favour of the citable
+version plus **Precision_Ω** (precision under an oracle retriever — it isolates the
+chunker from the retriever, exactly our confound). Coverage/duplication stay, framed
+as the chunker analogue of READoc's vocabulary F1. Our paired bootstrap is a genuine
+methodological edge: `arXiv:2604.12047` reports point estimates only.
+
+**Dataset migration** (`memory/benchmark-datasets.md`). Our gold is LLM-authored,
+not public, and arXiv-heavy — three separate attack surfaces. FinanceBench is the
+fix: 150 human-annotated questions over 84 born-digital SEC filings, CC-BY-NC-4.0,
+verbatim evidence text + page number, table-heavy, non-arXiv, and it is the corpus
+our closest competitor used. `scripts/fetch_financebench.py` (stdlib only) fetches
+the PDFs and rewrites the gold into our QA schema; **smoke-tested on 2 documents:
+7 gold rows, span chars 173–2874, mean 1186**.
+
+That mean is the catch and the one real design consequence: FinanceBench evidence
+is a *page region*, not a sentence span, so `relevance.py`'s containment rule
+cannot score it — a 500-word chunk will never contain a 6k-char region. The
+benchmark needs a `--relevance page|span|token` switch before the full run: page
+for comparability with `arXiv:2604.12047`, token for comparability with Chroma.
+
+**Paper draft.** `paper/main.tex` + `paper/refs.bib`, plain `article` class (venue
+undecided). Carries the v6 numbers, the ablation table, the negative results
+(XY-cut lost; the v5→v6 gold artefact that reversed the vision-model conclusion),
+and an explicit limitations section listing every axis where we lose. `\todo{}`
+marks the open work; `refs.bib` has a header naming the entries whose author lists
+are still unverified — do not submit on those.
+
+**Environment note:** the project `.venv` is absent from the working directory;
+only the system Python is on PATH. Recreate before any test or benchmark run.
