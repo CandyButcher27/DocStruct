@@ -49,6 +49,7 @@ data/hybrid-outputs/
 data/model-outputs/
 data/markdown-outputs/
 data/doclaynet/
+data/financebench/
 data/v1/
 data/*.json
 data/*.pdf
