@@ -27,11 +27,36 @@ class LangChainAdapter(ChunkAdapter):
         import pdfplumber
         from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+        joiner = "\n\n"
         with pdfplumber.open(pdf_path) as pdf:
-            text = "\n\n".join((page.extract_text() or "") for page in pdf.pages)
+            page_texts = [(page.extract_text() or "") for page in pdf.pages]
+        text = joiner.join(page_texts)
+
+        # Character span of each page within the concatenated text. This splitter is
+        # handed the whole document precisely because it ignores structure, so its
+        # chunks straddle page breaks by construction; page attribution has to be
+        # recovered by offset rather than read off a page object.
+        bounds, pos = [], 0
+        for page_text in page_texts:
+            bounds.append((pos, pos + len(page_text)))
+            pos += len(page_text) + len(joiner)
 
         splitter = RecursiveCharacterTextSplitter(
             chunk_size=self.chunk_size, chunk_overlap=self.chunk_overlap
         )
-        parts = splitter.split_text(text)
-        return [EvalChunk(id=f"lc_{i}", text=p) for i, p in enumerate(parts) if p.strip()]
+        out: List[EvalChunk] = []
+        search_from = 0
+        for i, part in enumerate(splitter.split_text(text)):
+            if not part.strip():
+                continue
+            # The splitter strips whitespace, so a chunk is not always findable
+            # verbatim. Fall back to the running cursor rather than dropping the
+            # page attribution, which would silently make the chunk unscorable.
+            start = text.find(part, search_from)
+            if start < 0:
+                start = min(search_from, max(len(text) - len(part), 0))
+            end = start + len(part)
+            search_from = start + 1
+            pages = [n for n, (a, b) in enumerate(bounds) if a < end and b > start]
+            out.append(EvalChunk(id=f"lc_{i}", text=part, metadata={"pages": pages}))
+        return out
