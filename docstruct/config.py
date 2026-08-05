@@ -310,6 +310,12 @@ QA_MAX_COMPLETION_TOKENS = 8000
 QA_REQUEST_PACING_SECONDS = 20.0
 BENCHMARK_TOP_K = 5
 RELEVANCE_MIN_OVERLAP = 0.6     # token-overlap fallback when answer span isn't an exact substring
+# Threshold for `region` relevance, used with page-region gold (FinanceBench).
+# Higher than the span fallback on purpose: a 1.2k-character evidence block shares
+# a long tail of common terms with any chunk from the same filing, so a lenient
+# threshold marks half the document relevant and flattens the tools together.
+# unvalidated — sweep it on FinanceBench before trusting the number.
+RELEVANCE_REGION_MIN_OVERLAP = 0.7
 # Hybrid retrieval (BM25 lexical + dense vector, fused by Reciprocal Rank Fusion)
 RRF_K = 60                      # standard RRF constant
 BM25_CANDIDATES = 20            # candidate pool per retriever before fusion

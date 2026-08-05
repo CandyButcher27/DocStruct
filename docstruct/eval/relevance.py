@@ -80,3 +80,58 @@ def is_relevant(chunk_text: str, answer_span: str, min_overlap: float | None = N
         return True
     min_overlap = config.RELEVANCE_MIN_OVERLAP if min_overlap is None else min_overlap
     return _token_overlap(answer_span, chunk_text) >= min_overlap
+
+
+def _overlap_coefficient(a: str, b: str) -> float:
+    """Szymkiewicz--Simpson overlap: |A n B| / min(|A|, |B|).
+
+    Normalising by the *smaller* set is the whole point. Jaccard and the
+    span-style ratio both punish a size mismatch that is expected here rather
+    than informative: a 400-word chunk sitting entirely inside a 1,000-word
+    evidence block is perfect evidence and scores 0.4 under either. Under the
+    overlap coefficient it scores 1.0, and so does the reverse containment.
+    """
+    ta = set(normalize_text(a).split())
+    tb = set(normalize_text(b).split())
+    if not ta or not tb:
+        return 0.0
+    return len(ta & tb) / min(len(ta), len(tb))
+
+
+def is_relevant_region(chunk_text: str, region: str, min_overlap: float | None = None) -> bool:
+    """True if the chunk substantially overlaps a *page-region* gold passage.
+
+    Public human-annotated corpora do not mark sentence spans. FinanceBench
+    evidence is the surrounding table or paragraph block — median 1,271
+    characters, up to 6,362 — so `is_relevant` cannot score it. Containment
+    never fires, and its token-overlap fallback cannot either: that fallback
+    measures the fraction of the *gold's* tokens present in the chunk, which for
+    a 1,000-word region and a 400-word chunk is capped at 0.4 no matter how
+    perfectly the chunk sits inside the evidence. Lowering the threshold does not
+    fix it, it just moves the arbitrary cutoff — the ratio is the wrong ratio.
+
+    The overlap coefficient normalises by the smaller side, so a chunk contained
+    in the evidence and evidence contained in a chunk both score 1.0, and a chunk
+    from an unrelated part of the filing still scores near zero.
+
+    Deliberately not page-metadata matching. That is the protocol
+    `arXiv:2604.12047` uses, but it requires every adapter to attribute chunks to
+    pages, and the LangChain baseline concatenates page text before splitting, so
+    its chunks straddle pages by construction. Text overlap needs nothing from the
+    adapter and stays tool-agnostic, which is the property the whole benchmark
+    rests on.
+    """
+    min_overlap = config.RELEVANCE_REGION_MIN_OVERLAP if min_overlap is None else min_overlap
+    return _overlap_coefficient(chunk_text, region) >= min_overlap
+
+
+# Relevance rules the benchmark can be run under. `span` is for gold that marks a
+# verbatim sentence-level answer (our generated corpora); `region` is for gold that
+# marks the surrounding block (FinanceBench and most human-annotated corpora).
+RELEVANCE_MODES = {"span": is_relevant, "region": is_relevant_region}
+
+
+def get_relevance(mode: str):
+    if mode not in RELEVANCE_MODES:
+        raise ValueError(f"unknown relevance mode {mode!r}; expected one of {sorted(RELEVANCE_MODES)}")
+    return RELEVANCE_MODES[mode]

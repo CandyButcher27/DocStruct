@@ -1,4 +1,12 @@
-from docstruct.eval.relevance import contains_verbatim, is_relevant, normalize_text
+import pytest
+
+from docstruct.eval.relevance import (
+    contains_verbatim,
+    get_relevance,
+    is_relevant,
+    is_relevant_region,
+    normalize_text,
+)
 
 
 def test_normalize_collapses_whitespace_and_case():
@@ -66,3 +74,35 @@ def test_genuinely_different_text_still_misses():
     from docstruct.eval.relevance import contains_verbatim
 
     assert not contains_verbatim("the FA-ISS index stores a copy", "the FA-ISS index deletes a copy")
+
+
+def test_region_relevance_credits_partial_coverage_of_a_block():
+    # FinanceBench-shaped gold: the evidence is a whole table block, so no chunk
+    # can contain it. A chunk carrying most of the block's terms is still the
+    # chunk that answers the question.
+    # A 400-word evidence block; the chunk sits inside it and answers the question.
+    filler = " ".join(f"lineitem{i} {i * 37}" for i in range(200))
+    region = (
+        "Consolidated Statement of Cash Flows Years ended December 31 "
+        "Purchases of property plant and equipment PP&E 1,577 1,373 1,420 " + filler
+    )
+    chunk = "Purchases of property plant and equipment PP&E 1,577 1,373 1,420"
+
+    # Containment cannot fire, and the span fallback is capped by the size ratio:
+    # the chunk holds a small fraction of the region's tokens however good it is.
+    assert not is_relevant(chunk, region)
+    # The overlap coefficient normalises by the smaller side, so it fires.
+    assert is_relevant_region(chunk, region)
+
+
+def test_region_relevance_rejects_an_unrelated_chunk():
+    region = "Purchases of property plant and equipment PP&E 1,577 1,373 1,420"
+    chunk = "Item 3. Legal Proceedings. Discussion of respirator mask litigation."
+    assert not is_relevant_region(chunk, region)
+
+
+def test_get_relevance_rejects_an_unknown_mode():
+    assert get_relevance("span") is is_relevant
+    assert get_relevance("region") is is_relevant_region
+    with pytest.raises(ValueError):
+        get_relevance("page")

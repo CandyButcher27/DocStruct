@@ -28,7 +28,7 @@ from docstruct import config
 from docstruct.eval.adapters.base import ChunkAdapter, EvalChunk
 from docstruct.eval.coverage import raw_document_text, text_coverage
 from docstruct.eval.qa_generator import QAItem
-from docstruct.eval.relevance import is_relevant
+from docstruct.eval.relevance import get_relevance
 from docstruct.eval.stats import align_per_question, bootstrap_ci, paired_bootstrap
 
 logger = logging.getLogger(__name__)
@@ -83,8 +83,9 @@ class ToolResult:
     vs_reference: Dict[str, dict] = field(default_factory=dict)
 
 
-def _score(retrieved_texts: List[str], answer_span: str, k: int):
-    flags = [is_relevant(t, answer_span) for t in retrieved_texts[:k]]
+def _score(retrieved_texts: List[str], answer_span: str, k: int, relevant=None):
+    relevant = relevant or get_relevance("span")
+    flags = [relevant(t, answer_span) for t in retrieved_texts[:k]]
     rr = next((1.0 / (i + 1) for i, f in enumerate(flags) if f), 0.0)
     hit1 = 1.0 if flags and flags[0] else 0.0
     recall = 1.0 if any(flags) else 0.0
@@ -153,12 +154,14 @@ def benchmark_tool(
     cache_dir: Optional[str] = None,
     rrf_k: int = config.RRF_K,
     reranker=None,
+    relevance: str = "span",
 ) -> ToolResult:
     """Benchmark one tool across all documents that have questions."""
     from rank_bm25 import BM25Okapi
 
     from docstruct.indexing.vector_store import VectorStore
 
+    relevant = get_relevance(relevance)
     by_doc = _qa_by_doc(qa)
     docs_with_qa = [p for p in pdf_paths if os.path.basename(p) in by_doc]
     n_total = len(docs_with_qa)
@@ -252,8 +255,8 @@ def benchmark_tool(
 
             retrieved = [texts[i] for i in hyb_order]
             total_context_words += sum(len(t.split()) for t in retrieved)
-            vr = _score([texts[i] for i in vec_order[:top_k]], case.answer_span, top_k)
-            hr = _score(retrieved, case.answer_span, top_k)
+            vr = _score([texts[i] for i in vec_order[:top_k]], case.answer_span, top_k, relevant)
+            hr = _score(retrieved, case.answer_span, top_k, relevant)
             for i in range(4):
                 v[i] += vr[i]; h[i] += hr[i]
             result.n_questions += 1
@@ -362,6 +365,7 @@ def run_benchmark(
     rrf_k: int = config.RRF_K,
     reranker_model: Optional[str] = None,
     reference: str = "docstruct",
+    relevance: str = "span",
 ) -> List[ToolResult]:
     """Benchmark every adapter, ranked by hybrid MRR. Embedder loaded once."""
     from sentence_transformers import SentenceTransformer
@@ -376,7 +380,7 @@ def run_benchmark(
     results = []
     for name, adapter in adapters.items():
         print(f"\n=== {name} ===", flush=True)
-        results.append(benchmark_tool(adapter, pdf_paths, qa, embedder, top_k, cache_dir=cache_dir, rrf_k=rrf_k, reranker=reranker))
+        results.append(benchmark_tool(adapter, pdf_paths, qa, embedder, top_k, cache_dir=cache_dir, rrf_k=rrf_k, reranker=reranker, relevance=relevance))
         r = results[-1]
         lo, hi = r.ci.get("mrr", (0.0, 0.0))
         print(f"  => MRR={r.mrr} [{lo}, {hi}]  NDCG={r.ndcg}  Recall={r.recall}  "
