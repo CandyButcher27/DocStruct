@@ -27,6 +27,17 @@ _USER_AGENT = "docstruct-eval/0.4 (+https://github.com/CandyButcher27/DocStruct)
 _PROVIDERS = {
     "ollama": {"base_url": "https://ollama.com", "key_env": "OLLAMA_API_KEY", "base_env": "OLLAMA_BASE_URL"},
     "groq": {"base_url": "https://api.groq.com/openai", "key_env": "GROQ_API_KEY", "base_env": "GROQ_BASE_URL"},
+    # Default model is gpt-4.1, not the stronger gpt-5, on purpose: the gpt-5
+    # family rejects `temperature` values other than 1, and gold generation is
+    # run at temperature 0 so the same corpus yields the same questions twice.
+    # Reproducible gold outranks a more capable generator here. Override with
+    # --model or DOCSTRUCT_LLM_MODEL if you accept sampled gold.
+    "openai": {
+        "base_url": "https://api.openai.com",
+        "key_env": "OPENAI_API_KEY",
+        "base_env": "OPENAI_BASE_URL",
+        "model": "gpt-4.1",
+    },
 }
 
 
@@ -54,6 +65,39 @@ def _backoff_seconds(err: Exception, attempt: int) -> float:
     return 1.5 * (attempt + 1)
 
 
+def _adapt_payload(payload: dict, err: urllib.error.HTTPError) -> bool:
+    """Rewrite a payload an endpoint rejected on parameter grounds. True if changed.
+
+    The OpenAI-compatible surface is not one surface. The gpt-5 / o-series family
+    renamed `max_tokens` to `max_completion_tokens` and accepts only the default
+    temperature, while gpt-4.1 and every other provider we talk to want the old
+    spelling. Keying this off a model-name table means the table is wrong the day
+    a new family ships; the error body already says exactly what to change, so
+    read it and comply once rather than guessing up front.
+
+    Only ever *removes* or *renames* — it never invents a value, so an adapted
+    request asks for the same thing in the dialect the endpoint speaks.
+    """
+    if err.code != 400:
+        return False
+    try:
+        detail = json.loads(err.read().decode("utf-8")).get("error", {})
+    except (ValueError, OSError):
+        return False
+    param, message = detail.get("param"), detail.get("message", "")
+
+    if param == "max_tokens" and "max_completion_tokens" in message and "max_tokens" in payload:
+        payload["max_completion_tokens"] = payload.pop("max_tokens")
+        return True
+    # Reasoning models reject any explicit temperature. Dropping it is safe for
+    # gold generation only because those models are not the default — see the
+    # comment on the `openai` provider entry.
+    if param == "temperature" and "temperature" in payload:
+        payload.pop("temperature")
+        return True
+    return False
+
+
 def available(provider: str = "ollama") -> bool:
     load_dotenv()
     spec = _PROVIDERS.get(provider, _PROVIDERS["ollama"])
@@ -75,7 +119,9 @@ class LLMClient:
         spec = _PROVIDERS.get(provider, _PROVIDERS["ollama"])
         self.base_url = (base_url or os.environ.get(spec["base_env"]) or spec["base_url"]).rstrip("/")
         self.api_key = api_key or os.environ.get(spec["key_env"])
-        self.model = model or os.environ.get("DOCSTRUCT_LLM_MODEL") or config.LLM_MODEL
+        self.model = (
+            model or os.environ.get("DOCSTRUCT_LLM_MODEL") or spec.get("model") or config.LLM_MODEL
+        )
         self.timeout = timeout
         if not self.api_key:
             raise RuntimeError(f"No API key for provider '{provider}' ({spec['key_env']} unset)")
@@ -112,15 +158,30 @@ class LLMClient:
         }
 
         last_err: Optional[Exception] = None
-        for attempt in range(retries):
+        attempt = 0
+        # Payload adaptations deliberately do not consume the retry budget: that
+        # budget exists for rate limits and network faults, and a gpt-5-family
+        # request needs two rewrites before it is even sent in the right dialect,
+        # which would leave one attempt for everything that can actually go wrong.
+        while attempt < retries:
             try:
                 req = urllib.request.Request(url, data=data, headers=headers, method="POST")
                 with urllib.request.urlopen(req, timeout=self.timeout) as resp:
                     body = json.loads(resp.read().decode("utf-8"))
                 return body["choices"][0]["message"]["content"]
-            except (urllib.error.URLError, urllib.error.HTTPError, KeyError, TimeoutError) as err:
+            except urllib.error.HTTPError as err:
+                last_err = err
+                if _adapt_payload(payload, err):
+                    # A rejected parameter is not a transient failure; retrying the
+                    # identical body just spends the budget. Adapt and go again now.
+                    data = json.dumps(payload).encode("utf-8")
+                    continue
+                time.sleep(_backoff_seconds(err, attempt))
+                attempt += 1
+            except (urllib.error.URLError, KeyError, TimeoutError) as err:
                 last_err = err
                 time.sleep(_backoff_seconds(err, attempt))
+                attempt += 1
         raise RuntimeError(f"LLM request failed after {retries} attempts: {last_err}")
 
     def chat_json(self, messages: List[dict], **kwargs) -> dict:

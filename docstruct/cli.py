@@ -234,7 +234,7 @@ def build_parser() -> argparse.ArgumentParser:
     g_p.add_argument("--weights", default=None, help="weights for hybrid chunking")
     g_p.add_argument("--per-doc", type=int, default=5, help="questions per document")
     g_p.add_argument("--model", default=None, help="LLM model id (default gpt-oss:120b)")
-    g_p.add_argument("--provider", default="ollama", choices=("ollama", "groq"),
+    g_p.add_argument("--provider", default="ollama", choices=("ollama", "groq", "openai"),
                      help="OpenAI-compatible provider to generate gold with")
     # Both of these exist because the right value is a property of the provider's
     # rate limits, not of DocStruct. A generous endpoint should see the whole
