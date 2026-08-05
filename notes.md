@@ -1008,3 +1008,59 @@ gpt-4.1 rather than gpt-5 because that family accepts only temperature 1 and gol
 generated at 0 for reproducibility. On a like-for-like single document gpt-4.1 kept
 2 of 6 pairs against gpt-oss:120b's 3 of 6 — **no quality argument for switching
 generators**, only a speed one.
+
+## Stage 15 — page relevance, seven baselines, and a finding about relevance itself (2026-08-06)
+
+`--relevance page` shipped (see Stage 14 for why OHR-Bench needs it). Adapters now
+emit the pages each chunk drew from; `_pages_of()` normalises the fact that
+Unstructured and Docling count pages from 1 while everything else counts from 0, and
+LangChain/LlamaIndex recover page spans by character offset because they concatenate
+before splitting. The benchmark **aborts** if an adapter reports no pages rather than
+scoring it zero — a silent zero reads as a result.
+
+**The finding, from the 3-doc page-mode smoke (not a result, but a real signal):**
+
+| tool | MRR | chunks | mean |
+|---|---|---|---|
+| unstructured | **0.817** | 397 | 84 w |
+| docstruct | 0.598 | 154 | 290 w |
+| pymupdf4llm | 0.595 | 66 | 484 w |
+| llamaindex | 0.572 | 140 | 99 w |
+| langchain | 0.544 | 251 | 57 w |
+| docstruct_geo | 0.343 | 96 | 333 w |
+
+The prediction going in was that page mode would favour `pymupdf4llm`, which emits
+one chunk per page. Wrong: **it favours small chunks.** Unstructured wins by 0.22 MRR
+with the smallest chunks in the field — more, tighter chunks each carry a clean page
+label and match a specific question better, so the top-5 lands on the evidence page
+more often.
+
+So the generalisation is bigger than "one relevance rule per corpus":
+
+> **No relevance rule is neutral with respect to chunk size.** `span` rewards large
+> chunks, `page` rewards small ones, `region` was built to be size-tolerant and is
+> the only one with a defensible claim to neutrality — and its threshold is still
+> unvalidated.
+
+That is a methodological contribution in its own right, and it means no single mode
+can carry a claim. Report all three and show whether the ranking survives; if
+DocStruct wins only under `span`, that is uncomfortable and has to be said.
+
+Also visible: docstruct 0.598 vs docstruct_geo 0.343, i.e. the vision detector worth
+**+0.255 MRR** here against +0.044 on arXiv — consistent with the 122-vs-4 table
+result from Stage 13.
+
+**Baselines now seven** (docstruct, docstruct_geo, langchain, pymupdf4llm,
+unstructured, llamaindex, llamaindex_semantic) plus docling. `llamaindex_semantic`
+is the semantic-chunking baseline the comparison was missing, and it is handed
+`config.EMBEDDING_MODEL` so the contest stays about where boundaries land rather than
+who embeds better. **docling has still never run**: locally it dies with
+`InvalidCxxCompiler` (no MSVC) and `std::bad_alloc`, both Windows/CPU problems, so
+Colab is its first real test.
+
+Two process failures worth recording. A LangChain adapter edit **silently failed to
+apply** and was committed with a message claiming it worked; the page-mode guard
+caught it at runtime, which is exactly why the guard exists. And the golden
+determinism test was pinned to a *filename* — the corpus rebuild reassigns
+`docN.pdf` sequentially, so it had silently repointed at a different paper and its
+failure read like a chunking regression. It now pins its input by sha256.
