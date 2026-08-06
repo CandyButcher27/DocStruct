@@ -148,11 +148,14 @@ def _qa_by_doc(qa: List[QAItem]) -> Dict[str, List[QAItem]]:
     return out
 
 
-def _ckpt_path(cache_dir: Optional[str], tool_name: str) -> Optional[str]:
+def _ckpt_path(cache_dir: Optional[str], tool_name: str, relevance: str) -> Optional[str]:
+    # The checkpoint stores scored results, and every score depends on the relevance
+    # rule. Keying on tool name alone made a second run under a different --relevance
+    # resume the first one's numbers and report them under the new mode's name.
     if not cache_dir:
         return None
     os.makedirs(cache_dir, exist_ok=True)
-    return os.path.join(cache_dir, f"bench_ckpt_{tool_name}.json")
+    return os.path.join(cache_dir, f"bench_ckpt_{tool_name}_{relevance}.json")
 
 
 def _load_ckpt(path: Optional[str]):
@@ -190,7 +193,7 @@ def benchmark_tool(
     docs_with_qa = [p for p in pdf_paths if os.path.basename(p) in by_doc]
     n_total = len(docs_with_qa)
 
-    ckpt_path = _ckpt_path(cache_dir, adapter.name)
+    ckpt_path = _ckpt_path(cache_dir, adapter.name, relevance)
     ckpt = _load_ckpt(ckpt_path)
 
     result = ToolResult(name=adapter.name)

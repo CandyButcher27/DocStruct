@@ -1,6 +1,6 @@
 import math
 
-from docstruct.eval.benchmark import _score, _qa_by_doc, _rrf, ToolResult
+from docstruct.eval.benchmark import _score, _qa_by_doc, _rrf, _ckpt_path, ToolResult
 from docstruct.eval.qa_generator import QAItem
 
 
@@ -57,3 +57,13 @@ def test_rrf_rewards_agreement():
 
 def test_rrf_single_list_preserves_order():
     assert _rrf([[3, 1, 2]]) == [3, 1, 2]
+
+
+def test_ckpt_path_separates_relevance_modes(tmp_path):
+    page = _ckpt_path(str(tmp_path), "docstruct", "page")
+    span = _ckpt_path(str(tmp_path), "docstruct", "span")
+    assert page != span
+
+
+def test_ckpt_path_none_without_cache_dir():
+    assert _ckpt_path(None, "docstruct", "page") is None
