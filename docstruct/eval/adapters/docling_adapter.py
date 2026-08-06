@@ -24,10 +24,19 @@ class DoclingAdapter(ChunkAdapter):
 
     def _ensure(self):
         if self._converter is None:
-            from docling.document_converter import DocumentConverter
             from docling.chunking import HybridChunker
+            from docling.datamodel.base_models import InputFormat
+            from docling.datamodel.pipeline_options import PdfPipelineOptions
+            from docling.document_converter import DocumentConverter, PdfFormatOption
 
-            self._converter = DocumentConverter()
+            # Docling defaults to OCR. Our corpora are born-digital and every other
+            # tool in the comparison reads the text layer, so OCR here costs ~50s a
+            # document (three RapidOCR models) to re-derive text that is already
+            # extractable. Measured on OHR-Bench academic docs, Colab T4.
+            opts = PdfPipelineOptions(do_ocr=False)
+            self._converter = DocumentConverter(
+                format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=opts)}
+            )
             self._chunker = HybridChunker()
 
     def chunk(self, pdf_path: str) -> List[EvalChunk]:
