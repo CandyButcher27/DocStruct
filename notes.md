@@ -1064,3 +1064,49 @@ caught it at runtime, which is exactly why the guard exists. And the golden
 determinism test was pinned to a *filename* — the corpus rebuild reassigns
 `docN.pdf` sequentially, so it had silently repointed at a different paper and its
 failure read like a chunking regression. It now pins its input by sha256.
+
+---
+
+## Stage 16 — pymupdf4llm was also OCRing born-digital pages (2026-08-07)
+
+The same defect as docling in Stage 15's fix, in a different tool, found by reading
+the OHR-Bench Colab log rather than by any test. `pymupdf4llm.to_markdown` routes
+through its layout path, which defaults to `use_ocr=OCRMode.SELECT_KEEP_OLD`: an
+ONNX classifier (`ocr_decision_model.onnx`, probability threshold 0.93) scores every
+page, and flagged pages are re-derived by RapidOCR. Nothing in our adapter asked for
+this.
+
+Measured on `doc1.pdf` locally:
+
+| | pages | chars | wall |
+|---|---|---|---|
+| `use_ocr=False` | 14 | 75,953 | 9.7 s |
+| default | 14 | 72,425 | 13.1 s |
+
+OCR was **35% slower and lost 3,528 characters**. It did not fill a gap; it replaced
+a good text layer with a worse transcription. On Colab with RapidOCR the cost is far
+worse — `AES_2022_10K` spent 270.6 s with 24 of 116 pages OCR'd, against 89.3 s for
+langchain on the same document.
+
+The audit script (below) shows why the classifier fires: the page it flagged in
+doc1 already carried 3,182 characters with 3 replacement characters. It is tuned to
+be eager, which is right for a general-purpose tool and wrong for this comparison.
+
+**Only pymupdf4llm's numbers are affected.** The tools queued behind it in that run
+share no code path — `unstructured` partitions with `strategy="fast"` (pdfminer text
+layer), and both llamaindex variants read through pdfplumber. Adapters are
+independent and the benchmark caches per tool, so pymupdf4llm re-runs alone.
+
+### The verdicts are worth keeping, so they are now recorded
+
+Disabling OCR throws away a signal that is useful precisely because it is not ours:
+a tool-agnostic, per-page estimate of how extractable a page's text is.
+`scripts/ocr_audit.py` runs the classifier alone — no OCR engine is invoked — and
+writes `reports/ocr_audit.json` with per-page `needs_ocr`, `ocr_spans`,
+`chars_total`, `chars_bad`, `img_area`, `txt_area`, plus a corpus-level
+`flagged_frac`.
+
+That last number is the point. The paper asserts "born-digital only" as a scope
+limit; `flagged_frac` is the first thing in this repo that can put evidence behind
+it, from a third-party model with no stake in the result. On the first three docs of
+`data/raw-pdfs` it is 4/47 pages (0.085).
