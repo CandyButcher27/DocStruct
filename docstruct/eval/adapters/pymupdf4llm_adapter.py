@@ -22,7 +22,15 @@ class PyMuPDF4LLMAdapter(ChunkAdapter):
     def chunk(self, pdf_path: str) -> List[EvalChunk]:
         import pymupdf4llm
 
-        pages = pymupdf4llm.to_markdown(pdf_path, page_chunks=True, show_progress=False)
+        # pymupdf4llm's layout path defaults to use_ocr=SELECT_KEEP_OLD: an ONNX
+        # classifier flags "needs OCR" pages and RapidOCR re-derives their text.
+        # Our corpora are born-digital and every other tool reads the text layer,
+        # so this costs 3x wall-clock for no new content (AES_2022_10K: 270.6s with
+        # OCR on 24/116 pages vs 89.3s for langchain). Same fix as docling.
+        # The per-page classifier verdicts are captured by scripts/ocr_audit.py.
+        pages = pymupdf4llm.to_markdown(
+            pdf_path, page_chunks=True, show_progress=False, use_ocr=False
+        )
         chunks: List[EvalChunk] = []
         for i, page in enumerate(pages):
             text = (page.get("text") if isinstance(page, dict) else str(page)) or ""

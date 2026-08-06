@@ -198,6 +198,29 @@ the *layout* config and dominate wall time (one document took 256 s). Caching at
 the block boundary — with chunking keys deliberately excluded from the cache key —
 is what makes chunking ablations affordable.
 
+### OCR off in every baseline adapter — a config choice the paper must state
+Twice now a baseline has silently enabled OCR on born-digital PDFs: docling via a
+bare `DocumentConverter()`, and pymupdf4llm via its layout path's
+`use_ocr=OCRMode.SELECT_KEEP_OLD`, where an ONNX classifier flags pages and RapidOCR
+re-derives them. Both were found by reading a run log, not by a test — a green suite
+cannot see a tool quietly running a different pipeline.
+
+Two reasons OCR is wrong here, and the second is the one that matters:
+
+1. **Cost.** docling ~50 s/document; pymupdf4llm 270.6 s on `AES_2022_10K` (24/116
+   pages OCR'd) against 89.3 s for langchain on the same file.
+2. **It measures a pipeline we are not comparing.** Every other tool reads the text
+   layer. A tool that OCRs is not a better chunker, it is a different system — and on
+   `doc1.pdf` it was strictly worse anyway: 72,425 chars against 75,953 with OCR off,
+   on a page that already carried 3,182 characters with 3 replacement characters.
+
+So: **any new adapter must be checked for a default-on OCR path before its numbers
+are trusted**, and "OCR disabled in all baselines" is a stated limitation, not a
+silent convenience. The classifier's per-page verdicts are preserved rather than
+discarded — `scripts/ocr_audit.py` runs it without invoking an OCR engine and writes
+`reports/ocr_audit.json`. Its corpus-level `flagged_frac` is third-party evidence for
+the "born-digital only" scope claim, which the paper currently asserts unsupported.
+
 ---
 
 ## Known-broken / known-missing, deliberately
