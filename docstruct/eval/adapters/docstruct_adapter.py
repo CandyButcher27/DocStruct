@@ -37,11 +37,30 @@ class DocStructAdapter(ChunkAdapter):
             cache_dir=self.cache_dir,
             pipeline_mode=self.pipeline_mode,
         )
-        return [
-            EvalChunk(
-                id=c.chunk_id,
-                text=c.content,
-                metadata={"section": _section(c), "page": c.page_num, "type": c.chunk_type},
+        # Chunk.page_num is the page a chunk *starts* on, but our units are
+        # structural: a section body routinely flows across a page break, and
+        # declaring only the first page makes the chunk unscoreable under
+        # `--relevance page` whenever the evidence sits after the break. Measured
+        # on OHR academic__2305.02437v3: 15 of 28 chunks carried text from a page
+        # they never declared, the best-matching page a median of +1 from the one
+        # claimed. Recover the full set from the blocks the chunk was built from,
+        # which is what every other adapter reports.
+        block_page = {b.block_id: b.page_num for b in result.blocks}
+        out: List[EvalChunk] = []
+        for c in result.chunks:
+            pages = sorted({block_page[b] for b in c.source_block_ids if b in block_page})
+            if not pages:
+                pages = [c.page_num]
+            out.append(
+                EvalChunk(
+                    id=c.chunk_id,
+                    text=c.content,
+                    metadata={
+                        "section": _section(c),
+                        "page": c.page_num,
+                        "pages": pages,
+                        "type": c.chunk_type,
+                    },
+                )
             )
-            for c in result.chunks
-        ]
+        return out
