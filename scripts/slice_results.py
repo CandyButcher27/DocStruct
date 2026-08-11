@@ -12,8 +12,8 @@ loses, and two of the open questions about the OHR-Bench run are exactly that:
 
 Joins `per_question` rows to the gold on (source_doc, question); no re-run needed.
 
-    python scripts/slice_results.py --results ohr_results.json \
-        --gold data/qa/ohrbench.json --manifest reports/ohrbench_manifest.json
+    python scripts/slice_results.py --results reports/ohr_results_span.json \
+        --gold data/qa/ohrbench.json --out reports/ohr_slices_span.md
 """
 
 from __future__ import annotations
@@ -43,7 +43,7 @@ def table(rows, head):
 
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--results", default="ohr_results.json")
+    ap.add_argument("--results", default="reports/ohr_results_span.json")
     ap.add_argument("--gold", default="data/qa/ohrbench.json")
     ap.add_argument("--manifest", default="reports/ohrbench_manifest.json")
     ap.add_argument("--out", default="reports/ohr_slices.md")
