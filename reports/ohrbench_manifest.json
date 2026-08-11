@@ -1,0 +1,857 @@
+[
+ {
+  "file": "academic__2305.02437v3.pdf",
+  "ohr_doc_name": "academic/2305.02437v3",
+  "domain": "academic",
+  "pages": 20,
+  "sha256": "cd4b3a22216e310c",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "academic__2305.14160v4.pdf",
+  "ohr_doc_name": "academic/2305.14160v4",
+  "domain": "academic",
+  "pages": 16,
+  "sha256": "035b1659c5305a0c",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "academic__2310.11511v1.pdf",
+  "ohr_doc_name": "academic/2310.11511v1",
+  "domain": "academic",
+  "pages": 30,
+  "sha256": "d9eaa1398abac0df",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "academic__2402.03216v4.pdf",
+  "ohr_doc_name": "academic/2402.03216v4",
+  "domain": "academic",
+  "pages": 18,
+  "sha256": "3b556af21c668b0a",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "academic__2403.20330v2.pdf",
+  "ohr_doc_name": "academic/2403.20330v2",
+  "domain": "academic",
+  "pages": 20,
+  "sha256": "5b52eec64322b17a",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "academic__2404.10198v2.pdf",
+  "ohr_doc_name": "academic/2404.10198v2",
+  "domain": "academic",
+  "pages": 13,
+  "sha256": "4a9066541f036dfd",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "academic__2405.14458v1.pdf",
+  "ohr_doc_name": "academic/2405.14458v1",
+  "domain": "academic",
+  "pages": 18,
+  "sha256": "2d891a5aa6b321b1",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "academic__2405.14831v1.pdf",
+  "ohr_doc_name": "academic/2405.14831v1",
+  "domain": "academic",
+  "pages": 28,
+  "sha256": "43413f14b75989b4",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "academic__2409.01704v1.pdf",
+  "ohr_doc_name": "academic/2409.01704v1",
+  "domain": "academic",
+  "pages": 19,
+  "sha256": "89b5b6f0116b2aed",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "academic__2409.16145v1.pdf",
+  "ohr_doc_name": "academic/2409.16145v1",
+  "domain": "academic",
+  "pages": 22,
+  "sha256": "a4744442ada036bf",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "finance__3M_2023Q2_10Q.pdf",
+  "ohr_doc_name": "finance/3M_2023Q2_10Q",
+  "domain": "finance",
+  "pages": 92,
+  "sha256": "3e66115793459f42",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "finance__AES_2022_10K.pdf",
+  "ohr_doc_name": "finance/AES_2022_10K",
+  "domain": "finance",
+  "pages": 257,
+  "sha256": "9c5de2227534c4d6",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "finance__AMAZON_2017_10K.pdf",
+  "ohr_doc_name": "finance/AMAZON_2017_10K",
+  "domain": "finance",
+  "pages": 85,
+  "sha256": "f8af08ff6c414735",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "finance__AMAZON_2019_10K.pdf",
+  "ohr_doc_name": "finance/AMAZON_2019_10K",
+  "domain": "finance",
+  "pages": 83,
+  "sha256": "d7df8c6cf3e351a8",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "finance__AMD_2022_10K.pdf",
+  "ohr_doc_name": "finance/AMD_2022_10K",
+  "domain": "finance",
+  "pages": 121,
+  "sha256": "a3bd74088fae0ad4",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "finance__JPMORGAN_2021Q1_10Q.pdf",
+  "ohr_doc_name": "finance/JPMORGAN_2021Q1_10Q",
+  "domain": "finance",
+  "pages": 179,
+  "sha256": "62518c05b02265dc",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "finance__JPMORGAN_2022Q2_10Q.pdf",
+  "ohr_doc_name": "finance/JPMORGAN_2022Q2_10Q",
+  "domain": "finance",
+  "pages": 197,
+  "sha256": "7d715f552d4eeb6b",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "finance__JPMORGAN_2022_10K.pdf",
+  "ohr_doc_name": "finance/JPMORGAN_2022_10K",
+  "domain": "finance",
+  "pages": 382,
+  "sha256": "c269899950f36edf",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "finance__JPMORGAN_2023Q2_10Q.pdf",
+  "ohr_doc_name": "finance/JPMORGAN_2023Q2_10Q",
+  "domain": "finance",
+  "pages": 217,
+  "sha256": "eef2d9c1fdb5dc82",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "finance__VERIZON_2021_10K.pdf",
+  "ohr_doc_name": "finance/VERIZON_2021_10K",
+  "domain": "finance",
+  "pages": 120,
+  "sha256": "f7fcb508f920e3df",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__ACCELERATEDTECHNOLOGIESHOLDINGCORP_04_24_2003-EX-10.13-JOINT_VENTURE_AGREEMENT.pdf",
+  "ohr_doc_name": "law/ACCELERATEDTECHNOLOGIESHOLDINGCORP_04_24_2003-EX-10.13-JOINT VENTURE AGREEMENT",
+  "domain": "law",
+  "pages": 3,
+  "sha256": "b8fc19715a6290de",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__ADMA_BioManufacturing_LLC_-_Amendment_3_to_Manufacturing_Agreement_.pdf",
+  "ohr_doc_name": "law/ADMA BioManufacturing, LLC -  Amendment #3 to Manufacturing Agreement ",
+  "domain": "law",
+  "pages": 6,
+  "sha256": "899f7627d704dfb7",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__ADUROBIOTECH_INC_06_02_2020-EX-10.7-CONSULTING_AGREEMENT.pdf",
+  "ohr_doc_name": "law/ADUROBIOTECH,INC_06_02_2020-EX-10.7-CONSULTING AGREEMENT",
+  "domain": "law",
+  "pages": 4,
+  "sha256": "18fc8a33dd82875e",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__AIRTECHINTERNATIONALGROUPINC_05_08_2000-EX-10.4-FRANCHISE_AGREEMENT.pdf",
+  "ohr_doc_name": "law/AIRTECHINTERNATIONALGROUPINC_05_08_2000-EX-10.4-FRANCHISE AGREEMENT",
+  "domain": "law",
+  "pages": 16,
+  "sha256": "0d9366515ac2c431",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__AMERICASSHOPPINGMALLINC_12_10_1999-EX-10.2-SITE_DEVELOPMENT_AND_HOSTING_AGREEMENT.pdf",
+  "ohr_doc_name": "law/AMERICASSHOPPINGMALLINC_12_10_1999-EX-10.2-SITE DEVELOPMENT AND HOSTING AGREEMENT",
+  "domain": "law",
+  "pages": 5,
+  "sha256": "8e1c9cd20e20f9ec",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__ASIANDRAGONGROUPINC_08_11_2005-EX-10.5-Reseller_Agreement.pdf",
+  "ohr_doc_name": "law/ASIANDRAGONGROUPINC_08_11_2005-EX-10.5-Reseller Agreement",
+  "domain": "law",
+  "pages": 18,
+  "sha256": "948fdbb2004ce17b",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__ArcGroupInc_20171211_8-K_EX-10.1_10976103_EX-10.1_Sponsorship_Agreement.pdf",
+  "ohr_doc_name": "law/ArcGroupInc_20171211_8-K_EX-10.1_10976103_EX-10.1_Sponsorship Agreement",
+  "domain": "law",
+  "pages": 4,
+  "sha256": "0bc652ae6ab3a7a3",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__ArmstrongFlooringInc_20190107_8-K_EX-10.2_11471795_EX-10.2_Intellectual_Property_Agreement.pdf",
+  "ohr_doc_name": "law/ArmstrongFlooringInc_20190107_8-K_EX-10.2_11471795_EX-10.2_Intellectual Property Agreement",
+  "domain": "law",
+  "pages": 40,
+  "sha256": "23756d11a458640e",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__Array_BioPharma_Inc._-_LICENSE_DEVELOPMENT_AND_COMMERCIALIZATION_AGREEMENT.pdf",
+  "ohr_doc_name": "law/Array BioPharma Inc. - LICENSE, DEVELOPMENT AND COMMERCIALIZATION AGREEMENT",
+  "domain": "law",
+  "pages": 107,
+  "sha256": "5d339dfdc809ceea",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__BANUESTRAFINANCIALCORP_09_08_2006-EX-10.16-AGENCY_AGREEMENT.pdf",
+  "ohr_doc_name": "law/BANUESTRAFINANCIALCORP_09_08_2006-EX-10.16-AGENCY AGREEMENT",
+  "domain": "law",
+  "pages": 14,
+  "sha256": "7ce2c3beb03ac5ef",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__BIOAMBERINC_04_10_2013-EX-10.34-DEVELOPMENT_AGREEMENT_1_.pdf",
+  "ohr_doc_name": "law/BIOAMBERINC_04_10_2013-EX-10.34-DEVELOPMENT AGREEMENT (1)",
+  "domain": "law",
+  "pages": 18,
+  "sha256": "08676c1ea03a5e31",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__CHERRYHILLMORTGAGEINVESTMENTCORP_09_26_2013-EX-10.1-Strategic_Alliance_Agreement.pdf",
+  "ohr_doc_name": "law/CHERRYHILLMORTGAGEINVESTMENTCORP_09_26_2013-EX-10.1-Strategic Alliance Agreement",
+  "domain": "law",
+  "pages": 11,
+  "sha256": "b883ac01f43f6d16",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__CYBERIANOUTPOSTINC_07_09_1998-EX-10.13-PROMOTION_AGREEMENT.pdf",
+  "ohr_doc_name": "law/CYBERIANOUTPOSTINC_07_09_1998-EX-10.13-PROMOTION AGREEMENT",
+  "domain": "law",
+  "pages": 5,
+  "sha256": "1c0c1c6d00341a42",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__CardlyticsInc_20180112_S-1_EX-10.16_11002987_EX-10.16_Maintenance_Agreement1.pdf",
+  "ohr_doc_name": "law/CardlyticsInc_20180112_S-1_EX-10.16_11002987_EX-10.16_Maintenance Agreement1",
+  "domain": "law",
+  "pages": 47,
+  "sha256": "4765b84564a06932",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__CcRealEstateIncomeFundadv_20181205_POS_8C_EX-99._H_3__11447739_EX-99._H_3__Marketing_Agreement.pdf",
+  "ohr_doc_name": "law/CcRealEstateIncomeFundadv_20181205_POS 8C_EX-99.(H)(3)_11447739_EX-99.(H)(3)_Marketing Agreement",
+  "domain": "law",
+  "pages": 14,
+  "sha256": "50f0d2742c2e4294",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__CnsPharmaceuticalsInc_20200326_8-K_EX-10.1_12079626_EX-10.1_Development_Agreement.pdf",
+  "ohr_doc_name": "law/CnsPharmaceuticalsInc_20200326_8-K_EX-10.1_12079626_EX-10.1_Development Agreement",
+  "domain": "law",
+  "pages": 5,
+  "sha256": "5e5fedaa2ed0915b",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__DIVERSINETCORP_03_01_2012-EX-4-RESELLER_AGREEMENT.pdf",
+  "ohr_doc_name": "law/DIVERSINETCORP_03_01_2012-EX-4-RESELLER AGREEMENT",
+  "domain": "law",
+  "pages": 15,
+  "sha256": "675ed4dfbe020b18",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__DYNTEKINC_07_30_1999-EX-10-ONLINE_HOSTING_AGREEMENT.pdf",
+  "ohr_doc_name": "law/DYNTEKINC_07_30_1999-EX-10-ONLINE HOSTING AGREEMENT",
+  "domain": "law",
+  "pages": 6,
+  "sha256": "d1a00ac50b130a71",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__ENERGYXXILTD_05_08_2015-EX-10.13-Transportation_AGREEMENT.pdf",
+  "ohr_doc_name": "law/ENERGYXXILTD_05_08_2015-EX-10.13-Transportation AGREEMENT",
+  "domain": "law",
+  "pages": 25,
+  "sha256": "1b47e87c92a66182",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__EcoScienceSolutionsInc_20171117_8-K_EX-10.1_10956472_EX-10.1_Endorsement_Agreement.pdf",
+  "ohr_doc_name": "law/EcoScienceSolutionsInc_20171117_8-K_EX-10.1_10956472_EX-10.1_Endorsement Agreement",
+  "domain": "law",
+  "pages": 7,
+  "sha256": "ffe63f581a42b207",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__FEDERATEDGOVERNMENTINCOMESECURITIESINC_04_28_2020-EX-99.SERV_AGREE-SERVICES_AGREEMENT_SECONDAMENDMENT.pdf",
+  "ohr_doc_name": "law/FEDERATEDGOVERNMENTINCOMESECURITIESINC_04_28_2020-EX-99.SERV AGREE-SERVICES AGREEMENT_SECONDAMENDMENT",
+  "domain": "law",
+  "pages": 1,
+  "sha256": "c2aa328d1773a056",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__FIBROGENINC_10_01_2014-EX-10.11-COLLABORATION_AGREEMENT.pdf",
+  "ohr_doc_name": "law/FIBROGENINC_10_01_2014-EX-10.11-COLLABORATION AGREEMENT",
+  "domain": "law",
+  "pages": 53,
+  "sha256": "e4bd78f0b944b611",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__FIDELITYNATIONALINFORMATIONSERVICES_INC_08_05_2009-EX-10.3-INTELLECTUAL_PROPERTY_AGREEMENT.pdf",
+  "ohr_doc_name": "law/FIDELITYNATIONALINFORMATIONSERVICES,INC_08_05_2009-EX-10.3-INTELLECTUAL PROPERTY AGREEMENT",
+  "domain": "law",
+  "pages": 31,
+  "sha256": "af5e14f37a7ac776",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__GRIDIRONBIONUTRIENTS_INC_02_05_2020-EX-10.3-SUPPLY_AGREEMENT.pdf",
+  "ohr_doc_name": "law/GRIDIRONBIONUTRIENTS,INC_02_05_2020-EX-10.3-SUPPLY AGREEMENT",
+  "domain": "law",
+  "pages": 3,
+  "sha256": "d93ea7019265bd2d",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__GULFSOUTHMEDICALSUPPLYINC_12_24_1997-EX-4-AFFILIATE_AGREEMENT.pdf",
+  "ohr_doc_name": "law/GULFSOUTHMEDICALSUPPLYINC_12_24_1997-EX-4-AFFILIATE AGREEMENT",
+  "domain": "law",
+  "pages": 8,
+  "sha256": "a4a646e9e36567c9",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__GWG_HOLDINGS_INC._-_ORDERLY_MARKETING_AGREEMENT.pdf",
+  "ohr_doc_name": "law/GWG HOLDINGS, INC. - ORDERLY MARKETING AGREEMENT",
+  "domain": "law",
+  "pages": 17,
+  "sha256": "cf9947599defa9a2",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__HALITRON_INC_03_01_2005-EX-10.15-SPONSORSHIP_AND_DEVELOPMENT_AGREEMENT.pdf",
+  "ohr_doc_name": "law/HALITRON,INC_03_01_2005-EX-10.15-SPONSORSHIP AND DEVELOPMENT AGREEMENT",
+  "domain": "law",
+  "pages": 6,
+  "sha256": "a319c438c2bc047c",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__HealthcareIntegratedTechnologiesInc_20190812_8-K_EX-10.1_11776966_EX-10.1_Reseller_Agreement.pdf",
+  "ohr_doc_name": "law/HealthcareIntegratedTechnologiesInc_20190812_8-K_EX-10.1_11776966_EX-10.1_Reseller Agreement",
+  "domain": "law",
+  "pages": 5,
+  "sha256": "7c8b2686abcb9c14",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__IDREAMSKYTECHNOLOGYLTD_07_03_2014-EX-10.39-Cooperation_Agreement_on_Mobile_Game_Business.pdf",
+  "ohr_doc_name": "law/IDREAMSKYTECHNOLOGYLTD_07_03_2014-EX-10.39-Cooperation Agreement on Mobile Game Business",
+  "domain": "law",
+  "pages": 29,
+  "sha256": "c1336673650746e7",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__IntegrityFunds_20200121_485BPOS_EX-99.E_UNDR_CONTR_11948727_EX-99.E_UNDR_CONTR_Service_Agreement.pdf",
+  "ohr_doc_name": "law/IntegrityFunds_20200121_485BPOS_EX-99.E UNDR CONTR_11948727_EX-99.E UNDR CONTR_Service Agreement",
+  "domain": "law",
+  "pages": 8,
+  "sha256": "594765b113dee282",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__KNOWLABS_INC_08_15_2005-EX-10-INTELLECTUAL_PROPERTY_AGREEMENT.pdf",
+  "ohr_doc_name": "law/KNOWLABS,INC_08_15_2005-EX-10-INTELLECTUAL PROPERTY AGREEMENT",
+  "domain": "law",
+  "pages": 3,
+  "sha256": "8ad8c7e21947e3cb",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__KitovPharmaLtd_20190326_20-F_EX-4.15_11584449_EX-4.15_Manufacturing_Agreement.pdf",
+  "ohr_doc_name": "law/KitovPharmaLtd_20190326_20-F_EX-4.15_11584449_EX-4.15_Manufacturing Agreement",
+  "domain": "law",
+  "pages": 19,
+  "sha256": "5850e801153af9b9",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__MACY_S_INC_05_11_2020-EX-99.4-JOINT_FILING_AGREEMENT.pdf",
+  "ohr_doc_name": "law/MACY_S,INC_05_11_2020-EX-99.4-JOINT FILING AGREEMENT",
+  "domain": "law",
+  "pages": 1,
+  "sha256": "7f54312cbcedc0dc",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__MARSHALLHOLDINGSINTERNATIONAL_INC_04_14_2004-EX-10.15-ENDORSEMENT_AGREEMENT.pdf",
+  "ohr_doc_name": "law/MARSHALLHOLDINGSINTERNATIONAL,INC_04_14_2004-EX-10.15-ENDORSEMENT AGREEMENT",
+  "domain": "law",
+  "pages": 3,
+  "sha256": "f80a544df2a6d0af",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__MPLXLP_06_17_2015-EX-10.1-TRANSPORTATION_SERVICES_AGREEMENT.pdf",
+  "ohr_doc_name": "law/MPLXLP_06_17_2015-EX-10.1-TRANSPORTATION SERVICES AGREEMENT",
+  "domain": "law",
+  "pages": 26,
+  "sha256": "7fa6d1466b4c82af",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__MRSFIELDSORIGINALCOOKIESINC_01_29_1998-EX-10-FRANCHISE_AGREEMENT.pdf",
+  "ohr_doc_name": "law/MRSFIELDSORIGINALCOOKIESINC_01_29_1998-EX-10-FRANCHISE AGREEMENT",
+  "domain": "law",
+  "pages": 45,
+  "sha256": "b33a2c2de56069ee",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__N2KINC_10_16_1997-EX-10.16-SPONSORSHIP_AGREEMENT.pdf",
+  "ohr_doc_name": "law/N2KINC_10_16_1997-EX-10.16-SPONSORSHIP AGREEMENT",
+  "domain": "law",
+  "pages": 10,
+  "sha256": "3953c584128911fc",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__NETGEAR_INC_04_21_2003-EX-10.16-AMENDMENT_TO_THE_DISTRIBUTOR_AGREEMENT_BETWEEN_INGRAM_MICRO_AND_NETGEAR-.pdf",
+  "ohr_doc_name": "law/NETGEAR,INC_04_21_2003-EX-10.16-AMENDMENT TO THE DISTRIBUTOR AGREEMENT BETWEEN INGRAM MICRO AND NETGEAR-",
+  "domain": "law",
+  "pages": 2,
+  "sha256": "b1ad4c2f07fb2c6a",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__NEXSTARFINANCEHOLDINGSINC_03_27_2002-EX-10.26-OUTSOURCING_AGREEMENT.pdf",
+  "ohr_doc_name": "law/NEXSTARFINANCEHOLDINGSINC_03_27_2002-EX-10.26-OUTSOURCING AGREEMENT",
+  "domain": "law",
+  "pages": 23,
+  "sha256": "7c6f3ef030583bed",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__OLDAPIWIND-DOWNLTD_01_08_2016-EX-1.3-AGENCY_AGREEMENT2.pdf",
+  "ohr_doc_name": "law/OLDAPIWIND-DOWNLTD_01_08_2016-EX-1.3-AGENCY AGREEMENT2",
+  "domain": "law",
+  "pages": 3,
+  "sha256": "5887262732ce60cc",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__OPTIMIZEDTRANSPORTATIONMANAGEMENT_INC_07_26_2000-EX-6.6-DISTRIBUTOR_AGREEMENT.pdf",
+  "ohr_doc_name": "law/OPTIMIZEDTRANSPORTATIONMANAGEMENT,INC_07_26_2000-EX-6.6-DISTRIBUTOR AGREEMENT",
+  "domain": "law",
+  "pages": 3,
+  "sha256": "559f7dd07b6203fa",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__ParatekPharmaceuticalsInc_20170505_10-KA_EX-10.29_10323872_EX-10.29_Outsourcing_Agreement.pdf",
+  "ohr_doc_name": "law/ParatekPharmaceuticalsInc_20170505_10-KA_EX-10.29_10323872_EX-10.29_Outsourcing Agreement",
+  "domain": "law",
+  "pages": 49,
+  "sha256": "efdc607a19a80f5d",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__PareteumCorp_20081001_8-K_EX-99.1_2654808_EX-99.1_Hosting_Agreement.pdf",
+  "ohr_doc_name": "law/PareteumCorp_20081001_8-K_EX-99.1_2654808_EX-99.1_Hosting Agreement",
+  "domain": "law",
+  "pages": 30,
+  "sha256": "72031417b50f6e52",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__PlayboyEnterprisesInc_20090220_10-QA_EX-10.2_4091580_EX-10.2_Content_License_Agreement__Marketing_Agreement__Sales-.pdf",
+  "ohr_doc_name": "law/PlayboyEnterprisesInc_20090220_10-QA_EX-10.2_4091580_EX-10.2_Content License Agreement_ Marketing Agreement_ Sales-Purchase Agreement2",
+  "domain": "law",
+  "pages": 2,
+  "sha256": "1322c34c10615101",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__RISEEDUCATIONCAYMANLTD_04_17_2020-EX-4.23-SERVICE_AGREEMENT.pdf",
+  "ohr_doc_name": "law/RISEEDUCATIONCAYMANLTD_04_17_2020-EX-4.23-SERVICE AGREEMENT",
+  "domain": "law",
+  "pages": 9,
+  "sha256": "07e7051d85e64d75",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__ReynoldsConsumerProductsInc_20191115_S-1_EX-10.18_11896469_EX-10.18_Supply_Agreement.pdf",
+  "ohr_doc_name": "law/ReynoldsConsumerProductsInc_20191115_S-1_EX-10.18_11896469_EX-10.18_Supply Agreement",
+  "domain": "law",
+  "pages": 16,
+  "sha256": "085f382aa806423a",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__RgcResourcesInc_20151216_8-K_EX-10.3_9372751_EX-10.3_Franchise_Agreement.pdf",
+  "ohr_doc_name": "law/RgcResourcesInc_20151216_8-K_EX-10.3_9372751_EX-10.3_Franchise Agreement",
+  "domain": "law",
+  "pages": 3,
+  "sha256": "d238b2639eb25207",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__SEPARATEACCOUNTIIOFAGL_05_02_2011-EX-99._J_4_-UNCONDITIONAL_CAPITAL_MAINTENANCE_AGREEMENT.pdf",
+  "ohr_doc_name": "law/SEPARATEACCOUNTIIOFAGL_05_02_2011-EX-99.(J)(4)-UNCONDITIONAL CAPITAL MAINTENANCE AGREEMENT",
+  "domain": "law",
+  "pages": 4,
+  "sha256": "a41340bd0ec53e51",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__SIBANNAC_INC_12_04_2017-EX-2.1-Strategic_Alliance_Agreement.pdf",
+  "ohr_doc_name": "law/SIBANNAC,INC_12_04_2017-EX-2.1-Strategic Alliance Agreement",
+  "domain": "law",
+  "pages": 5,
+  "sha256": "ccc177274c77f9ab",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__ScansourceInc_20190822_10-K_EX-10.38_11793958_EX-10.38_Distributor_Agreement2.pdf",
+  "ohr_doc_name": "law/ScansourceInc_20190822_10-K_EX-10.38_11793958_EX-10.38_Distributor Agreement2",
+  "domain": "law",
+  "pages": 3,
+  "sha256": "b040c847f6342154",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__TRICITYBANKSHARESCORP_05_15_1998-EX-10-OUTSOURCING_AGREEMENT.pdf",
+  "ohr_doc_name": "law/TRICITYBANKSHARESCORP_05_15_1998-EX-10-OUTSOURCING AGREEMENT",
+  "domain": "law",
+  "pages": 21,
+  "sha256": "d3433b64f4b36369",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__TheglobeComInc_19990503_S-1A_EX-10.20_5416126_EX-10.20_Co-Branding_Agreement.pdf",
+  "ohr_doc_name": "law/TheglobeComInc_19990503_S-1A_EX-10.20_5416126_EX-10.20_Co-Branding Agreement",
+  "domain": "law",
+  "pages": 9,
+  "sha256": "58b06c0c4f20d042",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__UnionDentalHoldingsInc_20050204_8-KA_EX-10_3345577_EX-10_Affiliate_Agreement.pdf",
+  "ohr_doc_name": "law/UnionDentalHoldingsInc_20050204_8-KA_EX-10_3345577_EX-10_Affiliate Agreement",
+  "domain": "law",
+  "pages": 3,
+  "sha256": "aa8c8ef413e2d702",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__VAXCYTE_INC_05_22_2020-EX-10.19-SUPPLY_AGREEMENT.pdf",
+  "ohr_doc_name": "law/VAXCYTE,INC_05_22_2020-EX-10.19-SUPPLY AGREEMENT",
+  "domain": "law",
+  "pages": 34,
+  "sha256": "d3ec0c9153f4d95d",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__VIVINT_SOLAR_INC._-_NON-COMPETITION_AGREEMENT.pdf",
+  "ohr_doc_name": "law/VIVINT SOLAR, INC. - NON-COMPETITION AGREEMENT",
+  "domain": "law",
+  "pages": 4,
+  "sha256": "bdc85ce6fd9033cc",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__VnueInc_20150914_8-K_EX-10.1_9259571_EX-10.1_Promotion_Agreement.pdf",
+  "ohr_doc_name": "law/VnueInc_20150914_8-K_EX-10.1_9259571_EX-10.1_Promotion Agreement",
+  "domain": "law",
+  "pages": 3,
+  "sha256": "1b714e036261180f",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__WHITESMOKE_INC_11_08_2011-EX-10.26-PROMOTION_AND_DISTRIBUTION_AGREEMENT.pdf",
+  "ohr_doc_name": "law/WHITESMOKE,INC_11_08_2011-EX-10.26-PROMOTION AND DISTRIBUTION AGREEMENT",
+  "domain": "law",
+  "pages": 40,
+  "sha256": "cb6fc82aad968eb4",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__WOMENSGOLFUNLIMITEDINC_03_29_2000-EX-10.13-ENDORSEMENT_AGREEMENT.pdf",
+  "ohr_doc_name": "law/WOMENSGOLFUNLIMITEDINC_03_29_2000-EX-10.13-ENDORSEMENT AGREEMENT",
+  "domain": "law",
+  "pages": 7,
+  "sha256": "21b30234adae4869",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__XACCT_Technologies_Inc.SUPPORT_AND_MAINTENANCE_AGREEMENT.pdf",
+  "ohr_doc_name": "law/XACCT Technologies, Inc.SUPPORT AND MAINTENANCE AGREEMENT",
+  "domain": "law",
+  "pages": 3,
+  "sha256": "4efb5d7e762f53cb",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "law__ZtoExpressCaymanInc_20160930_F-1_EX-10.10_9752871_EX-10.10_Transportation_Agreement.pdf",
+  "ohr_doc_name": "law/ZtoExpressCaymanInc_20160930_F-1_EX-10.10_9752871_EX-10.10_Transportation Agreement",
+  "domain": "law",
+  "pages": 4,
+  "sha256": "c280c948ce15d74b",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "manual__2021-Apple-Catalog.pdf",
+  "ohr_doc_name": "manual/2021-Apple-Catalog",
+  "domain": "manual",
+  "pages": 55,
+  "sha256": "6ec3f43d9efb3df3",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "manual__8dfc21ec151fb9d3578fc32d5c4e5df9.pdf",
+  "ohr_doc_name": "manual/8dfc21ec151fb9d3578fc32d5c4e5df9",
+  "domain": "manual",
+  "pages": 18,
+  "sha256": "b38932583846e5de",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "manual__DSA-278777.pdf",
+  "ohr_doc_name": "manual/DSA-278777",
+  "domain": "manual",
+  "pages": 21,
+  "sha256": "d7c46ad196d20c27",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "manual__Guide-for-international-students-web.pdf",
+  "ohr_doc_name": "manual/Guide-for-international-students-web",
+  "domain": "manual",
+  "pages": 76,
+  "sha256": "19be7df5dce477f6",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "manual__Macbook_air.pdf",
+  "ohr_doc_name": "manual/Macbook_air",
+  "domain": "manual",
+  "pages": 76,
+  "sha256": "d99de99131b4d8a5",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "manual__User_Manual_1500S_Classic_EN.pdf",
+  "ohr_doc_name": "manual/User_Manual_1500S_Classic_EN",
+  "domain": "manual",
+  "pages": 108,
+  "sha256": "ba6a07e262b070f9",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "manual__dgx_a100.pdf",
+  "ohr_doc_name": "manual/dgx_a100",
+  "domain": "manual",
+  "pages": 120,
+  "sha256": "20632d95c488e8de",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "manual__guojixueshengshenghuozhinanyingwen9.1.pdf",
+  "ohr_doc_name": "manual/guojixueshengshenghuozhinanyingwen9.1",
+  "domain": "manual",
+  "pages": 40,
+  "sha256": "b82471e5adf0c53b",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "manual__honor_watch_gs_pro.pdf",
+  "ohr_doc_name": "manual/honor_watch_gs_pro",
+  "domain": "manual",
+  "pages": 42,
+  "sha256": "2d5559e514dc54f6",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "manual__mi_phone.pdf",
+  "ohr_doc_name": "manual/mi_phone",
+  "domain": "manual",
+  "pages": 37,
+  "sha256": "c5feec13dc103392",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "manual__nova_y70.pdf",
+  "ohr_doc_name": "manual/nova_y70",
+  "domain": "manual",
+  "pages": 45,
+  "sha256": "1d645b8b4b035ca5",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "manual__obs-productdesc-en.pdf",
+  "ohr_doc_name": "manual/obs-productdesc-en",
+  "domain": "manual",
+  "pages": 65,
+  "sha256": "67356c31d3733fc7",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "manual__owners-manual-2170416.pdf",
+  "ohr_doc_name": "manual/owners-manual-2170416",
+  "domain": "manual",
+  "pages": 32,
+  "sha256": "91e70aaf49192b4d",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "manual__t480_ug_en.pdf",
+  "ohr_doc_name": "manual/t480_ug_en",
+  "domain": "manual",
+  "pages": 170,
+  "sha256": "ee0393dadb951a95",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ },
+ {
+  "file": "manual__watch_d.pdf",
+  "ohr_doc_name": "manual/watch_d",
+  "domain": "manual",
+  "pages": 27,
+  "sha256": "bb5fd3576ac080c8",
+  "source": "https://huggingface.co/datasets/opendatalab/OHR-Bench/resolve/main/pdfs.zip",
+  "license": "CC-BY-4.0 (research only)"
+ }
+]
