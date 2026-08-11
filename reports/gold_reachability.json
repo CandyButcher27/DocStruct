@@ -1,0 +1,29 @@
+{
+  "gold": "data/qa/ohrbench.json",
+  "n_items": 3558,
+  "n_docs": 95,
+  "skipped_missing_pdf": 0,
+  "skipped_bad_page": 0,
+  "reachable_pct": {
+    "plain": 40.8,
+    "despaced": 48.6,
+    "token_fallback": 75.4,
+    "span": 80.2,
+    "region": 80.2
+  },
+  "region_median_overlap": 0.968,
+  "by_evidence_source": {
+    "text": {
+      "n": 2666,
+      "span_pct": 95.5
+    },
+    "equation": {
+      "n": 45,
+      "span_pct": 8.9
+    },
+    "table": {
+      "n": 847,
+      "span_pct": 35.7
+    }
+  }
+}

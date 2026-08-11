@@ -97,7 +97,15 @@ python scripts/fetch_financebench.py --limit 2
 |---|---|---|
 | internal (`benchmark_qa_v*`) | `span` | gold marks a verbatim sentence |
 | FinanceBench | `region` | gold marks a ~167-word block; `span` fails in proportion to how *small* a tool chunks (74% of regions unreachable for unstructured, 11% for us) and hands us an unearned win |
-| OHR-Bench | `page` | gold is written against their normalised `gt_text`; only **1.5%** of spans appear verbatim in raw PDF text, so every text rule scores noise |
+| OHR-Bench | report **all three** | the "only 1.5% appear verbatim" figure compared spans to the normalised `gt_text`, not to `is_relevant`. Measured against the real rule (`scripts/gold_reachability.py`): **80.2% span-reachable**, 80.2% region, on the gold's own page and identically for every tool. `span` is fair here; the shipped `page` leaderboard is one of three, not the one |
+
+Reachability is a *ceiling*, not a score: no chunker can beat it, and it is the same
+number for every tool, so it says whether a rule can measure the corpus at all. Run
+`scripts/gold_reachability.py` on any new corpus **before** its first leaderboard.
+And no rule is size-neutral — `span` rewards large chunks, `page` rewards small ones
+(measured: unstructured wins `page` mode with the smallest chunks in the field),
+`region` is the only one built to be size-tolerant and its threshold is still
+`# unvalidated`. A single-mode claim is not a claim.
 
 **Before any GPU session, run the 3-document smoke.** Five failures this session were
 invisible to a green test suite and only surfaced by running the real CLI: a missing
