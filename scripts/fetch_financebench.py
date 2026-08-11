@@ -11,6 +11,7 @@ data/qa/financebench.json, plus a sha256 manifest.
 import argparse
 import hashlib
 import json
+import time
 import urllib.request
 from pathlib import Path
 
@@ -25,10 +26,21 @@ MANIFEST = ROOT / "reports" / "financebench_manifest.json"
 
 
 def get(url: str) -> bytes:
-    # raw.githubusercontent resets the connection on urllib's default User-Agent
+    # raw.githubusercontent resets the connection on urllib's default User-Agent,
+    # and throttles by tearing the socket down partway through the 84-file run
+    # (WinError 10054), so a bare fetch dies around the 8th PDF. Back off and retry.
     req = urllib.request.Request(url, headers={"User-Agent": "docstruct-fetch/1.0"})
-    with urllib.request.urlopen(req, timeout=120) as r:
-        return r.read()
+    for attempt in range(6):
+        try:
+            with urllib.request.urlopen(req, timeout=120) as r:
+                return r.read()
+        except Exception as e:
+            if attempt == 5:
+                raise
+            wait = 2**attempt
+            print(f"  {type(e).__name__}: {e} -- retry {attempt + 1}/5 in {wait}s")
+            time.sleep(wait)
+    raise AssertionError("unreachable")
 
 
 def main() -> None:
