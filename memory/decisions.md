@@ -69,6 +69,23 @@ It is wired in and available, but it is applied identically to every tool, so it
 lifts all of them and cannot close a relative gap. Same objection to tuning RRF
 `k`. Both are retrieval-side knobs; the gap was a chunking problem.
 
+### Open, not rejected: the model detector's value does not replicate (2026-08-11)
+Not a decision yet — a measurement that a decision will eventually have to answer,
+recorded here so nobody re-derives it or quotes the arXiv number as universal.
+
+`docstruct` vs `docstruct_geo` on OHR-Bench: **+0.0012 MRR under `span` (p=0.80)
+and +0.0090 under `region` (p=0.12)** — neither significant, on 3,558 questions.
+The internal arXiv corpus says +0.0443 (p=0.0026), and OHR-Bench `page` says
++0.1305, but page mode rewards chunk count and geometry-only emits 5,810 chunks
+against hybrid's 9,080, so that one is an artefact of the rule. Under `region`,
+geometry-only is *ahead* on table-sourced questions (0.3868 vs 0.3655).
+
+So the YOLO layer — the GPU requirement and the largest cost in the pipeline —
+currently has **no measured retrieval value outside arXiv**. Before concluding
+anything: FinanceBench is the corpus built to show it (borderless financial tables,
+122 vs 4 detected tables on `3M_2018_10K`) and has not been run. Do not remove the
+detector on this evidence, and do not claim it pays for itself either.
+
 ---
 
 ## Landed config-gated, default OFF — implemented, awaiting ablation (Fable review)

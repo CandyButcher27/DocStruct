@@ -5,14 +5,27 @@ Ranked by expected value. Everything here has been audited against the actual co
 
 ## Next up
 
-0. **Adopt FinanceBench as the external corpus** (added 2026-08-05, paper track).
-   Supersedes item 1 as the cheapest way to break arXiv homogeneity *and* removes
-   the "LLM-generated gold" objection at the same time: 150 human-annotated
+> **Item 0 is done (2026-08-11).** OHR-Bench, not FinanceBench, became the primary
+> external corpus: 95 docs, 3,558 human questions, seven tools, **all three
+> relevance modes**. DocStruct is 1st under `span` and `region`, 6th of 7 under
+> `page`, on identical chunks — the ranking inverts with the rule, which is a
+> result in its own right (`relevance-modes.md`). The `--relevance` switch that
+> was the blocker below shipped and now has three modes, not two.
+>
+> What that run leaves open, in priority order: **(a)** the FinanceBench run —
+> corpus and gold fetched (84 PDFs / 189 rows), needs GPU; **(b)** sweeping
+> `RELEVANCE_REGION_MIN_OVERLAP`, since our best result rides on an unvalidated
+> 0.7 and the reachability script cannot settle it (circular on region gold);
+> **(c)** the model detector's value, which does **not** replicate outside arXiv
+> (+0.0012 span, +0.0090 region, neither significant) — FinanceBench is the corpus
+> built to test it.
+
+0. ~~**Adopt FinanceBench as the external corpus**~~ (added 2026-08-05, paper track).
+   Superseded by the OHR-Bench run above, and partly done: 150 human-annotated
    questions / 84 born-digital SEC filings, public, table-heavy, and the corpus our
-   closest competitor (`arXiv:2604.12047`) used. `scripts/fetch_financebench.py` is
-   written and smoke-tested; the only code work is a `--relevance page|span|token`
-   switch in the benchmark, because FinanceBench evidence is a page region rather
-   than a sentence span. See `benchmark-datasets.md` and `related-work.md`.
+   closest competitor (`arXiv:2604.12047`) used. `scripts/fetch_financebench.py`
+   has now fetched all 84 documents and 189 evidence rows; what remains is the GPU
+   run under `--relevance region`. See `benchmark-datasets.md` and `related-work.md`.
    Item 1 below stays valuable (558 paired questions is statistical power
    FinanceBench's 150 cannot match) but is no longer the *first* move.
 

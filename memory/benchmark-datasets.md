@@ -117,9 +117,12 @@ born-digital), measured not assumed:
 
 **Why this beats FinanceBench as the primary external corpus:**
 
-- **Evidence is span-level: median 25 words** (p25 16, p75 39, max 405). Only 1.3%
-  exceed LangChain's mean chunk, so `--relevance span` is *fair* here — none of the
-  size-bias that forced `region` mode on FinanceBench.
+- **Evidence is span-level: median 25 words** (p25 16, p75 39, max 405), and the
+  gold is only **9% of its page** by token count, so the reachability question is
+  not circular here the way it is on FinanceBench. Measured against the rule the
+  benchmark applies: **80.2% span-reachable** (text 95.5%, table 35.7%, equation
+  8.9%). `--relevance span` is legitimate on this corpus — but so is `page`, and
+  they disagree about who wins, so all three get reported.
 - **3,558 questions against FinanceBench's 150**, and four domains against one.
 - **3,787 pages against ~15,000** — actually runnable, ~2.4 h CPU at the measured
   2.30 s/page, minutes on a GPU.
@@ -189,9 +192,15 @@ GPU is required for this corpus, not merely faster.
 
 | Corpus | Role | Gold | Relevance mode |
 |---|---|---|---|
-| **OHR-Bench** (95 docs / 3,558 QA / 4 domains) | **primary** — breadth, span-level human gold, table-typed evidence, parse-fidelity GT | human | `span` |
-| **FinanceBench** (84 docs / 150 QA) | head-to-head with `arXiv:2604.12047` on their own corpus | human | `region` (mandatory, see above) |
+| **OHR-Bench** (95 docs / 3,558 QA / 4 domains) | **primary** — breadth, span-level human gold, table-typed evidence, parse-fidelity GT | human | **all three** — run 2026-08-11, and the ranking inverts between them; see [`relevance-modes.md`](relevance-modes.md) |
+| **FinanceBench** (84 docs / 189 evidence rows) | head-to-head with `arXiv:2604.12047` on their own corpus | human | `region` (mandatory, see above) |
 | internal arXiv corpus | ablations and statistical power; the only span-level gold we control end to end | LLM | `span` |
+| **PMC papers** (7 journals, fetching) | publisher diversity beyond arXiv; JATS XML gives section-hierarchy gold that predates the benchmark | publisher XML | not yet defined |
+
+**Status 2026-08-12.** OHR-Bench is **done** — all three modes, seven tools,
+identical chunks. FinanceBench is **fetched and unrun**: 84 PDFs and 189 evidence
+rows are on disk (`data/financebench/`, `data/qa/financebench.json`), and the run
+needs a GPU session plus a sweep of `RELEVANCE_REGION_MIN_OVERLAP`.
 
 Three corpora with three different provenances is more than either closest
 competitor reports. **The internal scraper is no longer worth repairing**: it has

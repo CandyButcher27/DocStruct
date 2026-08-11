@@ -1,66 +1,62 @@
 # TO-DO
 
-Working scratchpad for the Fable-review work. Durable detail lives in `notes.md`
-(Stages 8–11) and `memory/` (esp. `measurement-environment.md`, `decisions.md`,
-`roadmap.md`). This file is the short "where we are / what's next".
+Short "where we are / what's next". Durable detail lives in `notes.md` (Stages
+8–17) and `memory/`. `memory/` wins when they disagree.
 
-## Done this session
+## Where we are (2026-08-12)
 
-- **§1 PyPI hardening (default ON):** typed errors + `open_pdf`, `Path`/`password`
-  input, scanned-PDF diagnostic, single-sourced `__version__`, `py.typed`, NullHandler,
-  `pymupdf` in `model` extra, `run_pipeline`/`PipelineResult` re-exports, CI + CHANGELOG.
-- **Bug fixes (default ON):** fixed-point graphic clustering, confidence-ordered
-  matching, appendix/Roman section numbering, graphic-primitive cap.
-- **Perf:** open the PDF once for both population passes.
-- **DX:** `Document.tables`/`figures`/`to_markdown`, Markdown escaping + figure
-  placeholders, CLI `run --format json|md|text`, `on_page` progress callback, README.
-- **§1.8 (pragmatic):** `config.override()` + `parse(config={...})` — thread-safe,
-  non-mutating per-parse overrides, zero call-site rewrites.
-- **§3.4 (gated):** multi-page table merge.
-- **Config-gated features, default OFF, unit-tested (14):** DEDUPE_CHARS, DEHYPHENATE,
-  NORMALIZE_TEXT, FIGURE_OVERLAP_BY_AREA, MULTI_COLUMN, BAND_SPLIT, STRIP_PAGE_FURNITURE,
-  TABLE_TEXT_STRATEGY_FALLBACK, TABLE_SERIALIZATION, TABLE_SPLIT_ROWS, TABLE_SETTINGS,
-  HEADER_RANK_BY_WEIGHT, KEEP_REFERENCES, LABEL_AWARE_CONTAINMENT, MERGE_MULTIPAGE_TABLES.
-- **Cache bug fixed:** block/geo caches were config-blind to new flags → would have
-  false-nulled every ablation. Now config-fingerprinted; model (YOLO) cache kept warm.
-- **Corpus:** +20 non-arXiv docs (→115). Gold for 9/23 new docs.
-- Full suite **192 passed**. All on `main` + `feat/pypi-hardening` (in sync, pushed).
+**OHR-Bench is done.** All three relevance modes, seven tools, 95 docs, 3,558
+human questions, identical chunks across modes. DocStruct is **1st under `span`
+and `region`, 6th of 7 under `page`** — the ranking inverts with the rule. Reports
+in `reports/ohr_report_{page,span,region}.md`, slices alongside, full read in
+`memory/relevance-modes.md`. This is the paper's headline.
 
-## To do (next session)
+Two results that go against us and are now recorded, not buried: **the model
+detector is not significant outside arXiv** (+0.0012 span, +0.0090 region), and we
+retrieve 2,194 context words per query against unstructured's 561.
 
-1. **Run the gated-feature ablation sweep — needs a GPU (Colab T4).**
-   16 h on this CPU + env kills long jobs. On GPU < 1 h. Steps in
-   `memory/measurement-environment.md`. Run `scripts/_sweep.sh`, compare each
-   `reports/ablations/ab_*.json` to `ab_baseline.json`, flip winning flags to
-   default-on in `config.py`, record in `memory/results.md`.
+**Corpora on disk:** OHR-Bench 95 docs (+ 12-doc subset), FinanceBench 84 docs /
+189 evidence rows, PMC papers fetching (7 journals, PDF + JATS XML each), internal
+arXiv 68 PDFs.
 
-2. **Finish corpus-broadening gold — 14 docs left** (doc109–117, 58, 69, 97–99).
-   `gen-qa` resumes/appends; run in ~3-doc batches (env kills long jobs). NOT blocked
-   on quota — the model works. Then merge `benchmark_qa_v7_extra.json` into the v6
-   gold → v7 and re-baseline all tools (`docstruct benchmark`) on 115 docs.
+## Next
 
-3. **Then** the gated flags become generalizable beyond arXiv; re-run the sweep on v7.
+1. **FinanceBench run — GPU.** Corpus and gold are fetched; nothing blocks it but
+   hardware. ~15,000 pages, `--relevance region` mandatory. It is also the corpus
+   built to test the model detector (122 vs 4 tables detected on `3M_2018_10K`),
+   so it decides whether the null result above is corpus-specific.
+2. **Sweep `RELEVANCE_REGION_MIN_OVERLAP`** against real chunks. Every region
+   number, including our best result, currently rides on an unvalidated 0.7. The
+   reachability script cannot settle it — that question is circular on region gold.
+3. **JATS → section-hierarchy gold** from the PMC XML. CPU-only. The only route to
+   scoring section paths as a metric rather than the qualitative claim it is now,
+   and no competitor in the table can report it.
+4. **Academic is our weakest domain in every mode** (`span` 0.4526 vs
+   unstructured's 0.5151, 5th of 7), on a 10-document slice too thin to settle it.
+   The PMC corpus is the follow-up.
+5. **Gated-feature ablation sweep — GPU.** 14 flags, all still default OFF.
+   `scripts/_sweep.sh`, steps in `memory/measurement-environment.md`.
+6. **Internal arXiv corpus is broken on disk**: gold covers 92 docs, 68 PDFs
+   present, **27 of the gold's documents missing**. `fetch_dataset_v2.py` dedupes
+   against the committed manifest rather than the disk, so it will not re-download
+   them. Prune the manifest to files that exist, or fix it to check `os.path.exists`.
+   Blocks nothing headline — this corpus is for ablations now.
+7. **IEEE Access / IEEEtran two-column is unrepresented.** Not in PMC, and its OA
+   PDFs 403 outside a browser. The biggest typographic contrast with arXiv is still
+   a corpus gap.
 
-## Paper track (opened 2026-08-05)
+## Paper track
 
-Research memory: `memory/related-work.md`, `memory/benchmark-datasets.md`,
-`memory/metrics-justification.md`. Draft: `paper/main.tex` + `paper/refs.bib`.
+Draft: `paper/main.tex` + `paper/refs.bib`. Source of truth is `memory/` —
+`relevance-modes.md`, `results.md`, `related-work.md`, `benchmark-datasets.md`,
+`metrics-justification.md`, `paper-structure-survey.md`.
 
-4. **FinanceBench run** — the single highest-value item. `scripts/fetch_financebench.py`
-   works (smoke-tested on 2 docs); run without `--limit` for all 84, then benchmark.
-   Blocked on: a `--relevance page|span|token` switch in `eval/benchmark.py`
-   (FinanceBench evidence is a ~1.2k-char page region, so chunk containment can't
-   score it). Public human gold kills the "you wrote your own exam" objection.
-5. **Semantic baseline** — add `ClusterSemanticChunker` (`chunking_evaluation` pkg)
-   to the tool set. Reviewers will ask why no semantic chunker is in the comparison.
-6. **Token-level IoU / Precision_Ω** (Chroma TR metric set) — replaces the homemade
-   "MRR per 1k context words" with the citable equivalent.
-7. **Rename Hit@1 → Precision@1** in the report, matching `arXiv:2604.12047`.
-8. **DocLayNet val split** for the detection layer, replacing the 2 hand-annotated
-   docs; also the only cheap path to calibrating the `# unvalidated` fusion constants.
-9. **Verify `refs.bib`** — several author lists are placeholders (see file header).
-10. **`.venv` is missing from the project dir** (only `python` on PATH). Recreate
-    before any test/benchmark run: `python -m venv .venv && .venv/Scripts/pip install -e ".[dev]"`.
+- **Verify `refs.bib`** — several author lists are placeholders (see file header).
+- **Rename Hit@1 → Precision@1**, matching `arXiv:2604.12047`.
+- **Token-level IoU / Precision_Ω** (Chroma TR metric set) to replace the homemade
+  MRR-per-1k-context-words.
+- **DocLayNet val split** for the detection layer, replacing the 2 hand-annotated
+  docs; also the only cheap path to calibrating the `# unvalidated` fusion constants.
 
 ## Deferred (with reasons — see decisions.md/roadmap.md)
 

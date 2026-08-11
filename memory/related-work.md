@@ -117,7 +117,16 @@ is OCR-oriented, so much of it is scanned; we need its born-digital subset.
 | Table structure quality | PubTables-1M / TSR literature (TEDS) | unscored by us | We emit table chunks and never verify their structure. |
 | Scanned / OCR documents | anything OCR-based | total | Explicit non-goal (`likely_scanned` diagnostic exists). |
 | Absolute retrieval numbers | D1 reports MRR 0.700–0.844 | not comparable — different corpus, different retrievers, page-level gold | Never put their numbers beside ours without the caveat. |
-| Gold-standard quality | FinanceBench (human), OHR-Bench (human-verified) | ours is `gpt-oss:120b`-generated | **The reason to migrate.** See `benchmark-datasets.md`. |
-| Neural/LLM chunk baselines | LumberChunker, ClusterSemanticChunker | we have never run against either | Must add ClusterSemanticChunker at minimum — it is pip-installable. |
+| Gold-standard quality | FinanceBench (human), OHR-Bench (human-verified) | ours is `gpt-oss:120b`-generated | **Migrated 2026-08-11** — the headline is now OHR-Bench human gold; the internal corpus is for ablations. |
+| Neural/LLM chunk baselines | LumberChunker, ClusterSemanticChunker | LumberChunker never run | `llamaindex_semantic` is now in the tool set and loses to us in all three OHR modes; ClusterSemanticChunker still not run. |
+| Retrieval under `page` relevance | unstructured (0.795 vs our 0.600), langchain, llamaindex, pymupdf4llm | we are **6th of 7** | Page mode rewards small chunks and unstructured has the smallest in the field. Real, and reported — see `relevance-modes.md`. |
+| Context efficiency (MRR / 1k words) | unstructured 1.166 vs our 0.322 | **3.6×** | We retrieve 2,194 words per query against their 561. We buy rank with context. |
+| Academic-domain retrieval | unstructured 0.5151, pymupdf4llm 0.5112 vs our 0.4526 (`span`) | 5th of 7 | Our weakest domain in every mode, on a 10-doc slice. The PMC paper corpus exists to settle it. |
+
+**Gap 5 to own, added 2026-08-11:** *nobody reports whether their ranking survives a
+change of relevance rule.* D1 reports page-level gold only; D2 reports its own. We
+ran three modes over identical chunks and the ranking inverts — first becomes fifth,
+sixth becomes first. That is a methodological contribution, and it is also the
+reason our own headline has to carry all three numbers.
 </content>
 </invoke>

@@ -1110,3 +1110,78 @@ That last number is the point. The paper asserts "born-digital only" as a scope
 limit; `flagged_frac` is the first thing in this repo that can put evidence behind
 it, from a third-party model with no stake in the result. On the first three docs of
 `data/raw-pdfs` it is 4/47 pages (0.085).
+
+---
+
+## Stage 17 — the relevance rule decides the winner (2026-08-11/12)
+
+The OHR-Bench Colab session finished all three relevance modes. The three runs
+share **identical chunks** — `n_chunks` and `mean_chunk_words` are equal across
+modes, because chunking came from the warm cache and only scoring changed. So the
+relevance rule is the sole variable, and the result is the cleanest experiment this
+project has run.
+
+| tool | `page` | `span` | `region` |
+|---|---|---|---|
+| docstruct | 0.6004 (6th) | **0.7059 (1st)** | **0.6657 (1st)** |
+| docstruct_geo | 0.4703 (7th) | 0.7047 | 0.6567 |
+| pymupdf4llm | 0.6684 | 0.6992 | 0.6040 |
+| unstructured | **0.7950 (1st)** | 0.6539 | 0.6006 |
+| langchain | 0.7562 | 0.6406 | 0.6029 |
+| llamaindex | 0.7294 | 0.6483 | 0.5887 |
+| llamaindex_semantic | 0.6515 | 0.6540 | 0.5749 |
+
+**First becomes fifth and sixth becomes first, on identical chunks.** Stated
+precisely: under `region` DocStruct beats all five external tools significantly;
+under `span` it beats four of five (`pymupdf4llm` +0.0067, p=0.23, inside the
+noise); under `page` it loses to four of five. Full write-up, including why each
+rule is size-biased and how to report it, is now `memory/relevance-modes.md`.
+
+The premise that sent us to `page` in the first place was wrong. "Only 1.5% of
+OHR-Bench spans appear verbatim in raw PDF text" compared spans to the corpus's
+normalised `gt_text`, not to what `is_relevant` actually applies.
+`scripts/gold_reachability.py` measures the real rule: **80.2% span-reachable**
+(text 95.5%, table 35.7%, equation 8.9%). `span` was always fair here.
+
+**The uncomfortable finding.** `docstruct` vs `docstruct_geo` is +0.0012 under
+`span` (p=0.80) and +0.0090 under `region` (p=0.12) — the model detector, the GPU
+requirement, the largest cost in the pipeline, buys **nothing measurable on the two
+modes we win**. Its +0.1305 under `page` is an artefact: geometry-only emits 5,810
+chunks against hybrid's 9,080 and page mode rewards chunk count. Under `region`
+geometry-only is actually ahead on table questions (0.3868 vs 0.3655). Recorded in
+`decisions.md` as open, not as a verdict — FinanceBench is the corpus built to test
+it and has not run.
+
+**Slices** (`scripts/slice_results.py`, joining `per_question` to gold on
+`(source_doc, question)`, no re-run needed): academic is our **weakest** domain in
+every mode (`span` 0.4526 against unstructured's 0.5151, 5th of 7) — we win overall
+by winning law and manual. Table MRR is 0.19–0.31 for every tool, which reads as a
+ceiling effect given 35.7% table reachability rather than as everyone being bad at
+tables. Back matter costs us 0.084 MRR from first fifth to last, against
+unstructured's 0.003 — real, and far smaller than any leaderboard gap.
+
+The 2026-08-11 `page` run reproduces the 2026-08-07 one tool-for-tool across MRR,
+NDCG, Recall, Hit@1 and chunk counts, on a different machine. The older root-level
+`ohr_report.md` / `ohr_results.json` were strictly redundant and are deleted.
+
+### Also this session
+
+`gold_reachability.py` learned to detect its own circularity. Run on FinanceBench
+it returns span 100.0% / region 98.4% / median overlap 1.000 — not an easy corpus
+but a question that answers itself, since both rules normalise by the gold and
+FinanceBench gold **is** a page region (measured: 69% of its page). It now reports
+the gold's median share of its page and refuses to let those rows stand as evidence
+above 20%; OHR-Bench measures 9%. One row survives: only **28.0%** of FinanceBench
+evidence appears verbatim in pdfplumber's text for its own annotated page.
+
+FinanceBench is now fetched in full — 84 PDFs, 189 evidence rows — after adding
+backoff for GitHub raw tearing the socket down eight files into the run.
+
+Corpus breadth beyond arXiv moved to Europe PMC (`scripts/fetch_pmc.py`) after
+OpenAlex's anonymous pool throttled to a standstill (25 min wall, 0.2 s CPU, all of
+it sleeping in a 429 backoff). PMC serves a rendered PDF *and* `fullTextXML` — the
+publisher's JATS, carrying the real section hierarchy, verified on the smoke at
+19–24 nested titled sections plus `table-wrap` and `fig` elements per article. That
+is gold which predates the benchmark, and the only route to scoring section paths
+as a metric rather than a claim. IEEE Access is not reachable this way, so IEEEtran
+two-column remains a gap.

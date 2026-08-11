@@ -26,6 +26,7 @@ matches the task before writing code:
 | [`memory/architecture.md`](memory/architecture.md) | You need the module map, data model, or where a responsibility lives |
 | [`memory/pipeline.md`](memory/pipeline.md) | You are changing detection, fusion, reading order, extraction or chunking |
 | [`memory/evaluation.md`](memory/evaluation.md) | You are touching `eval/`, running benchmarks, or adding a metric |
+| [`memory/relevance-modes.md`](memory/relevance-modes.md) | **Before quoting any leaderboard number** — the OHR-Bench ranking inverts between relevance modes on identical chunks |
 | [`memory/related-work.md`](memory/related-work.md) | You are writing the paper, positioning against competitors, or asked "has this been done?" |
 | [`memory/paper-structure-survey.md`](memory/paper-structure-survey.md) | You are editing `paper/` — how comparable papers are *organised*, venue conventions, and the edit list for the draft |
 | [`memory/benchmark-datasets.md`](memory/benchmark-datasets.md) | You need a public corpus, or are touching gold generation / the FinanceBench migration |
@@ -64,13 +65,17 @@ was updated last.
    span *length* — the span *reachability*. Ask: is this gold findable in raw PDF
    text at all, and is it findable equally for a tool that chunks small? Both
    external corpora failed a naive assumption here, in opposite directions.
+   **A single-mode leaderboard is not a result** — measured on OHR-Bench, the
+   ranking inverts between modes on identical chunks (`memory/relevance-modes.md`).
 8. **Gold must be tool-agnostic, and preferably not ours.** Never generate Q&A from
    the output of a tool being benchmarked. Prefer a public human-annotated corpus
    (FinanceBench first — see `memory/benchmark-datasets.md`) over LLM-generated gold
    for any headline number in the paper.
 9. **Report the losses.** Coverage 0.817 vs LangChain's 1.00, duplication 2.06, no
-   parse-fidelity number, born-digital only. These belong in the main table, not an
-   appendix. `memory/related-work.md` keeps the list of who beats us where.
+   parse-fidelity number, born-digital only, **6th of 7 under page relevance**, and
+   **the model detector is not significant outside arXiv** (+0.0012 span / +0.0090
+   region on OHR-Bench). These belong in the main table, not an appendix.
+   `memory/related-work.md` keeps the list of who beats us where.
 
 ## The paper
 
@@ -88,7 +93,13 @@ python scripts/ablate.py --name try --set MIN_CHUNK_TOKENS=300
 
 # corpora (all self-fetching, so they work on Colab too)
 python scripts/fetch_ohrbench.py --limit 3     # primary external corpus
-python scripts/fetch_financebench.py --limit 2
+python scripts/fetch_financebench.py           # 84 PDFs / 189 rows, fetched
+python scripts/fetch_pmc.py --per-journal 2    # papers + publisher JATS XML
+
+# reading a run without re-running it
+python scripts/gold_reachability.py --gold data/qa/ohrbench.json --pdfs-dir data/ohrbench
+python scripts/slice_results.py --results reports/ohr_results_span.json \
+    --out reports/ohr_slices_span.md          # by evidence source / domain / position
 ```
 
 **Relevance mode is not optional — pick it per corpus, or the leaderboard lies.**
@@ -97,15 +108,20 @@ python scripts/fetch_financebench.py --limit 2
 |---|---|---|
 | internal (`benchmark_qa_v*`) | `span` | gold marks a verbatim sentence |
 | FinanceBench | `region` | gold marks a ~167-word block; `span` fails in proportion to how *small* a tool chunks (74% of regions unreachable for unstructured, 11% for us) and hands us an unearned win |
-| OHR-Bench | report **all three** | the "only 1.5% appear verbatim" figure compared spans to the normalised `gt_text`, not to `is_relevant`. Measured against the real rule (`scripts/gold_reachability.py`): **80.2% span-reachable**, 80.2% region, on the gold's own page and identically for every tool. `span` is fair here; the shipped `page` leaderboard is one of three, not the one |
+| OHR-Bench | report **all three** — done 2026-08-11 | the "only 1.5% appear verbatim" figure compared spans to the normalised `gt_text`, not to `is_relevant`. Measured against the real rule: **80.2% span-reachable**. And the three modes disagree about who wins |
 
-Reachability is a *ceiling*, not a score: no chunker can beat it, and it is the same
-number for every tool, so it says whether a rule can measure the corpus at all. Run
-`scripts/gold_reachability.py` on any new corpus **before** its first leaderboard.
-And no rule is size-neutral — `span` rewards large chunks, `page` rewards small ones
-(measured: unstructured wins `page` mode with the smallest chunks in the field),
+Reachability is a *ceiling*, not a score: it is the same number for every tool, so it
+says whether a rule can measure the corpus at all. Run `scripts/gold_reachability.py`
+on any new corpus **before** its first leaderboard, and heed its circularity warning —
+once the gold is a large share of its page (FinanceBench: 69%), span and region
+reachability are ~100% by construction and prove nothing.
+
+No rule is size-neutral: `span` rewards large chunks, `page` rewards small ones
+(measured — unstructured wins `page` with the smallest chunks in the field),
 `region` is the only one built to be size-tolerant and its threshold is still
-`# unvalidated`. A single-mode claim is not a claim.
+`# unvalidated`. **Measured consequence: on OHR-Bench the ranking inverts between
+modes on identical chunks** — DocStruct 1st under span and region, 6th of 7 under
+page. A single-mode claim is not a claim. See `memory/relevance-modes.md`.
 
 **Before any GPU session, run the 3-document smoke.** Five failures this session were
 invisible to a green test suite and only surfaced by running the real CLI: a missing

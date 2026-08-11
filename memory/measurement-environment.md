@@ -19,6 +19,20 @@ Everything else — `parse()` geometry-only, unit tests, single-doc parsing, and
 **gen-qa (runs on Ollama cloud, no local compute)** — is fine on CPU. Do not wait on
 hardware for day-to-day work; reach for a GPU *only* for the sweep/benchmark.
 
+**Analysis of a finished run never needs a GPU**, and two scripts exist so that it
+does not get one: `scripts/slice_results.py` re-reads a results JSON and slices it by
+evidence source, domain and document position (it joins `per_question` to the gold on
+`(source_doc, question)`, so no re-run), and `scripts/gold_reachability.py` measures a
+corpus's ceiling per relevance rule from pdfplumber text alone. Corpus fetching is
+network-bound: `fetch_ohrbench.py`, `fetch_financebench.py`, `fetch_pmc.py` all run on
+a laptop.
+
+**Colab, in practice (2026-08-11).** The three-mode OHR-Bench run took ~2 h per mode
+on a T4, ~6 h total across one session, with the detector cache on Drive. Re-running a
+mode is a *full* re-run — the checkpoint stores scored results, not retrievals — but
+the warm YOLO cache removes the expensive part, and chunking is identical across
+modes, which is what makes the mode comparison a clean experiment.
+
 ## Why the sweep did not run
 
 One `ablate.py` run on 92 docs is **~69 min** on this CPU (first pass YOLO + per-run

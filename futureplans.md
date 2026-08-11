@@ -4,9 +4,20 @@ Written 2026-08-06 at the end of the infrastructure session. Read this first, th
 `memory/benchmark-datasets.md` and `memory/evaluation.md`. `to-do.md` is the older
 scratchpad; where they disagree, this file is newer.
 
-**One-line state:** the harness is ready and nothing has been measured. Every number
-produced on 2026-08-06 came from a 3-document smoke test and **none of it is
-citable**. Tomorrow's job is to produce the first real leaderboards on a GPU.
+**One-line state (as written 2026-08-06):** the harness is ready and nothing has been
+measured. Every number produced on 2026-08-06 came from a 3-document smoke test and
+**none of it is citable**. Tomorrow's job is to produce the first real leaderboards
+on a GPU.
+
+> **Update 2026-08-12 — §1 is done, §2 is not.** OHR-Bench ran on 2026-08-11 for all
+> **three** relevance modes, seven tools (docling excluded by choice), 95 docs, 3,558
+> questions: `reports/ohr_report_{page,span,region}.md`. The `--relevance page`
+> command below is superseded — the premise that page was the only viable mode was
+> wrong, and the ranking inverts between modes. Read `memory/relevance-modes.md`
+> before using anything in §1. §2 (FinanceBench) is still accurate and still the next
+> GPU job; its corpus is now fetched in full (84 PDFs / 189 rows).
+>
+> `to-do.md` was rewritten on 2026-08-12 and is newer than this file again.
 
 ---
 

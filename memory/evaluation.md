@@ -134,11 +134,27 @@ the scale.
 One rule does not fit three corpora, and picking the wrong one produces a
 plausible-looking leaderboard rather than an obvious failure.
 
-| Mode | Compares | Use for | Known bias |
+| Mode | Compares | Use for | Measured bias |
 |---|---|---|---|
-| `span` (default) | chunk text contains the gold sentence | our generated gold | fails in proportion to how *small* a tool chunks when gold is block-level |
-| `region` | Szymkiewicz–Simpson overlap, normalised by the smaller set | FinanceBench | tolerant of size mismatch in both directions; threshold `RELEVANCE_REGION_MIN_OVERLAP` still unvalidated |
-| `page` | chunk's pages contain the evidence page | OHR-Bench | coarse — credits being on the page, not containing the answer. Favours one-chunk-per-page tools (`pymupdf4llm`) by construction, and penalises any tool that drops back matter (DocStruct drops references) |
+| `span` (default) | chunk text contains the gold sentence | our generated gold; OHR-Bench (80.2% reachable) | rewards **large** chunks — containment is unbounded in chunk size |
+| `region` | Szymkiewicz–Simpson overlap, normalised by the smaller set | FinanceBench; OHR-Bench | the only size-tolerant rule; threshold `RELEVANCE_REGION_MIN_OVERLAP` still unvalidated |
+| `page` | chunk's pages contain the evidence page | OHR-Bench, as one of three | rewards **small** chunks. Coarse: credits being on the page, not containing the answer, and penalises any tool that drops back matter (DocStruct drops references) |
+
+**`page`'s direction was predicted wrong, and the wrong prediction is instructive.**
+The expectation was that page mode favours one-chunk-per-page tools
+(`pymupdf4llm`). Measured, it does not: **unstructured wins page mode with the
+smallest chunks in the field** (87 words). Chunk *count* beats chunk-page alignment.
+
+**Picking a mode picks a winner.** On OHR-Bench, with identical chunks in all three
+runs, DocStruct ranks 1st under `span` and `region` and 6th of 7 under `page`,
+while unstructured does the reverse. A single-mode leaderboard reports the mode as
+much as the tool. Full result and how to report it: [`relevance-modes.md`](relevance-modes.md).
+
+Before a corpus's first leaderboard, run `scripts/gold_reachability.py`: it reports
+what fraction of the gold each rule can reach at all, on the gold's own evidence
+page, identically for every tool. It also warns when the question is **circular** —
+once the gold is a large share of its page (FinanceBench: 69%), span and region
+reachability are ~100% by construction and prove nothing.
 
 `page` needs every adapter to report the pages a chunk drew from. `_pages_of()` in
 `benchmark.py` normalises that: Unstructured and Docling count pages from 1, everyone
@@ -185,6 +201,14 @@ disabled (`run_pipeline(pipeline_mode=...)`). They answer "what is each detector
 actually worth?" — the first question a two-detector design invites — and are
 **deliberately not in the default tool list**, because that is a different
 question from the cross-tool leaderboard.
+
+**The current answer is uncomfortable and is not to be smoothed over.** On the
+internal arXiv corpus the model detector is worth +0.0443 MRR (p=0.0026). On
+OHR-Bench it is worth +0.0012 under `span` (p=0.80) and +0.0090 under `region`
+(p=0.12) — **not significant in either**. Its apparent +0.1305 under `page` is a
+page-mode artefact: geometry-only emits fewer chunks and page mode rewards chunk
+count. FinanceBench, where borderless financial tables should favour it, has not
+been run.
 
 The trap here is the block cache: its key must include the pipeline mode, or a
 geometry-only run *with weights present* hashes identically to the hybrid run and
