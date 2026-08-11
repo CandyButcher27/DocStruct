@@ -1,0 +1,189 @@
+[
+  {
+    "file": "plos__W7201847349.pdf",
+    "venue": "PLOS ONE",
+    "openalex_id": "W7201847349",
+    "doi": "https://doi.org/10.1371/journal.pone.0354957",
+    "title": "How soundscape shapes restorative experience in a world heritage site: The mediating role of cultural authenticity at Mount Emei, China",
+    "publication_date": "2026-08-07",
+    "license": "cc-by",
+    "source": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0354957&type=printable",
+    "sha256": "a567fe0b6e2ea9c824f6ff69fe7a37ebe360a1321576dc8ac5515b5b57e03594"
+  },
+  {
+    "file": "frontiers__W7202033503.pdf",
+    "venue": "Frontiers in Psychology",
+    "openalex_id": "W7202033503",
+    "doi": "https://doi.org/10.3389/fpsyg.2026.1926635",
+    "title": "From community support to subjective well-being: an integrative moderated mediation model of resilience and parenting stress in rural contexts",
+    "publication_date": "2026-08-10",
+    "license": "cc-by",
+    "source": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2026.1926635/pdf",
+    "sha256": "f3927e0060c47c91dd112e77c825c1b8ea039b2bc036b4ef30dcea5cb070dc45"
+  },
+  {
+    "file": "elife__W4416128321.pdf",
+    "venue": "eLife",
+    "openalex_id": "W4416128321",
+    "doi": "https://doi.org/10.7554/elife.109853.3",
+    "title": "Evaluating the applicability of replication success metrics in animal-to-human translation: A simulation study",
+    "publication_date": "2026-08-07",
+    "license": "cc-by",
+    "source": "https://elifesciences.org/download/aHR0cHM6Ly9jZG4uZWxpZmVzY2llbmNlcy5vcmcvYXJ0aWNsZXMvMTA5ODUzL2VsaWZlLTEwOTg1My12MS5wZGY_Y2Fub25pY2FsVXJpPWh0dHBzOi8vZWxpZmVzY2llbmNlcy5vcmcvYXJ0aWNsZXMvMTA5ODUz/elife-109853-v1.pdf?_hash=ZldByN0d88i%2FK7iKSiDC78EY4AiOeP6J9tVDZryBqzI%3D",
+    "sha256": "02224c305ea79646d2641a6a0eed4077ff376d2e6a0c9b22769de3b8859f54dc"
+  },
+  {
+    "file": "plos__W7201851208.pdf",
+    "venue": "PLOS ONE",
+    "openalex_id": "W7201851208",
+    "doi": "https://doi.org/10.1371/journal.pone.0355611",
+    "title": "A lightweight alignment-aware DBNet for surgical instrument code detection",
+    "publication_date": "2026-08-07",
+    "license": "cc-by",
+    "source": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0355611&type=printable",
+    "sha256": "18bb418afa92aa24b0946a6d4e24c0f1a61e9ae1e48f24d33dcd215d84fed8cb"
+  },
+  {
+    "file": "plos__W7201850085.pdf",
+    "venue": "PLOS ONE",
+    "openalex_id": "W7201850085",
+    "doi": "https://doi.org/10.1371/journal.pone.0351112",
+    "title": "Adaptive token division-based transformer for visual object tracking",
+    "publication_date": "2026-08-07",
+    "license": "cc-by",
+    "source": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0351112&type=printable",
+    "sha256": "1b9d56ec482992a2b0c265c103de8d5b9526d2fc44ef782e8eb58c3ff75cfddc"
+  },
+  {
+    "file": "plos__W7201848111.pdf",
+    "venue": "PLOS ONE",
+    "openalex_id": "W7201848111",
+    "doi": "https://doi.org/10.1371/journal.pone.0353694",
+    "title": "Identification of senescence-related genes in diagnosing idiopathic pulmonary fibrosis via integrating bioinformatics analysis and machine learning",
+    "publication_date": "2026-08-07",
+    "license": "cc-by",
+    "source": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0353694&type=printable",
+    "sha256": "7b6e6f35f3f109952d70363d1d83e938a1a7ef04c304d5b1f6bfc081f53a9b8a"
+  },
+  {
+    "file": "plos__W7201877525.pdf",
+    "venue": "PLOS ONE",
+    "openalex_id": "W7201877525",
+    "doi": "https://doi.org/10.1371/journal.pone.0344331",
+    "title": "A corpus-based comparison of stance markers in materials science research article abstracts by Chinese and English L1 authors",
+    "publication_date": "2026-08-07",
+    "license": "cc-by",
+    "source": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0344331&type=printable",
+    "sha256": "dcbfdabb084f03894a4a234a39774e5776b44d99256aba64cb2f43bc5f7ceec6"
+  },
+  {
+    "file": "plos__W4416349106.pdf",
+    "venue": "PLOS ONE",
+    "openalex_id": "W4416349106",
+    "doi": "https://doi.org/10.1371/journal.pone.0354748",
+    "title": "Regret, uncertainty, and bounded rationality in norm-driven decisions",
+    "publication_date": "2026-08-07",
+    "license": "cc-by",
+    "source": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0354748&type=printable",
+    "sha256": "deb57d270802318350197558634f73917e8a4ca21e4c2f8d2d2f726f7deb221a"
+  },
+  {
+    "file": "plos__W7201891174.pdf",
+    "venue": "PLOS ONE",
+    "openalex_id": "W7201891174",
+    "doi": "https://doi.org/10.1371/journal.pone.0349257",
+    "title": "Evaluation of the adequacy of care for individuals with diabetes in Brazil: The intersection between gender, race, and socioeconomic profile",
+    "publication_date": "2026-08-07",
+    "license": "cc-by",
+    "source": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0349257&type=printable",
+    "sha256": "1eb6b3eeb5d21f3d295f6d6a512fecec3e534fbc5ade1e5056c07e674f7e9eb6"
+  },
+  {
+    "file": "plos__W7201862254.pdf",
+    "venue": "PLOS ONE",
+    "openalex_id": "W7201862254",
+    "doi": "https://doi.org/10.1371/journal.pone.0354309",
+    "title": "Household level multidimensional energy poverty and its determinants: Evidence from tea estates in Bangladesh",
+    "publication_date": "2026-08-07",
+    "license": "cc-by",
+    "source": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0354309&type=printable",
+    "sha256": "771c4952403a2514906b0a3b8771fe97cc8ca34ce5dbf657817f18f42bb5545e"
+  },
+  {
+    "file": "plos__W7201877242.pdf",
+    "venue": "PLOS ONE",
+    "openalex_id": "W7201877242",
+    "doi": "https://doi.org/10.1371/journal.pone.0355841",
+    "title": "A Transgenic mouse tolerant to syngeneic cancer cells expressing truncated human epidermal growth factor receptor",
+    "publication_date": "2026-08-07",
+    "license": "cc-by",
+    "source": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0355841&type=printable",
+    "sha256": "a50192770398b88e442bfa5e5df14093bd5dc94711c66e9c0399edfa74843a94"
+  },
+  {
+    "file": "plos__W7201834663.pdf",
+    "venue": "PLOS ONE",
+    "openalex_id": "W7201834663",
+    "doi": "https://doi.org/10.1371/journal.pone.0355646",
+    "title": "Enhancing the solubility of puerarin via melt sonocrystallization",
+    "publication_date": "2026-08-07",
+    "license": "cc-by",
+    "source": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0355646&type=printable",
+    "sha256": "c632c96c0214c0053a98992bed5c6ba49e596e0fa04f0c9936486348388d6037"
+  },
+  {
+    "file": "plos__W7201869097.pdf",
+    "venue": "PLOS ONE",
+    "openalex_id": "W7201869097",
+    "doi": "https://doi.org/10.1371/journal.pone.0343349",
+    "title": "Mobile money, and the welfare of women and youths in fragile states: Evidence from Mozambique",
+    "publication_date": "2026-08-07",
+    "license": "cc-by",
+    "source": "https://finmark.org.za/system/documents/files/000/000/155/original/Mozambique_Survey-2020-07-311.pdf?1597303567",
+    "sha256": "d2da9b802f183e88d9e59c399f87b480c6a284e64b32a915ced4dcf98e6e1b4e"
+  },
+  {
+    "file": "plos__W7201877031.pdf",
+    "venue": "PLOS ONE",
+    "openalex_id": "W7201877031",
+    "doi": "https://doi.org/10.1371/journal.pone.0355681",
+    "title": "Dual regulatory mechanisms of YGP1 expression in response to glucose availability in Saccharomyces cerevisiae",
+    "publication_date": "2026-08-07",
+    "license": "cc-by",
+    "source": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0355681&type=printable",
+    "sha256": "5b824c3ecf93a9c771191e1013a4ce98901470c3bb52b6dc08f195f981755e72"
+  },
+  {
+    "file": "plos__W7201843239.pdf",
+    "venue": "PLOS ONE",
+    "openalex_id": "W7201843239",
+    "doi": "https://doi.org/10.1371/journal.pone.0354157",
+    "title": "Efficient fine-tuning of large-scale vision-language models for visual marketing analysis: From brand logo detection to aesthetic preference prediction",
+    "publication_date": "2026-08-07",
+    "license": "cc-by",
+    "source": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0354157&type=printable",
+    "sha256": "828f68f28ae78bcb6f8ba3219d843d2f65ec00714ec5ba1cbc1eece23f516e4b"
+  },
+  {
+    "file": "plos__W7201895446.pdf",
+    "venue": "PLOS ONE",
+    "openalex_id": "W7201895446",
+    "doi": "https://doi.org/10.1371/journal.pone.0350986",
+    "title": "Spatial assessment of soil erosion using GIS-integrated RUSLE in the Wolaita zone, Ethiopia",
+    "publication_date": "2026-08-07",
+    "license": "cc-by",
+    "source": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0350986&type=printable",
+    "sha256": "99431a67ea2e7dda75ad7e9824f721f1b74ecf414fe9950879fbb14bbe3d0ffa"
+  },
+  {
+    "file": "plos__W7201843728.pdf",
+    "venue": "PLOS ONE",
+    "openalex_id": "W7201843728",
+    "doi": "https://doi.org/10.1371/journal.pone.0336321",
+    "title": "Factors affecting menstrual hygiene among women living in slum areas of Budanilakantha Municipality, Kathmandu",
+    "publication_date": "2026-08-07",
+    "license": "cc-by",
+    "source": "https://journals.plos.org/plosone/article/file?id=10.1371/journal.pone.0336321&type=printable",
+    "sha256": "13fd36d1cd73da87c50854a9515519b5bd08b875ba29d407484775875903b6fb"
+  }
+]

@@ -26,13 +26,17 @@ import json
 import os
 import re
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 
 PDF_DIR = os.path.join("data", "papers")
 MANIFEST = os.path.join("reports", "papers_manifest.json")
 API = "https://api.openalex.org"
-MAILTO = "docstruct-bench@example.org"
+# OpenAlex's polite pool keys off a real, reachable address; example.org gets the
+# same throttling as an anonymous caller. Set OPENALEX_MAILTO (or --mailto) to your
+# own -- deliberately not hardcoded, so nobody's address ships in the repo.
+MAILTO = os.environ.get("OPENALEX_MAILTO", "")
 
 # venue -> short slug used in the filename. Chosen for typesetting diversity, not
 # subject: each of these renders through a different template family.
@@ -58,7 +62,11 @@ def get(url: str, tries: int = 5) -> bytes:
         except Exception as e:  # noqa: BLE001
             if attempt == tries - 1:
                 raise
+            # OpenAlex 429s for minutes, not seconds; a 1-2-4-8 ladder exhausts itself
+            # inside its cooldown and the run dies on a throttle it could have waited out.
             wait = 2**attempt
+            if isinstance(e, urllib.error.HTTPError) and e.code == 429:
+                wait = max(int(e.headers.get("Retry-After") or 0), 15 * (attempt + 1))
             print(f"    {type(e).__name__}: {e} -- retry in {wait}s")
             time.sleep(wait)
     raise AssertionError("unreachable")
@@ -94,11 +102,17 @@ def works(source_id: str, n: int, from_date: str) -> list[dict]:
 
 
 def main() -> int:
+    global MAILTO
     ap = argparse.ArgumentParser()
     ap.add_argument("--per-venue", type=int, default=15)
     ap.add_argument("--from-date", default="2023-01-01")
     ap.add_argument("--venues", default="", help="comma-separated subset of the venue names")
+    ap.add_argument("--mailto", default=MAILTO, help="your address, for OpenAlex's polite pool")
     args = ap.parse_args()
+
+    MAILTO = args.mailto
+    if not MAILTO:
+        print("no --mailto/OPENALEX_MAILTO: using the anonymous pool, expect 429s\n")
 
     wanted = VENUES
     if args.venues:
@@ -112,13 +126,20 @@ def main() -> int:
 
     for name, slug in wanted.items():
         print(f"{name} ...", flush=True)
-        sid = resolve_source(name)
+        # one venue's throttle used to kill the whole run and discard every venue
+        # queued behind it. Each venue is independent; failure here is a skip.
+        try:
+            sid = resolve_source(name)
+            # ask for a big multiple: most OA records point at a landing page, not a
+            # PDF, and Nature-family records almost always do (measured 3/3)
+            candidates = works(sid, min(args.per_venue * 8, 200), args.from_date) if sid else []
+        except Exception as e:  # noqa: BLE001
+            print(f"  OpenAlex query failed ({type(e).__name__}), venue skipped")
+            continue
         if not sid:
             print("  no OpenAlex source, skipped")
             continue
-        # ask for a big multiple: most OA records point at a landing page, not a PDF,
-        # and Nature-family records almost always do (measured 3/3 on the smoke)
-        for w in works(sid, min(args.per_venue * 8, 200), args.from_date):
+        for w in candidates:
             got = sum(1 for m in manifest if m["venue"] == name)
             if got >= args.per_venue:
                 break
