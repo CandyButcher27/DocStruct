@@ -52,6 +52,7 @@ def main() -> int:
 
     counts = collections.Counter()
     overlaps = []
+    ratios = []
     by_source = collections.defaultdict(collections.Counter)
     n = missing_pdf = bad_page = 0
 
@@ -60,11 +61,15 @@ def main() -> int:
         if not os.path.exists(path):
             missing_pdf += len(items)
             continue
+        # only the evidence pages: FinanceBench filings run to 250 pages against a
+        # handful of gold rows, so extracting every page is ~50x the work needed
+        want = {int(g["page_num"]) for g in items}
         with pdfplumber.open(path) as pdf:
-            pages = [pg.extract_text() or "" for pg in pdf.pages]
+            n_pages = len(pdf.pages)
+            pages = {i: (pdf.pages[i].extract_text() or "") for i in want if 0 <= i < n_pages}
         for g in items:
             pn = int(g["page_num"])
-            if not (0 <= pn < len(pages)):
+            if pn not in pages:
                 bad_page += 1
                 continue
             text, span = pages[pn], g["answer_span"]
@@ -79,6 +84,8 @@ def main() -> int:
             counts["span"] += plain or desp or tok
             counts["region"] += region
             overlaps.append(_overlap_coefficient(span, text))
+            page_tokens = len(set(normalize_text(text).split()))
+            ratios.append(len(set(normalize_text(span).split())) / page_tokens if page_tokens else 0.0)
             src = g.get("evidence_source", "?")
             by_source[src]["n"] += 1
             by_source[src]["span"] += plain or desp or tok
@@ -102,6 +109,19 @@ def main() -> int:
     for src, c in sorted(by_source.items(), key=lambda kv: -kv[1]["n"]):
         print(f"    {src:12} n={c['n']:5}  span-reachable {100*c['span']/c['n']:5.1f}%")
 
+    # The reference here is the whole evidence page, so these rules are only a real
+    # test when the gold is much smaller than the page. Once the gold *is* a page
+    # region, both the token fallback and the overlap coefficient normalise by the
+    # gold, every item scores ~1.0 by construction, and a 100% reading means the
+    # question was circular -- not that the corpus is easy.
+    gold_frac = statistics.median(ratios)
+    print(f"\n  gold is {gold_frac:.0%} of its page (median)")
+    if gold_frac > 0.2:
+        print("  ** span/region reachability above is CIRCULAR at this gold size and is not\n"
+              "     evidence that a chunker can score this corpus. Only the plain-substring\n"
+              "     row is informative here; validate the region threshold against real\n"
+              "     chunks instead.")
+
     out = {
         "gold": args.gold,
         "n_items": n,
@@ -110,6 +130,8 @@ def main() -> int:
         "skipped_bad_page": bad_page,
         "reachable_pct": pct,
         "region_median_overlap": round(statistics.median(overlaps), 4),
+        "gold_frac_of_page_median": round(gold_frac, 4),
+        "circular": gold_frac > 0.2,
         "by_evidence_source": {
             s: {"n": c["n"], "span_pct": round(100 * c["span"] / c["n"], 1)}
             for s, c in by_source.items()

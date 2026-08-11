@@ -1,0 +1,23 @@
+{
+  "gold": "data/qa/financebench.json",
+  "n_items": 189,
+  "n_docs": 84,
+  "skipped_missing_pdf": 0,
+  "skipped_bad_page": 0,
+  "reachable_pct": {
+    "plain": 28.0,
+    "despaced": 30.2,
+    "token_fallback": 100.0,
+    "span": 100.0,
+    "region": 98.4
+  },
+  "region_median_overlap": 1.0,
+  "gold_frac_of_page_median": 0.6949,
+  "circular": true,
+  "by_evidence_source": {
+    "?": {
+      "n": 189,
+      "span_pct": 100.0
+    }
+  }
+}
