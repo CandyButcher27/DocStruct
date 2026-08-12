@@ -157,7 +157,8 @@ def _cmd_benchmark(args) -> int:
 
     results = run_benchmark(adapters, pdfs, qa, top_k=args.top_k, cache_dir=args.cache_dir,
                             rrf_k=args.rrf_k, reranker_model=args.rerank_model,
-                            reference=args.reference, relevance=args.relevance)
+                            reference=args.reference, relevance=args.relevance,
+                            dump_scores=args.dump_scores)
     meta = {
         "timestamp": now_iso(),
         "n_docs": len({q.source_doc for q in qa}),
@@ -167,6 +168,7 @@ def _cmd_benchmark(args) -> int:
         "rerank_model": args.rerank_model,
         "reference": args.reference,
         "relevance": args.relevance,
+        "dump_scores": args.dump_scores,
         "config": config_snapshot(),
     }
     write_report(results, meta, args.report_md, args.report_json)
@@ -263,6 +265,11 @@ def build_parser() -> argparse.ArgumentParser:
                           "region: gold marks the surrounding block (FinanceBench). "
                           "page: gold is written against a normalised parse, so only the "
                           "evidence page id is trustworthy (OHR-Bench).")
+    b_p.add_argument("--dump-scores", action="store_true",
+                     help="record the continuous relevance score behind each retrieved "
+                          "chunk, so the mode's threshold can be swept offline with "
+                          "scripts/sweep_relevance_threshold.py instead of a second run. "
+                          "No effect under --relevance page, which has no threshold.")
     b_p.add_argument("--reference", default="docstruct",
                      help="tool every other is paired-bootstrap tested against")
     b_p.set_defaults(func=_cmd_benchmark)

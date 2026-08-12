@@ -28,7 +28,7 @@ from docstruct import config
 from docstruct.eval.adapters.base import ChunkAdapter, EvalChunk
 from docstruct.eval.coverage import raw_document_text, text_coverage
 from docstruct.eval.qa_generator import QAItem
-from docstruct.eval.relevance import PAGE_MODES, get_relevance
+from docstruct.eval.relevance import PAGE_MODES, get_relevance, get_score
 from docstruct.eval.stats import align_per_question, bootstrap_ci, paired_bootstrap
 
 logger = logging.getLogger(__name__)
@@ -83,6 +83,22 @@ class ToolResult:
     vs_reference: Dict[str, dict] = field(default_factory=dict)
 
 
+def metrics_from_flags(flags: List[bool]):
+    """Rank metrics from per-rank relevance flags, in rank order.
+
+    Split out from `_score` so an offline threshold sweep scores a finished run with
+    exactly this arithmetic instead of a second copy of it.
+    """
+    rr = next((1.0 / (i + 1) for i, f in enumerate(flags) if f), 0.0)
+    hit1 = 1.0 if flags and flags[0] else 0.0
+    recall = 1.0 if any(flags) else 0.0
+    dcg = sum(1.0 / math.log2(i + 2) for i, f in enumerate(flags) if f)
+    n_rel = sum(flags)
+    idcg = sum(1.0 / math.log2(i + 2) for i in range(n_rel)) if n_rel else 0.0
+    ndcg = dcg / idcg if idcg > 0 else 0.0
+    return rr, hit1, recall, ndcg
+
+
 def _score(retrieved_keys: List, gold, k: int, relevant=None):
     """Rank metrics for one question.
 
@@ -92,15 +108,7 @@ def _score(retrieved_keys: List, gold, k: int, relevant=None):
     metric maths below never has to know which mode is running.
     """
     relevant = relevant or get_relevance("span")
-    flags = [relevant(key, gold) for key in retrieved_keys[:k]]
-    rr = next((1.0 / (i + 1) for i, f in enumerate(flags) if f), 0.0)
-    hit1 = 1.0 if flags and flags[0] else 0.0
-    recall = 1.0 if any(flags) else 0.0
-    dcg = sum(1.0 / math.log2(i + 2) for i, f in enumerate(flags) if f)
-    n_rel = sum(flags)
-    idcg = sum(1.0 / math.log2(i + 2) for i in range(n_rel)) if n_rel else 0.0
-    ndcg = dcg / idcg if idcg > 0 else 0.0
-    return rr, hit1, recall, ndcg
+    return metrics_from_flags([relevant(key, gold) for key in retrieved_keys[:k]])
 
 
 def _pages_of(chunk: EvalChunk) -> List[int]:
@@ -148,14 +156,20 @@ def _qa_by_doc(qa: List[QAItem]) -> Dict[str, List[QAItem]]:
     return out
 
 
-def _ckpt_path(cache_dir: Optional[str], tool_name: str, relevance: str) -> Optional[str]:
+def _ckpt_path(cache_dir: Optional[str], tool_name: str, relevance: str,
+               dump_scores: bool = False) -> Optional[str]:
     # The checkpoint stores scored results, and every score depends on the relevance
     # rule. Keying on tool name alone made a second run under a different --relevance
     # resume the first one's numbers and report them under the new mode's name.
+    # `dump_scores` joins the key for the same reason: resuming a dumping run onto a
+    # non-dumping checkpoint yields per_question rows that carry scores for the
+    # documents done after the flag and not for the ones done before it, which is a
+    # sweep silently computed over a subset.
     if not cache_dir:
         return None
     os.makedirs(cache_dir, exist_ok=True)
-    return os.path.join(cache_dir, f"bench_ckpt_{tool_name}_{relevance}.json")
+    suffix = "_scores" if dump_scores else ""
+    return os.path.join(cache_dir, f"bench_ckpt_{tool_name}_{relevance}{suffix}.json")
 
 
 def _load_ckpt(path: Optional[str]):
@@ -181,6 +195,7 @@ def benchmark_tool(
     rrf_k: int = config.RRF_K,
     reranker=None,
     relevance: str = "span",
+    dump_scores: bool = False,
 ) -> ToolResult:
     """Benchmark one tool across all documents that have questions."""
     from rank_bm25 import BM25Okapi
@@ -189,11 +204,12 @@ def benchmark_tool(
 
     relevant = get_relevance(relevance)
     by_page = relevance in PAGE_MODES
+    scorer = get_score(relevance) if dump_scores else None
     by_doc = _qa_by_doc(qa)
     docs_with_qa = [p for p in pdf_paths if os.path.basename(p) in by_doc]
     n_total = len(docs_with_qa)
 
-    ckpt_path = _ckpt_path(cache_dir, adapter.name, relevance)
+    ckpt_path = _ckpt_path(cache_dir, adapter.name, relevance, dump_scores)
     ckpt = _load_ckpt(ckpt_path)
 
     result = ToolResult(name=adapter.name)
@@ -301,12 +317,18 @@ def benchmark_tool(
             # Every metric is kept per question, not just RR: bootstrap CIs and
             # the paired test need the raw per-question vector, and it cannot be
             # recovered from an average after the fact.
-            result.per_question.append(
-                {"doc": doc_id, "question": case.question,
-                 "vec_rr": round(vr[0], 4), "hyb_rr": round(hr[0], 4),
-                 "hyb_hit1": hr[1], "hyb_recall": hr[2], "hyb_ndcg": round(hr[3], 4),
-                 "context_words": sum(len(t.split()) for t in retrieved)}
-            )
+            row = {"doc": doc_id, "question": case.question,
+                   "vec_rr": round(vr[0], 4), "hyb_rr": round(hr[0], 4),
+                   "hyb_hit1": hr[1], "hyb_recall": hr[2], "hyb_ndcg": round(hr[3], 4),
+                   "context_words": sum(len(t.split()) for t in retrieved)}
+            if scorer is not None:
+                # The continuous score behind the boolean, in rank order. Four floats
+                # a question is what makes the threshold sweepable without a second
+                # GPU session; the retrieval it came from is the expensive part.
+                row["hyb_scores"] = [round(scorer(texts[i], gold), 4) for i in hyb_order]
+                row["vec_scores"] = [round(scorer(texts[i], gold), 4)
+                                     for i in vec_order[:top_k]]
+            result.per_question.append(row)
         eval_t = time.perf_counter() - t1
         result.eval_seconds += eval_t
         done_docs.add(doc_id)
@@ -402,6 +424,7 @@ def run_benchmark(
     reranker_model: Optional[str] = None,
     reference: str = "docstruct",
     relevance: str = "span",
+    dump_scores: bool = False,
 ) -> List[ToolResult]:
     """Benchmark every adapter, ranked by hybrid MRR. Embedder loaded once."""
     from sentence_transformers import SentenceTransformer
@@ -416,7 +439,7 @@ def run_benchmark(
     results = []
     for name, adapter in adapters.items():
         print(f"\n=== {name} ===", flush=True)
-        results.append(benchmark_tool(adapter, pdf_paths, qa, embedder, top_k, cache_dir=cache_dir, rrf_k=rrf_k, reranker=reranker, relevance=relevance))
+        results.append(benchmark_tool(adapter, pdf_paths, qa, embedder, top_k, cache_dir=cache_dir, rrf_k=rrf_k, reranker=reranker, relevance=relevance, dump_scores=dump_scores))
         r = results[-1]
         lo, hi = r.ci.get("mrr", (0.0, 0.0))
         print(f"  => MRR={r.mrr} [{lo}, {hi}]  NDCG={r.ndcg}  Recall={r.recall}  "

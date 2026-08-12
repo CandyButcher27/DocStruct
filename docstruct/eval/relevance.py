@@ -160,6 +160,31 @@ def is_relevant_page(chunk_pages, evidence_page: int) -> bool:
 #            trustworthy (OHR-Bench)
 RELEVANCE_MODES = {"span": is_relevant, "region": is_relevant_region, "page": is_relevant_page}
 
+
+def span_score(chunk_text: str, answer_span: str) -> float:
+    """The continuous quantity `is_relevant` thresholds at RELEVANCE_MIN_OVERLAP."""
+    if contains_verbatim(chunk_text, answer_span):
+        return 1.0
+    return _token_overlap(answer_span, chunk_text)
+
+
+def region_score(chunk_text: str, region: str) -> float:
+    """The continuous quantity `is_relevant_region` thresholds."""
+    return _overlap_coefficient(chunk_text, region)
+
+
+# The text modes are a threshold over a continuous score. Recording the score
+# instead of the boolean makes the threshold sweepable **offline** from a finished
+# run: retrieval is what costs a GPU session, and re-thresholding does not need it.
+# `page` is genuinely boolean -- a chunk is on the evidence page or it is not --
+# so it has no entry and nothing to sweep.
+CONTINUOUS_SCORERS = {"span": span_score, "region": region_score}
+
+
+def get_score(mode: str):
+    """The continuous scorer behind a mode, or None if the mode has no threshold."""
+    return CONTINUOUS_SCORERS.get(mode)
+
 # Modes scored on page identity rather than chunk text. The benchmark has to hand
 # these the chunk's pages instead of its text.
 PAGE_MODES = frozenset({"page"})
