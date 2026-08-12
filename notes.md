@@ -1185,3 +1185,51 @@ publisher's JATS, carrying the real section hierarchy, verified on the smoke at
 is gold which predates the benchmark, and the only route to scoring section paths
 as a metric rather than a claim. IEEE Access is not reachable this way, so IEEEtran
 two-column remains a gap.
+
+---
+
+## Stage 18 — an 18-page paper takes 8 minutes (2026-08-12)
+
+Found by accident: two section-scorer runs made zero progress because each spent
+its whole life inside one document. `natcomm__PMC12855844.pdf`, **18 pages**, takes
+**475 s** geometry-only. The next document takes 14.3 s.
+
+The document carries **422,340 vector primitives** against a typical 5,763, with
+**134,164 on one page** — a Nature Communications figure page. Stage breakdown:
+
+| stage | time |
+|---|---|
+| `detect` | 362.5 s |
+| `fuse` + reading order | 0.0 s |
+| `populate_text` | 271.4 s |
+| `populate_tables` | 1.7 s |
+
+**Two separate costs, and one of them is pure waste.** `detect_page` collects
+`images + curves + rects + lines`, finds the count over `FIGURE_CLUSTER_MAX_PRIMITIVES`
+(5,000), and discards the lot. The cap does its job — it exists to stop the O(n²)
+fixed-point clustering hanging — but it fires *after* pdfplumber has materialised
+the objects, measured at **53.1 s for one page**. We pay full price to learn we
+should have skipped.
+
+The second is `populate_text`: 216 blocks × `page.crop()`, and pdfplumber's crop
+filters every object on the page, so each block pays against 134k objects.
+
+**A measurement caveat worth keeping.** The first timing pass said pdfplumber was
+fast (`extract_words` 1.0 s, `find_tables` 1.9 s) and pointed the finger at our
+code. Wrong: those numbers were taken after a `len(page.curves)` line had already
+warmed pdfplumber's lazy object cache. Cold, the same `detect_page` is 57.7 s of
+which 53.1 s is the parse. Any per-stage timing on pdfplumber has to run on a
+freshly opened page or it attributes the parse to whoever touched it first.
+
+Candidate fixes, neither applied — both are parse-path changes and want their own
+measurement plus an ablation before they land:
+
+1. Decide to skip figure clustering from a cheap proxy (content-stream size) *before*
+   touching `page.curves`, instead of after.
+2. `populate_text` could crop from a page filtered to chars once per page, so 216
+   crops do not each filter 134k vector objects.
+
+Neither is on the retrieval path's critical list, but both are on `parse()`, so a
+user with a figure-heavy paper pays this today. The arXiv corpus never contained a
+document like this — the same blind spot corpus broadening exists to close, showing
+up as a performance bug rather than a quality one.
