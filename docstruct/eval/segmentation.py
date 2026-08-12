@@ -14,7 +14,7 @@ relevance reward large chunks and `page` reward small ones. Pk (Beeferman, Berge
 segmentation metrics precisely because they penalise over- and under-segmentation
 both. Lower is better for both; 0.0 is perfect agreement.
 
-**The spine is whitespace-free characters, and that is not a detail.** Gold text
+**The spine is alphanumeric characters only, and that is not a detail.** Gold text
 comes from XML and chunk text from the PDF, so they are never byte-identical, and
 the first version of this module compared *word tokens*. It reported a 68.8%
 ceiling that was almost entirely an artefact: pdfplumber's default extraction
@@ -25,14 +25,23 @@ word n-gram can match. Matching on despaced characters instead moved that same
 document from 16.1% to 96.7%. `relevance.py` already reasons this way -- word
 spacing in a PDF is inferred, not stored -- and this is the same argument applied
 to alignment rather than to containment.
+
+Punctuation goes for a second reason: tools disagree about it. pymupdf4llm emits
+Markdown, so its chunks carry `**Figure 1.**` and table pipes the PDF never had,
+and a punctuation-sensitive spine located 1 of its 33 chunks on one paper --
+excluding it from 20 of 122 documents for its output format rather than for its
+boundaries. Both sides are normalised identically, so the choice favours nobody.
 """
 
 from __future__ import annotations
 
 import os
+import re
 from typing import Dict, List, Optional, Sequence
 
 from docstruct.eval.relevance import _despaced
+
+_ALNUM = re.compile(r"[^a-z0-9]")
 
 # Characters matched per probe. Long enough that a hit is not a coincidence in a
 # 60,000-character document, short enough to sit inside one column's run of text
@@ -42,11 +51,24 @@ _PROBE = 40
 # figure reference or a formula often enough that the first probe alone
 # under-reports what is genuinely locatable.
 _MAX_PROBES = 8
+# Bumped whenever spine_of() changes; a cached spine built under the old
+# normalisation would silently serve mismatched offsets.
+_SPINE_VERSION = 2
 
 
 def spine_of(text: str) -> str:
-    """The common sequence both segmentations are located on."""
-    return _despaced(text)
+    """The common sequence both segmentations are located on.
+
+    Alphanumeric characters only. Whitespace goes because PDF word spacing is
+    inferred rather than stored (the argument `relevance.py` already makes), and
+    punctuation goes because **tools do not agree on it**: pymupdf4llm emits
+    Markdown, so its chunks carry `**Figure 1.**` and table pipes that appear
+    nowhere in the PDF's own text. Matching on despaced *characters* located 1 of
+    its 33 chunks on one paper and excluded it from 20 of 122 documents — a
+    penalty for its output format rather than for its boundaries. Both sides are
+    normalised identically, so no tool is advantaged by the choice.
+    """
+    return _ALNUM.sub("", _despaced(text))
 
 
 def cached_spine(pdf_path: str, cache_dir: str = ".cache/spines") -> str:
@@ -66,7 +88,7 @@ def cached_spine(pdf_path: str, cache_dir: str = ".cache/spines") -> str:
 
     st = os.stat(pdf_path)
     key = hashlib.sha1(
-        f"{os.path.basename(pdf_path)}:{st.st_size}:{int(st.st_mtime)}".encode()
+        f"{_SPINE_VERSION}:{os.path.basename(pdf_path)}:{st.st_size}:{int(st.st_mtime)}".encode()
     ).hexdigest()[:16]
     path = os.path.join(cache_dir, f"{key}.txt")
     if os.path.exists(path):
@@ -80,8 +102,12 @@ def cached_spine(pdf_path: str, cache_dir: str = ".cache/spines") -> str:
 
 
 def _first_hit(spine: str, text: str, start: int = 0) -> Optional[int]:
-    """Where `text` begins in `spine` at or after `start`, by sliding probes."""
-    d = _despaced(text)
+    """Where `text` begins in `spine` at or after `start`, by sliding probes.
+
+    The probe is normalised with `spine_of`, the same function that built the
+    spine. Anything else silently matches nothing.
+    """
+    d = spine_of(text)
     for i in range(_MAX_PROBES):
         probe = d[i * _PROBE:(i + 1) * _PROBE]
         if len(probe) < _PROBE:
@@ -119,6 +145,25 @@ def _longest_increasing(values: List[Optional[int]]) -> List[int]:
         out.append(cur)
         cur = prev[cur]
     return out[::-1]
+
+
+def locate_chunk_boundaries(spine: str, chunk_texts: Sequence[str]) -> List[int]:
+    """Sorted spine offsets of a tool's chunks. **No ordering constraint.**
+
+    Gold sections are ordered, so `locate_boundaries` enforces monotonicity and uses
+    it to disambiguate repeated text. Chunks are not the same object: a boundary is
+    a *position*, and the order a tool happens to emit its chunks in is its own
+    reading-order decision, not evidence about where the boundary is.
+
+    Forcing chunks monotone was measured doing real damage. On one eLife paper every
+    one of pymupdf4llm's 33 chunks was found on the spine, and the increasing-subsequence
+    filter kept **2** -- because pdfplumber's raw text order differs from the order the
+    tool emits. Pk then scored it as a chunker with almost no boundaries. The same tool
+    on a single-column BMC paper kept 20 of 20, which is what makes it a property of the
+    reference's reading order rather than of the tool.
+    """
+    hits = [_first_hit(spine, t) for t in chunk_texts]
+    return sorted(o for o in hits if o is not None)
 
 
 def locate_boundaries(spine: str, section_texts: Sequence[str]) -> List[Optional[int]]:

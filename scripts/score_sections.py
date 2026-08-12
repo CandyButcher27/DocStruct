@@ -32,6 +32,7 @@ from docstruct.eval.segmentation import (  # noqa: E402
     boundary_mask,
     cached_spine,
     locate_boundaries,
+    locate_chunk_boundaries,
     pk_windowdiff,
     straddle_rate,
 )
@@ -153,8 +154,7 @@ def main() -> int:
                 print(f"  {doc}: {type(e).__name__}: {e}")
                 errors += 1
                 continue
-            chunk_offsets = [o for o in locate_boundaries(spine, [c.text for c in chunks])
-                             if o is not None]
+            chunk_offsets = locate_chunk_boundaries(spine, [c.text for c in chunks])
             if len(chunk_offsets) < 2:
                 errors += 1
                 continue

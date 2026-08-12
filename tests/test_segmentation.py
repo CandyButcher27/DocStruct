@@ -97,3 +97,18 @@ def test_straddle_rate_counts_chunks_crossing_a_gold_boundary():
     # a chunk spanning every section crosses both boundaries -- still one straddling
     # chunk, since the rate counts chunks and not crossings
     assert straddle_rate([0, 10, 20], [0], n=30) == 1.0
+
+
+def test_chunk_boundaries_are_not_forced_into_order():
+    """A tool's emission order is not evidence about where its boundaries are.
+
+    Gold sections are ordered and the aligner uses that. Chunks are not: forcing
+    them monotone against pdfplumber's reading order threw away 31 of one tool's 33
+    located boundaries on a real paper, then scored it as having almost none.
+    """
+    from docstruct.eval.segmentation import locate_chunk_boundaries
+
+    # emitted back-to-front; every chunk is present in the document
+    out = locate_chunk_boundaries(DOC, list(reversed(SECTIONS)))
+    assert len(out) == 3
+    assert out == sorted(out)
