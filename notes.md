@@ -1233,3 +1233,53 @@ Neither is on the retrieval path's critical list, but both are on `parse()`, so 
 user with a figure-heavy paper pays this today. The arXiv corpus never contained a
 document like this — the same blind spot corpus broadening exists to close, showing
 up as a performance bug rather than a quality one.
+
+---
+
+## Stage 19 — FinanceBench is not a retrieval benchmark for us (2026-08-13)
+
+The Colab smoke returned `MRR=0.0` for both tools on two documents, 7 questions.
+Not a bug, and not the chunkers.
+
+**The scoring rule is fine.** A relevant chunk exists: best region overlap against
+langchain's chunks is 0.990 and 1.000, well over the 0.7 threshold.
+
+**The retrieval never reaches it.** Rank of the first relevant chunk, hybrid RRF
+over dense + BM25, five questions across `3M_2018_10K` (729 chunks) and
+`3M_2022_10K` (1,176 chunks):
+
+| embedder | ranks | recall@5 | recall@50 | recall@100 | MRR@5 |
+|---|---|---|---|---|---|
+| all-MiniLM-L6-v2 | 81, 83, 163, 239, 299, 299, 299 | 0/5 | 0/5 | 2/5 | 0.0000 |
+| BAAI/bge-small-en-v1.5 | 63, 146, 173, 173, 173, 181, 222 | 0/5 | 0/5 | 1/5 | 0.0000 |
+| intfloat/e5-small-v2 | 42, 62, 128, 128, 128, 175, 252 | 0/5 | 1/5 | 2/5 | 0.0000 |
+
+Chunking was done once and every embedder scored on the identical chunk set, so
+the embedder is the only variable. A stronger one moves the best rank from 81 to
+42 and changes nothing: **top-5 is unreachable under all three.**
+
+Why this corpus behaves unlike OHR-Bench, whose questions quote distinctive
+phrases: FinanceBench questions are analyst prompts ("Assume that you are a public
+equities analyst...") with almost no lexical overlap with the evidence; the
+evidence is a numeric financial table, which small dense encoders embed poorly;
+and a 10-K yields 729-1,176 chunks, so the target is one in a thousand.
+
+**Decision: FinanceBench is not run as a retrieval leaderboard.** Every tool would
+score ~0, which discriminates nothing -- and the whole point of holding the
+embedder fixed is to isolate chunking. Reporting a table of zeros would be worse
+than reporting nothing, because it reads as a chunking result.
+
+It keeps three uses, all of which it has already delivered or can:
+
+1. **Parse fidelity** — only 28.0% of its evidence appears verbatim in pdfplumber's
+   text for its own annotated page (Stage 17), measured before any tool runs.
+2. **Borderless-table detection** — 122 detected tables against pdfplumber's 4 on
+   `3M_2018_10K`. This is the corpus where the model detector should pay for itself,
+   and that can be measured without a retrieval leaderboard.
+3. **A methodological point worth stating**: `arXiv:2604.12047` reports MRR
+   0.700-0.844 on this corpus. Our protocol reaches 0.0 on the same PDFs, which
+   makes the "not comparable -- different retrievers, page-level gold" caveat in
+   `related-work.md` concrete rather than hedged.
+
+The notebook gates the run behind `RUN_FINANCEBENCH = False` rather than deleting
+it, so the measurement can be repeated if the retrieval side ever changes.
