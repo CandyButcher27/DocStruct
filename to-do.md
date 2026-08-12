@@ -41,7 +41,13 @@ arXiv 68 PDFs.
    against the committed manifest rather than the disk, so it will not re-download
    them. Prune the manifest to files that exist, or fix it to check `os.path.exists`.
    Blocks nothing headline — this corpus is for ablations now.
-7. **IEEE Access / IEEEtran two-column is unrepresented.** Not in PMC, and its OA
+7. **An 18-page paper takes 8 minutes to parse** (`notes.md` Stage 18). 422k vector
+   primitives; `detect` 362 s and `populate_text` 271 s, and the figure-clustering
+   cap discards the objects *after* pdfplumber spent 53 s/page materialising them.
+   This is on `parse()`, so users pay it, not just the benchmark. Two candidate
+   fixes recorded; both need their own measurement before landing.
+
+8. **IEEE Access / IEEEtran two-column is unrepresented.** Not in PMC, and its OA
    PDFs 403 outside a browser. The biggest typographic contrast with arXiv is still
    a corpus gap.
 
