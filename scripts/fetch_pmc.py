@@ -109,7 +109,11 @@ def main() -> int:
             print(f"  search failed ({type(e).__name__}), journal skipped")
             continue
 
-        kept = sum(1 for m in manifest if m["journal"] == journal)
+        # counts up from zero, not from the manifest: the `fname in have` branch
+        # below already counts everything a previous run kept, and seeding from the
+        # manifest too double-counted every resumed article -- which is why the
+        # first full run stopped one short on all seven journals.
+        kept = 0
         for r in hits:
             if kept >= args.per_journal:
                 break
@@ -136,9 +140,12 @@ def main() -> int:
                     with open(xml_path, "wb") as f:
                         f.write(get(XML.format(pmcid=pmcid), tries=2))
             except Exception as e:  # noqa: BLE001
+                # a PDF whose XML never arrived is worse than nothing: it is not in
+                # the manifest, but a --pdfs-dir glob still picks it up, so the
+                # corpus silently grows articles with no gold. Drop the pair.
                 print(f"  {pmcid}: {type(e).__name__}, skipped")
                 for p in (pdf_path, xml_path):
-                    if os.path.exists(p) and not os.path.getsize(p):
+                    if os.path.exists(p):
                         os.remove(p)
                 continue
 
