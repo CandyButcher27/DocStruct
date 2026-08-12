@@ -29,6 +29,7 @@ to alignment rather than to containment.
 
 from __future__ import annotations
 
+import os
 from typing import Dict, List, Optional, Sequence
 
 from docstruct.eval.relevance import _despaced
@@ -46,6 +47,36 @@ _MAX_PROBES = 8
 def spine_of(text: str) -> str:
     """The common sequence both segmentations are located on."""
     return _despaced(text)
+
+
+def cached_spine(pdf_path: str, cache_dir: str = ".cache/spines") -> str:
+    """The document's spine, extracted once and reused across runs and tools.
+
+    pdfplumber extraction dominates both the reachability check and the scorer, and
+    this environment kills long unattended jobs roughly hourly -- a full-corpus pass
+    died twice at ~25 and ~50 of 126 documents, losing all of it. The spine depends
+    only on the PDF, so caching it makes a re-run resume in effect rather than start
+    over, and the scorer reuses what the reachability pass already paid for.
+
+    Keyed on size and mtime as well as name, so a refetched corpus invalidates.
+    """
+    import hashlib
+
+    from docstruct.eval.coverage import raw_document_text
+
+    st = os.stat(pdf_path)
+    key = hashlib.sha1(
+        f"{os.path.basename(pdf_path)}:{st.st_size}:{int(st.st_mtime)}".encode()
+    ).hexdigest()[:16]
+    path = os.path.join(cache_dir, f"{key}.txt")
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as f:
+            return f.read()
+    spine = spine_of(raw_document_text(pdf_path))
+    os.makedirs(cache_dir, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(spine)
+    return spine
 
 
 def _first_hit(spine: str, text: str, start: int = 0) -> Optional[int]:

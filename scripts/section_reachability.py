@@ -26,8 +26,12 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from docstruct.eval.coverage import raw_document_text  # noqa: E402
-from docstruct.eval.segmentation import _PROBE, locate_boundaries, spine_of  # noqa: E402
+from docstruct.eval.segmentation import (  # noqa: E402
+    _PROBE,
+    cached_spine,
+    locate_boundaries,
+    spine_of,
+)
 
 
 def main() -> int:
@@ -55,7 +59,7 @@ def main() -> int:
         if not os.path.exists(path):
             missing_pdf += 1
             continue
-        spine = spine_of(raw_document_text(path))
+        spine = cached_spine(path)
         if len(spine) < 50:
             per_doc.append({"doc": doc, "n_sections": len(gold[doc]), "located": 0,
                             "pct": 0.0, "spine_chars": len(spine), "note": "no text layer"})

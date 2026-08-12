@@ -28,12 +28,11 @@ import time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from docstruct.eval.adapters import get_adapters  # noqa: E402
-from docstruct.eval.coverage import raw_document_text  # noqa: E402
 from docstruct.eval.segmentation import (  # noqa: E402
     boundary_mask,
+    cached_spine,
     locate_boundaries,
     pk_windowdiff,
-    spine_of,
     straddle_rate,
 )
 
@@ -75,7 +74,7 @@ def main() -> int:
         path = os.path.join(args.pdfs_dir, doc)
         if not os.path.exists(path):
             continue
-        spine = spine_of(raw_document_text(path))
+        spine = cached_spine(path)
         if len(spine) < 500:
             continue
         secs = [s for s in gold[doc] if not s["in_back_matter"]]
