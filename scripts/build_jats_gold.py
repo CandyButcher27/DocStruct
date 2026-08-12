@@ -53,7 +53,33 @@ OUT = os.path.join("data", "qa", "pmc_sections.json")
 # JATS wrappers whose text is not body prose. Tables and figures are pulled out
 # rather than deleted: they are content DocStruct emits as its own chunk types, so
 # a metric that silently dropped them would flatter every tool that drops them too.
+#
+# `tex-math` is the one that has to be excluded at *any* depth. JATS wraps every
+# formula, including inline ones inside a paragraph or a section title, in
+# <inline-formula><tex-math>, and the tex-math holds a complete LaTeX preamble --
+# \documentclass[12pt]{minimal}\usepackage{amsmath}... -- which appears nowhere in
+# the rendered PDF. Pulling it in put ~40 tokens of boilerplate at the head of
+# every section of a maths-heavy paper and made those sections unlocatable in the
+# PDF's own text (measured: 26 of 55 sections located on one BMC paper).
 _NON_PROSE = {"table-wrap", "fig", "disp-formula", "supplementary-material"}
+_NEVER_TEXT = {"tex-math", "mml:math", "math", "alternatives"}
+
+
+def _itertext(el: ET.Element) -> list[str]:
+    """Text of an element, skipping excluded tags at every depth.
+
+    `itertext()` cannot do this: it descends into every descendant, so excluding a
+    tag only where it appears as a direct child misses the inline case entirely.
+    """
+    out = []
+    if el.text:
+        out.append(el.text)
+    for child in el:
+        if child.tag.split("}")[-1] not in _NEVER_TEXT:
+            out.extend(_itertext(child))
+        if child.tail:
+            out.append(child.tail)
+    return out
 
 
 def _text_of(el: ET.Element, skip_nested_sec: bool = True) -> str:
@@ -63,13 +89,13 @@ def _text_of(el: ET.Element, skip_nested_sec: bool = True) -> str:
         tag = child.tag.split("}")[-1]
         if tag == "title" or (skip_nested_sec and tag == "sec") or tag in _NON_PROSE:
             continue
-        parts.append("".join(child.itertext()))
+        parts.extend(_itertext(child))
     return re.sub(r"\s+", " ", " ".join(parts)).strip()
 
 
 def _title_of(sec: ET.Element) -> str:
     t = sec.find("title")
-    return re.sub(r"\s+", " ", "".join(t.itertext())).strip() if t is not None else ""
+    return re.sub(r"\s+", " ", " ".join(_itertext(t))).strip() if t is not None else ""
 
 
 def _walk(sec: ET.Element, path: list[str], out: list[dict], counts: collections.Counter,
