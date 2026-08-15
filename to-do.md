@@ -1,9 +1,9 @@
 # TO-DO
 
 Short "where we are / what's next". Durable detail lives in `notes.md` (Stages
-8–17) and `memory/`. `memory/` wins when they disagree.
+8–21) and `memory/`. `memory/` wins when they disagree.
 
-## Where we are (2026-08-13)
+## Where we are (2026-08-16)
 
 **OHR-Bench is done.** All three relevance modes, seven tools, 95 docs, 3,558
 human questions, identical chunks across modes. DocStruct is **1st under `span`
@@ -15,29 +15,37 @@ Two results that go against us and are now recorded, not buried: **the model
 detector is not significant outside arXiv** (+0.0012 span, +0.0090 region), and we
 retrieve 2,194 context words per query against unstructured's 561.
 
-**Section-boundary agreement is in, and we win it.** Seven tools against the PMC
-papers' publisher-authored JATS boundaries: `docstruct_geo` 1st on both WindowDiff
-(0.4362) and Pk (0.3525). No retriever, no relevance rule, gold nobody wrote for us --
-the most tool-agnostic result in the project. `reports/section_scores.md`,
-`memory/results.md`, `notes.md` Stage 20. **Caveat: 24 documents, not 126** -- the Colab
-session had only 24 PMC PDFs fetched. Re-run before it goes in the paper.
+**Compute is done. The blocker is now writing, not measurement.** The 2026-08-16 GPU
+session closed both remaining gaps and neither result moved, which is what was worth
+paying for. `notes.md` Stage 21.
+
+**Section-boundary agreement is in, and we win it.** Seven tools, **134 documents**, against the
+PMC papers' publisher-authored JATS boundaries: `docstruct_geo` 1st on both WindowDiff
+(0.4226) and Pk (0.3418). No retriever, no relevance rule, gold nobody wrote for us --
+the most tool-agnostic result in the project. Reproduces the 24-document pilot in order
+and within 0.02 in value. Ceiling and scores now cover the same population (138 with
+gold, 134 scored, 84.7% body ceiling). `reports/section_scores.md`, `memory/results.md`.
+
+**The region threshold is validated.** `RELEVANCE_REGION_MIN_OVERLAP = 0.7` was
+`# unvalidated` and one headline rested on it. Swept 0.1-1.0 on OHR-Bench: **a DocStruct
+variant is 1st at all ten thresholds**, margin +0.045 to +0.062 over the best external
+tool across 0.4-1.0. `config.py` now carries the measurement. Two things the paper must
+say anyway: 0.7 is where our margin peaks (+0.0619), and the field below us reorders
+constantly even though our position does not.
 
 **Corpora on disk:** OHR-Bench 95 docs (+ 12-doc subset), FinanceBench 84 docs /
-189 evidence rows, PMC papers fetching (7 journals, PDF + JATS XML each), internal
+189 evidence rows, PMC papers 133 (7 journals, PDF + JATS XML each), internal
 arXiv 68 PDFs.
 
 ## Next
 
-1. **One GPU session closes the last two measurement gaps — `notebooks/pmc_sections_colab.ipynb`,
-   Run all, ~4 h.** §5–8 re-run the section table on the full 126-doc PMC corpus; §9–11 do
-   item 3. Ordered by value, both checkpointed to Drive, so a reclaimed session resumes.
-   After this the blocker is writing, not compute.
-
-   The section half: the current table is 24 docs and its
-   ceiling file covers a different population (`reports/section_reachability.json` = 126
-   docs, `reports/section_reachability_colab24.json` = the scored 24). The notebook
-   asserts the fetched count before spending GPU time. This is the cheapest remaining
-   headline in the project -- everything else needs a corpus or a metric we do not have.
+1. **Write the paper.** This is the only thing on the critical path.
+   `paper/main.tex` is dated 2026-08-05: it mentions OHR-Bench once, still lists
+   FinanceBench as the planned external corpus, and carries `\todo{run it. This section
+   is the difference between an internal report and a paper.}` over a Results section
+   that is internal-arXiv-only. §4 Setup and §5 Results are rewrites around the three
+   external results (OHR-Bench three modes, section boundaries, the threshold sweep),
+   not edits. Everything they need is measured and in `memory/`.
 
 2. **FinanceBench — NOT a retrieval leaderboard. Downgraded, see `notes.md` Stage 19.**
    Measured: its evidence is unreachable at top-5 under three embedders on identical
@@ -48,14 +56,12 @@ arXiv 68 PDFs.
    **borderless-table detection** (122 detected vs pdfplumber's 4 on `3M_2018_10K`) --
    the latter is still the cleanest remaining test of the model detector, now that three
    corpora have called it null.
-3. **Sweep `RELEVANCE_REGION_MIN_OVERLAP`** against real chunks — **same GPU session
-   as item 1**, §9–11 of the same notebook. Every region number, including our best
-   result, rides on an unvalidated 0.7. The reachability script cannot settle it (that
-   question is circular on region gold), and the existing region results carry no
-   `hyb_scores`, so the offline sweep has nothing to read. Needs one OHR-Bench re-run
-   under `--relevance region --dump-scores` (~2 h: `dump_scores` is part of the
-   checkpoint key by design, so it deliberately will not resume the 08-11 run).
-   Read the sweep for the plateau, not the peak.
+3. **Report-only metric work — no GPU, no new runs.** Rename Hit@1 -> Precision@1
+   (matching `arXiv:2604.12047`); adopt token-level IoU / Precision_Omega to replace the
+   homemade MRR-per-1k-context-words; add Beeferman 1999 and Pevzner & Hearst 2002 to
+   `refs.bib` and verify the placeholder author lists flagged in its header. All
+   computable from dumps already on disk.
+
 4. **Section *hierarchy* (paths), not just boundaries.** Boundary agreement is done
    (item 1); scoring the nesting — does chunk N sit under the right `SectionPath`? — is
    still open, and is still the metric no competitor in the table can report. The JATS
@@ -90,6 +96,10 @@ Draft: `paper/main.tex` + `paper/refs.bib`. Source of truth is `memory/` —
 - **Verify `refs.bib`** — several author lists are placeholders (see file header).
   Two new citations are now required: **Beeferman et al. 1999** (Pk) and
   **Pevzner & Hearst 2002** (WindowDiff).
+- **New losses to report in the main table, not the appendix**: unstructured hard-fails
+  on 26% of PMC PDFs so its section row is on 99 of 134 documents (say the N); 0.7 is
+  where our region margin peaks; and the region *field* ranking is threshold-sensitive
+  even though our position is not.
 - **Rename Hit@1 → Precision@1**, matching `arXiv:2604.12047`.
 - **Token-level IoU / Precision_Ω** (Chroma TR metric set) to replace the homemade
   MRR-per-1k-context-words.

@@ -77,43 +77,88 @@ including why each rule is size-biased, in
 run tool-for-tool on MRR, NDCG, Recall, Hit@1 and chunk counts, on a different
 machine and session.
 
-## Section-boundary agreement — PMC papers, publisher JATS gold (2026-08-13)
+## Section-boundary agreement — PMC papers, publisher JATS gold (2026-08-16)
 
 **The only metric here that does not go through a retriever.** Boundaries against
 boundaries, gold written by the publisher for its own purposes. Pk and WindowDiff are
 *error* rates — lower is better. Report: `reports/section_scores.md`.
 
-| tool | WindowDiff | Pk | straddle | mean chunks | docs | errors | s |
-|---|---|---|---|---|---|---|---|
-| **docstruct_geo** | **0.4362 (1st)** | **0.3525 (1st)** | 0.527 | 25.5 | 24 | 0 | 132 |
-| pymupdf4llm | 0.4928 | 0.4661 | 0.6005 | 15.9 | 24 | 0 | 253 |
-| **docstruct** | 0.4934 | 0.3641 (2nd) | 0.4484 | 35.4 | 24 | 0 | 312 |
-| llamaindex_semantic | 0.5334 | 0.5134 | 0.2496 | 24.7 | 24 | 0 | 273 |
-| llamaindex | 0.6959 | 0.5938 | 0.3828 | 37.9 | 24 | 0 | 115 |
-| langchain | 0.8821 | 0.6183 | 0.2227 | 73.9 | 24 | 0 | 118 |
-| unstructured | 0.8839 | 0.5974 | 0.1924 | 92.4 | 18 | 6 | 91 |
+| tool | WindowDiff | Pk | straddle | mean chunks | docs | errors |
+|---|---|---|---|---|---|---|
+| **docstruct_geo** | **0.4226 (1st)** | **0.3418 (1st)** | 0.5129 | 26.8 | 134 | 0 |
+| pymupdf4llm | 0.4800 | 0.4490 | 0.5734 | 17.7 | 134 | 0 |
+| **docstruct** | 0.4818 | 0.3531 (2nd) | 0.4385 | 37.5 | 134 | 0 |
+| llamaindex_semantic | 0.5337 | 0.5128 | 0.1889 | 29.1 | 134 | 0 |
+| llamaindex | 0.6952 | 0.5979 | 0.3660 | 42.7 | 134 | 0 |
+| langchain | 0.8787 | 0.6200 | 0.2202 | 85.6 | 134 | 0 |
+| unstructured | 0.8933 | 0.6025 | 0.1820 | 106.9 | **99** | **35** |
+
+Ceiling: 138 documents with gold, 3,381 sections, **84.7% body**, of which 134 scored
+(4 dropped by the <50%-locatable rule). Ceiling and scores describe the same population.
+
+**Reproduces the 24-document pilot exactly in order, and within 0.02 in value**
+(WindowDiff 0.4362 → 0.4226, Pk 0.3525 → 0.3418) on a 5.6× larger corpus. That is the
+evidence the metric is not noise.
 
 **How to read it, and the three things that keep it honest:**
 
-- **Chunk count confounds WindowDiff.** langchain (74 chunks) and unstructured (92)
-  are scored against a gold averaging ~21 sections, and WindowDiff counts boundaries
-  per window, so over-segmentation is punished. Their *straddle* rate is the best in
-  the table for exactly the same reason — tiny chunks rarely cross anything. Pk
-  forgives over-segmentation and still puts them at 0.59–0.62. Quote both or neither.
+- **Chunk count confounds WindowDiff.** langchain (86 chunks) and unstructured (107) are
+  scored against a gold averaging ~25 sections, and WindowDiff counts boundaries per
+  window, so over-segmentation is punished. Their *straddle* rate is the best in the
+  table for exactly the same reason — tiny chunks rarely cross anything. Pk forgives
+  over-segmentation and still puts them at 0.60–0.62. Quote both or neither.
 - **Straddle rate is not an error.** 57.4% of gold sections are shorter than
-  `MIN_CHUNK_TOKENS`; merging them is the design. It bounds how meaningful a per-chunk
-  section *label* can be. Not a win to claim.
-- **24 documents, not 126.** The Colab session had only 24 PMC PDFs on disk. The
-  full-corpus ceiling (`reports/section_reachability.json`: 126 docs, 3,144 sections,
-  84.5% body) and the scored subset's ceiling
-  (`reports/section_reachability_colab24.json`: 86.9% body) are different populations.
-  **Do not put this table in the paper before the full-corpus re-run**
-  (`notebooks/pmc_sections_colab.ipynb`).
+  `MIN_CHUNK_TOKENS`; merging them is the design. Not a win to claim.
+- **unstructured's row is on 99 documents, not 134** — it hard-failed on 35 (26%). The
+  rate matches the pilot (6 of 24), so it is systematic. Its N belongs in the caption,
+  and the failure rate itself is a result about unstructured on born-digital PDFs.
 
-**Third corpus where the model detector does not pay for itself.** `docstruct_geo`
-beats hybrid `docstruct` on WindowDiff at 2.4× the speed (132 s vs 312 s), matching
-OHR-Bench's +0.0012 span / +0.0090 region. arXiv remains the only corpus where the
-detector helps.
+**Third corpus where the model detector does not pay for itself.** `docstruct_geo` beats
+hybrid `docstruct` on WindowDiff at 2.4× the speed, matching OHR-Bench's +0.0012 span /
++0.0090 region.
+
+## Region threshold — swept, and the ranking does not move (2026-08-16)
+
+`RELEVANCE_REGION_MIN_OVERLAP = 0.7` was `# unvalidated`; the region headline rested on
+it. Swept on **OHR-Bench, not FinanceBench** (whose evidence is unreachable —
+`notes.md` Stage 19): 3,558 questions, 7 tools, offline re-scoring of one run's dumped
+overlaps, so chunking is identical at every threshold and the rule is the only variable.
+Report: `reports/ohr_region_threshold_sweep.json`.
+
+**Precondition met:** the dumping run reproduces the cited 2026-08-11 leaderboard to a
+max MRR drift of **0.0002**, with identical chunk counts for all seven tools.
+
+| tool | 0.1 | 0.3 | 0.5 | 0.7 | 0.9 | 1.0 |
+|---|---|---|---|---|---|---|
+| docstruct | 0.9590 | 0.8803 | 0.7888 | **0.6659** | **0.5275** | **0.3890** |
+| docstruct_geo | **0.9666** | **0.8926** | **0.7995** | 0.6567 | 0.5076 | 0.3704 |
+| pymupdf4llm | 0.9455 | 0.8543 | 0.7468 | 0.6040 | 0.4821 | 0.3263 |
+| llamaindex_semantic | 0.9617 | 0.8661 | 0.7400 | 0.5747 | 0.4297 | 0.3098 |
+| unstructured | 0.9365 | 0.8339 | 0.7213 | 0.6008 | 0.3911 | 0.2127 |
+| llamaindex | 0.9463 | 0.8407 | 0.7263 | 0.5885 | 0.4604 | 0.3401 |
+| langchain | 0.9357 | 0.8137 | 0.7111 | 0.6031 | 0.4662 | 0.3370 |
+
+**A DocStruct variant is 1st at all ten thresholds; the two hold both top places at all
+ten.** Margin over the best external tool is +0.045 to +0.062 across 0.4–1.0. The region
+result does not depend on the constant.
+
+**Two caveats to state before a reviewer does:**
+
+- **0.7 is where our margin peaks** (+0.0619). It predates the sweep by months, but say
+  it in the paper rather than wait to be asked. The defence: the margin is +0.045 or
+  better everywhere from 0.4 up — a bump on a plateau, not a cliff.
+- **The low end is uninformative, not favourable.** At 0.0 every chunk is relevant and
+  MRR is 1.0 by definition, so the convergence at 0.1 is that definition asserting
+  itself. A metric that climbs as the threshold falls is not evidence for a low one.
+
+**The field below us reorders constantly** — llamaindex_semantic is 2nd at 0.1 and 7th
+at 0.7; unstructured 4th at 0.6 and 7th at 1.0. Our *position* is threshold-independent;
+a *ranking of the field* is not, and owes the caveat. Same lesson as
+[`relevance-modes.md`](relevance-modes.md), one level down, now measured.
+
+**The variants cross over between 0.5 and 0.6**: geometry-only wins the loose half,
+hybrid wins the strict half (+0.0092 at 0.7). Still small and still not significant, but
+it is the first sign the detector does anything under a strict rule.
 
 ## Internal corpus headline (`reports/v6_report.md`)
 

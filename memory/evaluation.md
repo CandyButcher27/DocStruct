@@ -269,9 +269,13 @@ none of the size-bias in [`relevance-modes.md`](relevance-modes.md) applies here
 - **Ceiling first.** `scripts/section_reachability.py` locates each gold section in the
   PDF's own text before anything is scored. Back matter is excluded (DocStruct drops
   references by design) and documents under 50% locatable are dropped. Body ceiling is
-  84.5% over 126 docs — scores read against that, never against 100%.
-- **The ceiling and the score must cover the same documents.** They currently do not (126
-  vs 24); see `results.md`.
+  84.7% over 138 docs — scores read against that, never against 100%.
+- **The ceiling and the score must cover the same documents.** They do as of 2026-08-16
+  (138 with gold, 134 scored, 4 dropped by the <50%-locatable rule). They did not on the
+  first run — 24 scored against a 126-document ceiling — because `fetch_pmc.py` trusted a
+  committed manifest over the disk and `score_sections.py` skips a missing PDF silently.
+- **`n_docs` is per tool, not per run.** unstructured hard-fails on ~26% of PMC PDFs, so
+  its row covers 99 of 134. Put the N in the caption.
 
 Numbers: `results.md`. Run it with `notebooks/pmc_sections_colab.ipynb` — hybrid
 `docstruct` wants a GPU (312 s for 24 papers there; one figure-dense paper measured 475 s

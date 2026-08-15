@@ -1359,3 +1359,104 @@ that gold's documents are missing on disk and will not re-download (to-do item 7
 committed manifest is a record of what was once fetched, never evidence of what is present.
 Both failures were silent and both produced a smaller corpus that looked like a complete
 run.
+
+---
+
+## Stage 21 -- both GPU jobs landed, and neither result moved (2026-08-16)
+
+One Colab session, ~4 h, `notebooks/pmc_sections_colab.ipynb`. Two open measurement
+questions, both now closed. The headline is that **nothing changed**, which is the
+outcome that was worth paying for.
+
+### 1. Section boundaries: 24 documents became 134, and the table held
+
+The `fetch_pmc.py` manifest fix (Stage 20 addendum) did what it was supposed to --
+the corpus went from 29 paired documents to the full set.
+
+| Tool | WindowDiff | Pk | Straddle | Mean chunks | Docs | Errors |
+|---|---|---|---|---|---|---|
+| docstruct_geo **(ours)** | **0.4226** | **0.3418** | 0.5129 | 26.8 | 134 | 0 |
+| pymupdf4llm | 0.4800 | 0.4490 | 0.5734 | 17.7 | 134 | 0 |
+| docstruct **(ours)** | 0.4818 | 0.3531 | 0.4385 | 37.5 | 134 | 0 |
+| llamaindex_semantic | 0.5337 | 0.5128 | 0.1889 | 29.1 | 134 | 0 |
+| llamaindex | 0.6952 | 0.5979 | 0.3660 | 42.7 | 134 | 0 |
+| langchain | 0.8787 | 0.6200 | 0.2202 | 85.6 | 134 | 0 |
+| unstructured | 0.8933 | 0.6025 | 0.1820 | 106.9 | **99** | **35** |
+
+Against the 24-document run: order identical, every value within 0.02. WindowDiff
+0.4362 -> 0.4226, Pk 0.3525 -> 0.3418. A 5.6x larger corpus that reproduces the small
+one is the cheapest kind of evidence that the metric is not noise, and it is the reason
+this table can now go in the paper as a headline rather than an appendix curiosity.
+
+Reachability: 138 documents with gold, 3,381 sections, 84.7% body ceiling -- and 134 of
+those 138 scored, the four dropped by the <50%-locatable rule. **The ceiling and the
+score finally describe the same population**, which was the specific defect of the last
+run (24 scored against a 126-document ceiling file). `section_reachability_colab24.json`
+is deleted; it existed only to keep those two populations apart.
+
+**One number in that table is not on the same population as the rest.** unstructured
+errored on 35 of 134 documents (26%) and its row covers 99. The rate is unchanged from
+the small run (6 of 24, 25%), so it is systematic rather than a session accident. Its
+row needs that N in the caption, and the failure itself is worth a sentence -- a 26%
+hard-failure rate on born-digital PMC PDFs is a result about unstructured, not a
+footnote about our harness.
+
+### 2. The region threshold: swept, and the ranking does not move
+
+`RELEVANCE_REGION_MIN_OVERLAP = 0.7` was `# unvalidated` and one of the paper's two
+headline wins rested on it. Swept on OHR-Bench (not FinanceBench -- Stage 19), 3,558
+questions, offline re-scoring of one run's dumped overlaps so chunking is identical at
+every threshold.
+
+**The dumping run reproduces the cited 2026-08-11 leaderboard: max MRR drift 0.0002,
+identical chunk counts for all seven tools.** That check was the precondition -- a dump
+that disagreed with the published numbers would have been describing a different run,
+and the sweep over it would have looked exactly as convincing while meaning nothing.
+
+MRR by threshold:
+
+| tool | 0.1 | 0.3 | 0.5 | 0.7 | 0.9 | 1.0 |
+|---|---|---|---|---|---|---|
+| docstruct | 0.9590 | 0.8803 | 0.7888 | **0.6659** | **0.5275** | **0.3890** |
+| docstruct_geo | **0.9666** | **0.8926** | **0.7995** | 0.6567 | 0.5076 | 0.3704 |
+| pymupdf4llm | 0.9455 | 0.8543 | 0.7468 | 0.6040 | 0.4821 | 0.3263 |
+| llamaindex_semantic | 0.9617 | 0.8661 | 0.7400 | 0.5747 | 0.4297 | 0.3098 |
+| unstructured | 0.9365 | 0.8339 | 0.7213 | 0.6008 | 0.3911 | 0.2127 |
+| llamaindex | 0.9463 | 0.8407 | 0.7263 | 0.5885 | 0.4604 | 0.3401 |
+| langchain | 0.9357 | 0.8137 | 0.7111 | 0.6031 | 0.4662 | 0.3370 |
+
+**A DocStruct variant is 1st at all ten thresholds, and the two of them hold both top
+places at all ten.** Margin over the best external tool: +0.045 to +0.062 across
+0.4-1.0. The region result does not depend on the constant, which is the claim the
+sweep existed to test, and `config.py` now carries the measurement instead of the
+`# unvalidated` marker (hard rule 5).
+
+**Read two things honestly before quoting this.**
+
+First, **0.7 is where our margin peaks** (+0.0619). We did not choose it that way -- it
+predates the sweep by months -- but a reviewer will check, so the paper says it rather
+than waiting to be asked. The defence is that the margin is +0.045 or better everywhere
+from 0.4 up, so the peak is a bump on a plateau, not a cliff we are standing on.
+
+Second, **the low end is uninformative, not favourable**. At 0.0 every chunk counts as
+relevant and MRR is 1.0 by definition, so the convergence at 0.1 (all seven tools inside
+0.03) is that definition asserting itself. A metric climbing as the threshold falls is
+not evidence for a low threshold.
+
+**The field below us reorders constantly** -- llamaindex_semantic runs 2nd at 0.1 and
+7th at 0.7; unstructured 4th at 0.6 and 7th at 1.0. So the *leaderboard* is
+threshold-sensitive even though *our position* is not. Anyone reporting a region
+ranking of the field owes that caveat; this is the relevance-mode lesson
+(`relevance-modes.md`) one level down, and it now has its own measurement.
+
+**Small rehabilitation of the model detector.** The variants cross over between 0.5 and
+0.6: geometry-only wins the loose half, hybrid wins the strict half (+0.0092 at 0.7).
+Still not significant, still tiny, and still against three corpora that found nothing --
+but it is the first sign the detector does something at all under a strict rule, and it
+is the direction a table-heavy corpus would predict.
+
+### Where that leaves the paper
+
+Compute is done. Every headline the draft needs is now measured, and the remaining work
+is that `paper/main.tex` is dated 2026-08-05, mentions OHR-Bench once, and still lists
+FinanceBench as the planned external corpus. Sections 4 and 5 are rewrites, not edits.

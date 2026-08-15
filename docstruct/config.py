@@ -314,7 +314,17 @@ RELEVANCE_MIN_OVERLAP = 0.6     # token-overlap fallback when answer span isn't 
 # Higher than the span fallback on purpose: a 1.2k-character evidence block shares
 # a long tail of common terms with any chunk from the same filing, so a lenient
 # threshold marks half the document relevant and flattens the tools together.
-# unvalidated — sweep it on FinanceBench before trusting the number.
+# Swept 2026-08-16 on OHR-Bench, not FinanceBench: the sweep needs a corpus whose
+# evidence is actually retrievable, and FinanceBench's is not (notes.md Stage 19).
+# 3,558 questions, 7 tools, thresholds 0.1-1.0, re-scored offline from one run's
+# dumped overlaps (reports/ohr_region_threshold_sweep.json), so chunking is identical
+# at every point and the threshold is the only variable.
+# A DocStruct variant places 1st at all ten thresholds, and {docstruct, docstruct_geo}
+# hold the top two places at all ten. Margin over the best external tool is +0.045 to
+# +0.062 MRR across 0.4-1.0. So the ranking does not depend on this number.
+# Kept at 0.7, but read the value honestly: it is where our margin happens to peak
+# (+0.0619). Below 0.4 every tool converges toward the 1.0 that 0.0 gives by
+# definition, which is why the low end is uninformative rather than favourable.
 RELEVANCE_REGION_MIN_OVERLAP = 0.7
 # Hybrid retrieval (BM25 lexical + dense vector, fused by Reciprocal Rank Fusion)
 RRF_K = 60                      # standard RRF constant

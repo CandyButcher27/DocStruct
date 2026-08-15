@@ -1,900 +1,984 @@
 {
   "gold": "data/qa/pmc_sections.json",
-  "n_docs": 126,
-  "n_sections": 3144,
-  "located": 2537,
-  "located_pct": 80.7,
+  "n_docs": 138,
+  "n_sections": 3381,
+  "located": 2737,
+  "located_pct": 81.0,
   "by_kind": {
-    "body_found": 2478,
-    "body_miss": 453,
-    "too_short_miss": 129,
-    "back_matter_found": 59,
-    "back_matter_miss": 25
+    "body_found": 2674,
+    "body_miss": 482,
+    "too_short_miss": 135,
+    "back_matter_found": 63,
+    "back_matter_miss": 27
   },
-  "body_ceiling_pct": 84.5,
-  "median_doc_pct": 85.0,
+  "body_ceiling_pct": 84.7,
+  "median_doc_pct": 85.3,
   "per_doc": [
     {
       "doc": "bmc__PMC12717768.pdf",
       "n_sections": 24,
       "located": 18,
       "pct": 75.0,
-      "spine_chars": 28136
+      "spine_chars": 26676
     },
     {
       "doc": "bmc__PMC12729160.pdf",
       "n_sections": 24,
       "located": 18,
       "pct": 75.0,
-      "spine_chars": 46570
+      "spine_chars": 43731
     },
     {
       "doc": "bmc__PMC12729404.pdf",
       "n_sections": 27,
       "located": 22,
       "pct": 81.5,
-      "spine_chars": 36442
+      "spine_chars": 34519
+    },
+    {
+      "doc": "bmc__PMC12750710.pdf",
+      "n_sections": 15,
+      "located": 15,
+      "pct": 100.0,
+      "spine_chars": 33588
     },
     {
       "doc": "bmc__PMC12750718.pdf",
       "n_sections": 55,
-      "located": 30,
-      "pct": 54.5,
-      "spine_chars": 44604
+      "located": 29,
+      "pct": 52.7,
+      "spine_chars": 37617
     },
     {
       "doc": "bmc__PMC12751606.pdf",
       "n_sections": 38,
       "located": 33,
       "pct": 86.8,
-      "spine_chars": 84744
+      "spine_chars": 80907
+    },
+    {
+      "doc": "bmc__PMC12751776.pdf",
+      "n_sections": 20,
+      "located": 19,
+      "pct": 95.0,
+      "spine_chars": 54546
     },
     {
       "doc": "bmc__PMC12751882.pdf",
       "n_sections": 13,
       "located": 12,
       "pct": 92.3,
-      "spine_chars": 39030
+      "spine_chars": 36764
     },
     {
       "doc": "bmc__PMC12751917.pdf",
       "n_sections": 22,
-      "located": 17,
-      "pct": 77.3,
-      "spine_chars": 17603
+      "located": 16,
+      "pct": 72.7,
+      "spine_chars": 16891
     },
     {
       "doc": "bmc__PMC12752283.pdf",
       "n_sections": 18,
       "located": 18,
       "pct": 100.0,
-      "spine_chars": 43502
+      "spine_chars": 40633
     },
     {
       "doc": "bmc__PMC12829140.pdf",
       "n_sections": 12,
       "located": 11,
       "pct": 91.7,
-      "spine_chars": 41512
+      "spine_chars": 38917
     },
     {
       "doc": "bmc__PMC12831358.pdf",
       "n_sections": 15,
       "located": 14,
       "pct": 93.3,
-      "spine_chars": 46393
+      "spine_chars": 43769
     },
     {
       "doc": "bmc__PMC12836810.pdf",
       "n_sections": 29,
       "located": 20,
       "pct": 69.0,
-      "spine_chars": 28650
+      "spine_chars": 26606
     },
     {
       "doc": "bmc__PMC12849458.pdf",
       "n_sections": 31,
       "located": 26,
       "pct": 83.9,
-      "spine_chars": 56364
+      "spine_chars": 52950
     },
     {
       "doc": "bmc__PMC12859858.pdf",
       "n_sections": 29,
-      "located": 26,
-      "pct": 89.7,
-      "spine_chars": 98121
+      "located": 27,
+      "pct": 93.1,
+      "spine_chars": 93511
     },
     {
       "doc": "bmc__PMC12859900.pdf",
       "n_sections": 22,
       "located": 16,
       "pct": 72.7,
-      "spine_chars": 24363
+      "spine_chars": 22910
     },
     {
       "doc": "bmc__PMC12859906.pdf",
       "n_sections": 16,
       "located": 15,
       "pct": 93.8,
-      "spine_chars": 50247
+      "spine_chars": 47726
     },
     {
       "doc": "bmc__PMC12859988.pdf",
       "n_sections": 17,
       "located": 16,
       "pct": 94.1,
-      "spine_chars": 66372
+      "spine_chars": 63512
     },
     {
       "doc": "bmc__PMC12860022.pdf",
       "n_sections": 30,
       "located": 25,
       "pct": 83.3,
-      "spine_chars": 46340
+      "spine_chars": 43415
     },
     {
       "doc": "bmc__PMC12866578.pdf",
       "n_sections": 35,
       "located": 30,
       "pct": 85.7,
-      "spine_chars": 47932
-    },
-    {
-      "doc": "bmc__PMC12875040.pdf",
-      "n_sections": 19,
-      "located": 18,
-      "pct": 94.7,
-      "spine_chars": 53571
+      "spine_chars": 44973
     },
     {
       "doc": "elife__PMC12726829.pdf",
       "n_sections": 29,
       "located": 26,
       "pct": 89.7,
-      "spine_chars": 100844
+      "spine_chars": 94867
     },
     {
       "doc": "elife__PMC12726831.pdf",
       "n_sections": 36,
       "located": 34,
       "pct": 94.4,
-      "spine_chars": 80386
+      "spine_chars": 75427
     },
     {
       "doc": "elife__PMC12736925.pdf",
       "n_sections": 18,
       "located": 17,
       "pct": 94.4,
-      "spine_chars": 44139
-    },
-    {
-      "doc": "elife__PMC12736935.pdf",
-      "n_sections": 32,
-      "located": 29,
-      "pct": 90.6,
-      "spine_chars": 87816
+      "spine_chars": 41150
     },
     {
       "doc": "elife__PMC12747517.pdf",
       "n_sections": 23,
       "located": 20,
       "pct": 87.0,
-      "spine_chars": 44105
+      "spine_chars": 40923
     },
     {
       "doc": "elife__PMC12747518.pdf",
       "n_sections": 23,
       "located": 16,
       "pct": 69.6,
-      "spine_chars": 53009
+      "spine_chars": 49324
     },
     {
       "doc": "elife__PMC12747519.pdf",
       "n_sections": 14,
       "located": 14,
       "pct": 100.0,
-      "spine_chars": 56583
+      "spine_chars": 52900
+    },
+    {
+      "doc": "elife__PMC12747520.pdf",
+      "n_sections": 27,
+      "located": 25,
+      "pct": 92.6,
+      "spine_chars": 66445
     },
     {
       "doc": "elife__PMC12747521.pdf",
       "n_sections": 29,
       "located": 28,
       "pct": 96.6,
-      "spine_chars": 91463
+      "spine_chars": 83631
     },
     {
       "doc": "elife__PMC12747522.pdf",
       "n_sections": 32,
       "located": 29,
       "pct": 90.6,
-      "spine_chars": 77420
+      "spine_chars": 71842
+    },
+    {
+      "doc": "elife__PMC12747525.pdf",
+      "n_sections": 40,
+      "located": 39,
+      "pct": 97.5,
+      "spine_chars": 81275
     },
     {
       "doc": "elife__PMC12747526.pdf",
       "n_sections": 41,
       "located": 38,
       "pct": 92.7,
-      "spine_chars": 90290
+      "spine_chars": 84389
     },
     {
       "doc": "elife__PMC12747541.pdf",
       "n_sections": 28,
       "located": 27,
       "pct": 96.4,
-      "spine_chars": 125656
+      "spine_chars": 117057
     },
     {
       "doc": "elife__PMC12753104.pdf",
-      "n_sections": 39,
-      "located": 38,
-      "pct": 97.4,
-      "spine_chars": 82263
+      "n_sections": 45,
+      "located": 42,
+      "pct": 93.3,
+      "spine_chars": 76634
     },
     {
       "doc": "elife__PMC12753105.pdf",
       "n_sections": 29,
       "located": 25,
       "pct": 86.2,
-      "spine_chars": 116360
+      "spine_chars": 108533
     },
     {
       "doc": "elife__PMC12755878.pdf",
       "n_sections": 21,
       "located": 18,
       "pct": 85.7,
-      "spine_chars": 58435
+      "spine_chars": 54698
+    },
+    {
+      "doc": "elife__PMC12755879.pdf",
+      "n_sections": 12,
+      "located": 12,
+      "pct": 100.0,
+      "spine_chars": 59787
     },
     {
       "doc": "elife__PMC12755881.pdf",
       "n_sections": 21,
       "located": 18,
       "pct": 85.7,
-      "spine_chars": 64291
+      "spine_chars": 60871
     },
     {
       "doc": "elife__PMC12755882.pdf",
       "n_sections": 26,
       "located": 25,
       "pct": 96.2,
-      "spine_chars": 74183
+      "spine_chars": 69235
     },
     {
       "doc": "elife__PMC12755883.pdf",
       "n_sections": 26,
       "located": 23,
       "pct": 88.5,
-      "spine_chars": 70582
+      "spine_chars": 64955
     },
     {
       "doc": "elife__PMC12755884.pdf",
       "n_sections": 12,
       "located": 10,
       "pct": 83.3,
-      "spine_chars": 169207
-    },
-    {
-      "doc": "elife__PMC12834501.pdf",
-      "n_sections": 20,
-      "located": 19,
-      "pct": 95.0,
-      "spine_chars": 63532
+      "spine_chars": 160451
     },
     {
       "doc": "frontiers__PMC12756130.pdf",
       "n_sections": 61,
-      "located": 38,
-      "pct": 62.3,
-      "spine_chars": 97421
+      "located": 37,
+      "pct": 60.7,
+      "spine_chars": 92364
     },
     {
-      "doc": "frontiers__PMC12757220.pdf",
-      "n_sections": 34,
-      "located": 24,
-      "pct": 70.6,
-      "spine_chars": 69853
+      "doc": "frontiers__PMC12756479.pdf",
+      "n_sections": 30,
+      "located": 21,
+      "pct": 70.0,
+      "spine_chars": 53631
+    },
+    {
+      "doc": "frontiers__PMC12756506.pdf",
+      "n_sections": 33,
+      "located": 20,
+      "pct": 60.6,
+      "spine_chars": 63662
     },
     {
       "doc": "frontiers__PMC12757243.pdf",
       "n_sections": 38,
       "located": 26,
       "pct": 68.4,
-      "spine_chars": 61125
+      "spine_chars": 57043
     },
     {
       "doc": "frontiers__PMC12757273.pdf",
       "n_sections": 37,
-      "located": 20,
-      "pct": 54.1,
-      "spine_chars": 53468
+      "located": 21,
+      "pct": 56.8,
+      "spine_chars": 49538
     },
     {
       "doc": "frontiers__PMC12757283.pdf",
       "n_sections": 37,
       "located": 23,
       "pct": 62.2,
-      "spine_chars": 92310
+      "spine_chars": 85619
     },
     {
       "doc": "frontiers__PMC12757289.pdf",
       "n_sections": 28,
-      "located": 19,
-      "pct": 67.9,
-      "spine_chars": 58838
-    },
-    {
-      "doc": "frontiers__PMC12757385.pdf",
-      "n_sections": 30,
-      "located": 19,
-      "pct": 63.3,
-      "spine_chars": 44738
+      "located": 18,
+      "pct": 64.3,
+      "spine_chars": 54510
     },
     {
       "doc": "frontiers__PMC12757399.pdf",
       "n_sections": 21,
       "located": 14,
       "pct": 66.7,
-      "spine_chars": 32011
-    },
-    {
-      "doc": "frontiers__PMC12757403.pdf",
-      "n_sections": 16,
-      "located": 11,
-      "pct": 68.8,
-      "spine_chars": 56412
+      "spine_chars": 29601
     },
     {
       "doc": "frontiers__PMC12757407.pdf",
       "n_sections": 28,
       "located": 21,
       "pct": 75.0,
-      "spine_chars": 81984
+      "spine_chars": 76220
     },
     {
       "doc": "frontiers__PMC12757962.pdf",
       "n_sections": 35,
-      "located": 24,
-      "pct": 68.6,
-      "spine_chars": 82393
+      "located": 22,
+      "pct": 62.9,
+      "spine_chars": 77127
     },
     {
       "doc": "frontiers__PMC12766322.pdf",
       "n_sections": 35,
       "located": 20,
       "pct": 57.1,
-      "spine_chars": 50945
+      "spine_chars": 48213
+    },
+    {
+      "doc": "frontiers__PMC12776628.pdf",
+      "n_sections": 25,
+      "located": 21,
+      "pct": 84.0,
+      "spine_chars": 60914
     },
     {
       "doc": "frontiers__PMC12777082.pdf",
       "n_sections": 24,
       "located": 19,
       "pct": 79.2,
-      "spine_chars": 68426
+      "spine_chars": 62665
     },
     {
       "doc": "frontiers__PMC12791166.pdf",
       "n_sections": 36,
       "located": 26,
       "pct": 72.2,
-      "spine_chars": 49805
+      "spine_chars": 47627
     },
     {
       "doc": "frontiers__PMC12794290.pdf",
       "n_sections": 50,
-      "located": 27,
-      "pct": 54.0,
-      "spine_chars": 45713
+      "located": 29,
+      "pct": 58.0,
+      "spine_chars": 43166
     },
     {
       "doc": "frontiers__PMC12796952.pdf",
       "n_sections": 27,
-      "located": 20,
-      "pct": 74.1,
-      "spine_chars": 49406
+      "located": 21,
+      "pct": 77.8,
+      "spine_chars": 46515
     },
     {
       "doc": "frontiers__PMC12797954.pdf",
       "n_sections": 22,
       "located": 15,
       "pct": 68.2,
-      "spine_chars": 51672
+      "spine_chars": 48427
+    },
+    {
+      "doc": "frontiers__PMC12798818.pdf",
+      "n_sections": 31,
+      "located": 24,
+      "pct": 77.4,
+      "spine_chars": 45546
     },
     {
       "doc": "frontiers__PMC12799491.pdf",
       "n_sections": 31,
       "located": 24,
       "pct": 77.4,
-      "spine_chars": 57538
+      "spine_chars": 52493
     },
     {
       "doc": "frontiers__PMC12801058.pdf",
       "n_sections": 26,
-      "located": 20,
-      "pct": 76.9,
-      "spine_chars": 72431
+      "located": 19,
+      "pct": 73.1,
+      "spine_chars": 67658
+    },
+    {
+      "doc": "natcomm__PMC12774871.pdf",
+      "n_sections": 11,
+      "located": 8,
+      "pct": 72.7,
+      "spine_chars": 23238
     },
     {
       "doc": "natcomm__PMC12775072.pdf",
       "n_sections": 20,
       "located": 10,
       "pct": 50.0,
-      "spine_chars": 45247
-    },
-    {
-      "doc": "natcomm__PMC12783123.pdf",
-      "n_sections": 29,
-      "located": 20,
-      "pct": 69.0,
-      "spine_chars": 57048
+      "spine_chars": 42623
     },
     {
       "doc": "natcomm__PMC12830622.pdf",
       "n_sections": 20,
       "located": 15,
       "pct": 75.0,
-      "spine_chars": 60606
+      "spine_chars": 57237
+    },
+    {
+      "doc": "natcomm__PMC12830901.pdf",
+      "n_sections": 29,
+      "located": 20,
+      "pct": 69.0,
+      "spine_chars": 66990
     },
     {
       "doc": "natcomm__PMC12847928.pdf",
       "n_sections": 20,
       "located": 15,
       "pct": 75.0,
-      "spine_chars": 78718
+      "spine_chars": 74490
     },
     {
       "doc": "natcomm__PMC12852918.pdf",
       "n_sections": 23,
       "located": 16,
       "pct": 69.6,
-      "spine_chars": 90282
+      "spine_chars": 84494
     },
     {
       "doc": "natcomm__PMC12855844.pdf",
       "n_sections": 34,
       "located": 20,
       "pct": 58.8,
-      "spine_chars": 95896
-    },
-    {
-      "doc": "natcomm__PMC12855986.pdf",
-      "n_sections": 25,
-      "located": 17,
-      "pct": 68.0,
-      "spine_chars": 44966
+      "spine_chars": 90344
     },
     {
       "doc": "natcomm__PMC12858907.pdf",
       "n_sections": 31,
       "located": 22,
       "pct": 71.0,
-      "spine_chars": 70872
+      "spine_chars": 66637
     },
     {
       "doc": "natcomm__PMC12864733.pdf",
       "n_sections": 15,
       "located": 10,
       "pct": 66.7,
-      "spine_chars": 48982
+      "spine_chars": 45504
     },
     {
       "doc": "natcomm__PMC12864740.pdf",
       "n_sections": 31,
       "located": 22,
       "pct": 71.0,
-      "spine_chars": 59176
+      "spine_chars": 55605
     },
     {
       "doc": "natcomm__PMC12864811.pdf",
       "n_sections": 21,
       "located": 13,
       "pct": 61.9,
-      "spine_chars": 54293
+      "spine_chars": 51063
+    },
+    {
+      "doc": "natcomm__PMC12865191.pdf",
+      "n_sections": 24,
+      "located": 15,
+      "pct": 62.5,
+      "spine_chars": 56045
     },
     {
       "doc": "natcomm__PMC12868822.pdf",
       "n_sections": 20,
       "located": 13,
       "pct": 65.0,
-      "spine_chars": 51828
+      "spine_chars": 48097
+    },
+    {
+      "doc": "natcomm__PMC12868863.pdf",
+      "n_sections": 18,
+      "located": 11,
+      "pct": 61.1,
+      "spine_chars": 28427
     },
     {
       "doc": "natcomm__PMC12872613.pdf",
       "n_sections": 73,
-      "located": 49,
-      "pct": 67.1,
-      "spine_chars": 117157
+      "located": 48,
+      "pct": 65.8,
+      "spine_chars": 108957
     },
     {
-      "doc": "natcomm__PMC12873301.pdf",
-      "n_sections": 19,
-      "located": 12,
-      "pct": 63.2,
-      "spine_chars": 56402
+      "doc": "natcomm__PMC12873266.pdf",
+      "n_sections": 20,
+      "located": 14,
+      "pct": 70.0,
+      "spine_chars": 62311
     },
     {
       "doc": "natcomm__PMC12877134.pdf",
       "n_sections": 27,
       "located": 19,
       "pct": 70.4,
-      "spine_chars": 44289
+      "spine_chars": 41719
     },
     {
       "doc": "natcomm__PMC12881661.pdf",
       "n_sections": 45,
       "located": 32,
       "pct": 71.1,
-      "spine_chars": 83902
+      "spine_chars": 78054
+    },
+    {
+      "doc": "natcomm__PMC12989454.pdf",
+      "n_sections": 14,
+      "located": 11,
+      "pct": 78.6,
+      "spine_chars": 41926
     },
     {
       "doc": "natcomm__PMC12996568.pdf",
       "n_sections": 26,
       "located": 21,
       "pct": 80.8,
-      "spine_chars": 114959
+      "spine_chars": 108291
     },
     {
       "doc": "natcomm__PMC12996602.pdf",
       "n_sections": 18,
       "located": 13,
       "pct": 72.2,
-      "spine_chars": 75900
+      "spine_chars": 71067
     },
     {
       "doc": "natcomm__PMC13039903.pdf",
       "n_sections": 28,
       "located": 18,
       "pct": 64.3,
-      "spine_chars": 67766
+      "spine_chars": 63167
     },
     {
-      "doc": "peerj__PMC12721105.pdf",
-      "n_sections": 14,
-      "located": 14,
+      "doc": "peerj__PMC12721102.pdf",
+      "n_sections": 26,
+      "located": 24,
+      "pct": 92.3,
+      "spine_chars": 39834
+    },
+    {
+      "doc": "peerj__PMC12721104.pdf",
+      "n_sections": 19,
+      "located": 19,
       "pct": 100.0,
-      "spine_chars": 75591
+      "spine_chars": 45867
     },
     {
       "doc": "peerj__PMC12721108.pdf",
       "n_sections": 27,
       "located": 26,
       "pct": 96.3,
-      "spine_chars": 67492
+      "spine_chars": 63513
     },
     {
-      "doc": "peerj__PMC12721125.pdf",
-      "n_sections": 30,
+      "doc": "peerj__PMC12721120.pdf",
+      "n_sections": 27,
       "located": 27,
-      "pct": 90.0,
-      "spine_chars": 48489
+      "pct": 100.0,
+      "spine_chars": 40501
     },
     {
-      "doc": "peerj__PMC12721126.pdf",
+      "doc": "peerj__PMC12721122.pdf",
       "n_sections": 22,
-      "located": 22,
+      "located": 21,
+      "pct": 95.5,
+      "spine_chars": 46640
+    },
+    {
+      "doc": "peerj__PMC12721127.pdf",
+      "n_sections": 12,
+      "located": 12,
       "pct": 100.0,
-      "spine_chars": 42762
+      "spine_chars": 62946
+    },
+    {
+      "doc": "peerj__PMC12981241.pdf",
+      "n_sections": 20,
+      "located": 18,
+      "pct": 90.0,
+      "spine_chars": 51501
     },
     {
       "doc": "peerj__PMC12985013.pdf",
       "n_sections": 36,
       "located": 34,
       "pct": 94.4,
-      "spine_chars": 52050
+      "spine_chars": 47844
     },
     {
       "doc": "peerj__PMC12988725.pdf",
       "n_sections": 8,
       "located": 8,
       "pct": 100.0,
-      "spine_chars": 49911
+      "spine_chars": 46662
     },
     {
       "doc": "peerj__PMC12988726.pdf",
       "n_sections": 12,
       "located": 12,
       "pct": 100.0,
-      "spine_chars": 27811
+      "spine_chars": 25958
     },
     {
       "doc": "peerj__PMC12988728.pdf",
       "n_sections": 27,
       "located": 27,
       "pct": 100.0,
-      "spine_chars": 74378
+      "spine_chars": 70063
     },
     {
       "doc": "peerj__PMC12988730.pdf",
       "n_sections": 27,
       "located": 25,
       "pct": 92.6,
-      "spine_chars": 61832
+      "spine_chars": 57678
     },
     {
       "doc": "peerj__PMC12988733.pdf",
       "n_sections": 20,
       "located": 17,
       "pct": 85.0,
-      "spine_chars": 45030
+      "spine_chars": 41175
     },
     {
       "doc": "peerj__PMC13094553.pdf",
       "n_sections": 24,
       "located": 21,
       "pct": 87.5,
-      "spine_chars": 40334
+      "spine_chars": 36897
     },
     {
       "doc": "peerj__PMC13094554.pdf",
       "n_sections": 20,
       "located": 18,
       "pct": 90.0,
-      "spine_chars": 42164
+      "spine_chars": 39875
     },
     {
       "doc": "peerj__PMC13094557.pdf",
       "n_sections": 25,
       "located": 22,
       "pct": 88.0,
-      "spine_chars": 44548
+      "spine_chars": 40630
     },
     {
       "doc": "peerj__PMC13245422.pdf",
       "n_sections": 15,
       "located": 13,
       "pct": 86.7,
-      "spine_chars": 36862
+      "spine_chars": 34883
     },
     {
       "doc": "peerj__PMC13245423.pdf",
       "n_sections": 23,
       "located": 23,
       "pct": 100.0,
-      "spine_chars": 37937
-    },
-    {
-      "doc": "peerj__PMC13245424.pdf",
-      "n_sections": 21,
-      "located": 20,
-      "pct": 95.2,
-      "spine_chars": 46010
-    },
-    {
-      "doc": "peerj__PMC13245425.pdf",
-      "n_sections": 29,
-      "located": 27,
-      "pct": 93.1,
-      "spine_chars": 57032
+      "spine_chars": 35515
     },
     {
       "doc": "peerj__PMC13245426.pdf",
       "n_sections": 12,
       "located": 12,
       "pct": 100.0,
-      "spine_chars": 46340
+      "spine_chars": 42911
+    },
+    {
+      "doc": "peerj__PMC13245429.pdf",
+      "n_sections": 24,
+      "located": 21,
+      "pct": 87.5,
+      "spine_chars": 57462
     },
     {
       "doc": "peerj__PMC13245431.pdf",
       "n_sections": 33,
       "located": 33,
       "pct": 100.0,
-      "spine_chars": 57095
+      "spine_chars": 52787
     },
     {
       "doc": "plos__PMC12952614.pdf",
       "n_sections": 1,
       "located": 1,
       "pct": 100.0,
-      "spine_chars": 1162
+      "spine_chars": 1075
+    },
+    {
+      "doc": "plos__PMC12965673.pdf",
+      "n_sections": 16,
+      "located": 16,
+      "pct": 100.0,
+      "spine_chars": 30697
     },
     {
       "doc": "plos__PMC12965701.pdf",
       "n_sections": 22,
       "located": 22,
       "pct": 100.0,
-      "spine_chars": 64784
+      "spine_chars": 60106
     },
     {
       "doc": "plos__PMC12987582.pdf",
       "n_sections": 14,
       "located": 11,
       "pct": 78.6,
-      "spine_chars": 36640
+      "spine_chars": 34577
     },
     {
       "doc": "plos__PMC13012445.pdf",
       "n_sections": 1,
       "located": 1,
       "pct": 100.0,
-      "spine_chars": 1221
+      "spine_chars": 1141
+    },
+    {
+      "doc": "plos__PMC13099099.pdf",
+      "n_sections": 23,
+      "located": 20,
+      "pct": 87.0,
+      "spine_chars": 53565
     },
     {
       "doc": "plos__PMC13249133.pdf",
       "n_sections": 1,
       "located": 1,
       "pct": 100.0,
-      "spine_chars": 1110
+      "spine_chars": 1025
+    },
+    {
+      "doc": "plos__PMC13298731.pdf",
+      "n_sections": 17,
+      "located": 15,
+      "pct": 88.2,
+      "spine_chars": 27978
     },
     {
       "doc": "plos__PMC13298746.pdf",
       "n_sections": 45,
       "located": 42,
       "pct": 93.3,
-      "spine_chars": 75054
+      "spine_chars": 70663
     },
     {
       "doc": "plos__PMC13298748.pdf",
       "n_sections": 20,
       "located": 20,
       "pct": 100.0,
-      "spine_chars": 85764
+      "spine_chars": 80037
     },
     {
       "doc": "plos__PMC13298764.pdf",
       "n_sections": 11,
       "located": 11,
       "pct": 100.0,
-      "spine_chars": 51177
+      "spine_chars": 47814
     },
     {
       "doc": "plos__PMC13298787.pdf",
       "n_sections": 20,
       "located": 17,
       "pct": 85.0,
-      "spine_chars": 43099
-    },
-    {
-      "doc": "plos__PMC13298789.pdf",
-      "n_sections": 23,
-      "located": 23,
-      "pct": 100.0,
-      "spine_chars": 69438
+      "spine_chars": 40098
     },
     {
       "doc": "plos__PMC13298916.pdf",
       "n_sections": 20,
       "located": 17,
       "pct": 85.0,
-      "spine_chars": 84006
+      "spine_chars": 78851
     },
     {
       "doc": "plos__PMC13298917.pdf",
       "n_sections": 16,
       "located": 16,
       "pct": 100.0,
-      "spine_chars": 50567
+      "spine_chars": 46732
     },
     {
       "doc": "plos__PMC13298929.pdf",
       "n_sections": 33,
       "located": 31,
       "pct": 93.9,
-      "spine_chars": 85539
+      "spine_chars": 80227
     },
     {
       "doc": "plos__PMC13298937.pdf",
       "n_sections": 15,
       "located": 13,
       "pct": 86.7,
-      "spine_chars": 34158
+      "spine_chars": 31776
     },
     {
       "doc": "plos__PMC13298939.pdf",
       "n_sections": 27,
       "located": 26,
       "pct": 96.3,
-      "spine_chars": 68520
+      "spine_chars": 65363
     },
     {
       "doc": "plos__PMC13298950.pdf",
       "n_sections": 15,
       "located": 15,
       "pct": 100.0,
-      "spine_chars": 35312
+      "spine_chars": 32550
+    },
+    {
+      "doc": "scirep__PMC12756272.pdf",
+      "n_sections": 13,
+      "located": 12,
+      "pct": 92.3,
+      "spine_chars": 38619
     },
     {
       "doc": "scirep__PMC12765006.pdf",
       "n_sections": 13,
       "located": 12,
       "pct": 92.3,
-      "spine_chars": 48857
+      "spine_chars": 45138
     },
     {
       "doc": "scirep__PMC12783103.pdf",
       "n_sections": 25,
       "located": 20,
       "pct": 80.0,
-      "spine_chars": 44336
+      "spine_chars": 41443
     },
     {
       "doc": "scirep__PMC12815906.pdf",
       "n_sections": 10,
       "located": 10,
       "pct": 100.0,
-      "spine_chars": 33652
+      "spine_chars": 30968
     },
     {
       "doc": "scirep__PMC12815946.pdf",
       "n_sections": 25,
       "located": 20,
       "pct": 80.0,
-      "spine_chars": 64705
+      "spine_chars": 59848
+    },
+    {
+      "doc": "scirep__PMC12827994.pdf",
+      "n_sections": 23,
+      "located": 18,
+      "pct": 78.3,
+      "spine_chars": 43477
     },
     {
       "doc": "scirep__PMC12830661.pdf",
       "n_sections": 28,
       "located": 22,
       "pct": 78.6,
-      "spine_chars": 52305
+      "spine_chars": 47348
     },
     {
       "doc": "scirep__PMC12834942.pdf",
       "n_sections": 25,
       "located": 20,
       "pct": 80.0,
-      "spine_chars": 82133
+      "spine_chars": 76032
     },
     {
       "doc": "scirep__PMC12835172.pdf",
       "n_sections": 12,
       "located": 11,
       "pct": 91.7,
-      "spine_chars": 29605
+      "spine_chars": 27692
     },
     {
       "doc": "scirep__PMC12852775.pdf",
       "n_sections": 21,
       "located": 16,
       "pct": 76.2,
-      "spine_chars": 43370
-    },
-    {
-      "doc": "scirep__PMC12852802.pdf",
-      "n_sections": 28,
-      "located": 23,
-      "pct": 82.1,
-      "spine_chars": 51341
+      "spine_chars": 40829
     },
     {
       "doc": "scirep__PMC12855954.pdf",
       "n_sections": 27,
       "located": 22,
       "pct": 81.5,
-      "spine_chars": 36985
+      "spine_chars": 34133
     },
     {
       "doc": "scirep__PMC12858950.pdf",
       "n_sections": 26,
       "located": 21,
       "pct": 80.8,
-      "spine_chars": 48685
+      "spine_chars": 45340
     },
     {
-      "doc": "scirep__PMC12859102.pdf",
-      "n_sections": 19,
-      "located": 14,
-      "pct": 73.7,
-      "spine_chars": 36573
+      "doc": "scirep__PMC12989452.pdf",
+      "n_sections": 9,
+      "located": 7,
+      "pct": 77.8,
+      "spine_chars": 7541
     },
     {
       "doc": "scirep__PMC12989455.pdf",
       "n_sections": 23,
-      "located": 17,
-      "pct": 73.9,
-      "spine_chars": 51845
+      "located": 18,
+      "pct": 78.3,
+      "spine_chars": 47879
+    },
+    {
+      "doc": "scirep__PMC12996287.pdf",
+      "n_sections": 41,
+      "located": 32,
+      "pct": 78.0,
+      "spine_chars": 68849
     },
     {
       "doc": "scirep__PMC13006446.pdf",
       "n_sections": 1,
       "located": 0,
       "pct": 0.0,
-      "spine_chars": 1471
+      "spine_chars": 1390
     },
     {
       "doc": "scirep__PMC13212643.pdf",
       "n_sections": 36,
       "located": 35,
       "pct": 97.2,
-      "spine_chars": 79987
+      "spine_chars": 73963
     }
   ]
 }

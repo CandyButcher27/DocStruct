@@ -153,3 +153,25 @@ alone is not, and quietly dropping `page` is not.
 **A single-mode claim is not a claim.** Run `scripts/gold_reachability.py` on any
 new corpus before its first leaderboard, check the circularity warning, then report
 every mode the corpus can support.
+
+## The region threshold itself, swept (2026-08-16)
+
+`region` is the mode built to be size-tolerant, and its `RELEVANCE_REGION_MIN_OVERLAP =
+0.7` was `# unvalidated` — so the obvious attack on the region result was that the
+constant chose the winner. It does not.
+
+Swept 0.1–1.0 on OHR-Bench by re-scoring one run's dumped overlaps offline (chunking
+identical at every point; the dumping run reproduces the 2026-08-11 leaderboard to a max
+MRR drift of 0.0002). **A DocStruct variant is 1st at all ten thresholds, and
+{docstruct, docstruct_geo} hold both top places at all ten**, with a +0.045 to +0.062
+margin over the best external tool across 0.4–1.0.
+
+Two things to carry into any write-up:
+
+1. **0.7 is where our margin peaks** (+0.0619). Say so first.
+2. **The field below us reorders constantly** — llamaindex_semantic 2nd at 0.1 and 7th
+   at 0.7, unstructured 4th at 0.6 and 7th at 1.0. So the mode-inversion lesson on this
+   page has a smaller sibling *inside* one mode: our position is threshold-independent,
+   but a published ranking of the whole field is not.
+
+Numbers: [`results.md`](results.md); raw `reports/ohr_region_threshold_sweep.json`.
