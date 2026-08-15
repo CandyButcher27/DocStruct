@@ -17,12 +17,16 @@ Companions: [`evaluation.md`](evaluation.md) (how they are implemented),
 | **Duplication** (chunk words / doc words) | `eval/coverage.py` | **No — ours** | Keep; it is the honest counterweight to coverage, and it is what makes Precision_Ω interpretable |
 | **Context words @ k** | `eval/report.py` | Semi-standard (cost columns are common, the name is not) | Keep as a cost column |
 | **MRR / 1k context words** | `eval/report.py` | **No — ours** | **Demote.** Chroma's token-level **IoU** is the published metric that encodes the same idea (rank quality per token spent). Report IoU as primary, keep MRR/1k as a secondary intuition |
+| **Pk** (section boundaries) | `scripts/score_sections.py` | Yes — Beeferman et al. 1999, the standard text-segmentation error rate | Keep. Cite the original; note it forgives over-segmentation |
+| **WindowDiff** (section boundaries) | `scripts/score_sections.py` | Yes — Pevzner & Hearst 2002, written specifically to fix Pk's blind spots | Keep, and **always report it beside Pk** — it punishes over-segmentation, Pk forgives it, and quoting one alone is quotable in either direction |
+| **Straddle rate** | `scripts/score_sections.py` | **No — ours** | Keep as a *descriptive* column, never as an error term. 57.4% of gold sections are under `MIN_CHUNK_TOKENS`, so merging them is intended; it bounds section-label meaningfulness, nothing more |
 | **mAP@0.5** (detection) | `eval/runner.py` | Yes — COCO-style; DocLayNet reports mAP@0.5:0.95 | Keep, but move to **mAP@0.5:0.95** to match DocLayNet, and run on its val split, not our 2 annotated docs |
 | Bootstrap 95% CI + **paired** bootstrap | `eval/stats.py` | Yes, and **better than most competitors** — D1 reports point estimates only | Keep and lead with it. This is a genuine methodological edge |
 
 **Summary answer to "are we using standard metrics?"** — the retrieval layer is
 fully standard (MRR / nDCG@k / Recall@k / P@1) and matches our closest competitor
-one-for-one. The *cost* layer is homemade (coverage, duplication, MRR/1k) and
+one-for-one; the section layer (Pk / WindowDiff) is standard too, and is the only
+one whose gold no competitor in the table can report against. The *cost* layer is homemade (coverage, duplication, MRR/1k) and
 should be re-expressed in the published vocabulary wherever an equivalent exists.
 
 ## Metrics to adopt
@@ -79,6 +83,7 @@ verify their structure. Either measure it or stop implying table quality.
 |---|---|
 | Rank quality | MRR, nDCG@5, Recall@{1,3,5}, Precision@1, each with 95% CI + paired p vs DocStruct |
 | Token economy | token-level Recall, Precision, **IoU**, Precision_Ω, context words @5 |
+| Structure | Pk, WindowDiff vs publisher JATS (+ straddle rate and the reachability ceiling as context columns) |
 | Fidelity | coverage, duplication |
 | Cost | chunking s/page (CPU, no network), deterministic (Y/N) |
 </content>

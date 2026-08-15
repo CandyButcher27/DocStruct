@@ -1283,3 +1283,58 @@ It keeps three uses, all of which it has already delivered or can:
 
 The notebook gates the run behind `RUN_FINANCEBENCH = False` rather than deleting
 it, so the measurement can be repeated if the retrieval side ever changes.
+
+---
+
+## Stage 20 -- section-boundary agreement: the first metric we win outright (2026-08-13)
+
+The Colab section run came back (`docstruct_results (1).zip`, now unpacked into
+`reports/`). Seven tools, PMC papers, scored against the publisher's own JATS section
+boundaries. Pk and WindowDiff are *error* rates -- lower is better.
+
+| Tool | WindowDiff | Pk | Straddle | Mean chunks | Docs | Errors | Seconds |
+|---|---|---|---|---|---|---|---|
+| docstruct_geo **(ours)** | **0.4362** | **0.3525** | 0.527 | 25.5 | 24 | 0 | 132.5 |
+| pymupdf4llm | 0.4928 | 0.4661 | 0.6005 | 15.9 | 24 | 0 | 253.0 |
+| docstruct **(ours)** | 0.4934 | 0.3641 | 0.4484 | 35.4 | 24 | 0 | 312.0 |
+| llamaindex_semantic | 0.5334 | 0.5134 | 0.2496 | 24.7 | 24 | 0 | 273.3 |
+| llamaindex | 0.6959 | 0.5938 | 0.3828 | 37.9 | 24 | 0 | 115.0 |
+| langchain | 0.8821 | 0.6183 | 0.2227 | 73.9 | 24 | 0 | 117.7 |
+| unstructured | 0.8839 | 0.5974 | 0.1924 | 92.4 | 18 | 6 | 91.3 |
+
+**What is new here.** Every external number so far has been retrieval, which means it
+is entangled with an embedder and a relevance rule -- and Stage 17 showed the ranking
+inverts when that rule changes. This metric touches neither. It compares boundaries to
+boundaries against gold a publisher wrote, for a purpose that has nothing to do with
+this benchmark. It is the most tool-agnostic gold in the project.
+
+**We are 1st on both metrics, and the two of ours disagree in a readable way.**
+`docstruct_geo` (geometry only, no model detector) wins WindowDiff; hybrid `docstruct`
+wins nothing but is close on Pk and is 2.4x slower (312 s vs 132 s). That is the third
+corpus in a row where the model detector does not pay for itself -- consistent with
+OHR-Bench's +0.0012 span / +0.0090 region. Three corpora agreeing is no longer a
+null result that can be waved off as corpus-specific.
+
+**Chunk count is the confound, and it cuts against the naive reading.** langchain and
+unstructured emit 74 and 92 chunks against a gold that averages ~21 sections, so they
+are penalised hard by WindowDiff (which counts boundaries per window) while scoring a
+*low* straddle rate -- of course, since tiny chunks rarely span a boundary. Pk forgives
+over-segmentation and their Pk is still 0.59-0.62. Both metrics have to be read
+together or the table lies in one direction or the other; this is the same size-neutrality
+problem as the relevance modes, in a new coat.
+
+**Straddle rate is not an error term.** 57.4% of gold sections are shorter than
+`MIN_CHUNK_TOKENS`, so merging them is the design working. It bounds how meaningful a
+per-chunk section *label* can be, nothing more. Our 0.527 against pymupdf4llm's 0.60 is
+not a win to claim.
+
+**The caveat that keeps this off the headline table today: 24 documents, not 126.**
+The Colab session had only 24 PMC PDFs on disk when `score_sections.py` ran, so the
+scores cover a subset. `reports/section_reachability.json` (126 docs, 3,144 sections,
+84.5% body ceiling) is the full-corpus ceiling; the 24-doc ceiling is 86.9% and now
+sits in `reports/section_reachability_colab24.json`. The two files are not the same
+population. `notebooks/pmc_sections_colab.ipynb` re-runs the table on the whole corpus
+and asserts the count before spending the GPU time.
+
+**FinanceBench still has not run as a retrieval leaderboard**, and Stage 19 is why. The
+zip's name is misleading -- it contains no FinanceBench output at all.

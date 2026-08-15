@@ -250,6 +250,33 @@ run with `--cache-dir ""` (correct but re-runs YOLO, ~90 s/doc).
 flags on the 92-doc/558-q v6 gold against the warm `.bench_cache`. Winners get their
 flag flipped to default-on and the numbers recorded in `results.md`.
 
+## Layer 3 — Section-boundary agreement (`scripts/score_sections.py`) — no retriever
+
+The only layer whose gold was not written for this project. `scripts/fetch_pmc.py` pulls
+open-access papers **with the publisher's JATS XML**; `scripts/build_jats_gold.py` turns
+the XML's `<sec>` structure into `data/qa/pmc_sections.json`. The chunker's boundaries are
+then compared to the publisher's, with no embedder and no relevance rule in between — so
+none of the size-bias in [`relevance-modes.md`](relevance-modes.md) applies here.
+
+- **Pk** (Beeferman 1999) and **WindowDiff** (Pevzner & Hearst 2002) — standard text
+  segmentation *error* rates, lower is better. WindowDiff counts boundaries per window and
+  so punishes over-segmentation; Pk only asks whether a window's ends share a segment and
+  forgives it. **Report both** — they disagree by design and a single one is quotable in
+  either direction.
+- **Straddle rate** — ours, and *not* an error term: the fraction of chunks crossing a gold
+  boundary. 57.4% of gold sections are below `MIN_CHUNK_TOKENS`, so merging is intended
+  behaviour. It bounds how meaningful a per-chunk section *label* can be.
+- **Ceiling first.** `scripts/section_reachability.py` locates each gold section in the
+  PDF's own text before anything is scored. Back matter is excluded (DocStruct drops
+  references by design) and documents under 50% locatable are dropped. Body ceiling is
+  84.5% over 126 docs — scores read against that, never against 100%.
+- **The ceiling and the score must cover the same documents.** They currently do not (126
+  vs 24); see `results.md`.
+
+Numbers: `results.md`. Run it with `notebooks/pmc_sections_colab.ipynb` — hybrid
+`docstruct` wants a GPU (312 s for 24 papers there; one figure-dense paper measured 475 s
+geometry-only on a laptop CPU).
+
 ## Report provenance
 
 `eval/report.py::config_snapshot()` dumps every uppercase `config` value into

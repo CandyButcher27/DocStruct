@@ -77,6 +77,44 @@ including why each rule is size-biased, in
 run tool-for-tool on MRR, NDCG, Recall, Hit@1 and chunk counts, on a different
 machine and session.
 
+## Section-boundary agreement — PMC papers, publisher JATS gold (2026-08-13)
+
+**The only metric here that does not go through a retriever.** Boundaries against
+boundaries, gold written by the publisher for its own purposes. Pk and WindowDiff are
+*error* rates — lower is better. Report: `reports/section_scores.md`.
+
+| tool | WindowDiff | Pk | straddle | mean chunks | docs | errors | s |
+|---|---|---|---|---|---|---|---|
+| **docstruct_geo** | **0.4362 (1st)** | **0.3525 (1st)** | 0.527 | 25.5 | 24 | 0 | 132 |
+| pymupdf4llm | 0.4928 | 0.4661 | 0.6005 | 15.9 | 24 | 0 | 253 |
+| **docstruct** | 0.4934 | 0.3641 (2nd) | 0.4484 | 35.4 | 24 | 0 | 312 |
+| llamaindex_semantic | 0.5334 | 0.5134 | 0.2496 | 24.7 | 24 | 0 | 273 |
+| llamaindex | 0.6959 | 0.5938 | 0.3828 | 37.9 | 24 | 0 | 115 |
+| langchain | 0.8821 | 0.6183 | 0.2227 | 73.9 | 24 | 0 | 118 |
+| unstructured | 0.8839 | 0.5974 | 0.1924 | 92.4 | 18 | 6 | 91 |
+
+**How to read it, and the three things that keep it honest:**
+
+- **Chunk count confounds WindowDiff.** langchain (74 chunks) and unstructured (92)
+  are scored against a gold averaging ~21 sections, and WindowDiff counts boundaries
+  per window, so over-segmentation is punished. Their *straddle* rate is the best in
+  the table for exactly the same reason — tiny chunks rarely cross anything. Pk
+  forgives over-segmentation and still puts them at 0.59–0.62. Quote both or neither.
+- **Straddle rate is not an error.** 57.4% of gold sections are shorter than
+  `MIN_CHUNK_TOKENS`; merging them is the design. It bounds how meaningful a per-chunk
+  section *label* can be. Not a win to claim.
+- **24 documents, not 126.** The Colab session had only 24 PMC PDFs on disk. The
+  full-corpus ceiling (`reports/section_reachability.json`: 126 docs, 3,144 sections,
+  84.5% body) and the scored subset's ceiling
+  (`reports/section_reachability_colab24.json`: 86.9% body) are different populations.
+  **Do not put this table in the paper before the full-corpus re-run**
+  (`notebooks/pmc_sections_colab.ipynb`).
+
+**Third corpus where the model detector does not pay for itself.** `docstruct_geo`
+beats hybrid `docstruct` on WindowDiff at 2.4× the speed (132 s vs 312 s), matching
+OHR-Bench's +0.0012 span / +0.0090 region. arXiv remains the only corpus where the
+detector helps.
+
 ## Internal corpus headline (`reports/v6_report.md`)
 
 92 born-digital PDFs, 558 LLM-generated Q&A, identical embedder and retriever for
