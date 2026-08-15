@@ -70,20 +70,36 @@ arXiv 68 PDFs.
    unstructured's 0.5151, 5th of 7), on a 10-document slice too thin to settle it.
    PMC answers the *structure* half — we win section boundaries there. The *retrieval*
    half on academic PDFs is still unanswered, because PMC has no Q&A gold.
-6. **Gated-feature ablation sweep — GPU.** 14 flags, all still default OFF.
+6. **Full-width blocks are extracted across the column gutter.** A block spanning
+   both columns has its text populated without column awareness, interleaving the two
+   columns into unreadable text. Reproduce:
+   `run_pipeline('data/raw-pdfs/doc1.pdf', weights='weights/yolov8m-doclaynet.pt')`,
+   page 0, block at `y0=332 x0=64 w=494`. It is labelled `header`, so the garbage
+   becomes a `SectionPath` level (2 of 76 chunks on that doc carry a bad path).
+   This is the failure the paper's intro attributes to naive parsers, inside our own
+   pipeline. Fix in `populate_text`: detect column bands within the block bbox and
+   extract per band. Needs `scripts/ablate.py` before landing (rule 1). `notes.md`
+   Stage 22.
+
+7. **Full-width elements above a two-column body sort after the columns.** On
+   `doc1.pdf` page 0 the paper title (`y0=97`) comes out 7th in reading order, after
+   the whole left column. Body pages are correct, so this is a title-page/section-break
+   defect. Same file, same measurement requirement. `notes.md` Stage 22.
+
+8. **Gated-feature ablation sweep — GPU.** 14 flags, all still default OFF.
    `scripts/_sweep.sh`, steps in `memory/measurement-environment.md`.
-7. **Internal arXiv corpus is broken on disk**: gold covers 92 docs, 68 PDFs
+9. **Internal arXiv corpus is broken on disk**: gold covers 92 docs, 68 PDFs
    present, **27 of the gold's documents missing**. `fetch_dataset_v2.py` dedupes
    against the committed manifest rather than the disk, so it will not re-download
    them. Prune the manifest to files that exist, or fix it to check `os.path.exists`.
    Blocks nothing headline — this corpus is for ablations now.
-8. **An 18-page paper takes 8 minutes to parse** (`notes.md` Stage 18). 422k vector
+10. **An 18-page paper takes 8 minutes to parse** (`notes.md` Stage 18). 422k vector
    primitives; `detect` 362 s and `populate_text` 271 s, and the figure-clustering
    cap discards the objects *after* pdfplumber spent 53 s/page materialising them.
    This is on `parse()`, so users pay it, not just the benchmark. Two candidate
    fixes recorded; both need their own measurement before landing.
 
-9. **IEEE Access / IEEEtran two-column is unrepresented.** Not in PMC, and its OA
+11. **IEEE Access / IEEEtran two-column is unrepresented.** Not in PMC, and its OA
    PDFs 403 outside a browser. The biggest typographic contrast with arXiv is still
    a corpus gap.
 

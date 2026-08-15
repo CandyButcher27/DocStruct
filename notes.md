@@ -1460,3 +1460,56 @@ is the direction a table-heavy corpus would predict.
 Compute is done. Every headline the draft needs is now measured, and the remaining work
 is that `paper/main.tex` is dated 2026-08-05, mentions OHR-Bench once, and still lists
 FinanceBench as the planned external corpus. Sections 4 and 5 are rewrites, not edits.
+
+---
+
+## Stage 22 -- building the README visual found two real defects (2026-08-16)
+
+`scripts/make_readme_gif.py` walks one page through `run_pipeline()` and draws what
+comes back. Drawing the actual output, rather than a diagram of the intended output,
+surfaced two bugs that a green test suite and every leaderboard had missed.
+
+### 1. Full-width blocks are extracted across the column gutter
+
+On `data/raw-pdfs/doc1.pdf` page 0, a block at `y0=332, x0=64, width=494` -- the full
+page width, over a two-column body -- carries the text:
+
+```
+bacyroresussminugltitphlee vexisiisotinnagnVdilTanagnudagLeL...
+```
+
+That is "abstract"/"scaling..." and its right-column neighbour interleaved character by
+character. A block whose bbox spans both columns has its text populated without column
+awareness, so extraction walks across the gutter and welds the two columns together.
+
+This is **the exact failure the paper's introduction attributes to naive parsers**,
+occurring inside DocStruct. It reaches the output: the affected block is classified
+`header`, so the garbage becomes a `SectionPath` level, and 2 of 76 chunks on that
+document carry a section path that fails a vowel-ratio sanity check.
+
+Impact is narrow but the class is not: it fires wherever fusion emits a full-width
+block over a multi-column region, which is exactly where a unilateral model detection
+is most likely. It also partly explains why section *labels* are less trustworthy than
+section *boundaries* -- and boundaries are what the PMC metric scores, which is why
+that result is unaffected.
+
+### 2. Full-width elements above columns are ordered after them
+
+Same page, reading order: `1 Abstract, 2 body, 3 sidebar, 4 Introduction, 5, 6, then
+7 = the paper title, 8 = the author block`. The title is at `y0=97`, above everything
+else on the page, and comes out seventh.
+
+The column-aware sweep assigns full-width elements to a column band and reads bands in
+order, so anything spanning the page -- title, author block, a full-width figure --
+sorts after the column it was assigned to instead of before both. Body pages are
+unaffected (verified on page 1: left column top-to-bottom, then right, correctly), so
+this is a title-page and section-break defect rather than a general one.
+
+### Neither is fixed here
+
+Repo rule 1: a change to reading order or extraction is worthless until it has been run
+through `scripts/ablate.py` against the numbers in `memory/results.md`. Both are logged
+in `to-do.md` with the reproduction. Recording them is also the honest option --
+the README now names both defects rather than shipping a demo that hides them.
+
+The demo uses page 1 (a body page) because that is the representative case, and says so.
