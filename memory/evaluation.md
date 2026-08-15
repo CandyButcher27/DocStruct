@@ -137,7 +137,7 @@ plausible-looking leaderboard rather than an obvious failure.
 | Mode | Compares | Use for | Measured bias |
 |---|---|---|---|
 | `span` (default) | chunk text contains the gold sentence | our generated gold; OHR-Bench (80.2% reachable) | rewards **large** chunks — containment is unbounded in chunk size |
-| `region` | Szymkiewicz–Simpson overlap, normalised by the smaller set | FinanceBench; OHR-Bench | the only size-tolerant rule; threshold `RELEVANCE_REGION_MIN_OVERLAP` still unvalidated |
+| `region` | Szymkiewicz–Simpson overlap, normalised by the smaller set | FinanceBench; OHR-Bench | the only size-tolerant rule; threshold **swept 2026-08-16** — a DocStruct variant leads at all ten values 0.1–1.0, so the ranking does not depend on it |
 | `page` | chunk's pages contain the evidence page | OHR-Bench, as one of three | rewards **small** chunks. Coarse: credits being on the page, not containing the answer, and penalises any tool that drops back matter (DocStruct drops references) |
 
 **`page`'s direction was predicted wrong, and the wrong prediction is instructive.**

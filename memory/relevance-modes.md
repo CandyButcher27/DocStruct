@@ -46,7 +46,8 @@ the smallest chunks in the field** (87 words against DocStruct's 317). Chunk
 
 `region` is the only mode with a defensible claim to size-neutrality, which is why
 DocStruct winning it matters more than DocStruct winning `span`. Its threshold
-`RELEVANCE_REGION_MIN_OVERLAP = 0.7` is still `# unvalidated` — that caveat rides
+`RELEVANCE_REGION_MIN_OVERLAP = 0.7` was `# unvalidated` until 2026-08-16 (swept; see
+the section at the end of this file) — that caveat rode
 along with every region number until it is swept against real chunks.
 
 ## Significance, stated precisely

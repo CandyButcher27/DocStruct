@@ -73,9 +73,20 @@ was updated last.
    for any headline number in the paper.
 9. **Report the losses.** Coverage 0.817 vs LangChain's 1.00, duplication 2.06, no
    parse-fidelity number, born-digital only, **6th of 7 under page relevance**, and
-   **the model detector is not significant outside arXiv** (+0.0012 span / +0.0090
-   region on OHR-Bench). These belong in the main table, not an appendix.
+   **the model detector is not significant on any corpus but arXiv** — +0.0012 span /
+   +0.0090 region on OHR-Bench, and on PMC section boundaries geometry-only *beats*
+   the hybrid at 2.4× the speed. Three corpora, no effect. Also: unstructured
+   hard-fails on 26% of PMC PDFs so its section row covers 99 of 134 (say the N), and
+   `RELEVANCE_REGION_MIN_OVERLAP = 0.7` is where our region margin happens to peak.
+   These belong in the main table, not an appendix.
    `memory/related-work.md` keeps the list of who beats us where.
+
+10. **Two known extraction defects are open and must not be forgotten**
+    (`to-do.md` 6 and 7, `notes.md` Stage 22): a block spanning both columns has its
+    text extracted across the gutter, interleaving the columns into an unreadable
+    section heading; and full-width elements above a two-column body sort *after* the
+    columns. Both were found by drawing the pipeline's real output, not by the test
+    suite. Neither is fixed, because rule 1 applies to them like anything else.
 
 ## The paper
 
@@ -87,7 +98,7 @@ above are its source of truth — update them, then the draft.
 ## Running things
 
 ```bash
-.venv/Scripts/python.exe -m pytest -q          # 201 tests, ~3 min
+.venv/Scripts/python.exe -m pytest -q          # 220 tests (215+5 skipped), ~4 min
 python -m docstruct.cli run data/raw-pdfs/doc1.pdf
 python scripts/ablate.py --name try --set MIN_CHUNK_TOKENS=300
 
@@ -107,8 +118,9 @@ python scripts/slice_results.py --results reports/ohr_results_span.json \
 | Corpus | Mode | Because |
 |---|---|---|
 | internal (`benchmark_qa_v*`) | `span` | gold marks a verbatim sentence |
-| FinanceBench | `region` | gold marks a ~167-word block; `span` fails in proportion to how *small* a tool chunks (74% of regions unreachable for unstructured, 11% for us) and hands us an unearned win |
+| FinanceBench | **n/a — do not run as a leaderboard** | measured 2026-08-13: evidence unreachable at top-5 under three embedders on identical chunks, so every tool scores MRR 0.0. That measures the retriever, not the chunker (`notes.md` Stage 19). Keep it for parse fidelity and borderless-table detection only |
 | OHR-Bench | report **all three** — done 2026-08-11 | the "only 1.5% appear verbatim" figure compared spans to the normalised `gt_text`, not to `is_relevant`. Measured against the real rule: **80.2% span-reachable**. And the three modes disagree about who wins |
+| PMC papers | **no relevance rule at all** | section-boundary agreement (Pk / WindowDiff) against publisher-authored JATS. No embedder, no rule, gold that predates the benchmark. 134 docs, we lead both metrics. `scripts/score_sections.py` |
 
 Reachability is a *ceiling*, not a score: it is the same number for every tool, so it
 says whether a rule can measure the corpus at all. Run `scripts/gold_reachability.py`

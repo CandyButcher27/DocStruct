@@ -11,7 +11,7 @@ docstruct.cli` always works** and is what to use in scripts and docs.
 ## Commands
 
 ```bash
-.venv/Scripts/python.exe -m pytest -q                 # 143 tests, ~3 min
+.venv/Scripts/python.exe -m pytest -q                 # 220 tests (215+5 skipped), ~4 min
 
 python -m docstruct.cli run data/raw-pdfs/doc1.pdf    # geometry-only
 python -m docstruct.cli run paper.pdf --weights weights/yolov8m-doclaynet.pt --json out.json

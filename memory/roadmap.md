@@ -12,13 +12,27 @@ Ranked by expected value. Everything here has been audited against the actual co
 > result in its own right (`relevance-modes.md`). The `--relevance` switch that
 > was the blocker below shipped and now has three modes, not two.
 >
-> What that run leaves open, in priority order: **(a)** the FinanceBench run —
-> corpus and gold fetched (84 PDFs / 189 rows), needs GPU; **(b)** sweeping
-> `RELEVANCE_REGION_MIN_OVERLAP`, since our best result rides on an unvalidated
-> 0.7 and the reachability script cannot settle it (circular on region gold);
-> **(c)** the model detector's value, which does **not** replicate outside arXiv
-> (+0.0012 span, +0.0090 region, neither significant) — FinanceBench is the corpus
-> built to test it.
+> **Updated 2026-08-16. (a) and (b) below are resolved; the ordering changed.**
+>
+> **(a) FinanceBench is not a retrieval leaderboard** — measured, not deferred. Its
+> evidence is unreachable at top-5 under three embedders on identical chunks, so every
+> tool scores MRR 0.0 (`notes.md` Stage 19). It keeps two uses that need no leaderboard:
+> parse fidelity, and borderless-table detection as the one place the model detector
+> could still pay for itself.
+>
+> **(b) The region threshold is swept** (2026-08-16, on OHR-Bench). A DocStruct variant
+> is 1st at all ten thresholds 0.1–1.0; the constant does not choose the winner.
+>
+> **(c) The model detector still does not replicate outside arXiv** (+0.0012 span,
+> +0.0090 region), and a third corpus now agrees: on PMC section boundaries,
+> geometry-only *beats* the hybrid at 2.4× the speed. Three corpora, no effect. The
+> open decision is no longer "measure it again" but "demote it or give it
+> FinanceBench's borderless tables".
+>
+> **New since:** section-boundary agreement against publisher JATS gold on 134 PMC
+> papers — we lead both Pk and WindowDiff, with no retriever involved
+> (`results.md`). And two extraction defects found while building the README figure
+> (`to-do.md` 6 and 7).
 
 0. ~~**Adopt FinanceBench as the external corpus**~~ (added 2026-08-05, paper track).
    Superseded by the OHR-Bench run above, and partly done: 150 human-annotated

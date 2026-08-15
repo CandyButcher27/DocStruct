@@ -91,3 +91,4 @@ docstruct_results*.zip
 docstruct_gpu_results.zip
 ohr_results.zip
 paper/figures/*.png
+dist/

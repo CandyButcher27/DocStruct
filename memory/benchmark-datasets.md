@@ -25,7 +25,13 @@ internal corpus as the secondary/ablation set (it is large and we control it).
 
 ## Tier 1 — adopt now
 
-### FinanceBench (primary external retrieval benchmark)
+### FinanceBench (**downgraded 2026-08-13 — not a retrieval benchmark for us**)
+
+> Kept in Tier 1 for parse fidelity and borderless-table detection only. As a
+> *retrieval* leaderboard it is measured-unusable under a fixed-embedder protocol:
+> every tool scores MRR 0.0 because the evidence is unreachable at top-5 under three
+> different embedders. `notes.md` Stage 19; paper §6.4. Do not run it expecting a
+> leaderboard.
 
 - `arXiv:2311.11944`, Patronus AI. Open subset: **150 QA over 84 PDFs**, license **CC-BY-NC-4.0** (research use fine; note it in the paper).
 - Gold: `financebench_open_source.jsonl`, one row per question. Verified schema:
@@ -71,8 +77,11 @@ $|A \cap B| / \min(|A|,|B|)$ — so containment in *either* direction scores 1.0
 a 100-word chunk sitting inside a 400-word evidence block is not punished for the
 size mismatch. Oracle check on `3M_2018_10K` (169 chunks, geometry-only): both gold
 regions reach overlap 0.99–1.00, so the signal is there and the threshold
-(`RELEVANCE_REGION_MIN_OVERLAP = 0.7`) has room — but it is still `# unvalidated`
-and must be swept on the full corpus.
+(`RELEVANCE_REGION_MIN_OVERLAP = 0.7`) has room. **Swept 2026-08-16 — on OHR-Bench,
+not here.** The sweep needs a corpus whose evidence is actually retrievable, and
+FinanceBench's is not (Stage 19). A DocStruct variant places 1st at all ten thresholds
+from 0.1 to 1.0, so the constant no longer decides the winner. See
+[`results.md`](results.md); the `# unvalidated` marker is gone from `config.py`.
 
 Page-metadata matching (`chunk.page_num == evidence_page_num`) is the protocol
 `arXiv:2604.12047` uses and was deliberately **not** implemented: it needs every
