@@ -1,0 +1,186 @@
+{
+  "gold": "data/qa/pmc_sections.json",
+  "n_docs": 24,
+  "n_sections": 510,
+  "located": 429,
+  "located_pct": 84.1,
+  "by_kind": {
+    "body_found": 418,
+    "body_miss": 63,
+    "back_matter_miss": 6,
+    "back_matter_found": 11,
+    "too_short_miss": 12
+  },
+  "body_ceiling_pct": 86.9,
+  "median_doc_pct": 87.2,
+  "per_doc": [
+    {
+      "doc": "bmc__PMC12750710.pdf",
+      "n_sections": 15,
+      "located": 15,
+      "pct": 100.0,
+      "spine_chars": 33588
+    },
+    {
+      "doc": "bmc__PMC12751776.pdf",
+      "n_sections": 20,
+      "located": 19,
+      "pct": 95.0,
+      "spine_chars": 54546
+    },
+    {
+      "doc": "elife__PMC12747520.pdf",
+      "n_sections": 27,
+      "located": 25,
+      "pct": 92.6,
+      "spine_chars": 66445
+    },
+    {
+      "doc": "elife__PMC12747525.pdf",
+      "n_sections": 40,
+      "located": 39,
+      "pct": 97.5,
+      "spine_chars": 81275
+    },
+    {
+      "doc": "elife__PMC12755879.pdf",
+      "n_sections": 12,
+      "located": 12,
+      "pct": 100.0,
+      "spine_chars": 59787
+    },
+    {
+      "doc": "frontiers__PMC12776628.pdf",
+      "n_sections": 25,
+      "located": 21,
+      "pct": 84.0,
+      "spine_chars": 60914
+    },
+    {
+      "doc": "frontiers__PMC12798818.pdf",
+      "n_sections": 31,
+      "located": 24,
+      "pct": 77.4,
+      "spine_chars": 45546
+    },
+    {
+      "doc": "natcomm__PMC12774871.pdf",
+      "n_sections": 11,
+      "located": 8,
+      "pct": 72.7,
+      "spine_chars": 23238
+    },
+    {
+      "doc": "natcomm__PMC12830901.pdf",
+      "n_sections": 29,
+      "located": 20,
+      "pct": 69.0,
+      "spine_chars": 66990
+    },
+    {
+      "doc": "natcomm__PMC12865191.pdf",
+      "n_sections": 24,
+      "located": 15,
+      "pct": 62.5,
+      "spine_chars": 56045
+    },
+    {
+      "doc": "natcomm__PMC12868863.pdf",
+      "n_sections": 18,
+      "located": 11,
+      "pct": 61.1,
+      "spine_chars": 28427
+    },
+    {
+      "doc": "natcomm__PMC12873266.pdf",
+      "n_sections": 20,
+      "located": 14,
+      "pct": 70.0,
+      "spine_chars": 62311
+    },
+    {
+      "doc": "natcomm__PMC12989454.pdf",
+      "n_sections": 14,
+      "located": 11,
+      "pct": 78.6,
+      "spine_chars": 41926
+    },
+    {
+      "doc": "peerj__PMC12721102.pdf",
+      "n_sections": 26,
+      "located": 24,
+      "pct": 92.3,
+      "spine_chars": 39834
+    },
+    {
+      "doc": "peerj__PMC12721127.pdf",
+      "n_sections": 12,
+      "located": 12,
+      "pct": 100.0,
+      "spine_chars": 62946
+    },
+    {
+      "doc": "peerj__PMC12981241.pdf",
+      "n_sections": 20,
+      "located": 18,
+      "pct": 90.0,
+      "spine_chars": 51501
+    },
+    {
+      "doc": "peerj__PMC13245429.pdf",
+      "n_sections": 24,
+      "located": 21,
+      "pct": 87.5,
+      "spine_chars": 57462
+    },
+    {
+      "doc": "plos__PMC12965673.pdf",
+      "n_sections": 16,
+      "located": 16,
+      "pct": 100.0,
+      "spine_chars": 30697
+    },
+    {
+      "doc": "plos__PMC13099099.pdf",
+      "n_sections": 23,
+      "located": 20,
+      "pct": 87.0,
+      "spine_chars": 53565
+    },
+    {
+      "doc": "plos__PMC13298731.pdf",
+      "n_sections": 17,
+      "located": 15,
+      "pct": 88.2,
+      "spine_chars": 27978
+    },
+    {
+      "doc": "scirep__PMC12756272.pdf",
+      "n_sections": 13,
+      "located": 12,
+      "pct": 92.3,
+      "spine_chars": 38619
+    },
+    {
+      "doc": "scirep__PMC12827994.pdf",
+      "n_sections": 23,
+      "located": 18,
+      "pct": 78.3,
+      "spine_chars": 43477
+    },
+    {
+      "doc": "scirep__PMC12989452.pdf",
+      "n_sections": 9,
+      "located": 7,
+      "pct": 77.8,
+      "spine_chars": 7541
+    },
+    {
+      "doc": "scirep__PMC12996287.pdf",
+      "n_sections": 41,
+      "located": 32,
+      "pct": 78.0,
+      "spine_chars": 68849
+    }
+  ]
+}

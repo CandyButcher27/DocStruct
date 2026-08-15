@@ -1,0 +1,69 @@
+{
+  "n_docs": 24,
+  "gold": "data/qa/pmc_sections.json",
+  "results": {
+    "docstruct": {
+      "pk": 0.3641,
+      "windowdiff": 0.4934,
+      "straddle_rate": 0.4484,
+      "mean_chunks": 35.4,
+      "n_docs": 24,
+      "errors": 0,
+      "seconds": 312.0
+    },
+    "docstruct_geo": {
+      "pk": 0.3525,
+      "windowdiff": 0.4362,
+      "straddle_rate": 0.527,
+      "mean_chunks": 25.5,
+      "n_docs": 24,
+      "errors": 0,
+      "seconds": 132.5
+    },
+    "langchain": {
+      "pk": 0.6183,
+      "windowdiff": 0.8821,
+      "straddle_rate": 0.2227,
+      "mean_chunks": 73.9,
+      "n_docs": 24,
+      "errors": 0,
+      "seconds": 117.7
+    },
+    "pymupdf4llm": {
+      "pk": 0.4661,
+      "windowdiff": 0.4928,
+      "straddle_rate": 0.6005,
+      "mean_chunks": 15.9,
+      "n_docs": 24,
+      "errors": 0,
+      "seconds": 253.0
+    },
+    "unstructured": {
+      "pk": 0.5974,
+      "windowdiff": 0.8839,
+      "straddle_rate": 0.1924,
+      "mean_chunks": 92.4,
+      "n_docs": 18,
+      "errors": 6,
+      "seconds": 91.3
+    },
+    "llamaindex": {
+      "pk": 0.5938,
+      "windowdiff": 0.6959,
+      "straddle_rate": 0.3828,
+      "mean_chunks": 37.9,
+      "n_docs": 24,
+      "errors": 0,
+      "seconds": 115.0
+    },
+    "llamaindex_semantic": {
+      "pk": 0.5134,
+      "windowdiff": 0.5334,
+      "straddle_rate": 0.2496,
+      "mean_chunks": 24.7,
+      "n_docs": 24,
+      "errors": 0,
+      "seconds": 273.3
+    }
+  }
+}
