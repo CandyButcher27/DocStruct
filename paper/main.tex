@@ -21,6 +21,7 @@
 \usepackage{times}
 \usepackage{booktabs}
 \usepackage{graphicx}
+\graphicspath{{figures/}}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{xcolor}
@@ -127,6 +128,19 @@ model. The contract is deliberate and total:
 \emph{No LLM calls in the pipeline. The same PDF in, the same chunks out. Fully
 local, fully auditable.}
 \end{quote}
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=\textwidth]{pipeline.pdf}
+\caption{\ds{} on one page of a two-column paper. (a) the page as the PDF ships it;
+(b) blocks after the geometric and vision detectors are fused, coloured by label;
+(c) the column-aware reading order and the chunks the blocks assemble into. Every box
+is an actual \texttt{run\_pipeline()} result rather than an illustration, produced by
+\texttt{scripts/make\_paper\_figures.py}. Note that only 2 of 12 regions on this page
+were seen by both detectors --- the two are genuinely blind to different things, which
+is what makes their agreement informative.}
+\label{fig:pipeline}
+\end{figure*}
 
 \paragraph{Contributions.}
 \begin{enumerate}\itemsep2pt
@@ -236,9 +250,11 @@ Proposals are matched by IoU and merged into a single sequence of blocks, each
 carrying a confidence derived from whether one or both detectors saw it and how well
 they agreed. Coordinates are top-left throughout ($y_0$ = top, $y$ increasing
 downward), matching \texttt{pdfplumber}; model output is transformed on the way in.
-\todo{the unilateral scale factors and clamp ranges are inherited from a v0
-prototype and are still marked \texttt{\# unvalidated}; calibrate on the DocLayNet
-val split}
+The scale factors applied to a unilateral detection, and the clamp ranges on the
+resulting confidence, are inherited from a prototype and are still marked
+\texttt{\# unvalidated} in \texttt{config.py}. They were never tuned against
+annotated layout gold, because we have none at the scale required; \S\ref{sec:limitations}
+returns to this.
 
 \subsection{Reading order and hierarchy}
 Blocks are ordered by a column-aware sweep that detects column bands from the $x$
@@ -330,10 +346,21 @@ span and region reachability approach 100\% by construction and prove nothing.
 \subsection{The relevance rule decides the winner}
 \label{sec:relevance}
 
-Table~\ref{tab:ohr} is the paper's central result. The three runs share
+Figure~\ref{fig:inversion} and Table~\ref{tab:ohr} are the paper's central
+result. The three runs share
 \emph{identical chunks} --- chunk counts and mean chunk widths are equal across
 modes, because chunking came from a warm cache and only scoring changed --- so the
 relevance rule is the only variable.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{mode_inversion.pdf}
+\caption{The same seven chunkers, the same chunks, three relevance rules. \ds{} runs
+6th $\to$ 1st $\to$ 1st and unstructured runs 1st $\to$ 5th $\to$ 5th. Nothing about
+the chunks changed between these columns; only the rule that decides whether a
+retrieved chunk counts as relevant.}
+\label{fig:inversion}
+\end{figure}
 
 \begin{table}[t]
 \centering
@@ -349,10 +376,10 @@ Tool & page & span & region & ctx \\
 \ds{}          & 0.600 (6) & \best{0.706 (1)} & \best{0.666 (1)} & 2194 \\
 \dsg{}         & 0.470 (7) & 0.705 (2) & 0.657 (2) & 2328 \\
 pymupdf4llm      & 0.668 (4) & 0.699 (3) & 0.604 (3) & 2424 \\
-unstructured     & \best{0.795 (1)} & 0.654 (4) & 0.601 (5) & \best{561} \\
+unstructured     & \best{0.795 (1)} & 0.654 (5) & 0.601 (5) & \best{561} \\
 langchain        & 0.756 (2) & 0.641 (7) & 0.603 (4) & 638 \\
 llamaindex       & 0.729 (3) & 0.648 (6) & 0.589 (6) & 1430 \\
-llamaindex\_sem  & 0.652 (5) & 0.654 (5) & 0.575 (7) & 4698 \\
+llamaindex\_sem  & 0.652 (5) & 0.654 (4) & 0.575 (7) & 4698 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -387,6 +414,16 @@ re-scoring offline at every threshold, so chunking is identical at every point. 
 dumping run reproduces the published leaderboard to a maximum MRR drift of $0.0002$
 with identical chunk counts, which is the precondition for the sweep meaning
 anything.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{threshold_sweep.pdf}
+\caption{Region MRR against the relevance threshold, re-scored offline from one run's
+dumped overlaps so the chunks are identical at every point. The two \ds{} lines are on
+top across the whole range. Read the plateau, not the peak: every curve rises as the
+threshold falls because at $0$ every chunk is relevant by definition.}
+\label{fig:sweep}
+\end{figure}
 
 \begin{table}[t]
 \centering
@@ -467,7 +504,18 @@ pilot produced the identical ordering with every value within $0.02$ (WindowDiff
 $0.436 \to 0.423$, Pk $0.353 \to 0.342$). We report this because a segmentation
 metric on a small corpus is exactly the kind of number that fails to replicate.
 
-\textbf{Read Pk and WindowDiff together or not at all.} WindowDiff counts boundaries
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{size_confound.pdf}
+\caption{Why Pk and WindowDiff must be read together. Each tool contributes two marks
+joined by a line; the length of that line is how much the two metrics disagree, and it
+grows with chunk count. LangChain and unstructured emit 86 and 107 chunks against a
+gold averaging $\approx$25 sections, so WindowDiff --- which counts boundaries per
+window --- punishes them where Pk does not.}
+\label{fig:confound}
+\end{figure}
+
+\textbf{Read Pk and WindowDiff together or not at all.} (Figure~\ref{fig:confound}.) WindowDiff counts boundaries
 per window, so it punishes a tool that puts three splits where the document has one;
 Pk only asks whether a window's ends share a segment, so it forgives
 over-segmentation. LangChain (86 chunks) and unstructured (107) against a gold
@@ -548,7 +596,16 @@ the threshold sweep, where hybrid overtakes geometry-only between $0.5$ and $0.6
 corpus would predict.
 
 \subsection{We are expensive in context}
-\ds{} retrieves 2{,}194 context words per query against unstructured's $561$. On
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{cost.pdf}
+\caption{Accuracy against the token bill. \ds{} sits top-centre: best MRR, but roughly
+four times the context of unstructured and langchain, which sit bottom-left. A
+deployment that pays per token may reasonably prefer the bottom-left corner.}
+\label{fig:cost}
+\end{figure}
+
+\noindent Figure~\ref{fig:cost} shows the trade. \ds{} retrieves 2{,}194 context words per query against unstructured's $561$. On
 rank quality per token spent, unstructured is $3.9\times$ more efficient. We win
 accuracy and lose token cost, and for a cost-sensitive deployment that trade may not
 be worth making. This is a real axis on which we lose and it belongs in the main
@@ -647,10 +704,18 @@ size preference alongside a ranking, without separating them. Until that is stan
 practice, chunker comparisons --- including ours --- should be read with the rule in
 view.
 
-\todo{Before submission: (1) verify every \texttt{refs.bib} author list;
-(2) rename Hit@1 $\to$ Precision@1 consistently; (3) adopt token-level IoU /
-Precision$_\Omega$; (4) DocLayNet val split for the detection layer;
-(5) add the pipeline figure.}
+\paragraph{Open work.} Two items on our own pre-submission list remain undone, and
+both are measurement rather than writing. \textbf{Token-level IoU and
+Precision$_\Omega$}~\citep{smith2024chunking} are the published vocabulary for
+``rank quality per token spent'', and would replace the homemade MRR-per-1k-words
+column in Figure~\ref{fig:cost}. We did not compute them: our dumped runs record the
+overlap \emph{score} behind each retrieved chunk but not the chunk and gold token sets
+themselves, so the metric needs a re-run rather than a re-analysis, and we would rather
+report it missing than approximate it and call it Chroma's.
+\textbf{DocLayNet's validation split} is the right home for the detection-layer mAP
+that currently rests on two hand-annotated documents, and is also the only cheap route
+to calibrating the fusion constants named in \S\ref{sec:pipeline}. Both are scoped and
+neither is started.
 
 \bibliographystyle{plainnat}
 \bibliography{refs}
