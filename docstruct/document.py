@@ -167,6 +167,84 @@ class Document:
                 fh.write(payload)
         return payload
 
+    def to_jsonl(self, path: Optional[str] = None) -> str:
+        """One chunk per line -- the shape most vector-store ingest scripts expect."""
+        lines = []
+        for c in self.chunks:
+            lines.append(json.dumps({
+                "id": c.chunk_id,
+                "text": c.content,
+                "metadata": self._metadata(c),
+            }, ensure_ascii=False))
+        payload = chr(10).join(lines)
+        if path:
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write(payload + chr(10))
+        return payload
+
+    def _metadata(self, chunk: Chunk) -> Dict:
+        """Flat, JSON-safe metadata. Flat because vector stores reject nested values."""
+        sp = chunk.section_path
+        return {
+            "source": self.path,
+            "chunk_type": chunk.chunk_type,
+            "page": chunk.page_num,
+            "reading_order": chunk.reading_order,
+            "section_h1": sp.h1,
+            "section_h2": sp.h2,
+            "section_h3": sp.h3,
+            "section_path": " > ".join(x for x in (sp.h1, sp.h2, sp.h3) if x),
+        }
+
+    # --- framework hand-off ----------------------------------------------
+
+    def to_langchain(self) -> List:
+        """Convert to ``langchain_core.documents.Document`` objects.
+
+        The section path travels in metadata, which is the whole point: a LangChain
+        retriever can then filter or display "which section did this come from",
+        which a fixed-size splitter cannot tell it.
+        """
+        try:
+            from langchain_core.documents import Document as LCDocument
+        except ImportError as err:  # pragma: no cover - depends on user env
+            raise ImportError(
+                "to_langchain() needs langchain-core: pip install langchain-core"
+            ) from err
+        return [LCDocument(page_content=c.content, metadata=self._metadata(c))
+                for c in self.chunks]
+
+    def to_llamaindex(self) -> List:
+        """Convert to LlamaIndex ``TextNode`` objects, section path in metadata."""
+        try:
+            from llama_index.core.schema import TextNode
+        except ImportError as err:  # pragma: no cover - depends on user env
+            raise ImportError(
+                "to_llamaindex() needs llama-index-core: pip install llama-index-core"
+            ) from err
+        return [TextNode(text=c.content, id_=c.chunk_id, metadata=self._metadata(c))
+                for c in self.chunks]
+
+    def stats(self) -> Dict:
+        """Counts a caller needs before indexing: how many chunks, how much text,
+        and how much of the document's own words survived into them."""
+        words = [len(c.content.split()) for c in self.chunks]
+        by_type: Dict[str, int] = {}
+        for c in self.chunks:
+            by_type[c.chunk_type] = by_type.get(c.chunk_type, 0) + 1
+        return {
+            "path": self.path,
+            "n_blocks": len(self.blocks),
+            "n_chunks": len(self.chunks),
+            "n_pages": len({b.page_num for b in self.blocks}),
+            "chunk_words_total": sum(words),
+            "chunk_words_mean": round(sum(words) / len(words), 1) if words else 0.0,
+            "chunk_words_min": min(words) if words else 0,
+            "chunk_words_max": max(words) if words else 0,
+            "chunks_by_type": by_type,
+            "n_sections": len(self.sections()),
+        }
+
 
 def parse(
     pdf_path: Union[str, Path],
@@ -195,3 +273,80 @@ def parse(
         config=config, on_page=on_page,
     )
     return Document(pdf_path, result.blocks, result.chunks, result.diagnostics)
+
+
+def parse_bytes(
+    data: bytes,
+    *,
+    name: str = "<bytes>",
+    **kwargs,
+) -> Document:
+    """Parse a PDF held in memory.
+
+    A web service receiving an upload has bytes, not a path, and writing them to a
+    temp file only to have the parser read them back is a round trip through the
+    filesystem for nothing. pdfplumber and PyMuPDF both open file-like objects, but
+    the pipeline is path-oriented throughout (the content-hash cache keys on the file,
+    the detector rasterises by path), so this writes one temp file and cleans it up.
+    That is honest about the current design rather than pretending to be zero-copy.
+
+    ``name`` is what appears as ``Document.path``; give it the original filename so
+    diagnostics and chunk ids stay meaningful.
+    """
+    import os
+    import tempfile
+
+    if not data.startswith(b"%PDF"):
+        from docstruct.errors import InvalidPDFError
+        raise InvalidPDFError(f"{name}: not a PDF (no %PDF header)")
+
+    fd, tmp = tempfile.mkstemp(suffix=".pdf")
+    try:
+        with os.fdopen(fd, "wb") as fh:
+            fh.write(data)
+        doc = parse(tmp, **kwargs)
+        doc.path = name
+        return doc
+    finally:
+        try:
+            os.unlink(tmp)
+        except OSError:
+            pass
+
+
+def parse_many(
+    pdf_paths,
+    *,
+    workers: Optional[int] = None,
+    on_error: str = "raise",
+    **kwargs,
+):
+    """Parse several PDFs across processes, yielding ``(path, Document | Exception)``.
+
+    Processes rather than threads: parsing is CPU-bound in pdfplumber and, in hybrid
+    mode, in the model, so threads would serialise on the GIL.
+
+    ``on_error="raise"`` propagates the first failure; ``on_error="return"`` yields the
+    exception in place of the Document, which is what a batch job over a real corpus
+    wants -- one malformed PDF in 500 should not lose the other 499.
+
+    Results arrive in completion order, not input order. Sort by path if you need
+    determinism across the *batch*; determinism of each document's chunks is
+    guaranteed either way.
+    """
+    import concurrent.futures as cf
+
+    paths = [str(p) for p in pdf_paths]
+    if on_error not in ("raise", "return"):
+        raise ValueError("on_error must be 'raise' or 'return'")
+
+    with cf.ProcessPoolExecutor(max_workers=workers) as ex:
+        futures = {ex.submit(parse, p, **kwargs): p for p in paths}
+        for fut in cf.as_completed(futures):
+            path = futures[fut]
+            try:
+                yield path, fut.result()
+            except Exception as err:  # noqa: BLE001
+                if on_error == "raise":
+                    raise
+                yield path, err

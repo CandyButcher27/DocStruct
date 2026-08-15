@@ -3,8 +3,11 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "docstruct"
-version = "0.4.0"
+# PyPI name is docstruct-rag: `docstruct` is taken (smrt-co, last released
+# 2023-06-22, an unrelated document-tree package). The import name stays
+# `docstruct` -- distribution name and import name need not match.
+name = "docstruct-rag"
+version = "0.5.0"
 description = "Local, deterministic, structure-aware PDF text extraction and chunking for RAG"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -40,7 +43,12 @@ benchmark = ["langchain-text-splitters>=0.3", "pymupdf4llm>=0.0.17", "rank-bm25>
 # in current resolutions, and `partition_pdf` imports it at module load even under
 # strategy="fast", so the adapter dies with ModuleNotFoundError without it.
 benchmark-heavy = ["unstructured[pdf]>=0.15", "unstructured-inference>=0.7", "docling>=2.0"]
-dev = ["pytest>=8.0"]
+dev = ["pytest>=8.0", "build>=1.2", "twine>=5.0"]
+# Hand-off to the two frameworks people actually index with. Optional by
+# design: Document.to_langchain()/to_llamaindex() raise a clear ImportError
+# naming the package to install, so neither is a hard dependency.
+langchain = ["langchain-core>=0.3"]
+llamaindex = ["llama-index-core>=0.11"]
 all = [
     "ultralytics>=8.0",
     "chromadb>=0.5",
@@ -56,6 +64,8 @@ all = [
 docstruct = "docstruct.cli:main"
 
 [project.urls]
+Documentation = "https://github.com/CandyButcher27/DocStruct/blob/main/docs/API.md"
+Issues = "https://github.com/CandyButcher27/DocStruct/issues"
 Homepage = "https://github.com/CandyButcher27/DocStruct"
 Repository = "https://github.com/CandyButcher27/DocStruct"
 
