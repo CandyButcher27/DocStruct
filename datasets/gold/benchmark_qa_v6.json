@@ -1,0 +1,4466 @@
+[
+  {
+    "question": "What method has been used to predict future air pollutant concentrations in Macau?",
+    "answer_span": "have been used to predict the future concentration of air pollutants (APS) in Macau.",
+    "source_doc": "doc1.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are transfer learning and pre-trained neural networks employed to improve prediction accuracy for AQMSs with limited data?",
+    "answer_span": "have been employed to assist AQMSs with less observed data to build a neural network with high prediction accuracy.",
+    "source_doc": "doc1.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "When did all AQMSs in Macau start measuring PM concentrations?",
+    "answer_span": "All AQMSs in Macau have officially begun to measure the concentration of PM in July 2012.",
+    "source_doc": "doc1.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What advantages do LSTM RNNs initialized with transfer learning have over randomly initialized networks?",
+    "answer_span": "have higher prediction accuracy; it incurred shorter training time than randomly initialized recurrent neural networks.",
+    "source_doc": "doc1.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the research question posed by the authors concerning neural network methods?",
+    "answer_span": "The research question is whether or not to use pre-trained neural network methods.",
+    "source_doc": "doc1.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the base scenario aim to investigate regarding prediction errors?",
+    "answer_span": "investigate the difference, in terms of prediction errors, between our proposed method and the original method.",
+    "source_doc": "doc1.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What do the experimental results indicate about pre-trained neural network methods?",
+    "answer_span": "show that, pre-trained neural network methods are helpful for training neural networks.",
+    "source_doc": "doc1.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What effect does using pre-trained neural networks have on the number of training epochs required?",
+    "answer_span": "The number of epochs that are required to train a LSTM RNNs into convergence can be reduced.",
+    "source_doc": "doc1.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What are Random Neural Networks (RNNs) classified as?",
+    "answer_span": "Random Neural Networks (RNNs) are a class of Neural Networks (NNs)",
+    "source_doc": "doc2.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Who introduced the RNN model and when?",
+    "answer_span": "The RNN model was introduced by E. Gelenbe in 1989 (Gelenbe, 1989a,b).",
+    "source_doc": "doc2.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What universal property of RNNs was shown under certain algebraic hypotheses?",
+    "answer_span": "In (Gelenbe et al., 2004b) the authors shown that under certain algebraic hypothesis the RNN is an universal approximator.",
+    "source_doc": "doc2.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which second‑order optimization method for RNNs is defined in Algorithm 3?",
+    "answer_span": "The BFGS method for RNN presented in (Likas and Stafylopatis, 2000) is defined in Algorithm 3.",
+    "source_doc": "doc2.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What has been proved about the LM algorithm regarding performance?",
+    "answer_span": "The LM algorithm has been proved to be efficient in terms of computational time and accuracy rate.",
+    "source_doc": "doc2.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which combinatorial optimization problem is mentioned as being solved using the RNN model?",
+    "answer_span": "the model has been also applied to solve combinatorial optimization problems, such that the Traveling Salesman Problem",
+    "source_doc": "doc2.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What novel technique does the paper introduce for uncertainty quantification?",
+    "answer_span": "We conduct novel evidence regularization that enables Uncertainty Quantification in Deep Learning.",
+    "source_doc": "doc3.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which theories are combined in the recently developed evidential models?",
+    "answer_span": "The recently developed evidential models bring together evidential theory (Shafer, 1976; Jøsang, 2016) and deep",
+    "source_doc": "doc3.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What happens to the logits and evidence for a zero‑evidence sample?",
+    "answer_span": "For a zero-evidence sample, the logits o → −∞ =⇒ e =exp(o ) =⇒ k =exp(o )=α −1",
+    "source_doc": "doc3.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "According to Theorem 3, what is the regularization loss for non‑ground‑truth nodes?",
+    "answer_span": "Theorem 3. Correct evidence regularization L (x,y) for nodes other than the ground truth node will be 0 i.e.",
+    "source_doc": "doc3.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the overall training objective of the proposed RED model described?",
+    "answer_span": "We formulate an overall objective used to train the proposed Regularized evidential model (RED).",
+    "source_doc": "doc3.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How do the gradient ranges of ReLU(.) and SoftPlus(.) based evidential models compare?",
+    "answer_span": "The range of gradients for both ReLU(.) and SoftPlus(.) based evidential models are identical.",
+    "source_doc": "doc3.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the effect of maximum vacuity on the gradient value for the correct node?",
+    "answer_span": "the vacuity is maximum, leading to the greatest gradientvalueof ∂Lcor(x,y) =−1.",
+    "source_doc": "doc3.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What λ values were used for MNIST, Cifar10, and Cifar100 experiments respectively?",
+    "answer_span": "λ = 1.0 was used for MNIST experiments, λ = 0.1 was used for Cifar10 experiments, and λ = 0.001wasusedforCifar100experiments.",
+    "source_doc": "doc3.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What method is currently the only one seriously considered for image classification in deep learning?",
+    "answer_span": "Deep learning is nowadays the only method that is seriously considered.",
+    "source_doc": "doc4.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What role does the optimization algorithm play in the generalization performance of deep neural networks?",
+    "answer_span": "The optimization algorithm, which is usually a variant of SGD, seems to play an important role for the generalization performance.",
+    "source_doc": "doc4.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does Figure 1.5 illustrate about neural networks?",
+    "answer_span": "The loss landscape of a neural network with four layers and ReLU activation function on four different scales.",
+    "source_doc": "doc4.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the No Free Lunch theorem guarantee for any learning algorithm in classification tasks?",
+    "answer_span": "for every learning algorithm A of a classification task there exists a distribution P such that",
+    "source_doc": "doc4.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does test error behave when the number of parameters is increased beyond the classical sweet spot?",
+    "answer_span": "test error decreases even below the sweet-spot in the u-shaped bias-variance curve when further increasing the number of parameters",
+    "source_doc": "doc4.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What property does the neural tangent kernel have during training in the infinite width limit?",
+    "answer_span": "K converges to a deterministic kernel K∞ which stays constant in time",
+    "source_doc": "doc4.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What continuity property does the scattering transform have with respect to deformations?",
+    "answer_span": "is Lipschitz continuous with respect to deformations in the sense that",
+    "source_doc": "doc4.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the relationship between the ENO procedure and deep ReLU neural networks?",
+    "answer_span": "The essentially non-oscillatory (ENO) procedure and its variant, are equivalent to deep ReLU neural networks.",
+    "source_doc": "doc5.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the paper demonstrate about deep ReLU neural networks and rough functions?",
+    "answer_span": "This demonstrates the ability of deep ReLU neural networks to approximate rough functions to high-order of accuracy.",
+    "source_doc": "doc5.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What property have artificial neural networks been shown to possess?",
+    "answer_span": "have been shown to possess universal approximation properties",
+    "source_doc": "doc5.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the paper prove about deep ReLU networks and piecewise smooth functions?",
+    "answer_span": "Thus, we prove that there exists a deep ReLU neural network that approximates piecewise smooth (say Lipschitz) functions to second-order accuracy.",
+    "source_doc": "doc5.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How can the ENO interpolation and reconstruction procedures be expressed?",
+    "answer_span": "The ENO interpolation (and the ENO reconstruction) procedure can be cast as a suitable deep ReLU neural network.",
+    "source_doc": "doc5.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How do the solutions obtained with ENO and DeLENO compare?",
+    "answer_span": "The solutions obtained with ENO and DeLENO are indistinguishable.",
+    "source_doc": "doc5.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What challenge is mentioned concerning proper randomization or compiling representative population samples?",
+    "answer_span": "Selection bias – Proper randomization or compiling representative population samples can be challenging, and it",
+    "source_doc": "doc6.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which metrics are said to change when data sources are altered?",
+    "answer_span": "Quality metrics – Finally, changing data sources imply changes in timeliness, validity, accuracy, completeness,",
+    "source_doc": "doc6.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is described as paramount and requiring significant engineering efforts?",
+    "answer_span": "Technical robustness – Building technical robustness is paramount and requires significant engineering efforts.",
+    "source_doc": "doc6.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What may occur in some cases when data sources are changed, according to the document?",
+    "answer_span": "Breaking changes or discontinuation – In some cases, changing data sources may cause the impossibility of",
+    "source_doc": "doc6.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are multiple data sources characterized in terms of difficulty?",
+    "answer_span": "multiple data sources can be a complex and time-consuming process.",
+    "source_doc": "doc6.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What might be required to retrieve relevant data from data providers?",
+    "answer_span": "It may require extensive research and communication with data providers to retrieve relevant data.",
+    "source_doc": "doc6.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "In what contexts does the document say data abundance becomes a factor?",
+    "answer_span": "The data abundance in governmental, corporate, social and personal contexts, both online and offline, becomes a",
+    "source_doc": "doc6.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the text define the scientific discipline concerned with optimal model parameters?",
+    "answer_span": "Learning to denote the scientific discipline concerned with learning the most optimal model parameters based on data.",
+    "source_doc": "doc6.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are the benefits of machine learning balanced against risks and insight quality?",
+    "answer_span": "the benefits of machine learning are balanced against the risks and that the resulting insights are both accurate and representative.",
+    "source_doc": "doc6.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What should be done when precision or recall deviates significantly from the reference set?",
+    "answer_span": "precision or recall starts to deviate significantly from this reference set, it should be flagged.",
+    "source_doc": "doc6.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the document define learning curves?",
+    "answer_span": "Learning curves describe a system’s performance on a task as a function of some resource to solve that task.",
+    "source_doc": "doc7.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What three criteria are used to categorise learning curve approaches in the proposed framework?",
+    "answer_span": "the decision-making situation they address, the intrinsic learning curve question they answer and the type of resources they use.",
+    "source_doc": "doc7.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does Data Acquisition determine according to the survey?",
+    "answer_span": "Data Acquisition determines how many data points should reasonably be acquired to obtain a desired performance.",
+    "source_doc": "doc7.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the utility typically characterised in relation to learning curves?",
+    "answer_span": "The utility usually involves a trade-off between the performance and the computational cost of training a model.",
+    "source_doc": "doc7.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the performance of a hypothesis expressed?",
+    "answer_span": "The performance of a hypothesis is typically expressed as risk, which is also often called out-of-sample error:",
+    "source_doc": "doc7.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "To which types of curves can early stopping be applied?",
+    "answer_span": "Early stopping can be applied to both sample‑wise curves and iteration‑wise curves.",
+    "source_doc": "doc7.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the main challenge in active learning?",
+    "answer_span": "The main challenge in active learning is deciding which data points to label.",
+    "source_doc": "doc8.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How can active learning approaches be broadly divided?",
+    "answer_span": "These approaches can be broadly divided into two categories: static pool-based and stream-based active learning.",
+    "source_doc": "doc8.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does online active learning involve?",
+    "answer_span": "online active learning, which involves continuously selecting and labeling observations as they arrive in a stream.",
+    "source_doc": "doc8.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the purpose of the margin-based query strategy?",
+    "answer_span": "where data points close to the decision boundary are selected",
+    "source_doc": "doc8.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How can label delay be classified in online active learning?",
+    "answer_span": "Label delay can be classified into null latency, intermediate latency, or extreme latency (Souza et al, 2018).",
+    "source_doc": "doc8.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the goal of selecting observations in online active learning?",
+    "answer_span": "selecting the most informative observations from data streams in real time",
+    "source_doc": "doc8.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the paper structured according to the authors?",
+    "answer_span": "The structure of this paper is as follows.",
+    "source_doc": "doc8.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What form do the recommendations take in the DOME paper?",
+    "answer_span": "The recommendations are formulated as questions to anyone wishing to pursue implementation of a machine learning algorithm.",
+    "source_doc": "doc9.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How often are novel ML methods experimentally validated according to the authors?",
+    "answer_span": "While every novel ML method should be validated experimentally, this happens only in a fraction of the publications9.",
+    "source_doc": "doc9.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What can guidelines or recommendations on constructing ML algorithms help ensure?",
+    "answer_span": "Guidelines or recommendations on how to appropriately construct ML algorithms can help to ensure correct results and predictions13,14.",
+    "source_doc": "doc9.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What must be clearly stated regarding the use of evaluation sets?",
+    "answer_span": "Clear statement that evaluation sets were not used for feature selection, pre-processing steps or parameter tuning.",
+    "source_doc": "doc9.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What adoption is required for evaluation according to the recommendations?",
+    "answer_span": "Adoption of community validated measures and benchmark datasets for evaluation.",
+    "source_doc": "doc9.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is described as the simplest approach for data splitting?",
+    "answer_span": "The simplest approach is to have independent train and test sets (possibly a third validation set).",
+    "source_doc": "doc9.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What issue is highlighted regarding overlapping train/test data splits?",
+    "answer_span": "Overlapping of train/test data splits are particularly troublesome to overcome in biology.",
+    "source_doc": "doc9.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How do the authors describe the scope of machine learning in biology?",
+    "answer_span": "The field of Machine Learning in biology is vast.",
+    "source_doc": "doc9.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which workflow systems are given as examples of commonly used tools?",
+    "answer_span": "Examples of commonly used workflows include Galaxy36 and Nextflow37.",
+    "source_doc": "doc9.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What role do emotions play in decision-making according to the survey?",
+    "answer_span": "Emotions are recognized as functional in decision-making by influencing motivation and action selection.",
+    "source_doc": "doc10.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How can emotion models benefit machine learning researchers?",
+    "answer_span": "For machine learning (ML) researchers, emotion models may improve learning efficiency.",
+    "source_doc": "doc10.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What benefits do emotions provide to the interactive ML and HRI community?",
+    "answer_span": "For the interactive ML and human-robot interaction (HRI) community, emotions can communicate state and enhance user investment.",
+    "source_doc": "doc10.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the survey say about affective modelling researchers' ability to investigate emotion theories?",
+    "answer_span": "Lastly, it allows affective modelling (AM) researchers to investigate their emotion theories in a successful AI agent class.",
+    "source_doc": "doc10.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the survey focus on regarding emotions?",
+    "answer_span": "The survey focuses on agent/robot emotions, and mostly ignores human user emotions.",
+    "source_doc": "doc10.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is emotion described in relation to human intelligence?",
+    "answer_span": "Emotion is an important part of human intelligence (Johnson-Laird and Oatley, 1992; Damasio, 1994; Baumeister et al, 2007).",
+    "source_doc": "doc10.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "For how many research fields is the study of emotions in learning agents useful?",
+    "answer_span": "The study of emotions in learning agents is useful for three research fields.",
+    "source_doc": "doc10.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What potential benefit do emotions have for the machine learning community?",
+    "answer_span": "First, for the machine learning (ML) community, emotions may benefit learning efficiency.",
+    "source_doc": "doc10.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the current state of research on natural language processing of Tangkhul language using an unsupervised approach?",
+    "answer_span": "There is no or little work on natural language processing of Tangkhul language.",
+    "source_doc": "doc11.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does morphological processing of a language signify in NLP work?",
+    "answer_span": "Morphological processing of a language is the beginning of NLP work of that particular language.",
+    "source_doc": "doc11.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "For which languages are there reports on morphological processing work?",
+    "answer_span": "There are reports on morphological processing work for many other major Indian languages.",
+    "source_doc": "doc11.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the condition of Tibeto-Burman languages of India regarding language processing tools?",
+    "answer_span": "The Tibeto-Burman languages of India are still lacking the basic language processing tools of required quality.",
+    "source_doc": "doc11.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are Tangkhul verbs characterized in terms of class and derivation?",
+    "answer_span": "Tangkhul verbs are close class, few verbs are derived from ‘nominal’ roots.",
+    "source_doc": "doc11.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the current version of the corpus contain in terms of total and unique words?",
+    "answer_span": "The current version of the corpus contains 21713 words, out of which 7362 are unique words (include inflections).",
+    "source_doc": "doc11.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What are the two main classes of word formation mentioned?",
+    "answer_span": "The two main class of word formation are inflection and derivation.",
+    "source_doc": "doc11.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What method has become practical for utilizing pre-trained language models?",
+    "answer_span": "Prompting has become a practical method for utilizing pre-trained language models (LMs).",
+    "source_doc": "doc12.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does prompting allow an LM to adapt to new tasks?",
+    "answer_span": "It allows an LM to adapt to new tasks with minimal training and parameter updates, thus achieving",
+    "source_doc": "doc12.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What novelty do the authors claim regarding speech language models?",
+    "answer_span": "We are the first to explore the potential of prompting speech LMs in the domain of speech processing.",
+    "source_doc": "doc12.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What advantages does prompting offer regarding computational and storage demands?",
+    "answer_span": "The low computational and storage demands of prompting offer significant advantages.",
+    "source_doc": "doc12.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the proposed approach explore regarding large vision models?",
+    "answer_span": "Our approach explores the use of large vision models for the challenging task of large-scale multi-domain universal object detection.",
+    "source_doc": "doc13.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What architecture is used for the frozen backbone in the detector?",
+    "answer_span": "The frozen backbone is a RegNet architecture initialized with the weights of SEER models.",
+    "source_doc": "doc13.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are one-hot category labels transformed for OID images?",
+    "answer_span": "We convert the one-hot category labels to multi-class labels by considering all parent categories as positives for OID images.",
+    "source_doc": "doc13.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the universal object detector perform across the three datasets?",
+    "answer_span": "The universal object detector consistently achieves superior results on all the three datasets.",
+    "source_doc": "doc13.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How many class scores does the classification branch of Cascade R-CNN output?",
+    "answer_span": "The classification branch of Cascade R-CNN outputs 541 class scores including",
+    "source_doc": "doc13.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the Zero Prediction strategy do in VLM evaluation?",
+    "answer_span": "Zero Prediction directly evaluates the VLM on downstream tasks without fine-tuning.",
+    "source_doc": "doc14.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the role of Text Prompt in VLM fine-tuning?",
+    "answer_span": "Text Prompt optimizes only the text prompts with downstream data prior to object and dense segmentation tasks.",
+    "source_doc": "doc14.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the pre-trained VLM model applied without any fine-tuning?",
+    "answer_span": "This approach involves directly applying the pre-trained VLM model to downstream datasets without any fine-tuning.",
+    "source_doc": "doc14.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What effect does dataset complexity have on the relative performance metric rPC?",
+    "answer_span": "The dataset complexity has a significant impact on the rPC.",
+    "source_doc": "doc14.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Why do VLMs achieve better domain adaptation according to the authors?",
+    "answer_span": "primarily due to their exposure to diverse cross-domain scenarios during pre-training.",
+    "source_doc": "doc14.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does Text Prompt affect model performance in domain adaptation?",
+    "answer_span": "Text Prompt has been shown to effectively improve model performance in most domain adaptation scenarios.",
+    "source_doc": "doc14.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the total amount of sponsorship for this year?",
+    "answer_span": "The total amount of sponsorship this year is $102.500",
+    "source_doc": "doc15.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What effort does the workshop make regarding diversity in research topics and presenters' backgrounds?",
+    "answer_span": "We try, as much as possible, to strive for diversity in the selected research topics and presenters’ backgrounds.",
+    "source_doc": "doc15.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does Directed Policy Gradient (DPG) allow a teacher or backup policy to do?",
+    "answer_span": "Our technique, Directed Policy Gradient (DPG), allows a teacher or backup policy to override the agent before it acts undesirably,",
+    "source_doc": "doc16.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What capability does Policy Gradient have regarding deterministic and stochastic incorrect advice?",
+    "answer_span": "Policy Gradient is able to ignore deterministic (i.e., orders) and stochastic (i.e., soft suggestions) incorrect advice",
+    "source_doc": "doc16.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What happens to π when no advice is available?",
+    "answer_span": "If no advice is available, π is set to the uniform distribution",
+    "source_doc": "doc16.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How many time‑steps does the optimal policy require to reach the goal?",
+    "answer_span": "The optimal policy takes 54 time-steps to reach the goal",
+    "source_doc": "doc16.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What effect does human advice have on the agent’s returns and performance at the start of training?",
+    "answer_span": "Human advice leads to the highest returns, and improves the performance of the agent right from the start.",
+    "source_doc": "doc16.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the neural network trained in the DPG approach?",
+    "answer_span": "The network is trained using the standard Policy Gradient loss shown in Equation 1",
+    "source_doc": "doc16.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is human advice represented in the experiments?",
+    "answer_span": "Human advice is represented as a probability distribution over macro-actions",
+    "source_doc": "doc16.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Why does Policy Gradient learn the correct policy according to the authors?",
+    "answer_span": "Policy Gradient also learns the correct policy, because it relies on returns.",
+    "source_doc": "doc16.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does SARSA learn about the advice that leads to a better action selection?",
+    "answer_span": "SARSA is able to learn the effect of the advice, which leads to the better a action to be selected.",
+    "source_doc": "doc16.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Where is the evaluation of the DPG method conducted?",
+    "answer_span": "The evaluation of our method takes place in the Five Rooms grid world environment (see Figure 2a)",
+    "source_doc": "doc16.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the name of the algorithm introduced for optimistic value estimation?",
+    "answer_span": "Value Bonuses using Ensemble Errors (VBE) that is easy to use and compatible with any base Reinforcement Learning algorithm",
+    "source_doc": "doc17.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the value bonus encourage the behavior policy to do?",
+    "answer_span": "encouraging the behavior policy to take an action in a state if it has high uncertainty",
+    "source_doc": "doc17.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the update equation for the Q-network parameters in the paper?",
+    "answer_span": "w ←w+ηδ∇q (s,a) forδ =def r+γq (s′,argmaxq (s′,a′))−q (s,a)",
+    "source_doc": "doc17.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What should the value bonus reflect according to the authors?",
+    "answer_span": "The value bonusshould reflectuncertainty in the action-value estimate",
+    "source_doc": "doc17.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How many ensemble members are used for BDQN in the experiments?",
+    "answer_span": "use an ensemble size of 10, without bootstrapping",
+    "source_doc": "doc17.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are the ensemble value functions updated relative to the target policy?",
+    "answer_span": "The ensemble value functions are updated on the same target policy as Double DQN",
+    "source_doc": "doc17.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What happens to the value bonuses as learning converges?",
+    "answer_span": "value bonuses go to zero, which is desired if we want the agent to stop exploring",
+    "source_doc": "doc17.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is a random action-value function (RQF) generated in VBE?",
+    "answer_span": "sample a random action-value function (RQF)—such as a random neural network",
+    "source_doc": "doc17.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What connection is noted between RQFs and BDQN?",
+    "answer_span": "there is a connection between RQFs and random prior functions in BDQN",
+    "source_doc": "doc17.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does Policy iteration [12, 13] do according to the document?",
+    "answer_span": "Policy iteration [12, 13] is a classic dynamic programming method that generates a sequence of monotonicallyimprovingpoliciesπ ,...,π ,byalternatingbetweentwosteps: estimatingthevalue",
+    "source_doc": "doc18.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is a training instance of the classification data set generated?",
+    "answer_span": "A training instance of the classification data set is generated as follows",
+    "source_doc": "doc18.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the function sgn(x) defined in the document?",
+    "answer_span": "The function: sgn(x)is1ifx > 0,0ifx = 0,and−1ifx < 0.",
+    "source_doc": "doc18.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is described as a decreasing function of the regularization strength λ?",
+    "answer_span": "The size of that hypersphere is a decreasing function of the regularization strength λ.",
+    "source_doc": "doc18.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "During which phase is the policy space a function of the regularization strength λ > 0?",
+    "answer_span": "During the M-learning phase, the policy space is a function of the regularization strength λ > 0.",
+    "source_doc": "doc18.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which algorithms used the same rollout parameters?",
+    "answer_span": "All M-learning versions, IPSE, and LFD used the same rollout parameters.",
+    "source_doc": "doc18.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Where can an overview of machine learning solutions to Tetris be found?",
+    "answer_span": "An overview of machine learning solutions to Tetris can be found in Algorta and S¸ims¸ek [33].",
+    "source_doc": "doc18.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does Figure 1 show regarding the IPSE algorithm?",
+    "answer_span": "Figure 1 shows policy weight trajectories of the IPSE algorithm setup).",
+    "source_doc": "doc18.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How did the M-learning versions differ according to the document?",
+    "answer_span": "The M-learning versions differed in regularization behavior and prior knowledge available.",
+    "source_doc": "doc18.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is identified as a major challenge when applying reinforcement learning to real-life scenarios?",
+    "answer_span": "Applying RL to real-life scenarios is a major challenge",
+    "source_doc": "doc19.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the document say about attempts at deploying RL on real robots in robotics?",
+    "answer_span": "In robotics, there is a plethora of successful attempts at deploying RL on real robots.",
+    "source_doc": "doc19.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the first method referred to as, and what does it keep from previous tasks?",
+    "answer_span": "The first method, referred to as rehearsal, keeps samples from previous tasks",
+    "source_doc": "doc19.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What can be evaluated by distilling and evaluating at several time steps according to the paper?",
+    "answer_span": "By distilling and evaluating at several time steps, we are able to evaluate the evolution of learning and forgetting",
+    "source_doc": "doc19.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the input image described in terms of viewpoint and lighting?",
+    "answer_span": "The input image is a top-down view of the floor, which is lighted",
+    "source_doc": "doc19.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "During RL training, what is said about the color of the background at each timestep?",
+    "answer_span": "During RL training, at each timestep, the color of the background is",
+    "source_doc": "doc19.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Where can the main software related to the experimental setting be found?",
+    "answer_span": "The main software related to our experimental setting can be found at the url",
+    "source_doc": "doc19.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "According to the document, what must the robot learn when a soccer ball appears?",
+    "answer_span": "the robot would have to learn how to wrap a sphere while still being able",
+    "source_doc": "doc19.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the document describe the ability to simulate the experiment regarding the robot’s input?",
+    "answer_span": "We are able to simulate the experiment, since the robot’s input is a fixed RGB image",
+    "source_doc": "doc19.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What algorithm is proposed for collaborative multi-agent reinforcement learning?",
+    "answer_span": "We propose a collaborative multi-agent reinforcement learning algorithm named variational policy propagation (VPP) to learn a joint policy",
+    "source_doc": "doc20.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Under what conditions is the joint policy shown to be a Markov Random Field?",
+    "answer_span": "We prove that the joint policy is a Markov Random Field under some mild conditions",
+    "source_doc": "doc20.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the algorithm incorporate variational inference into the policy?",
+    "answer_span": "We integrate the variational inference as special differentiable layers in policy such that the actions can be efficiently sampled",
+    "source_doc": "doc20.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What scalability claim is made about the proposed method?",
+    "answer_span": "Our method is computationally efficient, which can scale up to one thousand agents",
+    "source_doc": "doc20.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What assumption is made about each agent's reward function?",
+    "answer_span": "the reward function r of each agent i just depends on its individual action and the actions of its neighbors",
+    "source_doc": "doc20.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What phrase describes the reduction of the joint action space?",
+    "answer_span": "and therefore reduce the exponentially large joint action space",
+    "source_doc": "doc20.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "On what type of tasks is the algorithm evaluated, and what result is reported?",
+    "answer_span": "We evaluate our algorithm on several large scale challenging tasks and demonstrate that it outperforms previous state-of-the-arts",
+    "source_doc": "doc20.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are the functions f˜ and T˜ approximated in the method?",
+    "answer_span": "Instead of deriving such dependency, we can directly approximate f˜ and T˜ by neural networks and learn them from data",
+    "source_doc": "doc20.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are the methods evaluated on traffic data described?",
+    "answer_span": "We evaluate different methods on both real-world and synthetic traffic data under the different numbers of intersections",
+    "source_doc": "doc20.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which learning procedures does the article present for RNNs?",
+    "answer_span": "We present the standard learning procedures used by RNNs, and, then, of second order derivatives.",
+    "source_doc": "doc21.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the aim of supervised learning according to the document?",
+    "answer_span": "The aim is “to learn” the relationship between input and output features.",
+    "source_doc": "doc21.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Who introduced the Random Neural Network model and when?",
+    "answer_span": "The RNN model was introduced by E. Gelenbe in 1989 (Gelenbe, 1989a,b).",
+    "source_doc": "doc21.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "From what biological behavior was the design of the RNN model inspired?",
+    "answer_span": "The design of the model was inspired from the biological behavior of neuron circuits in the neo-cortex.",
+    "source_doc": "doc21.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What universal property of RNNs is mentioned in the 2004b reference?",
+    "answer_span": "In (Gelenbe et al., 2004b) the authors shown that under certain algebraic hypothesis the RNN is an universal approximator.",
+    "source_doc": "doc21.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "When was the first overview about RNN presented and by whom?",
+    "answer_span": "The first overview about RNN was presented in 2000 (Bakircioğlu and Koçak, 2000).",
+    "source_doc": "doc21.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the article provide regarding numerical optimization algorithms for RNN training?",
+    "answer_span": "We provide a structured overview about the numerical optimization algorithms used for training RNNs.",
+    "source_doc": "doc21.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What computational advantages and limitations of the model are discussed?",
+    "answer_span": "We discuss some points related to the computational advantages of the model, as well as about its weaknesses and limitations.",
+    "source_doc": "doc21.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the crux of these embeddings according to the document?",
+    "answer_span": "The crux of these embeddings is that they are pretrained in an unsupervised fashion on huge amount of data",
+    "source_doc": "doc22.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "On what basis is the universal graph encoder built according to the paper?",
+    "answer_span": "Our universal graph encoder is based on a GNN model but with several key improvements.",
+    "source_doc": "doc22.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What capability does DUGNN gain regarding regular graphs?",
+    "answer_span": "DUGNN can now differentiate certain regular graphs where the classical WL graph",
+    "source_doc": "doc22.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the paper describe the presented neural network architecture?",
+    "answer_span": "We have presented a powerful univeral graph embedding neural network architecture with three",
+    "source_doc": "doc22.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What happens to accuracy when the supervised loss L is removed?",
+    "answer_span": "The accuracy drops by around 1% when L is removed.",
+    "source_doc": "doc22.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "On which datasets is the DUGNN model evaluated for graph classification?",
+    "answer_span": "to evaluate the DUGNN model on the graph classification task, namely, PTC, PROTEINS, NCI1, D&D, ENZYMES, COLLAB, IMDB-BINARYandIMDB-MULTI",
+    "source_doc": "doc22.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the graph decoder leverage as a multi-task component?",
+    "answer_span": "and leverages rich Graph Kernels (as a multi-task graph decoder)",
+    "source_doc": "doc22.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What effect does removing the graph decoder have on accuracy?",
+    "answer_span": "removing the graph decoder (i.e., L and L(unsup)) reduces accuracy by around by 2%−3%",
+    "source_doc": "doc22.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the proposed method in this paper achieve compared to previous approaches?",
+    "answer_span": "The proposed method in this paper improves the results of the current attention-based approaches.",
+    "source_doc": "doc23.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is deep learning described in relation to Natural Language Processing in the document?",
+    "answer_span": "Deep learning is also playing a central role in Natural Language Processing (NLP) through learned word vector representations.",
+    "source_doc": "doc23.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What intuition underlies the model regarding the relevance of text parts?",
+    "answer_span": "The intuition underlying the model is that not all parts of a text are equally relevant to represent it.",
+    "source_doc": "doc23.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the model aim to improve performance by focusing on essential parts of sentences?",
+    "answer_span": "to improve the model performance by selectively focusing the network on essential parts of the text sentences",
+    "source_doc": "doc23.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which components are combined in the HAHNN model?",
+    "answer_span": "The HAHNN model combines convolutional layers, Gated Recurrent Units, and attention mechanisms.",
+    "source_doc": "doc23.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is described as the first layer of HAHNN?",
+    "answer_span": "The first layer of HAHNN is a pre-processed word embedding layer (black circles in the Figure 1).",
+    "source_doc": "doc23.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What experimental trials were performed with temporal convolutional layers?",
+    "answer_span": "We also have performed some trials with temporal convolutional layers with dilated convolutions and gotten promising results.",
+    "source_doc": "doc23.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the next layer use to process words in the architecture?",
+    "answer_span": "In the next layers, we use a word encoder applying the attention mechanism on word level context vector.",
+    "source_doc": "doc23.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the model measure the importance of a word?",
+    "answer_span": "The model measures the importance of a word as the similarity of u with a word level context vector",
+    "source_doc": "doc23.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What novel linear attention mechanism is designed for computer vision in the paper?",
+    "answer_span": "We design a novel linear attention mechanism named LKA for computer vision",
+    "source_doc": "doc24.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is attention mechanism described in terms of its function?",
+    "answer_span": "Attention mechanism can be regarded as an adaptive selection process according to the input feature",
+    "source_doc": "doc24.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the diagram illustrate about a 13×13 convolution?",
+    "answer_span": "The diagram shows that a 13×13 convolution is decomposed into a",
+    "source_doc": "doc24.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the hierarchical structure of VAN described as?",
+    "answer_span": "Our VAN has a simple hierarchical structure, i.e., a sequence of four stages with decreasing output spatial resolution",
+    "source_doc": "doc24.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does VAN's accuracy-throughput trade-off compare to Swin?",
+    "answer_span": "VAN achieves a better accuracy-throughput trade-off than swin",
+    "source_doc": "doc24.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does DW-D-Conv denote and its role?",
+    "answer_span": "DW-D-Conv denotes depth-wise dilation convolution which plays a role in capturing long-range dependence in LKA",
+    "source_doc": "doc24.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What happens to classification performance without DW-D-Conv?",
+    "answer_span": "Without it, the classification performance will drop by 1.3% (74.1% vs. 75.4%)",
+    "source_doc": "doc24.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the ablation study choose as the baseline model?",
+    "answer_span": "We conduct an ablation study to prove that results quickly, we choose VAN-B0 as our baseline model",
+    "source_doc": "doc24.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What top-1 accuracy does VAN achieve with 200M parameters?",
+    "answer_span": "VAN achieves 87.8% Top-1 accuracy with 200M parameters and surpasses the same level ViT [13]",
+    "source_doc": "doc24.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What framework does the paper introduce for flow-matching models?",
+    "answer_span": "We introduce , an on-policy generative field distillation framework for flow-matching models that routes each sample to one capability field",
+    "source_doc": "doc25.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the method ensure each sample retains its semantic identity?",
+    "answer_span": "each sample is dispatched to exactly one frozen capability field, preserving its semantic identity",
+    "source_doc": "doc25.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Where is the routed field queried during training?",
+    "answer_span": "the routed field is queried on a stop-gradient state drawn from the current student rollout",
+    "source_doc": "doc25.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How many low-noise queries are used per sample?",
+    "answer_span": "we use a single semantic-side low-noise query per sample",
+    "source_doc": "doc25.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What loss is used to update the student model?",
+    "answer_span": "The student is updated by a plain velocity MSE loss",
+    "source_doc": "doc25.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "By how much does DanceOPD improve GEditBench over the best reproduced OPD baseline?",
+    "answer_span": "improves GEditBench over the best reproduced OPD baseline by 8.1%",
+    "source_doc": "doc25.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What improvements does DanceOPD achieve in realism reward over off-policy distillation?",
+    "answer_span": "DanceOPD improves the realism reward over off-policy distillation by 9.9% and closes 85.3% of the student-to-teacher reward gap",
+    "source_doc": "doc25.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How much does the best measured composition improve GEditBench average over train-only CFG absorption?",
+    "answer_span": "The best measured composition improves the GEditBench average over train-only absorption by 7.6% and over eval-only CFG by 1.4%",
+    "source_doc": "doc25.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the percentage gain of hard routing over soft mixing?",
+    "answer_span": "hard routing improves the average over soft mixing by 15.2%",
+    "source_doc": "doc25.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What are the detection performance metrics of the system against human ground truth?",
+    "answer_span": "Against this human ground truth the detector is well balanced: detection F1 is 83.8% (precision 85.5%, recall 82.3%).",
+    "source_doc": "doc26.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What effect does guided decoding have on off‑ontology output and throughput?",
+    "answer_span": "Guided decoding eliminates 25.6% off-ontology output while simultaneously improving throughput by ∼10%.",
+    "source_doc": "doc26.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the requirement for Task100 regarding star rating and audience?",
+    "answer_span": "Task100: It must over 4.5 stars ,find recipes that children can help prepare.",
+    "source_doc": "doc27.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What key responsibility does the German Central Bank have regarding securities?",
+    "answer_span": "Verifying the eligibility of securities as collateral is a key responsibility of the German Central Bank.",
+    "source_doc": "doc28.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Under what condition is a prospectus deemed eligible?",
+    "answer_span": "A prospectus is eligible if and only if all the criteria are fulfilled.",
+    "source_doc": "doc28.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What advantages do LLMs provide according to the findings?",
+    "answer_span": "Our findings indicate that LLMs provide significant advantages in adaptability and robustness.",
+    "source_doc": "doc28.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What performance does the proposed taxonomy achieve across the three LLMs?",
+    "answer_span": "The proposed taxonomy attains the strongest document- and span-level performance across the three LLMs",
+    "source_doc": "doc29.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How many prompt variants are evaluated across three LLMs?",
+    "answer_span": "We evaluate six prompt variants across three LLMs.",
+    "source_doc": "doc29.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which models are used in the evaluation of the taxonomy?",
+    "answer_span": "The models are GPT-5.4, Claude Sonnet 4.6, and (Word2Vec cosine-to-seed and embedding-graph centrality).",
+    "source_doc": "doc29.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How many annotators labeled the posts and across how many nested layers?",
+    "answer_span": "Two trained annotators independently labeled every post across three nested layers",
+    "source_doc": "doc29.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the agreement level for document-level ILE presence across annotation layers?",
+    "answer_span": "The agreement is high across all annotation layers: κ = 0.852 for document-level ILE presence",
+    "source_doc": "doc29.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What effect does removing any single class have on accuracy?",
+    "answer_span": "Removing any single class decreases performance, with accuracy declining by 1.70% to 3.58%",
+    "source_doc": "doc29.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the best document-level performance achieved by the proposed taxonomy?",
+    "answer_span": "The proposed taxonomy achieves the best document-level performance (Acc = 0.843, F1 = 0.839)",
+    "source_doc": "doc29.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "On which class does the proposed taxonomy show the largest recall effect?",
+    "answer_span": "The largest effect appears on Class 1 recall, where the proposed taxonomy reaches 0.772",
+    "source_doc": "doc29.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "On how many multilingual datasets does the evaluation occur?",
+    "answer_span": "We evaluate on nine multilingual Suite (human-annotated subset)",
+    "source_doc": "doc30.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Where can the code for the experiments be found?",
+    "answer_span": "1We release the code for our experiments at https://",
+    "source_doc": "doc30.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which optimizer and reference are used for all training runs?",
+    "answer_span": "Training details. We use AdamW Loshchilov and Hutter [2017] as the optimizer for all runs with learning rate",
+    "source_doc": "doc32.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What types of values can the feedback Z take depending on the environment?",
+    "answer_span": "The feedback Z may be binary, scalar-valued, or vector-valued, depending on the environment.",
+    "source_doc": "doc32.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the intuition about feedback formalized in the paper?",
+    "answer_span": "We formalize this intuition using a simple notion of feedback resolution.",
+    "source_doc": "doc32.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "In what settings is RiVER presented as an RL framework for improving LLMs?",
+    "answer_span": "We presented RiVER, an RL framework for improving LLMs in settings where ground-truth answers or optimal",
+    "source_doc": "doc32.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are executable programs obtained from model responses?",
+    "answer_span": "We extract the executable programs from the responses as c = Code(o).",
+    "source_doc": "doc32.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are candidate responses sampled for each prompt q?",
+    "answer_span": "For each prompt q, we sample a group of G candidate responses from the rollout policy, o ,...,o ∼ π (·|q).",
+    "source_doc": "doc32.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does ARBG avoid while improving scalability?",
+    "answer_span": "ARBG circumvents sequential inference-time interventions, while offering enhanced scalability by leveraging parameter transferable model",
+    "source_doc": "doc33.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which framework has emerged as a powerful alternative to traditional sampling methods?",
+    "answer_span": "Boltzmann Generators (BGs) (Noe´ et al., 2019) have emerged as a powerful framework to circumvent this.",
+    "source_doc": "doc33.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What characteristic do states in thermodynamic equilibrium exhibit?",
+    "answer_span": "states in thermodynamic equilibrium—i.e., modes of the distribution—are often sparse and well-separated by high-energy barriers",
+    "source_doc": "doc33.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What advantage does ARBG claim over LLMs regarding likelihood estimation?",
+    "answer_span": "ARBG offers new tools that computationally efficient at likelihood estimation than to LLMs",
+    "source_doc": "doc33.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Who do the authors thank for inspiring the idea?",
+    "answer_span": "The authors would like to thank Benjamin Murrell for planting the seeds of this idea",
+    "source_doc": "doc33.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "From which organization did Danyal Rehman receive a postdoctoral fellowship?",
+    "answer_span": "Danyal Rehman received financial support from the Natural Sciences and Engineering Research Council’s (NSERC) Banting Postdoctoral Fellowship",
+    "source_doc": "doc33.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What bin count is used for the model discretization?",
+    "answer_span": "we set the bin count to |B| = 2048",
+    "source_doc": "doc33.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What do the authors study regarding sequence probability and correctness?",
+    "answer_span": "We study the relationship between sequence probability and correctness across 12 models, 6 datasets, and 8 decoding methods.",
+    "source_doc": "doc34.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Who introduced power sampling as a scalable SPS algorithm?",
+    "answer_span": "Karan and Du (2025) introduce power sampling from LLMs as a scalable power sampling (SPS) algorithm.",
+    "source_doc": "doc34.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "According to the proof, what does beam search keep at each depth for a fixed horizon T?",
+    "answer_span": "Proof. For a fixed horizon T, beam search keeps the K highest-scoring partial continuations at each depth.",
+    "source_doc": "doc34.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is noted about power‑sampling methods and correctness?",
+    "answer_span": "Power-sampling methods reliably find more probable sequences which, however, are not always more correct.",
+    "source_doc": "doc34.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the per‑sample Spearman rank correlation measure?",
+    "answer_span": "The per-sample Spearman rank correlation ρ (Spearman, 1904) measures monotone agreement between the two quantities.",
+    "source_doc": "doc34.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "With what block sizes is SPS run in the experiments?",
+    "answer_span": "We run SPS with block sizes B ∈ {96,192,384}.",
+    "source_doc": "doc34.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "According to Figure 5, how do many methods compare to the LTS baseline?",
+    "answer_span": "many methods produce samples that are both more probable and more accurate than the low-temperature sampling (LTS) baseline.",
+    "source_doc": "doc34.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What improvement does ENS achieve on turbulent Kolmogorov flow while avoiding hybrid methods' compute cost?",
+    "answer_span": "with gains reaching 10× on turbulent Kolmogorov flow, while avoiding the expensive compute cost of hybrid methods",
+    "source_doc": "doc35.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does ENS’s learned correction policy behave under distribution shift?",
+    "answer_span": "ENS’s learned correction policy generalizes under distribution shift, including zero-shot parameter changes and cross-equation transfer",
+    "source_doc": "doc35.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "According to the authors, what can be an unreliable proxy for reconstruction accuracy in ill-conditioned systems?",
+    "answer_span": "numerically minimizing the PDE residual can be an unreliable proxy for reconstruction accuracy in ill-conditioned systems",
+    "source_doc": "doc35.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does ENS receive alongside its PDE residual field during correction?",
+    "answer_span": "ENS receives the current solution prediction alongside its PDE residual field, and learns to produce a correction",
+    "source_doc": "doc35.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does our ENS produce in terms of reconstruction and physical accuracy?",
+    "answer_span": "Our ENS produces both near-perfect reconstruction and physical accuracy",
+    "source_doc": "doc35.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "In what proportion of tested settings does ENS attain the most accurate predictions?",
+    "answer_span": "ENS attains the most accurate predictions in most of the tested settings",
+    "source_doc": "doc35.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does ENS affect the residual norm across different initializations?",
+    "answer_span": "ENS drives ∥r(uˆ(k))∥ to a consistent floor independently of initialization, as verified empirically in Fig. 4b",
+    "source_doc": "doc35.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the residual field enter C and what does the network read?",
+    "answer_span": "The residual field enters C as a spatial input channel—the network reads where and how the solution currently violates",
+    "source_doc": "doc35.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "On what tasks is ENS’s advantage pronounced, and what does it include?",
+    "answer_span": "ENS’s advantage is pronounced on distribution-shift tasks, including changed coefficients and cross-equation transfer",
+    "source_doc": "doc35.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the runtime of the algorithm described in terms of computational cost?",
+    "answer_span": "Our algorithm is also fast: its runtime is dominated by the cost of computing the empirical covariance matrix.",
+    "source_doc": "doc38.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the algorithm's runtime relate to computing the sample covariance in the untruncated setting?",
+    "answer_span": "matches the runtime of computing the sample covariance in the untruncated setting",
+    "source_doc": "doc38.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the relative truncation parameter γ fully characterize in the analysis?",
+    "answer_span": "relative truncation parameter fully characterizes how truncation changes the moments compared to the untruncated distribution",
+    "source_doc": "doc38.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does Ribbon approximate regarding the Bayesian bootstrap?",
+    "answer_span": "Ribbon approximates the Bayesian-bootstrap or weighted-likelihood-bootstrap refitting target.",
+    "source_doc": "doc39.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How can the uncertainty scale of Ribbon be adjusted?",
+    "answer_span": "Ribbon gives a calibrated Dirichlet-reweighting family whose uncertainty scale can be tuned on validation data.",
+    "source_doc": "doc39.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "To what value of α does the standard Bayesian bootstrap correspond?",
+    "answer_span": "The standard Bayesian bootstrap corresponds to α = 1.",
+    "source_doc": "doc39.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What principle determines component persistence based on output utilization and non-utilization?",
+    "answer_span": "components persist as long as their outputs are utilized by other components, whereas prolonged non-utilization promotes adaptation and exploration.",
+    "source_doc": "doc40.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Under what condition can self-sustaining interaction networks arise without external selection pressures?",
+    "answer_span": "self-sustaining interaction networks can arise even without external selection pressures",
+    "source_doc": "doc40.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What may functional utilization provide as a mechanism for organized structure in complex adaptive systems?",
+    "answer_span": "functional utilization may provide a simple, substrate-independent mechanism for the emergence and stabilization of organized structure in complex adaptive systems.",
+    "source_doc": "doc40.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the central idea behind SBS regarding persistence?",
+    "answer_span": "The central idea behind SBS is that persistence is linked to utilization.",
+    "source_doc": "doc40.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the stability of the core described across subsequent time windows?",
+    "answer_span": "the composition of the core remains stable across all 20 subsequent time windows",
+    "source_doc": "doc40.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the acceptance threshold Θ varied in the parameter sweep experiments?",
+    "answer_span": "The acceptance threshold Θ is swept from 0 to 1",
+    "source_doc": "doc40.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What did the authors apply AUTOCOG to and how many settings were evaluated?",
+    "answer_span": "We applied AUTOCOG to expert ratings of differing reliability, and evaluated the system in two settings; see Figure 1B-D.",
+    "source_doc": "doc41.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "In the experiments, where did the observed data fall relative to the predictions of TTB and Tallying?",
+    "answer_span": "Across both experiments, the observed data falls between the predictions of the TTB and Tallying, though leaning slightly closer",
+    "source_doc": "doc41.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "According to the document, what strategy do subjects likely use involving cues and validities?",
+    "answer_span": "..Subjects likely use a weighted compensatory strategy where both the number of cues and their specific validities are integrated",
+    "source_doc": "doc41.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What do the results indicate about theorizing when the generative step is automated?",
+    "answer_span": "These results indicate what theorizing can look like when the generative step is automated.",
+    "source_doc": "doc41.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What components are included in the full preregistration according to the document?",
+    "answer_span": "The full preregistration contains the frozen stimulus battery, model definitions, power simulations, exclusion criteria, and completed 96 trials.",
+    "source_doc": "doc41.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the Weighted Additive Theory (WADD) describe decision‑makers' evaluation of options?",
+    "answer_span": "Weighted Additive Theory (WADD): Decision-makers evaluate options using a",
+    "source_doc": "doc41.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "In what type of decision‑making were the simulations conducted?",
+    "answer_span": "The simulations were conducted in a multi-attribute decision-making",
+    "source_doc": "doc41.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the observed data compare to the predictions of TTB and Tallying in terms of closeness?",
+    "answer_span": "The observed data falls squarely between the predictions of the TTB and Tallying, though leaning slightly closer",
+    "source_doc": "doc41.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "According to the paper, how are cognitive tasks organized?",
+    "answer_span": "Cognitive tasks are organized by both shared and specialized neural processes.",
+    "source_doc": "doc42.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "When can task relations arise within a paradigm according to the authors?",
+    "answer_span": "task relations may arise both within a paradigm, where tasks share similar demands",
+    "source_doc": "doc42.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is task‑representation structure described across brain regions?",
+    "answer_span": "task-representation structure is broadly preserved across the cerebral cortex, cerebellum, and",
+    "source_doc": "doc42.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "From which dataset were the task‑fMRI data sourced?",
+    "answer_span": "We used task-fMRI data from the HCP S1200 release [21, 22].",
+    "source_doc": "doc42.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Into how many cortical regions were the data parcellated?",
+    "answer_span": "parcellated into 360 cortical regions with the multimodal parcellation atlas",
+    "source_doc": "doc42.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How were participants divided for the analysis?",
+    "answer_span": "Participants were divided into into temporal patches and masked along the regional, temporal, or combined dimensions.",
+    "source_doc": "doc42.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which components were optimized during adaptation?",
+    "answer_span": "Only the projection P and target decoder G were optimized during adaptation.",
+    "source_doc": "doc42.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What are the two types of equilibrium points described for the Izhikevich model?",
+    "answer_span": "a stable node at v ≈−70mV (resting potential) and an unstable saddle at v ≈−50mV (dynamical firing threshold)",
+    "source_doc": "doc43.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What would a purely stochastic AI network yield for DET and recurrent points?",
+    "answer_span": "A purely stochastic AI network would yield DET≈0: all recurrent points would be isolated.",
+    "source_doc": "doc43.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the observed DET≈0.65 value indicate about recurrent points?",
+    "answer_span": "The observed value indicates that ∼65% of recurrent points belong to diagonal structures",
+    "source_doc": "doc43.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the final spike raster confirm about excitatory and inhibitory activity?",
+    "answer_span": "The spike raster of the final second (bottom) confirms sparse, low-synchrony excitatory firing and faster inhibitory activity.",
+    "source_doc": "doc43.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How many unique PNGs are detected at p =0 (ring lattice, C≈0.35)?",
+    "answer_span": "At p =0 (ring lattice, C≈0.35) approximately 850 unique PNGs are detected",
+    "source_doc": "doc43.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How many PNGs survive at p =0.3 (near-random graph, C≈0.20) after decline?",
+    "answer_span": "while at p =0.3 (near-random graph, C≈0.20) fewer than 50 survive a decline exceeding 90%.",
+    "source_doc": "doc43.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are Erdos–Renyi random graphs described in terms of connection and clustering?",
+    "answer_span": "Erdo˝s–Re´nyi (ER) random graphs [21] with connection zero clusteringC≈p.",
+    "source_doc": "doc43.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the RP approach require and how does it operate?",
+    "answer_span": "The RP approach requires only the binary spike matrix and operates entirely in phase",
+    "source_doc": "doc43.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the per‑minute ratio provide and what happens to unavailable alternatives?",
+    "answer_span": "the per-minute ratio gives interpretable willingness-to-pay, and unavailable alternatives receive zero probability.",
+    "source_doc": "doc44.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Why is the softmax invariant to adding a constant to every utility V?",
+    "answer_span": "The softmax is invariant to adding the same constant to every V , so it’s enough to show that",
+    "source_doc": "doc44.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the rule for Stage 2 in the two‑stage training procedure?",
+    "answer_span": "Setting g ≡ 0 during Stage 1 is a hard structural",
+    "source_doc": "doc44.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the adapter’s post‑calibration ECE on Swissmetro compare to the multinomial logit’s?",
+    "answer_span": "The adapter’s post-calibration ECE stays elevated on Swissmetro (8.4% for Mitra, 17.0% for TabPFN) against the multinomial logit’s 4.0%.",
+    "source_doc": "doc44.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What violation do raw foundation models exhibit against the multinomial logit?",
+    "answer_span": "the raw foundation models violate aggregate against the multinomial logit’s mechanically zero leak.",
+    "source_doc": "doc44.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What combined statement describes the two‑stage procedure and the setting of g during Stage 1?",
+    "answer_span": "The two-stage procedure avoids this trade-off. Setting g ≡ 0 during Stage 1 is a hard structural",
+    "source_doc": "doc44.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What criterion is used to choose the partition after constructing the sensitivity statistic?",
+    "answer_span": "We then select the admissible partition that minimizes this sensitivity.",
+    "source_doc": "doc45.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the proposed procedure avoid that is common in structural estimation?",
+    "answer_span": "The procedure requires only local derivatives, avoids repeated re-estimation,",
+    "source_doc": "doc45.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are some structural parameters treated in common practice according to the paper?",
+    "answer_span": "to calibrate some structural parameters—that is, to hold them fixed at prespecified values",
+    "source_doc": "doc45.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the paper conceptualize the calibration–estimation split?",
+    "answer_span": "We treat the calibration–estimation split as a partition-selection problem.",
+    "source_doc": "doc45.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the scalar sensitivity statistic measure?",
+    "answer_span": "We construct a scalar sensitivity statistic that measures the local response of the object of interest",
+    "source_doc": "doc45.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the final partition determined according to the authors?",
+    "answer_span": "The selected partition is the one that minimizes this rule.",
+    "source_doc": "doc45.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What role does the normalization matrix Σ play in the methodology?",
+    "answer_span": "The normalization matrix Σ defines the metric used to measure local miscalibrations of the fixed parameters.",
+    "source_doc": "doc45.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Does the least‑sensitive partition change when different thresholds are applied?",
+    "answer_span": "The least-sensitive partition remains S∗ for all thresholds considered.",
+    "source_doc": "doc45.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is observed about the robustness of fixing ψ in the New Keynesian example?",
+    "answer_span": "Fixing ψ is relatively robust: the curve is nearly flat around zero.",
+    "source_doc": "doc45.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the conformal prediction method extended in this paper?",
+    "answer_span": "We extend the conformal prediction method to construct prediction bands for locally stationary time series.",
+    "source_doc": "doc46.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are the sharp explicit bounds obtained according to the paper?",
+    "answer_span": "Sharp explicit bounds are derived by exploiting geometric inequalities when no information about correlations across samples is available.",
+    "source_doc": "doc47.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How should one interpret a zero lower bound according to the authors?",
+    "answer_span": "This lower bound is often zero, but this should not be interpreted as a defect of the bound.",
+    "source_doc": "doc47.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What geometric condition must the marginal contributions satisfy for cancellation?",
+    "answer_span": "the marginal contributions must be capable of closing into a polygon.",
+    "source_doc": "doc47.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What effect does ruling out strong negative effective dependence have on the lower bound?",
+    "answer_span": "Information that rules out strong negative effective dependence raises the lower bound by limiting cancellation.",
+    "source_doc": "doc47.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the role of the verification theorem in this work?",
+    "answer_span": "The verification theorem, which is the primary focus of the present work, constitutes a cornerstone of the dynamic programming approach.",
+    "source_doc": "doc48.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the viscous term −µ∆u represent in the CBF equations?",
+    "answer_span": "The viscous term −µ∆u with µ > 0 (Brinkman coefficient) accounts for the viscous stress arising from the pore microstructure.",
+    "source_doc": "doc48.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which regimes are classified as supercritical in the paper?",
+    "answer_span": "Supercritical case r > 3 and the critical case r = 3 with 2βµ ≥ 1.",
+    "source_doc": "doc48.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What existence result is given for optimal pairs?",
+    "answer_span": "There exists at least one admissible pair (Z∗,u∗) for which the functional Υ(Z;u) attains its minimum.",
+    "source_doc": "doc48.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What continuity property does the value function V have?",
+    "answer_span": "The value function V is continuous, that is, V ∈ C([0,T];H).",
+    "source_doc": "doc48.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "According to the document, what benefit does the fourth-order convexity provide for the Split CIF implementation?",
+    "answer_span": "thanks to which a guaranteed fast implementation of the Split CIF can be realized",
+    "source_doc": "doc49.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the arbitrary even-order convexity of the w-optimization problem described in the conjecture?",
+    "answer_span": "the w-optimization problem has arbitrary even-order convexity, or in other words",
+    "source_doc": "doc49.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What aspect of the Split CIF does the w-optimization step concern?",
+    "answer_span": "concerns the performance and implementation efficiency of the Split CIF",
+    "source_doc": "doc49.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How can the w-optimization problem be formalized using the trace function?",
+    "answer_span": "The w-optimization problem can also be formalized as w = arg min tr{P(w)}",
+    "source_doc": "doc49.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "From what does the proposed conjecture originate according to the paper?",
+    "answer_span": "The proposed conjecture stems from the w-optimization problem involved in the Split CIF",
+    "source_doc": "doc49.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "In the first special case, to which filter does the Split CIF reduce when matrices P and P are zero?",
+    "answer_span": "the Split CIF is reduced to the famous Kalman filter",
+    "source_doc": "doc49.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What happens to the expression of the derivative dm lndet(P) as the order m increases?",
+    "answer_span": "The expression of the derivative dm lndet(P) quickly becomes too complicated as m increases",
+    "source_doc": "doc49.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are evaluation and genetic operations managed in CHAMB-GA?",
+    "answer_span": "evaluation and genetic operations are not managed within the same process and are utilizing distinct communication between microservices",
+    "source_doc": "doc50.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What role do the CHAMB-GA scripts play in user interaction?",
+    "answer_span": "The CHAMB-GA scripts act as a control hub that handles all user interaction.",
+    "source_doc": "doc50.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What effect does horizontal scaling have on individual throughput?",
+    "answer_span": "Horizontal scaling increases the throughput of individuals by increasing the amount of workers being deployed in parallel.",
+    "source_doc": "doc50.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What benefit does vertical scaling provide for fitness evaluation time?",
+    "answer_span": "Vertical scaling may decrease the time taken per fitness evaluation by increasing the resources available to each worker.",
+    "source_doc": "doc50.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "To what extent does the system scale without hitting throughput saturation?",
+    "answer_span": "The system scales near-linear to more than 3500 CPU cores distributed across 28 compute nodes without reaching throughput saturation.",
+    "source_doc": "doc50.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does DanceOPD achieve compared to other methods in terms of composition and cost?",
+    "answer_span": "DanceOPD achieves a better composition while incurring a lower cost.",
+    "source_doc": "doc51.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "According to the paper, what is one of the three design choices for field-query in capability composition?",
+    "answer_span": "which capability field should supervise a given sample",
+    "source_doc": "doc51.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which loss function is used to train the student model in DanceOPD?",
+    "answer_span": "The student is updated by a plain velocity MSE loss",
+    "source_doc": "doc51.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does hard‑routed sample‑wise field matching affect the semantic identity of capability queries?",
+    "answer_span": "This routing preserves the semantic identity of each capability query",
+    "source_doc": "doc51.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does querying the routed field on student‑visited states accomplish?",
+    "answer_span": "aligning supervision with the student’s own visitation distribution",
+    "source_doc": "doc51.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Why is a single low‑noise query per sample used in DanceOPD?",
+    "answer_span": "provides a high signal-to-noise capability supervision while avoiding correlated trajectory samples",
+    "source_doc": "doc51.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How much does DanceOPD improve the realism reward over off‑policy distillation?",
+    "answer_span": "improves the realism reward over off-policy distillation by 9.9% and closes 85.3% of the student-to-teacher reward gap",
+    "source_doc": "doc51.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the overall claim about on‑policy generative field distillation in the conclusion?",
+    "answer_span": "on-policy generative field distillation is a practical route toward scalable multi-capability visual generation",
+    "source_doc": "doc51.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Why is entity linking considered essential in this work?",
+    "answer_span": "Entity linking is an essential step for a large scale political network analysis.",
+    "source_doc": "doc52.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What accuracy does PEEU achieve when based on Qwen2.5-VL-7B with identical data scales?",
+    "answer_span": "with identical data scales for all methods, PEEU PEEU based on Qwen2.5-VL-7B reaches 30.6%",
+    "source_doc": "doc53.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What effect does high-level task training have on OOD generalization?",
+    "answer_span": "while high-level task training yields stronger OOD generalization",
+    "source_doc": "doc53.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the requirement for Task100 in the dataset?",
+    "answer_span": "Task100: It must over 4.5 stars ,find recipes that children can help prepare.",
+    "source_doc": "doc53.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is a key responsibility of the German Central Bank regarding securities?",
+    "answer_span": "Verifying the eligibility of securities as collateral is a key responsibility of the German Central Bank.",
+    "source_doc": "doc54.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the paper present as its main contribution?",
+    "answer_span": "In this paper, we present the first case study",
+    "source_doc": "doc54.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How do Llama-3.3-70B-Instruct and Command-R 08-2024 compare in performance?",
+    "answer_span": "Both Llama-3.3-70B-Instruct and Command-R 08-2024 generally perform within 1–3 percentage points of each other on most metrics",
+    "source_doc": "doc54.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are the first four criteria described in the study?",
+    "answer_span": "The first 4 criteria will be referred to as “simple” criteria, as they depend only a single extracted",
+    "source_doc": "doc54.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "When is a prospectus considered eligible?",
+    "answer_span": "A prospectus is eligible if and only if all the criteria are fulfilled",
+    "source_doc": "doc54.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which model emerged as the top performer by a slight margin?",
+    "answer_span": "Command-R 08-2024 emerging as the top performer by a very slight margin",
+    "source_doc": "doc54.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How many TikTok video captions were collected for the dataset?",
+    "answer_span": "1,400 TikTok video captions collected between March and May 2026",
+    "source_doc": "doc55.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What improvement in accuracy and F1 does the proposed taxonomy achieve?",
+    "answer_span": "achieving an improvement of 4.7% in accuracy and 5.4% in F1",
+    "source_doc": "doc55.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which large language models were evaluated in the experiments?",
+    "answer_span": "The models are GPT-5.4, Claude Sonnet 4.6, and",
+    "source_doc": "doc55.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the κ agreement score for document-level ILE presence?",
+    "answer_span": "The agreement is high across all annotation layers: κ = 0.852 for document-level ILE presence",
+    "source_doc": "doc55.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the study examine regarding the original question and its English translation?",
+    "answer_span": "We examine the benefits of a simple the original question, the English translated of the final translation module.",
+    "source_doc": "doc56.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the study emphasize about information flow in machine translation?",
+    "answer_span": "Our study emphasizes the need to better design information flow in machine translation",
+    "source_doc": "doc56.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the final ablation study show about the most beneficial context to propagate?",
+    "answer_span": "Finally, our ablation study shows that the original user question is the most beneficial context to propagate.",
+    "source_doc": "doc56.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What information does Table 2 provide in the study?",
+    "answer_span": "Table 2: Gains of the context-aware cascade (C ) and three backbone models.",
+    "source_doc": "doc56.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the document report about C's benefits for smaller models versus GPT-4o-mini?",
+    "answer_span": "We find that C benefits smaller models benefits for GPT-4o-mini, while still helping for several datasets and languages.",
+    "source_doc": "doc56.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the paper claim about tokenization in relation to difficulty?",
+    "answer_span": "Tokenization is a mechanical tax, not a proxy for difficulty.",
+    "source_doc": "doc57.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What perplexity ratio does the 17th-century Italian corpus show, according to the study?",
+    "answer_span": "The 17th-century Italian corpus exhibits a mean perplexity ratio of 2.42×, with the academic",
+    "source_doc": "doc57.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How much token inflation is eliminated by correcting the long s character?",
+    "answer_span": "Correcting ſ→s alone eliminates approximately 79% of the total token inflation (ranging from 70% to 82% across individual books).",
+    "source_doc": "doc57.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How do tokenization penalties compare between the two datasets, and what happens to perplexity behavior?",
+    "answer_span": "Both datasets incur similar tokenization penalties (≈25–30%), yet their perplexity behavior diverges sharply.",
+    "source_doc": "doc57.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is token inflation defined in the context of historical text processing?",
+    "answer_span": "Token inflation is defined as the relative increase in tokens required for the historical version.",
+    "source_doc": "doc57.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What increase in perplexity does the 19th-century Italian control condition exhibit relative to contemporary Italian?",
+    "answer_span": "The 19th-century Italian control condition exhibits only a modest increase in perplexity relative to contemporary Italian (1.70×).",
+    "source_doc": "doc57.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does high perplexity indicate, and does it imply semantic failure?",
+    "answer_span": "High perplexity indicates predictive difficulty, but it does not necessarily imply semantic failure.",
+    "source_doc": "doc57.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are encoding cost and comprehension difficulty related according to the findings?",
+    "answer_span": "Encoding cost and comprehension difficulty are effectively uncorrelated.",
+    "source_doc": "doc57.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How do instance-wise ranks affect scale dependence according to the authors?",
+    "answer_span": "Instance-wise ranks remove scale dependence, but a uniform rank mapping still treats s = 1,",
+    "source_doc": "doc59.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which reward design variant applies GRPO directly to raw scores?",
+    "answer_span": "Raw-GRPO Shao et al. [2024] applies GRPO directly to raw",
+    "source_doc": "doc59.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the purpose of winner‑heavy shaping in the proposed method?",
+    "answer_span": "Winner-heavy shaping. Instance-wise ranks remove scale dependence, but a uniform rank mapping still treats s = 1,",
+    "source_doc": "doc59.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What possible forms can the feedback Z take in the environments considered?",
+    "answer_span": "The feedback Z may be binary, scalar-valued, or vector-valued, depending on the environment.",
+    "source_doc": "doc59.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the feedback Z defined in terms of the deterministic verifier or executable environment?",
+    "answer_span": "Let Z = Φ (o) denote the feedback induced by a deterministic verifier or executable environment.",
+    "source_doc": "doc59.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How do the authors formalize the intuition behind feedback resolution?",
+    "answer_span": "We formalize this intuition using a simple notion of feedback resolution.",
+    "source_doc": "doc59.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is said about the sparsity and separation of states in thermodynamic equilibrium?",
+    "answer_span": "states in thermodynamic equilibrium—i.e., modes of the distribution—are often sparse and well-separated by high-energy barriers",
+    "source_doc": "doc60.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the document define AUTOREGRESSIVE BOLTZMANN GENERATORS (ARBG)?",
+    "answer_span": "AUTOREGRESSIVE BOLTZMANN GENERATORS (ARBG), a novel autoregressive model for Boltzmann Generators",
+    "source_doc": "doc60.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which metric measures agreement between generated and reference energy distributions?",
+    "answer_span": "2-Wasserstein energy distance (E-W ), which measures agreement between generated and reference energy distributions",
+    "source_doc": "doc60.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the unnormalized importance weight described in the sampling formulation?",
+    "answer_span": "the unnormalized importance weight and xi ∼ p(x), i ∈ [K] are K statistically-independent samples",
+    "source_doc": "doc60.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What bin count is used for ARBG in the experiments?",
+    "answer_span": "we set the bin count to |B| = 2048.",
+    "source_doc": "doc60.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What temperature range is reported as sufficient for smaller systems?",
+    "answer_span": "For smaller systems, temperatures near 1.0 are sufficient",
+    "source_doc": "doc60.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the paper study regarding sequence probability and correctness across models and datasets?",
+    "answer_span": "We study the relationship between sequence probability and correctness across 12 models, 6 datasets, and 8 decoding methods.",
+    "source_doc": "doc61.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does Figure 1 illustrate in terms of correlation levels?",
+    "answer_span": "Figure 1: The correlation between log-probability and correctness across three levels.",
+    "source_doc": "doc61.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the across‑method correlation visualized in the left panel?",
+    "answer_span": "Left: Across-method-correlation: log-probability plotted against accuracy for various decoding methods and hyperparameters (connected by lines).",
+    "source_doc": "doc61.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What correlation is computed between log‑probability and a binary correctness label?",
+    "answer_span": "We compute correlations between the continuous log-probability and a binary correctness label y ∈ {0,1}.",
+    "source_doc": "doc61.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the per‑sample Spearman rank correlation measure?",
+    "answer_span": "The per-sample Spearman rank correlation ρ (Spearman, 1904) measures monotone agreement between the two quantities.",
+    "source_doc": "doc61.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does ENS achieve in most settings according to the paper?",
+    "answer_span": "ENS attains the highest prediction accuracy in the large majority of settings",
+    "source_doc": "doc62.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "According to Proposition 1, what is the effect of minimizing the PDE residual on reconstruction error?",
+    "answer_span": "For a PDE with true solution u⋆ satisfying r(u⋆)≈0, minimizing ∥r(u)∥ does not reliably reduce reconstruction error.",
+    "source_doc": "doc62.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does ENS treat the PDE residual field differently from hybrid methods?",
+    "answer_span": "the PDE residual field should be a direct input to the network, instead of an optimization target.",
+    "source_doc": "doc62.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What common structure do recent hybrid methods share regarding the PDE residual?",
+    "answer_span": "Hybrid methods incorporate the PDE residual at test time to impose physics-based corrections.",
+    "source_doc": "doc62.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What property of ENS allows it to converge from initial residuals spanning seven orders of magnitude?",
+    "answer_span": "ENS further exhibits initialization-robust convergence: trajectories spanning seven orders of magnitude in initial residual converge to the same residual floor",
+    "source_doc": "doc62.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does conditioning on the gradient affect the ENS corrector compared to residual conditioning?",
+    "answer_span": "conditioning on the gradient biases the corrector toward driving the residual to zero",
+    "source_doc": "doc62.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What result does the ablation study show when the residual input is replaced by a zero field?",
+    "answer_span": "the ablated model reduces neither quantity, whereas ENS drives both down",
+    "source_doc": "doc62.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the zero‑residual manifold described in relation to the Jacobian’s smallest singular direction?",
+    "answer_span": "the zero-residual manifold is nearly flat along the smallest singular direction of J",
+    "source_doc": "doc62.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the sampling process adapt to according to the document?",
+    "answer_span": "This allows the sampling process to adapt to the evolving representation space, resulting in progressively better TVDF𝑘(𝐴,𝜇 𝑖 ,𝜇 val𝑖 )",
+    "source_doc": "doc63.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does TVDF account for candidate samples in practice?",
+    "answer_span": "In contrast, TVDF accounts for how each candidate sample in practice.",
+    "source_doc": "doc63.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which method performs second best at larger budgets according to the passage?",
+    "answer_span": "TVDF (0.739). At larger budgets, TVMed performs second best, the highest performance.",
+    "source_doc": "doc63.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What has recent work explored using computationally efficient techniques?",
+    "answer_span": "Consequently, recent work has explored candidate pairs using computationally efficient techniques, and for learning under limited budgets.",
+    "source_doc": "doc63.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the paper assess generation quality across multiple scales?",
+    "answer_span": "We design a multi-scale generation assessment combining QA fidelity scoring with cycle-consistent",
+    "source_doc": "doc64.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which components jointly produce the training signal according to the method?",
+    "answer_span": "Self-consistency agreement and Solver Token Entropy (STE) jointly produce the training signal",
+    "source_doc": "doc64.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is generation improved in relation to the Solver?",
+    "answer_span": "We improve generation by treating the Solver as an internal evaluator.",
+    "source_doc": "doc64.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What weights are used in the generation reward for QA fidelity and cycle-consistency?",
+    "answer_span": "Generation reward uses QA fidelity weight 0.65, cycle-consistency weight 0.20",
+    "source_doc": "doc64.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the ratio of visual understanding to image generation in the default joint run?",
+    "answer_span": "The default joint run uses a 3:2 visual understanding:image generation cycle.",
+    "source_doc": "doc64.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are the two loops in the framework coupled?",
+    "answer_span": "The two loops are coupled only through the Solver: the Proposer/Solver are trained from",
+    "source_doc": "doc64.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What inconsistency exists between predicted future observations and actions?",
+    "answer_span": "inconsistencies between predicted future observations and the corresponding generated actions",
+    "source_doc": "doc65.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "During which phase does the model condition on real observations sampled from D?",
+    "answer_span": "During this phase, the model conditions on real observations sampled from D",
+    "source_doc": "doc65.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "On what type of tasks is REGEN evaluated in the real world?",
+    "answer_span": "We evaluate REGEN on three real-world manipulation tasks with a shared pick-and-place structure but different object-goal combinations",
+    "source_doc": "doc65.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What method is proposed for training on raw unlabeled images?",
+    "answer_span": "We propose VISE (Visual Invariance Self-Evolution), annotations, and is trained on raw unlabeled images.",
+    "source_doc": "doc66.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How many benchmarks were used in the experiments?",
+    "answer_span": "Experiments on 18 benchmarks demonstrate the Region-& Image-level Understanding",
+    "source_doc": "doc66.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the training signal regularize in LMMs?",
+    "answer_span": "regularizing the model’s visual conditioning policy rather than its answer surface",
+    "source_doc": "doc66.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which backbone family is used as the base and what components are frozen?",
+    "answer_span": "We use the Qwen3-VL family [2] as the base backbone, freezing the vision encoder and updating the multimodal",
+    "source_doc": "doc66.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the geometric invariance reward expressed?",
+    "answer_span": "The geometric invariance reward GIoU(B , B )+1 R = proj new",
+    "source_doc": "doc66.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What procedure is introduced to perturb regions?",
+    "answer_span": "We do this by introducing a regional perturbation procedure termed ghosting",
+    "source_doc": "doc66.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are the invariance signals combined in the total reward?",
+    "answer_span": "The total reward combines both invariance signals as R = λ R + λ R ,whereλ = λ = 0.5",
+    "source_doc": "doc66.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What baseline is maintained to reduce gradient variance?",
+    "answer_span": "We maintain an exponential moving average baseline b ←0.9b +0.1R to reduce gradient variance, giving advantage A =R −b",
+    "source_doc": "doc66.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What improvements does training with R provide for captioning at 2B?",
+    "answer_span": "Training with R yields moderate captioning gains (+4.83 COCO CIDEr, +4.33 Flickr30k at 2B) and modest (+10.52, +10.16, +8.67, +6.25)",
+    "source_doc": "doc66.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does DnA do with the interactions after identification?",
+    "answer_span": "DnA then projects these interactions into two distinct subspaces with criminability.",
+    "source_doc": "doc67.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How much absolute gain does DnA achieve on ImageNet-1K compared to the baseline?",
+    "answer_span": "Using a ViT-B backbone, our proposed DnA achieves an absolute gain of 0.8% on ImageNet-1K compared to the baseline.",
+    "source_doc": "doc67.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the purpose of the positive query in DnA?",
+    "answer_span": "Positive query: Which features belong to the correct class?",
+    "source_doc": "doc67.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the negative query aim to identify in DnA?",
+    "answer_span": "Negative query: Which features do not belong to the correct class, but are closely associated?",
+    "source_doc": "doc67.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are traditional attention and DnA branches denoted?",
+    "answer_span": "We define traditional attention as A, and DnA branches as A+ and A−.",
+    "source_doc": "doc67.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are the internal features of the flow model manipulated during generation?",
+    "answer_span": "We disperse the internal features of the flow model during batch generation with feature self-guidance.",
+    "source_doc": "doc68.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What effect does increasing feature-space variance have on sample diversity?",
+    "answer_span": "Increasing the feature-space variance directly leads to a significant rise in the diversity of generated samples.",
+    "source_doc": "doc68.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What kind of dispersion is proposed for internal features?",
+    "answer_span": "We propose a principled dispersion of internal features expanding with the input conditioning.",
+    "source_doc": "doc68.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the training-free approach designed for integration with flow models?",
+    "answer_span": "Our training-free approach is designed for seamless integration into any pretrained flow model as a plug-and-play module.",
+    "source_doc": "doc68.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the method perform relative to existing diversity-enhancement baselines regarding speed and quality?",
+    "answer_span": "Our method significantly outperforms existing diversity-enhancement baselines while preserving the native high-speed inference characteristic of the underlying flow models.",
+    "source_doc": "doc68.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What describes the runtime characteristic of the proposed algorithm?",
+    "answer_span": "Our algorithm is also fast: its runtime is dominated by the cost of computing the empirical covariance matrix.",
+    "source_doc": "doc70.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the algorithm's runtime compare to computing the sample covariance without truncation?",
+    "answer_span": "The runtime of our algorithm matches the runtime of computing the sample covariance in the untruncated setting",
+    "source_doc": "doc70.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does Ribbon approximate in terms of bootstrap refitting?",
+    "answer_span": "Ribbon approximates the Bayesian-bootstrap or weighted-likelihood-bootstrap refitting target.",
+    "source_doc": "doc71.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How can the uncertainty scale of Ribbon be adjusted?",
+    "answer_span": "Ribbon gives a calibrated Dirichlet-reweighting family whose uncertainty scale can be tuned on validation data.",
+    "source_doc": "doc71.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does Ribbon's in‑distribution coverage compare to Laplace?",
+    "answer_span": "Ribbon achieves near-nominal ID coverage while maintaining moderate OOD expansion, outperforming Laplace in ID calibration.",
+    "source_doc": "doc71.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What determines whether components persist or adapt in the SBS framework?",
+    "answer_span": "components persist as long as their outputs are utilized by other components, whereas prolonged non-utilization promotes adaptation and exploration.",
+    "source_doc": "doc72.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the central idea behind the Surviving by Serving principle?",
+    "answer_span": "the central idea behind SBS is that persistence is linked to utilization.",
+    "source_doc": "doc72.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the adaptation probability change with consecutive credit‑less episodes?",
+    "answer_span": "The probability of adaptation increases with the number ∆t of consecutive uncredited episodes according to a Hill-type function,",
+    "source_doc": "doc72.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What processing steps are applied to the two input vectors before generating an output?",
+    "answer_span": "the two input vectors are first linearly combined (“assembled”) using the agent-specific coefficients a and b and then normalized.",
+    "source_doc": "doc72.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What must the system do to meet target conditions under the Missing Dimension Hurdle?",
+    "answer_span": "the system must leave the original raw-material subspace in order to satisfy the target conditions.",
+    "source_doc": "doc72.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does AUTOCOG propose and run to test new theories?",
+    "answer_span": "proposing new theories and designing and running experiments to test them.",
+    "source_doc": "doc73.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What novel theory did the system surface regarding multi-cue decision-making?",
+    "answer_span": "It also surfaced a novel theory of multi-cue decision-making in solved, or synthesized [21, 22, 23]",
+    "source_doc": "doc73.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "To what data did the authors apply AUTOCOG and how many settings were evaluated?",
+    "answer_span": "We applied AUTOCOG to expert ratings of differing reliability, and evaluated the system in two settings; see Figure 1B-D.",
+    "source_doc": "doc73.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How were the simulations evaluated in terms of error metric?",
+    "answer_span": "The simulations were conducted in a multi-attribute decision-making meansquarederror(MSE )computed over the vector of pˆ(B) values across all unique option-pairs.",
+    "source_doc": "doc73.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How did the surfaced theories perform over cycles?",
+    "answer_span": "The surfaced theories improved over cycles and predicted behavior beyond the data that produced them",
+    "source_doc": "doc73.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is a key advantage of AUTOCOG regarding the trajectory of theory development?",
+    "answer_span": "A key advantage of AUTOCOG is that the full trajectory taken to surface these two theories is available for study;",
+    "source_doc": "doc73.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are cognitive tasks organized according to the document?",
+    "answer_span": "Cognitive tasks are organized by both shared and specialized neural processes.",
+    "source_doc": "doc74.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the document suggest about many-to-one task relations and pairwise taskonomy?",
+    "answer_span": "suggesting that many-to-one task relations are not fully captured by the pairwise taskonomy visual systems",
+    "source_doc": "doc74.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What do large-scale modeling and neuroimaging studies suggest about cognitive task representations?",
+    "answer_span": "Large-scale modeling and neuroimaging studies further suggest that cognitive task representations exhibit structured organization rather than forming unrelated categories",
+    "source_doc": "doc74.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What formal frameworks does the Cognitive Atlas and Cognitive Paradigm Ontology provide?",
+    "answer_span": "The Cognitive Atlas and the Cognitive Paradigm Ontology provide formal frameworks for describing cognitive constructs, experimental paradigms, and their relationships",
+    "source_doc": "doc74.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "From which release were the task-fMRI data used?",
+    "answer_span": "We used task-fMRI data from the HCP S1200 release [21, 22].",
+    "source_doc": "doc74.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which preprocessing pipeline was used to process the data?",
+    "answer_span": "The data were processed using the HCP minimal preprocessing pipeline [23]",
+    "source_doc": "doc74.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "During adaptation, which components were optimized?",
+    "answer_span": "Only the projection P and target decoder G were optimized during adaptation.",
+    "source_doc": "doc74.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How was each evaluated transfer assignment represented?",
+    "answer_span": "Each evaluated transfer assignment was represented as a directed hyperedge e = (S → t )",
+    "source_doc": "doc74.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is a task’s allocation frequency defined?",
+    "answer_span": "A task’s allocation frequency was defined as the number of evaluated BIP solutions in which it received direct supervision.",
+    "source_doc": "doc74.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the Izhikevich model simplify neuronal dynamics?",
+    "answer_span": "The Izhikevich model [16] reduces it to two variables by",
+    "source_doc": "doc75.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the document say about how real interaction strengths affect functional memory depth compared to randomised weight?",
+    "answer_span": "real interaction strengths organise functional memory at greater hierarchical depth than randomised weight across all thirty-four empirical networks.",
+    "source_doc": "doc76.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "According to the study, what effect does randomising edge weights while preserving binary topology have on functional memory depth?",
+    "answer_span": "randomising edge weights while preserving binary topology reduces functional memory depth.",
+    "source_doc": "doc76.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What operation is performed on alternative k’s cost to test monotonicity?",
+    "answer_span": "perturb k’s cost upward by 1% of its observed range and check whether P falls",
+    "source_doc": "doc77.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the alternative-specific feature transform ϕ select from the input vector x?",
+    "answer_span": "selects from x the columns that enter alternative k’s utility, typically including cost, time",
+    "source_doc": "doc77.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does precomputing q(x) affect monotonicity and trade‑off ratio calculations?",
+    "answer_span": "Becauseq(x )isprecomputed,∂q/∂x = 0,somonotonicityandtrade-off ratios reduce to functions of β∗ alone.",
+    "source_doc": "doc77.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the adapter achieve regarding behavioral validity and accuracy?",
+    "answer_span": "The adapter recovers behavioral validity while keeping most of the accuracy gain.",
+    "source_doc": "doc77.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How do the trade‑off ratios relate to the structural multinomial logit model?",
+    "answer_span": "The trade-off ratios match the structural multinomial logit by construction (Proposition 1) and are stable across seeds:",
+    "source_doc": "doc77.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the adapter’s post‑calibration ECE indicate on the Swissmetro dataset?",
+    "answer_span": "The adapter’s post-calibration ECE stays elevated on Swissmetro (8.4% for Mitra, 17.0% for TabPFN) against the multinomial logit’s 4.0%.",
+    "source_doc": "doc77.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What property of the softmax function is highlighted in the proof?",
+    "answer_span": "The softmax is invariant to adding the same constant to every V , so it’s enough to show that",
+    "source_doc": "doc77.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the stated effect of setting g ≡ 0 during Stage 1?",
+    "answer_span": "Setting g ≡ 0 during Stage 1 is a hard structural",
+    "source_doc": "doc77.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the rule used to select the partition in the paper?",
+    "answer_span": "The selected partition is the one that minimizes this rule.",
+    "source_doc": "doc78.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the paper treat the calibration–estimation split?",
+    "answer_span": "We treat the calibration–estimation split as a partition-selection problem.",
+    "source_doc": "doc78.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the criterion target instead of worst-case MSE?",
+    "answer_span": "Our criterion targets worst-case bias rather than worst-case MSE",
+    "source_doc": "doc78.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is fixing ψ described in terms of robustness?",
+    "answer_span": "Fixing ψ is relatively robust: the curve is nearly flat around zero.",
+    "source_doc": "doc78.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What can a few percent miscalibrations cause for some partitions?",
+    "answer_span": "For some partitions, miscalibrations of only a few percent are sufficient to overturn the qualitative conclusion",
+    "source_doc": "doc78.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Does the least-sensitive partition change across different thresholds?",
+    "answer_span": "The least-sensitive partition remains S∗ for all thresholds considered.",
+    "source_doc": "doc78.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What method do the authors propose to estimate optimal weights for candidate multi-layer network VAR models?",
+    "answer_span": "We propose a penalized time-varying model averaging (PTVMA) method to estimate the optimal weights",
+    "source_doc": "doc79.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which conformal prediction method is introduced to construct interval forecasts without fixing the number of candidate models?",
+    "answer_span": "We propose a PTVMA-based conformal prediction method to construct interval forecasts",
+    "source_doc": "doc79.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Under what condition does the PTVMA criterion achieve selection consistency?",
+    "answer_span": "The PTVMA criterion achieves selection consistency when correctly specified candidates exist",
+    "source_doc": "doc79.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which network layer dominates early in the sample period, particularly around 2009–2012?",
+    "answer_span": "The production network layer is dominant in the early part of the time period, especially around 2009–2012",
+    "source_doc": "doc79.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the in-sample fit of PTVMA compare to that of the NAR model?",
+    "answer_span": "The PTVMA delivers uniformly better in-sample fit than the NAR indicating significant reductions of in-sample prediction error",
+    "source_doc": "doc79.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What advantage does the proposed PTVMA have regarding forecast gain and conformal prediction intervals?",
+    "answer_span": "The proposed PTVMA achieves the forecast gain by adaptively weighting candidate probabilities of conformal prediction intervals at 90% nominal level",
+    "source_doc": "doc79.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is expected about optimal weights when network dependence strength varies over time?",
+    "answer_span": "When the strength of network dependence is time-varying, the optimal weights are expected to be time-varying as well",
+    "source_doc": "doc79.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What assumption is made about candidate models to enhance the applicability of the proposed methodology?",
+    "answer_span": "We allow all the candidate models to be misspecified, enhancing the applicability of the proposed model and methodology",
+    "source_doc": "doc79.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does ABC-Models instantiate and study?",
+    "answer_span": "ABC-Models instantiates DiT and VLA policies and studies architecture and compute-scaling sim-to-real correlation.",
+    "source_doc": "doc90.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "For how many steps and with what batch size are all models trained?",
+    "answer_span": "All models are trained for 200k steps with a global batch size of 4608.",
+    "source_doc": "doc90.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What gradient clipping setting is used during training?",
+    "answer_span": "We use gradient clipping with a maximum gradient norm of 10.",
+    "source_doc": "doc90.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the 80:10:10 data ratio compare to other training approaches?",
+    "answer_span": "We find that this ratio is better than training on either whole episodes or interventions alone.",
+    "source_doc": "doc90.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which optimizer and weight decay are used in training?",
+    "answer_span": "We use the AdamW optimizer [18] with a weight decay of 0.01.",
+    "source_doc": "doc90.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the inference speed of ABC-VLA compare to ABC-DiT?",
+    "answer_span": "ABC-VLA is faster than ABC-DiT despite having more than twice as many total parameters.",
+    "source_doc": "doc90.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What method is released for collecting intervention data without extra hardware?",
+    "answer_span": "We release a new method to collect intervention data using no additional hardware other than the conventional passive leader-arm setup.",
+    "source_doc": "doc90.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How many mechanisms are studied for shaping policy behavior at inference time?",
+    "answer_span": "We study three mechanisms for shaping the behavior of our policies at inference time.",
+    "source_doc": "doc90.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does Operator-ID conditioning enable at test time?",
+    "answer_span": "Operator-ID conditioning allows test-time conditioning on desired behavior without data filtering.",
+    "source_doc": "doc90.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the success rate of Global Best without target-specific evidence?",
+    "answer_span": "Without target-specific evidence, Global Best succeeds on 0.4686 of scored executions.",
+    "source_doc": "doc91.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "In the primary 3-to-1 cross-fit, how are trials allocated between commissioning profile and scoring?",
+    "answer_span": "The primary 3-to-1 cross-fit, three trials form the commissioning profile and the remaining trial scores the selected expert.",
+    "source_doc": "doc91.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What are the key quantities (records, variants, experts, trials) described in the study?",
+    "answer_span": "The study contains 34,752 valid rollout records, 398 variants, 28 heterogeneous experts, and four recorded trials per included variant–expert pair.",
+    "source_doc": "doc91.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the purpose of the Hindsight bound in the evaluation?",
+    "answer_span": "The Hindsight bound sees all scored outcomes and is used only as a non-deployable upper reference.",
+    "source_doc": "doc91.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What computational tool does the Laplace transform provide for curved-space mode functions?",
+    "answer_span": "A Laplace transform turns this observation into a computational tool, resolving each curved-space mode function",
+    "source_doc": "doc92.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the Laplace representation reveal about singularities of the correlator?",
+    "answer_span": "The Laplace representation makes its total- and partial-energy singularities transparent “from flat space”",
+    "source_doc": "doc92.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which differential equation does the dual Laplace-space function satisfy for massive fields?",
+    "answer_span": "which is the Legendre equation of degree iµ− 1",
+    "source_doc": "doc92.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What representation is obtained for the massive mode function after Laplace inversion?",
+    "answer_span": "we obtain the plane-wave representation of the massive mode function",
+    "source_doc": "doc92.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the significance of λ = −1 in the Laplace-space analysis?",
+    "answer_span": "the latter is what makes λ = −1 a branch point, which we call the (Laplace-space) Bunch-Davies singularity",
+    "source_doc": "doc92.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the explicit form of the bulk-to-boundary propagator for conformally coupled external legs?",
+    "answer_span": "K (E,τ) = 0 eiEτ , K (E,τ) = 0 e−iEτ .",
+    "source_doc": "doc92.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are internal lines labeled in the Laplace-space diagrammatic rules?",
+    "answer_span": "Assign the dual variable λ to the vertex i and the internal line connecting vertices i and j.",
+    "source_doc": "doc92.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What computational tool does a Laplace transform provide according to the authors?",
+    "answer_span": "A Laplace transform turns this observation into a computational tool",
+    "source_doc": "doc93.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the Laplace transform inverted back to the original function?",
+    "answer_span": "The transform inverts to a Bromwich integral, iF(−iz) = (cid:82)c+i∞ dλ eλzFˆ(λ) for any c > −1",
+    "source_doc": "doc93.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What function represents the weight after performing the Laplace transform?",
+    "answer_span": "The weight is then the Legendre function, H(1)(−z)",
+    "source_doc": "doc93.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the conformally coupled mode function expressed in the paper?",
+    "answer_span": "The conformally coupled mode function is an exact plane wave up to a power factor, φ(τ;E)=iHτe−iEτ/ 2E",
+    "source_doc": "doc93.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "On which example does the method demonstrate its full power?",
+    "answer_span": "The method shows its full force on the paradigmatic massive single exchange",
+    "source_doc": "doc93.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What happens to the total-energy denominator at vanishing total energy?",
+    "answer_span": "At vanishing total energy, λ → 0, the total-energy denominator λ + λ − λ˜ is the only factor",
+    "source_doc": "doc93.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the solid nature of the dark medium prevent?",
+    "answer_span": "The solid nature of the dark medium prevents the instabilities and strong acoustic oscillations that typically arise in perfect-fluid unifications.",
+    "source_doc": "doc94.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How can one go beyond the perfect‑fluid description?",
+    "answer_span": "A natural way to go beyond the perfect-fluid description is to endow the medium with rigidity.",
+    "source_doc": "doc94.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What can relativistic solids support and possess that perfect fluids do not?",
+    "answer_span": "Relativistic solids can support shear deformations in addition to compression, and hence possess perturbative responses",
+    "source_doc": "doc94.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Under what condition is the null energy condition satisfied?",
+    "answer_span": "The null energy condition is satisfied provided 2bK >0.",
+    "source_doc": "doc94.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What can the solid unification generate?",
+    "answer_span": "The solid unification can instead generate distinctive signatures.",
+    "source_doc": "doc94.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What did Ms. Doling tell the bankruptcy court about the Debtors' chapter 13 plan?",
+    "answer_span": "Ms. Doling nevertheless told the bankruptcy court that the Debtors had completed their chapter 13 plan.",
+    "source_doc": "doc95.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What action did the court take regarding Ms. Doling's motion for reconsideration?",
+    "answer_span": "The court sanctioned her and denied her motion for reconsideration.",
+    "source_doc": "doc95.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What did the appellate panel decide about the bankruptcy court’s sanctions?",
+    "answer_span": "We therefore REVERSE the bankruptcy court’s imposition of sanctions.",
+    "source_doc": "doc95.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How many motions to dismiss did the trustee file and why?",
+    "answer_span": "The trustee filed fourteen motions to dismiss because the Debtors failed to make their payments to the trustee.",
+    "source_doc": "doc95.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What was the bankruptcy court's decision on further continuance?",
+    "answer_span": "The bankruptcy court denied any further continuance and granted the Motion to Dismiss.",
+    "source_doc": "doc95.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What was JPMorgan Chase's total net revenue for the year ended December 31, 2023?",
+    "answer_span": "Total net revenue $ 158,104 $ 128,695 $ 121,649",
+    "source_doc": "doc96.pdf",
+    "source_chunk_id": "part_0",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What was the return on tangible common equity (ROTCE) reported for 2023?",
+    "answer_span": "return on tangible common equity (ROTCE) of 21%",
+    "source_doc": "doc96.pdf",
+    "source_chunk_id": "part_0",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the primary funding source for JPMorgan Chase Bank, N.A.?",
+    "answer_span": "Deposits are the primary funding source for JPMorgan Chase Bank, N.A.",
+    "source_doc": "doc96.pdf",
+    "source_chunk_id": "part_2",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the fair value of the Firm’s derivative receivables incorporate to reflect credit quality?",
+    "answer_span": "The fair value of the Firm’s derivative receivables incorporates CVA to reflect the credit quality of counterparties.",
+    "source_doc": "doc96.pdf",
+    "source_chunk_id": "part_2",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Was the Firm’s goodwill impaired at December 31, 2023?",
+    "answer_span": "The Firm’s goodwill was not impaired at December 31, 2023, 2022 and 2021.",
+    "source_doc": "doc96.pdf",
+    "source_chunk_id": "part_4",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Why is the multi‑way coincidence calculus considered canonical according to the text?",
+    "answer_span": "the multi‑way coincidence calculus is canonical because it is the log of the right",
+    "source_doc": "doc37.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which theorem presents the multi‑way Laplace normal form for the Hellinger transform?",
+    "answer_span": "Theorem E.2 (Multi‑way Laplace normal form for the Hellinger transform).",
+    "source_doc": "doc37.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What type of bounds are derived by exploiting geometric inequalities when no correlation information is available?",
+    "answer_span": "Sharp explicit bounds are derived by exploiting geometric inequalities when no information about correlations across samples is available.",
+    "source_doc": "doc80.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What condition is required for exact cancellation when only two moments are considered?",
+    "answer_span": "With two moments, exact cancellation requires a knife-edge balance between the two components.",
+    "source_doc": "doc80.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the upper bound represent in terms of sampling errors across empirical moments?",
+    "answer_span": "The upper bound corresponds to maximal alignment of the sampling errors across empirical moments.",
+    "source_doc": "doc80.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does ruling out strong negative effective dependence affect the lower bound?",
+    "answer_span": "Information that rules out strong negative effective dependence raises the lower bound by limiting cancellation.",
+    "source_doc": "doc80.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which previous result does the sharp upper bound match?",
+    "answer_span": "The sharp upper bound coincides with the result of Cocci and Plagborg-Møller (2025);",
+    "source_doc": "doc80.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "When is the lower bound achieved according to the authors?",
+    "answer_span": "The lower bound is attained when these components cancel as much as possible.",
+    "source_doc": "doc80.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "To what scope of applications does the proposed framework extend?",
+    "answer_span": "Our framework applies to a wide range of empirical settings.",
+    "source_doc": "doc80.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the full name of the SCHSAR model as introduced in the paper?",
+    "answer_span": "the Selection-corrected Heterogeneous Spatial Autoregressive (hereafter referred to as SCHSAR) model",
+    "source_doc": "doc81.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the unified framework aim to tackle simultaneously according to the authors?",
+    "answer_span": "the Selection-corrected Heterogeneous Spatial Autoregressive (hereafter referred to as SCHSAR) model, that simultaneously tackles both heterogeneity and endogeneity concerns",
+    "source_doc": "doc81.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which Bayesian method do the authors propose for estimation and inference?",
+    "answer_span": "We propose a fully Bayesian data augmentation approach for estimation and inference",
+    "source_doc": "doc81.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the degree heterogeneity variable a affect the outcome variable Y?",
+    "answer_span": "The degree heterogeneity a may also affect Y through the unobserved part",
+    "source_doc": "doc81.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the size of the firm sample used in the empirical analysis?",
+    "answer_span": "Using a sample of 1,150 firms, the empirical analysis reveals",
+    "source_doc": "doc81.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the estimated network effect magnitude for the peer-driven type?",
+    "answer_span": "a larger estimated network effect of around 0.215",
+    "source_doc": "doc81.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which prior distribution is assigned to the peer effect parameter λ?",
+    "answer_span": "λ ∼ B(d,d) ⇔ p(λ) = , (29)",
+    "source_doc": "doc81.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the reported sensitivity of the metamaterial to nanogap refractive index changes?",
+    "answer_span": "the sensitivity to tracking changes in the nanogap refractive index thus amounts to 1400 nm/RIU",
+    "source_doc": "doc82.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the presented electrochemically‑cleanable metamaterial enable in terms of spectroscopic techniques?",
+    "answer_span": "we present an electrochemically-cleanable metamaterial that enables combined real-time SEIRA and SERS in flow",
+    "source_doc": "doc82.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What shift in the MLagg MIR resonance is observed when the sample is oxidized in situ?",
+    "answer_span": "a repeatable blue-shift of the MLagg MIR resonance is observed as the sample is oxidized in situ",
+    "source_doc": "doc82.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "By how much does the nanogap size increase due to formation of Au(III) oxide layers?",
+    "answer_span": "the gap increases from 0.9 to 1.8 nm due to the formation of two to three atomic layers of Au(III) oxide",
+    "source_doc": "doc82.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which redox reaction is used to test the EC‑SEIRA/SERS substrate?",
+    "answer_span": "we test this substrate by monitoring the model redox reaction of ferrocyanide detecting both SEIRA and SERS",
+    "source_doc": "doc82.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are surface‑bound species removed from the substrate during regeneration?",
+    "answer_span": "we remove surface-bound species by sweeping the applied potential over the gold oxidation potential",
+    "source_doc": "doc82.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What effect do oxidizing potentials greater than +1.0 V have on CB[5] vibrational resonances?",
+    "answer_span": "Oxidizing potentials (>+1.0 V) lead to a clear decrease in the amplitude of all CB[5] vibrational resonances",
+    "source_doc": "doc82.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "To what concentration can ferrocyanide be detected using the combined SEIRA and SERS measurements?",
+    "answer_span": "down to concentrations <1 mM in 500 mM potassium phosphate buffer (KPB) with high signal-to-noise for SEIRA and SERS",
+    "source_doc": "doc82.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What expression describes the magnetic field outside of the sphere?",
+    "answer_span": "The magnetic field outside of the sphere is given by a linear superposition of an incoming spherical",
+    "source_doc": "doc83.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the document define the CPA bandwidth in the relevant section?",
+    "answer_span": "In this section, we find the CPA bandwidth (i.e., the half width at half maximum of the absorption 1−|s|2).",
+    "source_doc": "doc83.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "At what value does the first divergence for the dipolar channel occur?",
+    "answer_span": "The first divergence for the dipolar channel occurs at k+ ≈4.493/ ε.",
+    "source_doc": "doc83.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What condition must the incoming wavefront satisfy for perfect absorption?",
+    "answer_span": "the incoming wavefront must be a spherical wave if it is to",
+    "source_doc": "doc83.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "In which limit is CPA of a coated sphere with a dispersion‑free conductivity considered for both polarizations?",
+    "answer_span": "in the large k+ limit, CPA of a coated sphere (with a dispersion‑free conductivity) for both",
+    "source_doc": "doc83.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which reference’s CPA solutions show that subwavelength CPA is achievable?",
+    "answer_span": "The CPA solutions found by [11] show that subwavelength CPA is achievable under",
+    "source_doc": "doc83.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are the coefficients a and b expanded in terms of ε?",
+    "answer_span": "We now expand each of a and b into terms proportional to ε2, ε ε and ε ε.",
+    "source_doc": "doc83.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the left side of Eq. (S13) described in terms of power integration?",
+    "answer_span": "The left side of Eq. (S13) is the power integrated (per unit length along the cylinder axis)",
+    "source_doc": "doc83.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What method is used to address the inverse design problem?",
+    "answer_span": "We address this inverse design problem using artificial neural networks.",
+    "source_doc": "doc84.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the relationship between design parameters and near-field landscapes modeled?",
+    "answer_span": "We model the relationship between the design parameters and near-field landscapes using multilayer neural networks.",
+    "source_doc": "doc84.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the proposed approach demonstrate regarding longitudinal landscapes?",
+    "answer_span": "Our approach designs simple and complex longitudinal landscapes, demonstrating accurate prediction and flexibility.",
+    "source_doc": "doc84.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What challenge does lateral field reconstruction face and how is it improved?",
+    "answer_span": "Lateral field reconstruction is more challenging but improved with training data selection and augmentation.",
+    "source_doc": "doc84.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How are guided modes defined in the context of Maxwell’s equations?",
+    "answer_span": "Guided modes are solutions to Maxwell’s equations for fields exclusively propagating within a confining structure, known as a waveguide.",
+    "source_doc": "doc84.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the main drawback of traditional near-field structuring methods?",
+    "answer_span": "The main drawback of these methods is the local conversion, resulting in bulky optics for on-chip applications.",
+    "source_doc": "doc84.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What do the authors report regarding non-Hermitian phenomena?",
+    "answer_span": "Here, we report the direct observation of non-Hermitian",
+    "source_doc": "doc85.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How does the length of the right loop compare to the left loop in the setup?",
+    "answer_span": "The right loop is 2∆L ≈ 64m longer than the left loop",
+    "source_doc": "doc85.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What type of noise and sampling rate are used experimentally?",
+    "answer_span": "Experimentally, we adopt Gaussian noise with a sampling rate of 200MHz",
+    "source_doc": "doc85.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the walker's evolution monitored in the experiment?",
+    "answer_span": "The evolution of the walker is monitored by measuring the time-resolved pulse intensity",
+    "source_doc": "doc85.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the viscous term −µ∆u represent in the CBF equations?",
+    "answer_span": "The viscous term −µ∆u with µ > 0 (Brinkman coefficient) accounts for the viscous stress arising from the pore microstructure.",
+    "source_doc": "doc86.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which term describes the convective transport in the CBF system?",
+    "answer_span": "The nonlinear term (u·∇)u describes the convective transport",
+    "source_doc": "doc86.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What physical effect does the linear term αu model?",
+    "answer_span": "The linear term αu with α > 0 (Darcy coefficient) represents the viscous resistance at low flow rates.",
+    "source_doc": "doc86.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the Forchheimer correction term defined in the equations?",
+    "answer_span": "The nonlinear term β|u|r−1u with β > 0 (Forchheimer coefficient) and r ≥ 1 (absorption exponent) represents the Forchheimer correction",
+    "source_doc": "doc86.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the critical exponent case for the parameter r?",
+    "answer_span": "The case r = 3 is called the critical exponent",
+    "source_doc": "doc86.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Under which conditions are global weak solutions unique?",
+    "answer_span": "under the conditions r = 3 with 2βµ ≥ 1 and r > 3, global weak solutions are unique",
+    "source_doc": "doc86.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the value function V(t,z) defined?",
+    "answer_span": "We define the value function as V(t,z) := min Υ(Z;u).",
+    "source_doc": "doc86.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Which higher‑order convexity property does the w‑optimization problem enjoy?",
+    "answer_span": "The w-optimization problem further enjoys an even more desirable property namely the fourth-order convexity",
+    "source_doc": "doc87.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the author propose concerning the w‑optimization problem?",
+    "answer_span": "Based on certain observations and analysis, the author proposes a conjecture concerning the w-optimization problem for further mathematical study.",
+    "source_doc": "doc87.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What is the conjecture about the w‑optimization problem’s convexity?",
+    "answer_span": "The conjecture is that the w-optimization problem has arbitrary even-order convexity",
+    "source_doc": "doc87.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the Split CIF described in the document?",
+    "answer_span": "The split covariance intersection filter (or Split CIF for short) [1] is a useful tool for general data fusion",
+    "source_doc": "doc87.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How can the w‑optimization problem be formalized using the trace function?",
+    "answer_span": "The w-optimization problem can also be formalized as w = arg min tr{P(w)}, (5)",
+    "source_doc": "doc87.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the document say about the conjecture for the first special case?",
+    "answer_span": "the conjecture (7) holds trivially for the first special case",
+    "source_doc": "doc87.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is the matrix P(w)⁻¹ described for the general case?",
+    "answer_span": "the matrix P(w)−1 is much more complicated as it becomes nonlinear in terms of w",
+    "source_doc": "doc87.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What role do the CHAMB-GA scripts play in user interaction?",
+    "answer_span": "The CHAMB-GA scripts act as a control hub that handles all user interaction.",
+    "source_doc": "doc88.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What effect does horizontal scaling have on individual throughput?",
+    "answer_span": "Horizontal scaling increases the throughput of individuals by increasing the amount of workers being deployed in parallel.",
+    "source_doc": "doc88.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How can vertical scaling affect fitness evaluation time?",
+    "answer_span": "Vertical scaling may decrease the time taken per fitness evaluation by increasing the resources available to each worker.",
+    "source_doc": "doc88.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "To what extent does the system scale without hitting throughput saturation?",
+    "answer_span": "The system scales near-linear to more than 3500 CPU cores distributed across 28 compute nodes without reaching throughput saturation.",
+    "source_doc": "doc88.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What capabilities does CHAMB-GA provide for algorithm and simulation components?",
+    "answer_span": "CHAMB-GA enables flexible message routing and the deployment of multiple algorithm and simulation components to seamlessly interact with each other.",
+    "source_doc": "doc88.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What type of short segments are described for daily user trips?",
+    "answer_span": "short segments where users apply their own transport between their homes or workplaces",
+    "source_doc": "doc89.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is users' accessibility ensured in the model?",
+    "answer_span": "Accessibility is ensured by imposing an upper limit on the travel times of the short segments",
+    "source_doc": "doc89.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "Under what condition will users employ the public transportation system?",
+    "answer_span": "We assume that only users within a given coverage radius will employ the system",
+    "source_doc": "doc89.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How is system effectiveness ensured according to the paper?",
+    "answer_span": "system effectiveness is ensured by limiting travel time on the transportation network",
+    "source_doc": "doc89.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the HCLP address regarding transit network design?",
+    "answer_span": "The HCLP addresses strategic decisions related to the design of a transit network, integrating network design and covering decisions",
+    "source_doc": "doc89.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What equivalence is noted regarding penalties for uncovered areas?",
+    "answer_span": "Note that minimizing the penalties for uncovered areas is equivalent to maximizing the captured demand",
+    "source_doc": "doc89.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "How can the HCLP be interpreted in relation to hub location problems?",
+    "answer_span": "the HCLP can be seen as a hub location problem, since it aims to locate some privileged facilities, i.e., hubs",
+    "source_doc": "doc89.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What connectivity requirement is imposed on the backbone network?",
+    "answer_span": "The backbone network has to be connected; otherwise, paths connecting pairs of hubs in different components would not exist",
+    "source_doc": "doc89.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "For which instance sizes does the matheuristic achieve near-optimal solutions?",
+    "answer_span": "The matheuristic produces near-optimal solutions only for the instances with 80 and 90 nodes",
+    "source_doc": "doc89.pdf",
+    "source_chunk_id": "fulldoc",
+    "page_num": -1,
+    "section_path": ""
+  }
+]
