@@ -28,8 +28,12 @@ arXiv 68 PDFs.
 
 ## Next
 
-1. **Re-run the section table on the full 126-doc PMC corpus — GPU.**
-   `notebooks/pmc_sections_colab.ipynb`, one-click. The current table is 24 docs and its
+1. **One GPU session closes the last two measurement gaps — `notebooks/pmc_sections_colab.ipynb`,
+   Run all, ~4 h.** §5–8 re-run the section table on the full 126-doc PMC corpus; §9–11 do
+   item 3. Ordered by value, both checkpointed to Drive, so a reclaimed session resumes.
+   After this the blocker is writing, not compute.
+
+   The section half: the current table is 24 docs and its
    ceiling file covers a different population (`reports/section_reachability.json` = 126
    docs, `reports/section_reachability_colab24.json` = the scored 24). The notebook
    asserts the fetched count before spending GPU time. This is the cheapest remaining
@@ -44,9 +48,14 @@ arXiv 68 PDFs.
    **borderless-table detection** (122 detected vs pdfplumber's 4 on `3M_2018_10K`) --
    the latter is still the cleanest remaining test of the model detector, now that three
    corpora have called it null.
-3. **Sweep `RELEVANCE_REGION_MIN_OVERLAP`** against real chunks. Every region
-   number, including our best result, currently rides on an unvalidated 0.7. The
-   reachability script cannot settle it — that question is circular on region gold.
+3. **Sweep `RELEVANCE_REGION_MIN_OVERLAP`** against real chunks — **same GPU session
+   as item 1**, §9–11 of the same notebook. Every region number, including our best
+   result, rides on an unvalidated 0.7. The reachability script cannot settle it (that
+   question is circular on region gold), and the existing region results carry no
+   `hyb_scores`, so the offline sweep has nothing to read. Needs one OHR-Bench re-run
+   under `--relevance region --dump-scores` (~2 h: `dump_scores` is part of the
+   checkpoint key by design, so it deliberately will not resume the 08-11 run).
+   Read the sweep for the plateau, not the peak.
 4. **Section *hierarchy* (paths), not just boundaries.** Boundary agreement is done
    (item 1); scoring the nesting — does chunk N sit under the right `SectionPath`? — is
    still open, and is still the metric no competitor in the table can report. The JATS
