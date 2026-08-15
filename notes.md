@@ -1338,3 +1338,24 @@ and asserts the count before spending the GPU time.
 
 **FinanceBench still has not run as a retrieval leaderboard**, and Stage 19 is why. The
 zip's name is misleading -- it contains no FinanceBench output at all.
+
+**Why it was 24 documents, found 2026-08-15.** Not NCBI throttling. `fetch_pmc.py` built
+its "already have" set from `reports/pmc_manifest.json`, which is committed -- so a fresh
+Colab clone claimed to own 133 papers it did not have a byte of, took the `fname in have`
+branch on every search hit, counted each one toward the per-journal quota *without
+downloading*, and exited reporting success having fetched nothing. The only PDFs present
+were the handful cached on Drive from earlier sessions.
+
+The script's own docstring already promised the right behaviour -- "re-running skips what
+is already **on disk**" -- so this was a bug against its documented contract, not a design
+choice. `prune_to_disk()` now drops manifest entries whose PDF *or* XML is missing before
+the set is built; disk is the only authority. Five tests, and a fresh-clone smoke against
+the live API: 133-entry manifest, empty `data/pmc/`, one paper requested, one PDF + one XML
+downloaded, manifest rewritten to 1 entry.
+
+**This is the second time this exact class has bitten** -- `fetch_dataset_v2.py` dedupes
+the internal arXiv corpus against its committed manifest the same way, which is why 27 of
+that gold's documents are missing on disk and will not re-download (to-do item 7). A
+committed manifest is a record of what was once fetched, never evidence of what is present.
+Both failures were silent and both produced a smaller corpus that looked like a complete
+run.

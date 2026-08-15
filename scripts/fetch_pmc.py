@@ -81,6 +81,25 @@ def search(journal: str, n: int, from_date: str, to_date: str) -> list[dict]:
     return json.loads(get(f"{SEARCH}?{q}"))["resultList"]["result"]
 
 
+def prune_to_disk(manifest: list[dict], pdf_dir: str) -> list[dict]:
+    """Drop manifest entries whose files are not actually present.
+
+    The manifest is committed, so a fresh clone claims to own 133 papers it does not
+    have a byte of. Trusting it made every search hit take the `fname in have` branch
+    in main(), which counts toward the per-journal quota *without downloading*: Colab
+    hit quota having fetched nothing, then scored 24 of 126 documents while looking
+    finished. Disk is the only authority on what is present.
+
+    Both halves must be present. A PDF whose XML never arrived has no gold, and
+    main() already deletes such pairs for that reason.
+    """
+    return [
+        m for m in manifest
+        if os.path.exists(os.path.join(pdf_dir, m["file"]))
+        and os.path.exists(os.path.join(pdf_dir, m["xml"]))
+    ]
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--per-journal", type=int, default=20)
@@ -97,6 +116,7 @@ def main() -> int:
     os.makedirs(PDF_DIR, exist_ok=True)
     os.makedirs(os.path.dirname(MANIFEST), exist_ok=True)
     manifest = json.load(open(MANIFEST, encoding="utf-8")) if os.path.exists(MANIFEST) else []
+    manifest = prune_to_disk(manifest, PDF_DIR)
     have = {m["file"] for m in manifest}
 
     for journal, slug in wanted.items():
