@@ -5,7 +5,19 @@
 </p>
 
 <p align="center">
+  <img src="docs/demo.gif" alt="DocStruct parsing a two-column PDF page: fused layout blocks, column-aware reading order, and the chunks they assemble into" width="620">
+</p>
+
+<p align="center">
+  <sub>A real page through the real pipeline — every box above is a
+  <code>run_pipeline()</code> result, not a mock-up.
+  Regenerate with <code>python scripts/make_readme_gif.py &lt;pdf&gt; --page 1</code>.</sub>
+</p>
+
+<p align="center">
   <a href="#benchmark">Benchmark</a> ·
+  <a href="paper/">Paper</a> ·
+  <a href="datasets/">Datasets</a> ·
   <a href="#install">Install</a> ·
   <a href="#quickstart">Quickstart</a> ·
   <a href="#how-it-works">How it works</a> ·
@@ -15,7 +27,7 @@
 <p align="center">
   <img alt="Python 3.11+" src="https://img.shields.io/badge/python-3.11%2B-blue">
   <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-green">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-143%20passing-brightgreen">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-220%20passing-brightgreen">
 </p>
 
 ---
@@ -58,9 +70,66 @@ other change combined.
 
 ## Benchmark
 
-92 born-digital PDFs, 558 LLM-generated Q&A pairs. The embedder and both
-retrievers are **held constant across every tool** — only the chunker varies — so
-the table measures chunking quality and nothing else.
+The embedder and both retrievers are **held constant across every tool** — only the
+chunker varies — so every table below measures chunking and nothing else.
+
+### The headline, and the catch: the relevance rule decides the winner
+
+OHR-Bench: 95 born-digital documents, **3,558 human-authored questions**, seven
+chunkers. All three columns are scored on **identical chunks** — only the rule that
+decides "is this chunk relevant?" changes.
+
+| Tool | `page` | `span` | `region` | ctx words |
+|---|---|---|---|---|
+| **docstruct** | 0.600 (6th) | **0.706 (1st)** | **0.666 (1st)** | 2194 |
+| docstruct_geo | 0.470 (7th) | 0.705 (2nd) | 0.657 (2nd) | 2328 |
+| pymupdf4llm | 0.668 | 0.699 (3rd) | 0.604 (3rd) | 2424 |
+| unstructured | **0.795 (1st)** | 0.654 | 0.601 | **561** |
+| langchain | 0.756 | 0.641 | 0.603 | 638 |
+| llamaindex | 0.729 | 0.648 | 0.589 | 1430 |
+| llamaindex_semantic | 0.652 | 0.654 | 0.575 | 4698 |
+
+**We are 1st of 7 under two rules and 6th of 7 under the third.** That is not noise
+and it is not a bug — no relevance rule is size-neutral. `span` rewards large chunks,
+`page` rewards small ones, and unstructured wins `page` with the smallest chunks in
+the field. A chunking leaderboard that reports one rule has reported a ranking *and*
+a size preference, tangled together.
+
+We could find no prior chunking evaluation that varies the rule, so we publish all
+three. Read [`memory/relevance-modes.md`](memory/relevance-modes.md) before quoting
+any row.
+
+Is our `region` win just a lucky threshold? No — swept 0.1→1.0, a DocStruct variant
+is **1st at all ten thresholds** ([`reports/ohr_region_threshold_sweep.json`](reports/ohr_region_threshold_sweep.json)).
+Worth stating plainly: 0.7 is where our margin happens to peak.
+
+### Section boundaries, with no retriever involved
+
+Do the chunk boundaries land where the *document's own* boundaries land? Scored
+against section boundaries the publishers wrote in JATS XML for **134 PubMed Central
+papers** — gold that predates this project and was written for an unrelated purpose.
+Pk and WindowDiff are **error** rates; lower is better.
+
+| Tool | WindowDiff | Pk | Chunks | Docs |
+|---|---|---|---|---|
+| **docstruct_geo** | **0.4226** | **0.3418** | 26.8 | 134 |
+| pymupdf4llm | 0.4800 | 0.4490 | 17.7 | 134 |
+| **docstruct** | 0.4818 | 0.3531 | 37.5 | 134 |
+| llamaindex_semantic | 0.5337 | 0.5128 | 29.1 | 134 |
+| llamaindex | 0.6952 | 0.5979 | 42.7 | 134 |
+| langchain | 0.8787 | 0.6200 | 85.6 | 134 |
+| unstructured | 0.8933 | 0.6025 | 106.9 | **99** |
+
+No embedder, no relevance rule, nothing of ours in the gold. Two caveats we'd rather
+state than have found: WindowDiff punishes over-segmentation, so read it beside Pk or
+not at all; and unstructured's row covers 99 of 134 documents because it hard-failed
+on 35 (26%).
+
+### Internal corpus (ablations only)
+
+92 born-digital arXiv PDFs, 558 **LLM-generated** Q&A pairs. The gold is synthetic, so
+by our own rule this carries no headline claim — it is here because ablations only need
+our own configurations to be comparable to each other.
 
 | Rank | Tool | MRR | 95% CI | NDCG@5 | Recall@5 | Hit@1 | Avg words/chunk | Context words |
 |---|---|---|---|---|---|---|---|---|
@@ -96,10 +165,18 @@ of the document's words (it splits raw text and drops nothing); DocStruct keeps
 emitted table chunks). DocStruct wins *retrieval*, not raw preservation — the
 report's extraction-fidelity table states this without spin.
 
-Full run with per-document breakdowns, the paired-significance table, extraction
-fidelity, and the config snapshot that produced it:
-[`reports/v6_report.md`](reports/v6_report.md). How the numbers got there, and what
-was tried and abandoned: [`notes.md`](notes.md).
+Full runs with per-document breakdowns, paired-significance tables, extraction
+fidelity and the config snapshot that produced each one:
+[`reports/`](reports/). The write-up is [`paper/main.tex`](paper/main.tex); the
+corpora and their checksums are [`datasets/`](datasets/). How the numbers got there,
+and what was tried and abandoned: [`notes.md`](notes.md).
+
+**Known defects, found and recorded rather than fixed quietly:** a layout block that
+spans both columns can have its text extracted across the gutter, interleaving the two
+columns into an unreadable section heading (2 of 76 chunks on the demo document); and
+full-width elements above a two-column body — a paper title, an author block — are
+ordered after the columns rather than before. Both are in
+[`to-do.md`](to-do.md).
 
 ## Install
 
@@ -325,7 +402,7 @@ python scripts/ablate.py --name min300 --set MIN_CHUNK_TOKENS=300
 
 ```
 docstruct/          the library (geometry, model, fusion, chunking, eval, cli)
-tests/              pytest suite, 143 tests
+tests/              pytest suite, 220 tests
 scripts/            corpus fetching and single-tool ablation runner
 tools/annotate.html browser UI for correcting detection ground truth
 reports/            benchmark reports, each with its full config snapshot
@@ -339,7 +416,7 @@ implementation_plan.md   standing plan-vs-code audit
 ```bash
 python -m venv .venv && .venv/Scripts/activate      # Windows
 pip install -e ".[all]"
-pytest -q                                            # ~143 tests, ~3 min
+pytest -q                                            # 220 tests, ~4 min
 ```
 
 Tests that need optional extras, real PDFs or an LLM self-skip when those are
