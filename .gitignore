@@ -76,3 +76,17 @@ data/pmc/
 ohr_results.zip
 data/qa/pmc_sections.json
 .cache/
+
+# LaTeX build artefacts (main.pdf is committed deliberately; the rest is derived)
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.out
+paper/*.toc
+paper/*.fls
+paper/*.fdb_latexmk
+
+# Result bundles downloaded from Colab -- unpack into reports/ instead
+docstruct_results*.zip
+docstruct_gpu_results.zip
+ohr_results.zip
