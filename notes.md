@@ -8,11 +8,28 @@
 
 # CURRENT STATUS — 2026-08-16
 
+## Every internal-corpus number is withdrawn (2026-08-16)
+
+The v6 corpus was confirmed broken by running the real code path rather than comparing
+filenames: `doc1.pdf` and `doc10.pdf` score 0/8 hits, MRR 0.0, because the files on
+disk are different papers than the gold was written from. `doc100.pdf` — one of the 9
+newer documents — scores 5/5, MRR 1.0, so only the older gold is affected.
+
+Withdrawn: the five-tool internal table, the +0.0429 / +0.0138 / −0.0101 ablation
+deltas, and the vision detector's +0.0443. The 56-document re-measurement is withdrawn
+too, since it used the same v6 gold. Coverage and duplication are now quoted from
+OHR-Bench (0.9632 / 1.83) instead of the internal table (0.817 / 2.06).
+
+Gold is being regenerated with `gpt-oss:120b` over the 102 PDFs actually held
+(`data/qa/benchmark_qa_v9.json`), from each document's full raw text and never from any
+tool's chunks. The stages below are the historical record and are left as written.
+
 ## The paper is submittable today
 
-`paper/main.tex` → 8 pages, builds clean, 0 undefined references, no `TODO` renders.
-Reframed around the finding rather than the system: *The Relevance Rule Decides the
-Leaderboard: Seven PDF Chunkers, Identical Chunks, Three Rankings*.
+`paper/main.tex` → 8 pages, builds clean, 0 undefined references. Reframed around the
+finding rather than the system: *The Relevance Rule Decides the Leaderboard: Seven PDF
+Chunkers, Identical Chunks, Three Rankings*. Internal-corpus figures are replaced by
+`\todo{}` markers pending the regeneration above; every external result stands.
 
 | Result | Number | Corpus |
 |---|---|---|

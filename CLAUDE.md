@@ -71,7 +71,8 @@ was updated last.
    the output of a tool being benchmarked. Prefer a public human-annotated corpus
    (FinanceBench first — see `memory/benchmark-datasets.md`) over LLM-generated gold
    for any headline number in the paper.
-9. **Report the losses.** Coverage 0.817 vs LangChain's 1.00, duplication 2.06, no
+9. **Report the losses.** Coverage 0.9632 vs LangChain's 1.00 and duplication 1.83
+   (both OHR-Bench; the old 0.817/2.06 came from the withdrawn internal table), no
    parse-fidelity number, born-digital only, **6th of 7 under page relevance**, and
    **the model detector is not significant on any corpus but arXiv** — +0.0012 span /
    +0.0090 region on OHR-Bench, and on PMC section boundaries geometry-only *beats*

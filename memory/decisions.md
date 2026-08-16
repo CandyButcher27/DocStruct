@@ -30,8 +30,9 @@ dropped 28% of content and are no longer imported by `pipeline.py` (kept in the
 module, unit-tested, unused). The *label-aware* successor `suppress_text_in_tables`
 (gated `LABEL_AWARE_CONTAINMENT`, default off) answers the "which nested regions are
 real duplicates" question with the one provably-safe case: a text block ≥90% inside a
-table whose serialized text already covers its words. Targets the benchmark's 2.06×
-duplication; every other nested case is still left alone. Awaiting the sweep.
+table whose serialized text already covers its words. Targets our duplication cost
+(1.83× on OHR-Bench, the highest of the seven); every other nested case is still left
+alone. Awaiting the sweep.
 
 ### Section-path breadcrumb injection into chunk text — reverted
 Prepending `[Section: h1 > h2]` to chunk bodies. Reverted in `c11e091`.
@@ -75,7 +76,8 @@ recorded here so nobody re-derives it or quotes the arXiv number as universal.
 
 `docstruct` vs `docstruct_geo` on OHR-Bench: **+0.0012 MRR under `span` (p=0.80)
 and +0.0090 under `region` (p=0.12)** — neither significant, on 3,558 questions.
-The internal arXiv corpus says +0.0443 (p=0.0026), and OHR-Bench `page` says
+The internal arXiv corpus said +0.0443 (p=0.0026) — **withdrawn, being re-measured**
+(`memory/results.md`) — and OHR-Bench `page` says
 +0.1305, but page mode rewards chunk count and geometry-only emits 5,810 chunks
 against hybrid's 9,080, so that one is an artefact of the rule. Under `region`,
 geometry-only is *ahead* on table-sourced questions (0.3868 vs 0.3655).
