@@ -40,8 +40,8 @@
 \newcommand{\dsg}{\textsc{DocStruct}-\textsc{geo}}
 \newcommand{\best}[1]{\textbf{#1}}
 
-\title{\vspace{-2em}\ds{}: Deterministic Structure-Aware Chunking of\\
-       Born-Digital PDFs for Retrieval-Augmented Generation}
+\title{\vspace{-2em}The Relevance Rule Decides the Leaderboard:\\
+       Seven PDF Chunkers, Identical Chunks, Three Rankings}
 
 \author{
   Aryaman Srivastava\\
@@ -55,37 +55,34 @@
 \maketitle
 
 \begin{abstract}
-Retrieval-augmented generation over PDFs is usually built on two stages that both
-discard structure: a parser flattens the PDF to text, and a generic splitter cuts
-that text at fixed lengths. The resulting chunks straddle section boundaries,
-interleave the columns of a two-column page, and separate tables from their
-headers. Recent work responds by placing a language model inside the segmentation
-loop, which raises recall but makes chunk boundaries non-deterministic, costly, and
-bound to a model version.
+Chunking decides what a retrieval-augmented system can retrieve, and chunkers are
+compared on leaderboards. We show those leaderboards are underdetermined by their own
+evaluation design. Scoring seven PDF chunkers on \emph{identical chunks} over 95
+documents and 3{,}558 human-authored questions, we find the ranking \emph{inverts}
+depending only on the rule used to decide whether a retrieved chunk is relevant: the
+tool that places 1st of 7 under span and region relevance places 6th of 7 under page
+relevance, and the tool it displaces is its exact mirror. No relevance rule is
+size-neutral --- span rewards large chunks, page rewards small ones --- so a
+single-rule comparison reports a size preference and a ranking entangled, without
+separating them. We could find no prior chunking evaluation that varies the rule.
 
-We present \ds{}, a fully local, deterministic, structure-aware chunker for
-born-digital PDFs. \ds{} fuses two mutually blind layout detectors --- a rules-based
-geometric detector over PDF primitives and an optional DocLayNet-trained vision
-detector --- into one confidence-scored block sequence, assigns reading order and a
-section hierarchy, and assembles chunks under a size floor that allows structural
-boundaries to be crossed rather than obeyed blindly. No language model is invoked on
-the parse path: the same PDF yields identical chunks on every run.
+The instrument for this result is \ds{}, a fully local, deterministic,
+structure-aware chunker for born-digital PDFs. It fuses a rules-based geometric
+detector over PDF primitives with an optional DocLayNet-trained vision detector,
+recovers reading order and section hierarchy, and assembles chunks under a size floor.
+No language model is invoked on the parse path, and the resulting determinism is
+measured rather than asserted: across 95 documents parsed twice in independent
+processes, all 5{,}810 chunks per run were byte-identical.
 
-We hold the embedder and both retrievers fixed across every tool, so the leaderboard
-measures chunking and nothing else. Our central finding is methodological and
-negative: \emph{on identical chunks, the ranking of seven chunkers inverts depending
-on which relevance rule scores them}. On OHR-Bench (95 documents, 3{,}558 human
-questions) \ds{} places 1st of 7 under span and region relevance and 6th of 7 under
-page relevance. We therefore report all three, and argue that any single-mode
-chunking leaderboard --- including several in the recent literature --- is
-underdetermined. We further evaluate without a retriever at all, against 134 PubMed
-Central papers whose section boundaries were annotated by their own publishers in
-JATS XML; there \dsg{} leads both Pk ($0.342$) and WindowDiff ($0.423$). A threshold
-sweep confirms the region result is not an artefact of an unvalidated constant: a
-\ds{} variant places 1st at all ten thresholds. We report where we lose:
-$81.7\%$ word coverage against LangChain's $100\%$, the highest chunk duplication in
-the comparison, $3.9\times$ the context cost of the most efficient baseline, and a
-vision detector that is significant on arXiv but null on three other corpora.
+To evaluate chunking without a relevance rule at all, we also score chunk boundaries
+against section boundaries authored by publishers in JATS XML for 134 PubMed Central
+papers --- gold written for an unrelated purpose, before this benchmark existed ---
+using the standard segmentation error rates Pk and WindowDiff. \ds{} leads both.
+We report where the approach does not pay: a vision detector that is significant on
+arXiv and null on three other corpora, $3.9\times$ the context cost of the leanest
+baseline, $81.7\%$ word coverage against LangChain's $100\%$, and a widely used
+financial corpus that turns out to be unusable as a retrieval benchmark under a
+fixed-embedder protocol.
 \end{abstract}
 
 % =====================================================================
@@ -144,28 +141,35 @@ is what makes their agreement informative.}
 
 \paragraph{Contributions.}
 \begin{enumerate}\itemsep2pt
-  \item \textbf{A deterministic structure-aware chunker} that fuses a geometric and
-  a vision layout detector into one block sequence, recovers reading order and
-  section hierarchy, and assembles chunks under a size floor
-  (\S\ref{sec:pipeline}).
+  \item \textbf{Chunking leaderboards are underdetermined by their relevance rule,
+  and we measure it.} On identical chunks over 95 documents and 3{,}558 human
+  questions, the ranking of seven tools inverts between span, region and page
+  relevance: \ds{} is 1st of 7 under two rules and 6th of 7 under the third, and
+  unstructured is its exact mirror (\S\ref{sec:relevance}). We can find no prior
+  chunking evaluation that reports more than one rule. A sweep over the region
+  threshold (\S\ref{sec:sweep}) shows this is a property of the \emph{rule}, not of a
+  badly chosen constant.
 
-  \item \textbf{A measured demonstration that chunking leaderboards are
-  underdetermined by their relevance rule.} On identical chunks, the ranking of
-  seven tools inverts between span, region and page relevance: \ds{} is 1st of 7
-  under two rules and 6th of 7 under the third (\S\ref{sec:relevance}). We can find
-  no prior chunking evaluation that reports more than one rule.
+  \item \textbf{A way to evaluate chunkers with no relevance rule at all.} We score
+  chunk boundaries against section boundaries authored by publishers in JATS XML for
+  134 PubMed Central papers, using the standard segmentation error rates Pk and
+  WindowDiff (\S\ref{sec:sections}). No embedder, no relevance rule, and gold written
+  for an unrelated purpose before this benchmark existed.
 
-  \item \textbf{A retriever-free structural metric.} We score chunk boundaries
-  against section boundaries authored by publishers in JATS XML for 134 PubMed
-  Central papers, using the standard segmentation error rates Pk and
-  WindowDiff (\S\ref{sec:sections}). No embedder, no relevance rule, and gold that
-  predates the benchmark.
+  \item \textbf{\ds{}, the instrument}: a deterministic, fully local,
+  structure-aware chunker that fuses a geometric and a vision layout detector,
+  recovers reading order and section hierarchy, and assembles chunks under a size
+  floor (\S\ref{sec:pipeline}). Its determinism is measured, not asserted --- 95
+  documents, two independent processes, 5{,}810 byte-identical chunks per run
+  (\S\ref{sec:determinism}) --- which is a row no LLM-segmented or
+  embedding-clustered chunker can fill.
 
-  \item \textbf{A negative-results section that we consider load-bearing}
+  \item \textbf{Results against our own system, reported in the main text}
   (\S\ref{sec:negative}): the vision detector is significant on arXiv and null on
   three other corpora; our context cost is $3.9\times$ the leanest baseline; our word
-  coverage is $81.7\%$ against LangChain's $100\%$; and a widely-used external corpus
-  turns out to be unusable as a retrieval benchmark at all.
+  coverage is $81.7\%$ against LangChain's $100\%$; and a widely-used financial corpus
+  turns out to be unusable as a retrieval benchmark under a fixed-embedder protocol,
+  where a published paper reports MRR $0.700$--$0.844$ on the same files.
 \end{enumerate}
 
 % =====================================================================
@@ -614,7 +618,7 @@ because it motivates the reachability ceilings we now compute before every
 leaderboard.
 
 % =====================================================================
-\section{Negative and Cautionary Results}
+\section{Where the approach does not pay}
 \label{sec:negative}
 
 \subsection{The vision detector does not generalise}
@@ -677,7 +681,7 @@ different retrievers, page-level gold'' caveat concrete rather than rhetorical, 
 it is a caution to anyone reading cross-paper numbers on this corpus.
 
 % =====================================================================
-\section{Limitations}
+\subsection{Standing limitations}
 \label{sec:limitations}
 
 \textbf{Born-digital only.} \ds{} reads PDF primitives, so scanned documents without
@@ -746,31 +750,35 @@ name is \texttt{docstruct}.
 % =====================================================================
 \section{Conclusion}
 
-Structure in a born-digital PDF is already in the file. \ds{} recovers it with
-geometry and rules, producing chunks that are deterministic, local and auditable,
-and that outperform five widely-used chunkers on human-annotated retrieval gold
-under two of three relevance rules --- and on publisher-authored section boundaries
-with no retriever involved at all.
+The result we would most like carried forward is not a leaderboard position. It is
+that \emph{the leaderboard depends on the relevance rule} --- measurably, reversibly,
+on chunks that never changed. A chunking comparison that reports one rule has reported
+a ranking and a size preference entangled together, and since no rule is size-neutral,
+that entanglement is not a detail. It can reverse the conclusion. Until reporting more
+than one rule is standard practice, chunker comparisons --- including ours --- should
+be read with the rule in view.
 
-The result we would most like carried forward is not the leaderboard. It is that
-\emph{the leaderboard depends on the relevance rule}, measurably and reversibly, on
-identical chunks. Chunking evaluations that report a single rule are reporting a
-size preference alongside a ranking, without separating them. Until that is standard
-practice, chunker comparisons --- including ours --- should be read with the rule in
-view.
+Two smaller things follow from having built an instrument careful enough to show it.
+Publisher-authored JATS structure gives a way to score chunk boundaries with no
+retriever and no relevance rule in the loop, which sidesteps the question of who wrote
+the gold. And determinism, when a pipeline has no model on its parse path, is not a
+slogan but a property that can be checked in an afternoon: 95 documents, two
+independent processes, 5{,}810 identical chunks.
 
-\paragraph{Open work.} Two items on our own pre-submission list remain undone, and
-both are measurement rather than writing. \textbf{Token-level IoU and
+\ds{} itself is a competent structure-aware chunker that wins where the rules favour
+large structural units and loses where they favour small ones. That is a narrower
+claim than "it is the best chunker", and it is the one the evidence supports.
+
+\paragraph{Open work.} Two items on our pre-submission list remain undone, and both
+are measurement rather than writing. \textbf{Token-level IoU and
 Precision$_\Omega$}~\citep{smith2024chunking} are the published vocabulary for
-``rank quality per token spent'', and would replace the homemade MRR-per-1k-words
-column in Figure~\ref{fig:cost}. We did not compute them: our dumped runs record the
-overlap \emph{score} behind each retrieved chunk but not the chunk and gold token sets
-themselves, so the metric needs a re-run rather than a re-analysis, and we would rather
-report it missing than approximate it and call it Chroma's.
-\textbf{DocLayNet's validation split} is the right home for the detection-layer mAP
-that currently rests on two hand-annotated documents, and is also the only cheap route
-to calibrating the fusion constants named in \S\ref{sec:pipeline}. Both are scoped and
-neither is started.
+``rank quality per token spent'' and would replace the homemade MRR-per-1k-words
+column in Figure~\ref{fig:cost}; our dumped runs record the overlap \emph{score}
+behind each retrieved chunk but not the chunk and gold token sets, so the metric needs
+a re-run rather than a re-analysis, and we would rather report it missing than
+approximate it. \textbf{DocLayNet's validation split} is the right home for the
+detection-layer mAP that currently rests on two hand-annotated documents, and the only
+cheap route to calibrating the fusion constants of \S\ref{sec:pipeline}.
 
 \bibliographystyle{plainnat}
 \bibliography{refs}

@@ -127,7 +127,15 @@ hybrid path is *not* deterministic, that is a genuine finding and it must go in 
 paper — it would mean the determinism guarantee holds for `docstruct_geo` and is
 qualified for `docstruct`. Better to find that yourself than have a reviewer find it.
 
-### 3.2 Reframe. (~3 hours, pure writing, zero new measurement)
+### 3.2 ~~Reframe~~ — **DONE 2026-08-16**
+
+Abstract rewritten to lead with the finding; §6 retitled "Where the approach does
+not pay"; Limitations merged into it so the paper stops apologising twice;
+contributions reordered so the method finding is #1 and DocStruct is #3, "the
+instrument". Original plan below.
+
+<details><summary>original entry</summary>
+
 
 - Rewrite the abstract to lead with what was found, not with the word *negative*.
   Current: *"Our central finding is methodological and negative."*
@@ -141,7 +149,15 @@ qualified for `docstruct`. Better to find that yourself than have a reviewer fin
 - Cut the total self-criticism budget by roughly a third. Every caveat currently in
   there is *true*; the problem is the ratio, not the content.
 
-### 3.3 Sharpen the title and the claim. (~1 hour)
+</details>
+
+### 3.3 ~~Sharpen the title and the claim~~ — **DONE 2026-08-16**
+
+Title is now *The Relevance Rule Decides the Leaderboard: Seven PDF Chunkers,
+Identical Chunks, Three Rankings*. Original reasoning below.
+
+<details><summary>original entry</summary>
+
 
 The current title sells the system. The contribution is the method finding. Consider:
 
@@ -151,6 +167,8 @@ The current title sells the system. The contribution is the method finding. Cons
 This is the strategic call in the whole document. Framing the paper around the method
 finding makes a modest system result into a supporting exhibit, instead of making the
 method finding into a caveat on a modest system result. **Recommended.**
+
+</details>
 
 ---
 
