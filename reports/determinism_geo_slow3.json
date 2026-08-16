@@ -1,0 +1,15 @@
+{
+  "pdfs_dir": "C:/Users/sriva/AppData/Local/Temp/claude/slow3",
+  "mode": "geometry-only",
+  "runs": 2,
+  "n_documents": 3,
+  "n_scored": 3,
+  "identical": 3,
+  "differing": 0,
+  "failed": 0,
+  "total_chunks_per_run": 1338,
+  "agreement_pct": 100.0,
+  "differing_docs": [],
+  "failed_docs": [],
+  "seconds": 185.9
+}

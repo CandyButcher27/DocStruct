@@ -90,10 +90,14 @@ the fastest way to get desk-rejected.
 
 ### 3.1 ~~Prove determinism~~ — **DONE 2026-08-16**
 
-92/92 documents byte-identical across independent processes, 4,472 chunks per run, 0
-differing. Now §5.5 of the paper and `reports/determinism_geo.json`. Three dense
-financial filings exceeded a 30-minute parse cap and are excluded from the 92 — that
-timeout is itself reported, as the performance limitation it is.
+**95/95** documents byte-identical across independent processes, **5,810 chunks per
+run**, 0 differing. Now §5.5 of the paper and `reports/determinism.json`. The three
+dense financial filings that blew a 30-minute cap finished under a 4-hour one and also
+matched; that cost is reported in Limitations.
+
+Unplanned cross-check: 5,810 is exactly the `n_chunks` recorded for `docstruct_geo` in
+the OHR-Bench retrieval run days earlier, on different hardware through a different
+code path.
 
 Still open on this item: the **hybrid path is unverified** (no GPU on the dev machine;
 CUDA kernel selection is not guaranteed bit-reproducible). The paper claims determinism

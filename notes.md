@@ -1532,11 +1532,11 @@ digest of the content. Two runs agree only if every chunk matches on all of them
 
 | | |
 |---|---|
-| documents scored | **92 of 95** |
-| byte-identical across independent processes | **92 (100.0%)** |
+| documents scored | **95 of 95** |
+| byte-identical across independent processes | **95 (100.0%)** |
 | differing | **0** |
-| chunks per run | 4,472 |
-| wall time | 6,810 s (~1h 53m, 6 workers) |
+| chunks per run | 5,810 |
+| wall time | 6,810 s for 92 docs + a 4h-cap re-run for the last 3 |
 
 **This is now a table row no LLM- or embedding-based chunker can fill**, and it is
 cheap to re-verify. It also closes the largest hole in the paper: a contract asserted
@@ -1549,8 +1549,12 @@ whole story — the corpus's largest document, at 382 pages, parsed fine. It is 
 density, which matches Stage 18: the cost is in materialising vector primitives, and
 financial filings are wall-to-wall ruled tables.
 
-They are re-running with a 4-hour cap to get the number to 95/95. Whatever comes back,
-**the timeout itself is reportable**: these are the same documents FinanceBench is made
+Re-run with a 4-hour cap: **3/3 identical, 1,338 chunks**, so the corpus total is
+**95/95 and 5,810 chunks**. And that total is an unplanned cross-check --- 5,810 is
+exactly the `n_chunks` recorded for `docstruct_geo` in `reports/ohr_results_span.json`,
+a run made days earlier on Colab through the benchmark harness rather than through
+`parse()`. Two independent paths agreeing to the chunk is better evidence than either
+alone. **The timeout is still reportable**: these are the same documents FinanceBench is made
 of, so "DocStruct is slow on long financial filings" is now measured on two independent
 corpora rather than asserted from one anecdote.
 

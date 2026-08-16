@@ -550,10 +550,15 @@ anything that varies across a process boundary, which is where non-determinism c
 from --- hash seeds, iteration order over addresses, thread scheduling, kernel
 selection.
 
-\textbf{92 of 92 scored documents were byte-identical, across 4{,}472 chunks per run
---- 100\%, with zero differing documents.} Three documents are excluded because they
-exceeded a 30-minute per-parse cap, not because they disagreed; \S\ref{sec:limitations}
-returns to them.
+\textbf{All 95 documents were byte-identical, across 5{,}810 chunks per run --- 100\%,
+with zero differing documents.} Three dense financial filings needed a raised per-parse
+cap to finish at all, and \S\ref{sec:limitations} reports that cost; none of them
+disagreed.
+
+The chunk total is an unplanned cross-check. 5{,}810 is exactly the chunk count recorded
+for \dsg{} in the OHR-Bench retrieval run of Table~\ref{tab:ohr}, produced days earlier
+on different hardware by a different code path. Two independent runs agreeing to the
+chunk is the kind of evidence a determinism claim wants.
 
 Two limits belong with the claim rather than after it. Determinism holds \emph{within}
 a version: a release that changes chunking changes boundaries, so a persisted index
@@ -695,7 +700,8 @@ says, even though the PMC structural result is strong.
 18-page paper takes roughly 8 minutes to parse, dominated by materialising 422k vector
 primitives, and this is on the user-facing \texttt{parse()} path rather than only the
 benchmark. The determinism run (\S\ref{sec:determinism}) put a number on the tail:
-three of 95 documents exceeded a 30-minute per-parse cap, all dense financial filings
+three of 95 documents exceeded a 30-minute per-parse cap and needed four hours to
+finish, all dense financial filings
 ---
 \texttt{JPMORGAN\_2022Q2\_10Q} (197 pages), \texttt{JPMORGAN\_2023Q2\_10Q} (217) and
 \texttt{VERIZON\_2021\_10K} (120) --- against a corpus median of 18 pages. Page count

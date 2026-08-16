@@ -1,0 +1,19 @@
+{
+  "pdfs_dir": "data/ohrbench",
+  "mode": "geometry-only",
+  "runs": 2,
+  "n_documents": 95,
+  "n_scored": 95,
+  "identical": 95,
+  "differing": 0,
+  "failed": 0,
+  "total_chunks_per_run": 5810,
+  "agreement_pct": 100.0,
+  "seconds": 6995.8,
+  "note": "merged from determinism_geo.json (92 docs, 30-min cap) and determinism_geo_slow3.json (3 dense financial filings, 4h cap). total_chunks_per_run matches docstruct_geo n_chunks in ohr_results_span.json exactly, an independent cross-check.",
+  "slow_documents": [
+    "finance__JPMORGAN_2022Q2_10Q.pdf",
+    "finance__JPMORGAN_2023Q2_10Q.pdf",
+    "finance__VERIZON_2021_10K.pdf"
+  ]
+}
