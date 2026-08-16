@@ -98,12 +98,11 @@ stream every $N$ characters, with a separator preference list as the only conces
 to structure. Neither stage has a representation of ``section'', ``table'' or
 ``column''.
 
-The consequences are visible in any real corpus. On a two-column paper,
-\texttt{page.extract\_text()} welds the two columns into single unreadable lines; a
-chunk boundary lands mid-sentence because a character budget expired; a table is
-severed from the header row that gives its columns meaning. Each failure degrades
-retrieval in a way that is invisible to the parser's own metrics, because the parser
-was never asked to preserve structure --- only characters.
+The consequences are visible in any real corpus: \texttt{page.extract\_text()} welds a
+two-column page into unreadable lines, a chunk boundary lands mid-sentence because a
+character budget expired, a table is severed from the header row that gives its columns
+meaning. Each failure is invisible to the parser's own metrics, because the parser was
+never asked to preserve structure --- only characters.
 
 Recent work responds by making segmentation semantic: an LLM judges where topics
 change~\citep{duarte2024lumberchunker}, or an embedding model clusters sentences into
@@ -128,7 +127,7 @@ local, fully auditable.}
 
 \begin{figure*}[t]
 \centering
-\includegraphics[width=\textwidth]{pipeline.pdf}
+\includegraphics[width=0.92\textwidth]{pipeline.pdf}
 \caption{\ds{} on one page of a two-column paper. (a) the page as the PDF ships it;
 (b) blocks after the geometric and vision detectors are fused, coloured by label;
 (c) the column-aware reading order and the chunks the blocks assemble into. Every box
@@ -187,12 +186,11 @@ parse-fidelity number, which we list as a limitation (\S\ref{sec:limitations}).
 
 \paragraph{Layout datasets and detectors.}
 PubLayNet~\citep{zhong2019publaynet}, DocBank~\citep{li2020docbank} and
-DocLayNet~\citep{pfitzmann2022doclaynet} provide page-level layout supervision;
-PubTables-1M~\citep{smock2022pubtables} and SciTSR~\citep{chi2019scitsr} target
-tables. Our optional vision detector is a YOLO model trained on DocLayNet. We use
-such a detector as \emph{one of two} evidence sources rather than the sole one,
-which is what allows the pipeline to degrade to a rules-only mode with no model
-weights present.
+DocLayNet~\citep{pfitzmann2022doclaynet} provide layout supervision;
+PubTables-1M~\citep{smock2022pubtables} and SciTSR~\citep{chi2019scitsr} target tables.
+Our vision detector is a YOLO model trained on DocLayNet, used as \emph{one of two}
+evidence sources rather than the only one, which is what lets the pipeline degrade to
+a rules-only mode with no weights present.
 
 \paragraph{Chunking strategies.}
 LumberChunker~\citep{duarte2024lumberchunker} uses an LLM to locate topic shifts.
@@ -228,58 +226,45 @@ chunkers against publisher-authored document structure, which is what
 \section{The \ds{} Pipeline}
 \label{sec:pipeline}
 
-\ds{} is a six-stage pipeline. Every threshold it uses lives in a single
-\texttt{config.py}, and every tuned constant carries a comment naming the
-measurement that chose it.
+Figure~\ref{fig:pipeline} shows the stages on a real page; this section states what
+each one is for. Every threshold lives in a single \texttt{config.py}, and every
+tuned constant carries a comment naming the measurement that chose it.
 
-\subsection{Two mutually blind detectors}
-The \emph{geometric} detector reads PDF primitives directly through
-\texttt{pdfplumber}: character positions, font names and sizes, ruling lines and
-rectangles. It proposes blocks from font-size clustering, vertical whitespace runs
-and ruling geometry. It is exact where the PDF is well-formed and blind where
-structure is implied only visually --- a borderless table, for instance, has no
-ruling lines to find.
-
-The \emph{vision} detector is a YOLOv8m trained on DocLayNet, run over page
-rasters. It proposes the same block types from appearance alone. It is blind to
-everything the geometric detector reads directly, and it is optional: with no
-weights present the pipeline runs geometry-only, which we report throughout as
+\paragraph{Two mutually blind detectors.} The \emph{geometric} detector reads PDF
+primitives through \texttt{pdfplumber} --- character positions, font names and sizes,
+ruling lines --- and proposes blocks from font-size clustering, whitespace runs and
+ruling geometry. It is exact where the PDF is well-formed and blind where structure is
+only implied visually: a borderless table has no rules to find. The \emph{vision}
+detector, a YOLOv8m trained on DocLayNet, proposes the same block types from page
+rasters and appearance alone. Each is blind to what the other reads directly, which is
+what makes their agreement informative rather than redundant. The vision detector is
+optional; with no weights the pipeline runs geometry-only, reported throughout as
 \dsg{}.
 
-The two are mutually blind by construction, which is what makes their agreement
-informative rather than redundant.
+\paragraph{Fusion.} Proposals are matched by IoU and merged into one block sequence,
+each block carrying a confidence derived from whether one or both detectors saw it and
+how well they agreed. Coordinates are top-left throughout, matching
+\texttt{pdfplumber}; model output is transformed on the way in. The scale factors for a
+unilateral detection and the clamps on the resulting confidence are inherited from a
+prototype and remain marked \texttt{\# unvalidated}: we have no annotated layout gold
+at the scale needed to tune them (\S\ref{sec:limitations}).
 
-\subsection{Fusion}
-Proposals are matched by IoU and merged into a single sequence of blocks, each
-carrying a confidence derived from whether one or both detectors saw it and how well
-they agreed. Coordinates are top-left throughout ($y_0$ = top, $y$ increasing
-downward), matching \texttt{pdfplumber}; model output is transformed on the way in.
-The scale factors applied to a unilateral detection, and the clamp ranges on the
-resulting confidence, are inherited from a prototype and are still marked
-\texttt{\# unvalidated} in \texttt{config.py}. They were never tuned against
-annotated layout gold, because we have none at the scale required; \S\ref{sec:limitations}
-returns to this.
+\paragraph{Reading order and hierarchy.} Blocks are ordered by a column-aware sweep
+that infers column bands from the $x$ distribution and reads each band top-to-bottom
+before moving right. Headings are classified by relative font size and weight, and
+each block gets a \texttt{SectionPath} --- the stack of headings above it. We
+evaluated recursive XY-cut as an alternative and \emph{rejected} it: $-0.0101$ MRR on
+our internal corpus.
 
-\subsection{Reading order and hierarchy}
-Blocks are ordered by a column-aware sweep that detects column bands from the $x$
-distribution and reads each band top-to-bottom before moving right. Headings are
-classified by relative font size and weight, and each block is assigned a
-\texttt{SectionPath} --- the stack of headings above it. We evaluated recursive
-XY-cut as an alternative and \emph{rejected} it: it cost $-0.0101$ MRR on our
-internal corpus (\S\ref{sec:internal}).
+\paragraph{Extraction and chunk assembly.} Text is extracted per block with a
+font-scaled word-gap tolerance, which recovers spacing a fixed tolerance mis-splits on
+display type. Chunks are then assembled by walking blocks in reading order and closing
+a chunk when a structural boundary is reached \emph{and} the accumulated content
+exceeds \texttt{MIN\_CHUNK\_TOKENS}. That floor is the single most valuable decision in
+the system: flushing on every structural boundary scored $0.6890$ MRR, and adding the
+floor with inline headers moved it to $0.7319$ ($+0.0429$). Tables are emitted as their
+own chunks with their header rows attached.
 
-\subsection{Extraction and chunk assembly}
-Text is extracted per block with a font-scaled word-gap tolerance, which recovers
-inter-word spacing that a fixed tolerance mis-splits on large display type.
-
-Chunks are then assembled by walking blocks in reading order and closing a chunk when
-a structural boundary is reached \emph{and} the accumulated content exceeds
-\texttt{MIN\_CHUNK\_TOKENS}. This floor is the single most valuable decision in the
-system: flushing on every structural boundary was worth $0.6890$ MRR, and adding the
-floor together with inline headers moved it to $0.7319$ ($+0.0429$). Tables are
-emitted as their own chunks with their header rows attached.
-
-% =====================================================================
 \section{Experimental Setup}
 \label{sec:setup}
 
@@ -309,12 +294,10 @@ strongest form of tool-agnostic gold available to us: it is not merely
 not-ours, it predates the benchmark and was written for an unrelated purpose.
 
 \textbf{An internal corpus} of 92 born-digital arXiv PDFs with 558 LLM-generated
-question--span pairs is retained for ablations only. Its gold is generated, so
-per our own rule it never carries a headline number.
-
-\textbf{FinanceBench}~\citep{islam2023financebench} was intended as a second
-external leaderboard and is \emph{not} used as one. \S\ref{sec:financebench}
-reports why.
+question--span pairs is used for ablations only: its gold is generated, so by our own
+rule it never carries a headline number. \textbf{FinanceBench}~\citep{islam2023financebench}
+was intended as a second external leaderboard and is \emph{not} used as one
+(\S\ref{sec:financebench}).
 
 \subsection{Relevance modes}
 \label{sec:relevancemodes}
@@ -335,13 +318,13 @@ short chunk is more likely to sit entirely on one page. \textbf{region} is the o
 one designed to be size-tolerant. \S\ref{sec:relevance} shows this is not a
 theoretical concern.
 
-\subsection{Reachability: a ceiling, not a score}
-Before any leaderboard, we measure what fraction of a corpus's gold is findable in
-the PDF's own text at all. This is identical for every tool, so it is a ceiling
-rather than a comparison, and it says whether a rule can measure the corpus. On
-OHR-Bench, 80.2\% of gold is span-reachable. The check also carries a circularity
-warning: once gold occupies a large share of its page --- 69\% on FinanceBench ---
-span and region reachability approach 100\% by construction and prove nothing.
+\paragraph{Reachability is a ceiling, not a score.} Before any leaderboard we measure
+what fraction of a corpus's gold is findable in the PDF's own text at all. It is
+identical for every tool, so it says whether a rule can measure the corpus rather than
+which tool is better: 80.2\% of OHR-Bench gold is span-reachable. It carries a
+circularity warning too --- once gold occupies a large share of its page (69\% on
+FinanceBench), span and region reachability approach 100\% by construction and prove
+nothing.
 
 % =====================================================================
 \section{Results}
@@ -429,29 +412,10 @@ threshold falls because at $0$ every chunk is relevant by definition.}
 \label{fig:sweep}
 \end{figure}
 
-\begin{table}[t]
-\centering
-\caption{OHR-Bench region MRR against the relevance threshold. A \ds{} variant is
-1st at all ten thresholds; the two hold both top places at all ten.}
-\label{tab:sweep}
-\small
-\begin{tabular}{lcccccc}
-\toprule
-Tool & 0.1 & 0.3 & 0.5 & 0.7 & 0.9 & 1.0 \\
-\midrule
-\ds{}         & .959 & .880 & .789 & \best{.666} & \best{.528} & \best{.389} \\
-\dsg{}        & \best{.967} & \best{.893} & \best{.800} & .657 & .508 & .370 \\
-pymupdf4llm     & .946 & .854 & .747 & .604 & .482 & .326 \\
-llamaindex\_sem & .962 & .866 & .740 & .575 & .430 & .310 \\
-unstructured    & .937 & .834 & .721 & .601 & .391 & .213 \\
-llamaindex      & .946 & .841 & .726 & .589 & .460 & .340 \\
-langchain       & .936 & .814 & .711 & .603 & .466 & .337 \\
-\bottomrule
-\end{tabular}
-\end{table}
 
-A \ds{} variant places 1st at all ten thresholds, and the two hold both top places at
-all ten, with a margin of $+0.045$ to $+0.062$ over the best external tool across
+
+A \ds{} variant places 1st at all ten thresholds and the two hold both top places at
+all ten, with a $+0.045$ to $+0.062$ MRR margin over the best external tool across
 $0.4$--$1.0$. The region result does not depend on the constant.
 
 Two caveats belong here rather than in a rebuttal. First, \textbf{$0.7$ is where our
@@ -571,9 +535,9 @@ CUDA, whose kernel selection is not guaranteed bit-reproducible, and we did not 
 GPU available to test it --- so the guarantee is established for \dsg{} and remains
 unverified for \ds{}. Geometry-only is pure Python and NumPy and has no such caveat.
 
-To our knowledge no LLM-segmented or embedding-clustered chunker can report this row
-at all, which is the practical content of the determinism argument: not that
-determinism is elegant, but that it is checkable, and we checked it.
+No LLM-segmented or embedding-clustered chunker can report this row at all, which is
+the practical content of the determinism argument: not that determinism is elegant,
+but that it is checkable.
 
 \subsection{Internal corpus and ablations}
 \label{sec:internal}
@@ -581,6 +545,17 @@ determinism is elegant, but that it is checkable, and we checked it.
 Table~\ref{tab:internal} reports the internal arXiv corpus. Its gold is
 LLM-generated, so it carries no headline claim; we use it for ablations, where only
 differences between our own configurations matter.
+
+\textbf{A reproducibility caveat we would rather state than have found.} This corpus is
+the one part of the paper that cannot currently be re-run. A re-fetch reused the
+\texttt{doc$N$.pdf} filenames for different papers, so the documents now on disk are not
+the ones this gold was generated against --- for all 65 documents, not some. The numbers
+here and the ablation deltas below were valid when measured, and were reproduced twice
+independently at the time, but restoring reproducibility requires recovering the
+original documents by arXiv id. Every external result in this paper --- OHR-Bench, the
+PMC section metric, the threshold sweep, the determinism run --- is unaffected: those
+corpora are fetched by scripts that key on document identity and their per-document
+checksums verify today.
 
 \begin{table}[t]
 \centering
@@ -606,15 +581,13 @@ with inline headers gave $+0.0429$, and font-scaled word-gap tolerance a further
 $+0.0138$. Recursive XY-cut \emph{cost} $-0.0101$ and is off by default. We report
 the rejected change because a table of only-successes is not an ablation.
 
-\textbf{A measurement artefact that reversed a conclusion.} An earlier corpus (55
-documents) reported the vision detector at $+0.0092$ MRR, $p=0.64$ --- ``the model
-does not pay for itself''. That was wrong, and wrong for an instructive reason:
+\textbf{A measurement artefact that reversed a conclusion.} An earlier 55-document
+corpus put the vision detector at $+0.0092$ MRR, $p=0.64$ --- ``the model does not pay
+for itself''. That was wrong for an instructive reason:
 \texttt{page.extract\_text()} welded two-column pages into unquotable lines, so gold
-drawn from two-column pages --- exactly where the vision detector helps most --- was
-being silently rejected during gold generation. Fixing reference extraction moved
-the effect to $+0.0443$, $p=0.0026$. The earlier numbers are superseded. We include
-this because it is a concrete case of a measurement defect flipping a conclusion, and
-because it motivates the reachability ceilings we now compute before every
+from two-column pages --- exactly where the detector helps most --- was silently
+rejected during gold generation. Fixing reference extraction moved the effect to
+$+0.0443$, $p=0.0026$. This is why we now compute a reachability ceiling before every
 leaderboard.
 
 % =====================================================================
@@ -636,16 +609,9 @@ the threshold sweep, where hybrid overtakes geometry-only between $0.5$ and $0.6
 corpus would predict.
 
 \subsection{We are expensive in context}
-\begin{figure}[t]
-\centering
-\includegraphics[width=\columnwidth]{cost.pdf}
-\caption{Accuracy against the token bill. \ds{} sits top-centre: best MRR, but roughly
-four times the context of unstructured and langchain, which sit bottom-left. A
-deployment that pays per token may reasonably prefer the bottom-left corner.}
-\label{fig:cost}
-\end{figure}
 
-\noindent Figure~\ref{fig:cost} shows the trade. \ds{} retrieves 2{,}194 context words per query against unstructured's $561$. On
+
+\ds{} retrieves 2{,}194 context words per query against unstructured's $561$. On
 rank quality per token spent, unstructured is $3.9\times$ more efficient. We win
 accuracy and lose token cost, and for a cost-sensitive deployment that trade may not
 be worth making. This is a real axis on which we lose and it belongs in the main
@@ -668,11 +634,11 @@ varying only the embedder, the rank of the first relevant chunk was 81--299
 under all three.
 
 The scoring rule is not at fault: a relevant chunk exists at region overlap
-$0.99$--$1.00$. Retrieval simply never reaches it. FinanceBench questions are analyst
-prompts with almost no lexical overlap with their evidence, the evidence is a numeric
-table that small encoders embed poorly, and a 10-K yields 729--1{,}176 chunks. Every
-tool would score $\approx 0$, which discriminates nothing --- and a table of zeros
-reads as a chunking result when it is a retrieval limit.
+$0.99$--$1.00$, retrieval never reaches it. FinanceBench questions are analyst prompts
+with almost no lexical overlap with their evidence, that evidence is a numeric table
+small encoders embed poorly, and a 10-K yields 729--1{,}176 chunks. Every tool scores
+$\approx 0$, which discriminates nothing --- and a table of zeros reads as a chunking
+result when it is a retrieval limit.
 
 We report this as a finding rather than omitting the corpus, because
 \citet{elbachyr2026empirical} report MRR $0.700$--$0.844$ on these same PDFs. Our
@@ -684,16 +650,16 @@ it is a caution to anyone reading cross-paper numbers on this corpus.
 \subsection{Standing limitations}
 \label{sec:limitations}
 
-\textbf{Born-digital only.} \ds{} reads PDF primitives, so scanned documents without
-a text layer are out of scope. We do not run OCR.
+\textbf{Born-digital only.} \ds{} reads PDF primitives, so scans without a text layer
+are out of scope; we do not run OCR.
 
 \textbf{No parse-fidelity number.} We do not report edit distance or TEDS on
 OmniDocBench or READoc, so ``the parse is correct'' is currently asserted through
 retrieval quality rather than measured directly.
 
 \textbf{Detection is under-validated.} Our layout metric rests on two hand-annotated
-documents. The DocLayNet val split is the correct home for it and is not yet run.
-Several fusion constants remain marked \texttt{\# unvalidated}.
+documents; the DocLayNet val split is its correct home and is not yet run, which also
+leaves several fusion constants marked \texttt{\# unvalidated}.
 
 \textbf{Academic is our weakest retrieval domain.} On OHR-Bench span, \ds{} scores
 $0.453$ against unstructured's $0.515$ --- 5th of 7 --- on a 10-document slice too
@@ -714,8 +680,8 @@ trouble. Table density does. These are the same documents FinanceBench is built 
 so the cost is measured on two independent corpora rather than inferred from one
 anecdote, and it is a real barrier to using \ds{} on long financial documents today.
 
-\textbf{Single-column English bias.} IEEE two-column templates are unrepresented in
-our corpora, and all corpora are English.
+\textbf{Corpus bias.} IEEE two-column templates are unrepresented, and every corpus is
+English.
 
 % =====================================================================
 \section{Reproducibility}
@@ -758,29 +724,33 @@ that entanglement is not a detail. It can reverse the conclusion. Until reportin
 than one rule is standard practice, chunker comparisons --- including ours --- should
 be read with the rule in view.
 
-Two smaller things follow from having built an instrument careful enough to show it.
-Publisher-authored JATS structure gives a way to score chunk boundaries with no
-retriever and no relevance rule in the loop, which sidesteps the question of who wrote
-the gold. And determinism, when a pipeline has no model on its parse path, is not a
-slogan but a property that can be checked in an afternoon: 95 documents, two
-independent processes, 5{,}810 identical chunks.
+Two smaller things follow. Publisher-authored JATS structure scores chunk boundaries
+with no retriever and no relevance rule in the loop, sidestepping the question of who
+wrote the gold. And determinism, in a pipeline with no model on its parse path, is
+checkable in an afternoon: 95 documents, two independent processes, 5{,}810 identical
+chunks.
 
-\ds{} itself is a competent structure-aware chunker that wins where the rules favour
-large structural units and loses where they favour small ones. That is a narrower
-claim than "it is the best chunker", and it is the one the evidence supports.
+\ds{} itself wins where the rules favour large structural units and loses where they
+favour small ones --- a narrower claim than ``best chunker'', and the one the evidence
+supports.
 
 \paragraph{Open work.} Two items on our pre-submission list remain undone, and both
 are measurement rather than writing. \textbf{Token-level IoU and
 Precision$_\Omega$}~\citep{smith2024chunking} are the published vocabulary for
-``rank quality per token spent'' and would replace the homemade MRR-per-1k-words
-column in Figure~\ref{fig:cost}; our dumped runs record the overlap \emph{score}
+``rank quality per token spent'' and would replace our homemade
+MRR-per-1k-words column; our dumped runs record the overlap \emph{score}
 behind each retrieved chunk but not the chunk and gold token sets, so the metric needs
 a re-run rather than a re-analysis, and we would rather report it missing than
 approximate it. \textbf{DocLayNet's validation split} is the right home for the
 detection-layer mAP that currently rests on two hand-annotated documents, and the only
 cheap route to calibrating the fusion constants of \S\ref{sec:pipeline}.
 
+% Bibliography set \small and with tightened item spacing -- standard in the
+% two-column venues this targets, and it is what brings the paper to 8 pages.
+{\small
+\setlength{\bibsep}{2pt plus 0.3ex}
 \bibliographystyle{plainnat}
 \bibliography{refs}
+}
 
 \end{document}

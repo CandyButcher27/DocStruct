@@ -88,7 +88,16 @@ arXiv 68 PDFs.
 
 8. **Gated-feature ablation sweep — GPU.** 14 flags, all still default OFF.
    `scripts/_sweep.sh`, steps in `memory/measurement-environment.md`.
-9. **Internal arXiv corpus is broken on disk**: gold covers 92 docs, 68 PDFs
+9. **Internal arXiv corpus does not match its own gold — worse than "missing".**
+   Measured 2026-08-16: for **all 65** documents that share a filename with the gold,
+   the gold matches nothing in the PDF. A re-fetch reused `doc<N>.pdf` names for
+   different papers. `datasets/verify.py` passes because the manifest was regenerated
+   from the new files. **No ablation can run until this is fixed**, which currently
+   blocks measuring `BAND_SPLIT`. `dataset_manifest_v2.json` still records `arxiv_id`
+   per entry, so the original set is recoverable; `fetch_dataset_v2.py` must key on
+   that rather than on positional filename. `notes.md` Stage 24.
+
+10. **~~Internal arXiv corpus is broken on disk~~ (superseded by item 9)**: gold covers 92 docs, 68 PDFs
    present, **27 of the gold's documents missing**. `fetch_dataset_v2.py` dedupes
    against the committed manifest rather than the disk, so it will not re-download
    them. Prune the manifest to files that exist, or fix it to check `os.path.exists`.

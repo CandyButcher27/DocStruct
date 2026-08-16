@@ -1565,3 +1565,55 @@ path goes through CUDA, whose kernel selection is not guaranteed bit-reproducibl
 this machine has no GPU (`torch.cuda.is_available()` is False), so the hybrid claim
 stays unverified rather than assumed. Geometry-only is pure Python and NumPy and has
 no such caveat.
+
+---
+
+## Stage 24 — the internal corpus no longer matches its own gold (2026-08-16)
+
+Trying to ablate the two extraction defects surfaced something worse than either.
+
+`scripts/ablate.py` returned `MRR=0.0` on document after document. Not a bad
+invocation: **the arXiv corpus on disk is a different set of documents from the one
+`benchmark_qa_v6.json` was generated against.** `doc1.pdf`'s gold asks about air
+pollution monitoring in Macau; `doc1.pdf` on disk is *ParVL: Parallel Scaling and
+Expandable Compute Allocation for Multimodal LLMs*.
+
+Measured across every document the gold and the disk share a filename with:
+
+| | |
+|---|---|
+| documents whose gold is findable in the PDF | **0** |
+| documents whose gold matches nothing | **65** |
+
+Not partial drift. The filenames were reused for entirely different papers, almost
+certainly by a re-fetch that renumbered `doc<N>.pdf` positionally instead of keying on
+identity. `datasets/verify.py` passes 68/68 because the manifest was regenerated from
+the *new* files, so manifest and disk agree with each other and neither agrees with the
+gold.
+
+**Consequences, stated plainly.**
+
+1. **The internal-corpus table in the paper is not reproducible today.** MRR 0.8203 and
+   the rest were valid when measured — they are consistent with each other and with the
+   two independent reproductions recorded in `results.md` — but no one can re-run them
+   against the corpus now on disk.
+2. **Three ablation deltas the paper quotes are in the same position**: the chunk-floor
+   +0.0429, XY-cut −0.0101, and the vision detector's +0.0443 (p=0.0026), which is the
+   *only* corpus where the detector shows an effect.
+3. **No ablation can run until this is repaired.** That blocks measuring `BAND_SPLIT`,
+   which is the fix for the reading-order defect.
+
+**What is unaffected:** every external number. OHR-Bench, the PMC section metric, the
+threshold sweep and the determinism run all use corpora fetched by scripts that key on
+document identity (`ohrbench_manifest.json` and `pmc_manifest.json` carry per-document
+checksums that verify today). The paper's headline results do not depend on the broken
+corpus.
+
+**Repair.** `fetch_dataset_v2.py` must key on `arxiv_id`, not on positional filename,
+and the gold must be regenerated or the original PDFs recovered by id from
+`dataset_manifest_v2.json` — which still records `arxiv_id` per entry, so the original
+document set is recoverable even though the files are not.
+
+Until then the honest move is to say so in the paper rather than present internal
+numbers as reproducible, and this is a second instance of the failure class from
+Stage 20: a manifest treated as evidence about files it does not actually describe.
