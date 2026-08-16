@@ -19,6 +19,7 @@
   <a href="paper/">Paper</a> ·
   <a href="datasets/">Datasets</a> ·
   <a href="#install">Install</a> ·
+  <a href="docs/API.md">API</a> ·
   <a href="#quickstart">Quickstart</a> ·
   <a href="#how-it-works">How it works</a> ·
   <a href="#reproducing-the-benchmark">Reproduce</a>
@@ -181,20 +182,28 @@ ordered after the columns rather than before. Both are in
 ## Install
 
 ```bash
-pip install -e .                  # core: pdfplumber + numpy (geometry-only)
-pip install -e ".[model]"         # + YOLOv8 (ultralytics)      -> hybrid mode
-pip install -e ".[retrieval]"     # + ChromaDB + sentence-transformers
-pip install -e ".[viz,eval,dev]"  # + visualization, eval extras, tests
-pip install -e ".[all]"           # everything
+pip install docstruct-rag
 ```
 
-The core install has **two dependencies**. Everything else is an optional extra,
-imported lazily, so a chunking-only deployment stays small.
+The distribution is **`docstruct-rag`** — `docstruct` was already taken on PyPI by an
+unrelated package. The import name is unchanged:
 
-Hybrid mode needs DocLayNet YOLOv8 weights, downloaded separately — e.g.
-[`hantian/yolo-doclaynet`](https://huggingface.co/hantian/yolo-doclaynet) →
-`weights/yolov8m-doclaynet.pt`. Without them the pipeline runs geometry-only and
-degrades gracefully; nothing crashes and no network is touched.
+```python
+import docstruct
+doc = docstruct.parse("paper.pdf")
+```
+
+Core install pulls two dependencies (`pdfplumber`, `numpy`) and needs no network at
+parse time. Everything else is an extra:
+
+```bash
+pip install "docstruct-rag[model]"        # YOLOv8/DocLayNet vision detector
+pip install "docstruct-rag[langchain]"    # doc.to_langchain()
+pip install "docstruct-rag[llamaindex]"   # doc.to_llamaindex()
+pip install "docstruct-rag[all]"          # everything incl. benchmark tooling
+```
+
+Full API reference: [`docs/API.md`](docs/API.md).
 
 ## Quickstart
 
