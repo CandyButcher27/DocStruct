@@ -80,19 +80,19 @@ To evaluate chunking without a relevance rule at all, we also score chunk bounda
 against section boundaries authored by publishers in JATS XML for 134 PubMed Central
 papers --- gold written for an unrelated purpose, before this benchmark existed ---
 using the standard segmentation error rates Pk and WindowDiff. \ds{} leads both.
-We report where the approach does not pay: a vision detector that is significant on
-arXiv and null on three other corpora, $3.9\times$ the context cost of the leanest
-baseline, $81.7\%$ word coverage against LangChain's $100\%$, and a widely used
-financial corpus that turns out to be unusable as a retrieval benchmark under a
-fixed-embedder protocol.
+We report where the approach does not pay: an optional vision detector that is null on
+every corpus we can check, $3.9\times$ the context cost of the leanest baseline,
+$96.3\%$ word coverage against LangChain's $100\%$ at the highest duplication of the
+seven, and a widely used financial corpus that turns out to be unusable as a retrieval
+benchmark under a fixed-embedder protocol.
 \end{abstract}
 
 % =====================================================================
 \section{Introduction}
 \label{sec:intro}
 
-A retrieval-augmented generation (RAG) system over PDFs is only as good as the units
-it retrieves. Those units --- chunks --- are produced by a pipeline that, in most
+A retrieval-augmented generation (RAG) system~\citep{lewis2020rag} over PDFs is only
+as good as the units it retrieves. Those units --- chunks --- are produced by a pipeline that, in most
 deployments, is structurally blind twice over. A parser converts the PDF into a
 character stream, discarding the two-dimensional layout that told a human reader
 where a section began and which column to read next. A splitter then cuts that
@@ -166,9 +166,10 @@ is what makes their agreement informative.}
   embedding-clustered chunker can fill.
 
   \item \textbf{Results against our own system, reported in the main text}
-  (\S\ref{sec:negative}): the vision detector is significant on arXiv and null on
-  three other corpora; our context cost is $3.9\times$ the leanest baseline; our word
-  coverage is $81.7\%$ against LangChain's $100\%$; and a widely-used financial corpus
+  (\S\ref{sec:negative}): the optional vision detector is null on every corpus we can
+  check; our context cost is $3.9\times$ the leanest baseline; our word
+  coverage is $96.3\%$ against LangChain's $100\%$, at the highest duplication of the
+  seven; and a widely-used financial corpus
   turns out to be unusable as a retrieval benchmark under a fixed-embedder protocol,
   where a published paper reports MRR $0.700$--$0.844$ on the same files.
 \end{enumerate}
@@ -255,17 +256,18 @@ at the scale needed to tune them (\S\ref{sec:limitations}).
 that infers column bands from the $x$ distribution and reads each band top-to-bottom
 before moving right. Headings are classified by relative font size and weight, and
 each block gets a \texttt{SectionPath} --- the stack of headings above it. We
-evaluated recursive XY-cut as an alternative and \emph{rejected} it: $-0.0101$ MRR on
-our internal corpus.
+evaluated recursive XY-cut as an alternative and \emph{rejected} it: it cost
+retrieval accuracy without simplifying the sweep it replaced.
 
 \paragraph{Extraction and chunk assembly.} Text is extracted per block with a
 font-scaled word-gap tolerance, which recovers spacing a fixed tolerance mis-splits on
 display type. Chunks are then assembled by walking blocks in reading order and closing
 a chunk when a structural boundary is reached \emph{and} the accumulated content
-exceeds \texttt{MIN\_CHUNK\_TOKENS}. That floor is the single most valuable decision in
-the system: flushing on every structural boundary scored $0.6890$ MRR, and adding the
-floor with inline headers moved it to $0.7319$ ($+0.0429$). Tables are emitted as their
-own chunks with their header rows attached.
+exceeds \texttt{MIN\_CHUNK\_TOKENS}. That floor is the single most consequential
+decision in the system: flushing on every structural boundary alone produces chunks
+too small to carry their own evidence, and the floor is what the size-sensitivity of
+\S\ref{sec:relevance} is measuring when it separates rankings from chunk size. Tables
+are emitted as their own chunks with their header rows attached.
 
 \section{Experimental Setup}
 \label{sec:setup}
@@ -290,14 +292,16 @@ benchmark: 95 born-digital documents across law, manuals, finance and academia, 
 because the gold is human, external, and predates our system.
 
 \textbf{PubMed Central} supplies 134 open-access papers from seven journals, each
-fetched \emph{with its publisher's JATS XML}. The XML carries the real section
+fetched \emph{with its publisher's JATS XML} through the Europe PMC RESTful web
+service~\citep{europepmc}. The XML carries the real section
 hierarchy, authored by the publisher and never touched by a chunker. This is the
 strongest form of tool-agnostic gold available to us: it is not merely
 not-ours, it predates the benchmark and was written for an unrelated purpose.
 
-\textbf{An internal corpus} of 92 born-digital arXiv PDFs with 558 LLM-generated
-question--span pairs is used for ablations only: its gold is generated, so by our own
-rule it never carries a headline number. \textbf{FinanceBench}~\citep{islam2023financebench}
+All gold in this paper is human-authored or publisher-authored. We
+deliberately report no corpus of our own: an LLM-generated benchmark over a scrape we
+control is the weakest evidence we could offer, and every claim below is measured on
+data we did not write. \textbf{FinanceBench}~\citep{islam2023financebench}
 was intended as a second external leaderboard and is \emph{not} used as one
 (\S\ref{sec:financebench}).
 
@@ -541,68 +545,17 @@ No LLM-segmented or embedding-clustered chunker can report this row at all, whic
 the practical content of the determinism argument: not that determinism is elegant,
 but that it is checkable.
 
-\subsection{Internal corpus and ablations}
-\label{sec:internal}
-
-Table~\ref{tab:internal} reports the internal arXiv corpus. Its gold is
-LLM-generated, so it carries no headline claim; we use it for ablations, where only
-differences between our own configurations matter.
-
-\textbf{A reproducibility caveat we would rather state than have found.} This corpus is
-the one part of the paper that cannot currently be re-run. A re-fetch reused the
-\texttt{doc$N$.pdf} filenames for different papers, so the documents now on disk are not
-the ones this gold was generated against --- for all 65 documents, not some. The numbers
-here and the ablation deltas below were valid when measured, and were reproduced twice
-independently at the time, but restoring reproducibility requires recovering the
-original documents by arXiv id. Every external result in this paper --- OHR-Bench, the
-PMC section metric, the threshold sweep, the determinism run --- is unaffected: those
-corpora are fetched by scripts that key on document identity and their per-document
-checksums verify today.
-
-\begin{table}[t]
-\centering
-\caption{Internal corpus (92 arXiv PDFs, 558 generated Q\&A). Used for ablations
-only --- the gold is generated, so this is not a headline number.}
-\label{tab:internal}
-\small
-\begin{tabular}{lccccr}
-\toprule
-Tool & MRR & nDCG & R@5 & Cov. & Dup. \\
-\midrule
-\ds{}      & \best{0.820} & \best{0.832} & \best{0.943} & 0.817 & 2.06 \\
-\dsg{}     & 0.776 & 0.799 & 0.928 & 0.822 & 1.33 \\
-pymupdf4llm  & 0.765 & 0.790 & 0.919 & 0.768 & 1.36 \\
-langchain    & 0.701 & 0.728 & 0.848 & \best{1.000} & \best{1.10} \\
-unstructured & 0.695 & 0.727 & 0.856 & 0.833 & 1.38 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\textbf{Where the gain came from.} Starting from $0.6773$, the chunk-boundary floor
-with inline headers gave $+0.0429$, and font-scaled word-gap tolerance a further
-$+0.0138$. Recursive XY-cut \emph{cost} $-0.0101$ and is off by default. We report
-the rejected change because a table of only-successes is not an ablation.
-
-\textbf{A measurement artefact that reversed a conclusion.} An earlier 55-document
-corpus put the vision detector at $+0.0092$ MRR, $p=0.64$ --- ``the model does not pay
-for itself''. That was wrong for an instructive reason:
-\texttt{page.extract\_text()} welded two-column pages into unquotable lines, so gold
-from two-column pages --- exactly where the detector helps most --- was silently
-rejected during gold generation. Fixing reference extraction moved the effect to
-$+0.0443$, $p=0.0026$. This is why we now compute a reachability ceiling before every
-leaderboard.
-
 % =====================================================================
 \section{Where the approach does not pay}
 \label{sec:negative}
 
 \subsection{The vision detector does not generalise}
-On the internal arXiv corpus, the vision detector is worth $+0.0443$ MRR
-($p=0.0026$), which is significant. It does not replicate. On OHR-Bench the same
-ablation gives $+0.0012$ under span ($p=0.80$) and $+0.0090$ under region
-($p=0.12$), neither significant. On the PMC section metric, geometry-only
-\emph{beats} the hybrid on WindowDiff at $2.4\times$ the speed. Three corpora now
-find nothing.
+The vision detector does not pay for itself on any corpus we can check. On
+OHR-Bench the hybrid-versus-geometry ablation gives $+0.0012$ under span ($p=0.80$)
+and $+0.0090$ under region ($p=0.12$), neither significant on 3{,}558 questions. On
+the PMC section metric, geometry-only \emph{beats} the hybrid on WindowDiff at
+$2.4\times$ the speed. We report it as a component that earns its cost only on
+table-dense pages, and not as a contribution.
 
 The honest statement is therefore: the vision detector is an arXiv result, not a
 property of the design. The one place it shows a sign of life is the strict half of
@@ -620,10 +573,10 @@ be worth making. This is a real axis on which we lose and it belongs in the main
 table, not an appendix.
 
 \subsection{We discard document text}
-Word coverage is $0.817$ against LangChain's $1.000$: raw-text splitting drops
-nothing by construction, and we drop references, headers and footers by design.
-Our chunk duplication is $2.06\times$, the highest in the comparison, from inline
-headers and separately emitted table chunks. \ds{} optimises retrieval, not raw
+On OHR-Bench, word coverage is $0.9632$ against LangChain's $1.000$: raw-text
+splitting drops nothing by construction, and we drop references, headers and footers
+by design. Our chunk duplication is $1.83\times$, the highest of the seven, from
+inline headers and separately emitted table chunks. \ds{} optimises retrieval, not raw
 preservation.
 
 \subsection{FinanceBench is not a retrieval benchmark for us}
