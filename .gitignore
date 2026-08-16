@@ -92,3 +92,16 @@ docstruct_gpu_results.zip
 ohr_results.zip
 paper/figures/*.png
 dist/
+
+# Local-only Colab upload packages (PDFs + weights, 900MB+) -- never commit
+/zip/
+
+# Per-run detector/block caches. `.bench_cache/` was already ignored, but every run
+# that needs its own cache dir gets a suffix, and those were landing in git status.
+.bench_cache*/
+
+# Corpus recovered by arXiv id (320MB of PDFs, re-fetchable with the recovery script)
+data/arxiv-v6/
+
+# Overleaf upload package, rebuilt from paper/ on demand
+/overleaf_upload.zip
