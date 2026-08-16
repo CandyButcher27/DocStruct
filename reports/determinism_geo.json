@@ -1,0 +1,28 @@
+{
+  "pdfs_dir": "data/ohrbench",
+  "mode": "geometry-only",
+  "runs": 2,
+  "n_documents": 95,
+  "n_scored": 92,
+  "identical": 92,
+  "differing": 0,
+  "failed": 3,
+  "total_chunks_per_run": 4472,
+  "agreement_pct": 100.0,
+  "differing_docs": [],
+  "failed_docs": [
+    {
+      "doc": "finance__JPMORGAN_2022Q2_10Q.pdf",
+      "error": "timeout"
+    },
+    {
+      "doc": "finance__JPMORGAN_2023Q2_10Q.pdf",
+      "error": "timeout"
+    },
+    {
+      "doc": "finance__VERIZON_2021_10K.pdf",
+      "error": "timeout"
+    }
+  ],
+  "seconds": 6809.9
+}

@@ -88,7 +88,18 @@ the fastest way to get desk-rejected.
 
 ## 3. Tier 1 — cheap, high payoff. Do these first.
 
-### 3.1 Prove determinism. (CPU, ~2 hours, no new data)
+### 3.1 ~~Prove determinism~~ — **DONE 2026-08-16**
+
+92/92 documents byte-identical across independent processes, 4,472 chunks per run, 0
+differing. Now §5.5 of the paper and `reports/determinism_geo.json`. Three dense
+financial filings exceeded a 30-minute parse cap and are excluded from the 92 — that
+timeout is itself reported, as the performance limitation it is.
+
+Still open on this item: the **hybrid path is unverified** (no GPU on the dev machine;
+CUDA kernel selection is not guaranteed bit-reproducible). The paper claims determinism
+for `docstruct_geo` and says the hybrid case is untested rather than assuming it.
+
+<details><summary>original entry</summary>
 
 **The single largest hole.** Determinism is the first line of the contract, in the
 abstract, in the title's spirit, and in the README — and there is *no experiment*.

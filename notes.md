@@ -1513,3 +1513,51 @@ in `to-do.md` with the reproduction. Recording them is also the honest option --
 the README now names both defects rather than shipping a demo that hides them.
 
 The demo uses page 1 (a body page) because that is the representative case, and says so.
+
+---
+
+## Stage 23 — determinism, finally measured (2026-08-16)
+
+The contract's first line — *same PDF in, same chunks out* — had one unit test behind
+it: `test_parse_is_deterministic`, one PDF, parsed twice, **in one process**. That
+cannot observe anything that varies across a process boundary, which is where
+non-determinism actually comes from: hash seeds, iteration order over addresses,
+thread scheduling, a model's kernel selection.
+
+`scripts/verify_determinism.py` parses every document in a **fresh subprocess** and
+hashes the whole chunk structure — id, type, page, reading order, section path, and a
+digest of the content. Two runs agree only if every chunk matches on all of them.
+
+**Result, OHR-Bench, geometry-only, 2 runs:**
+
+| | |
+|---|---|
+| documents scored | **92 of 95** |
+| byte-identical across independent processes | **92 (100.0%)** |
+| differing | **0** |
+| chunks per run | 4,472 |
+| wall time | 6,810 s (~1h 53m, 6 workers) |
+
+**This is now a table row no LLM- or embedding-based chunker can fill**, and it is
+cheap to re-verify. It also closes the largest hole in the paper: a contract asserted
+in the abstract with no experiment behind it.
+
+**Three documents timed out at the 30-minute-per-parse cap**, all dense financial
+filings: `JPMORGAN_2022Q2_10Q` (197 pages), `JPMORGAN_2023Q2_10Q` (217), and
+`VERIZON_2021_10K` (120), against a corpus median of 18 pages. Page count is not the
+whole story — the corpus's largest document, at 382 pages, parsed fine. It is table
+density, which matches Stage 18: the cost is in materialising vector primitives, and
+financial filings are wall-to-wall ruled tables.
+
+They are re-running with a 4-hour cap to get the number to 95/95. Whatever comes back,
+**the timeout itself is reportable**: these are the same documents FinanceBench is made
+of, so "DocStruct is slow on long financial filings" is now measured on two independent
+corpora rather than asserted from one anecdote.
+
+**What this does not cover, and the paper says so:** determinism holds *within* a
+version, not across versions — a release that changes chunking changes boundaries, so
+a persisted index needs a pinned version. And this run is geometry-only. The hybrid
+path goes through CUDA, whose kernel selection is not guaranteed bit-reproducible, and
+this machine has no GPU (`torch.cuda.is_available()` is False), so the hybrid claim
+stays unverified rather than assumed. Geometry-only is pure Python and NumPy and has
+no such caveat.

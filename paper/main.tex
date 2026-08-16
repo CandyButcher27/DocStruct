@@ -535,6 +535,37 @@ $6/24$, so it is systematic. That failure rate is itself a finding about
 unstructured on born-digital PDFs, and we report it rather than silently dropping the
 tool.
 
+\subsection{Determinism, measured}
+\label{sec:determinism}
+
+Every claim above is about quality. This one is about the property that motivated the
+design, and it is the claim a reader should be most suspicious of, because
+determinism is easy to assert and rarely tested past a single file.
+
+We parsed all 95 OHR-Bench documents twice, each parse in a \emph{separate process},
+and compared a hash over the full chunk structure: identifier, type, page, reading
+order, section path, and a digest of the content. Two runs agree only if every chunk
+matches on all of them. Separate processes matter: a same-process check cannot observe
+anything that varies across a process boundary, which is where non-determinism comes
+from --- hash seeds, iteration order over addresses, thread scheduling, kernel
+selection.
+
+\textbf{92 of 92 scored documents were byte-identical, across 4{,}472 chunks per run
+--- 100\%, with zero differing documents.} Three documents are excluded because they
+exceeded a 30-minute per-parse cap, not because they disagreed; \S\ref{sec:limitations}
+returns to them.
+
+Two limits belong with the claim rather than after it. Determinism holds \emph{within}
+a version: a release that changes chunking changes boundaries, so a persisted index
+must pin a version. And this run is geometry-only. The hybrid path runs a model through
+CUDA, whose kernel selection is not guaranteed bit-reproducible, and we did not have a
+GPU available to test it --- so the guarantee is established for \dsg{} and remains
+unverified for \ds{}. Geometry-only is pure Python and NumPy and has no such caveat.
+
+To our knowledge no LLM-segmented or embedding-clustered chunker can report this row
+at all, which is the practical content of the determinism argument: not that
+determinism is elegant, but that it is checkable, and we checked it.
+
 \subsection{Internal corpus and ablations}
 \label{sec:internal}
 
@@ -660,9 +691,18 @@ $0.453$ against unstructured's $0.515$ --- 5th of 7 --- on a 10-document slice t
 thin to settle. ``\ds{} is good for research papers'' is not what the retrieval data
 says, even though the PMC structural result is strong.
 
-\textbf{Performance.} A figure-dense 18-page paper takes roughly 8 minutes to parse,
-dominated by materialising 422k vector primitives. This is on the user-facing
-\texttt{parse()} path, not only the benchmark.
+\textbf{Performance, and it is our sharpest practical limitation.} A figure-dense
+18-page paper takes roughly 8 minutes to parse, dominated by materialising 422k vector
+primitives, and this is on the user-facing \texttt{parse()} path rather than only the
+benchmark. The determinism run (\S\ref{sec:determinism}) put a number on the tail:
+three of 95 documents exceeded a 30-minute per-parse cap, all dense financial filings
+---
+\texttt{JPMORGAN\_2022Q2\_10Q} (197 pages), \texttt{JPMORGAN\_2023Q2\_10Q} (217) and
+\texttt{VERIZON\_2021\_10K} (120) --- against a corpus median of 18 pages. Page count
+alone does not explain it: the corpus's longest document, at 382 pages, parsed without
+trouble. Table density does. These are the same documents FinanceBench is built from,
+so the cost is measured on two independent corpora rather than inferred from one
+anecdote, and it is a real barrier to using \ds{} on long financial documents today.
 
 \textbf{Single-column English bias.} IEEE two-column templates are unrepresented in
 our corpora, and all corpora are English.
@@ -685,8 +725,17 @@ reconstructed:
 \texttt{datasets/} in the repository root carries the manifests, SHA-256 checksums
 and derived gold files needed to verify a reconstruction byte-for-byte. The two GPU
 runs behind \S\ref{sec:sweep} and \S\ref{sec:sections} are reproduced end-to-end by
-\texttt{notebooks/pmc\_sections\_colab.ipynb}. Determinism can be checked directly:
-parsing the same PDF twice yields identical chunk boundaries.
+\texttt{notebooks/pmc\_sections\_colab.ipynb}. Determinism is checked by
+\texttt{scripts/verify\_determinism.py}, which reproduces \S\ref{sec:determinism}
+end-to-end:
+
+\begin{quote}\small
+\texttt{python scripts/verify\_determinism.py \textbackslash{}}\\
+\texttt{~~--pdfs-dir data/ohrbench --runs 2}
+\end{quote}
+
+\noindent The library is installable as \texttt{pip install docstruct-rag}; the import
+name is \texttt{docstruct}.
 
 % =====================================================================
 \section{Conclusion}
