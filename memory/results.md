@@ -179,12 +179,14 @@ minutes. That is the performance limitation, measured.
 
 ## Internal corpus headline (`reports/v6_report.md`)
 
-> **⚠ NOT REPRODUCIBLE AS OF 2026-08-16.** The arXiv PDFs on disk are a *different set
-> of papers* from the ones this gold was generated against — 0 of 65 shared filenames
-> have findable gold (`notes.md` Stage 24). Every number in this section was valid when
-> measured and was reproduced twice independently at the time, but it cannot be re-run
-> until the corpus is recovered by `arxiv_id`. **No ablation can run until then.**
-> External results are unaffected.
+> **⚠ THE 92-DOCUMENT NUMBERS BELOW ARE HISTORICAL.** The corpus they were measured on
+> was overwritten (`notes.md` Stage 24/25). **56 of the 92 documents were recovered by
+> arXiv id on 2026-08-16** into `data/arxiv-v6/` — 83.8% of their gold spans are
+> reachable (268/320 across 54/56 documents), so the subset is sound. The re-measured
+> 56-document table is the one to quote; these 92-document figures were valid when
+> taken and were reproduced twice at the time, but cannot be re-run. The other 36
+> documents appear in no committed manifest.
+> External results (OHR-Bench, PMC, sweep, determinism) were never affected.
 
 
 92 born-digital PDFs, 558 LLM-generated Q&A, identical embedder and retriever for

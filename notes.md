@@ -1,11 +1,103 @@
-# DocStruct work notes
+# DocStruct — engineering log
+
+> **Read [`ROADMAP.md`](ROADMAP.md) for what to do next. This section is what has been
+> done and what still needs you.** Everything below the divider is the chronological
+> log, Stages 1–25, kept because it records why each decision was taken.
+
+---
+
+# CURRENT STATUS — 2026-08-16
+
+## The paper is submittable today
+
+`paper/main.tex` → 8 pages, builds clean, 0 undefined references, no `TODO` renders.
+Reframed around the finding rather than the system: *The Relevance Rule Decides the
+Leaderboard: Seven PDF Chunkers, Identical Chunks, Three Rankings*.
+
+| Result | Number | Corpus |
+|---|---|---|
+| 1st of 7 under `span` | MRR 0.706 | OHR-Bench, 3,558 human questions |
+| 1st of 7 under `region` | MRR 0.666 | same |
+| 6th of 7 under `page` | MRR 0.600 | same — **this is the evidence, not an admission** |
+| 1st at all 10 region thresholds | +0.045–0.062 margin | same, re-scored offline |
+| 1st on WindowDiff and Pk | 0.4226 / 0.3418 | 134 PMC papers, publisher JATS gold |
+| Determinism | **95/95 docs, 5,810 chunks, 0 differing** | OHR-Bench, independent processes |
+
+## What was done this session
+
+**Measurement**
+- Determinism measured for the first time: 95/95 documents byte-identical across
+  independent processes. The chunk total cross-checks exactly against the benchmark's
+  own count from a different machine and code path.
+- Region threshold swept 0.1–1.0. A DocStruct variant leads at all ten, so the region
+  result does not depend on the unvalidated constant. `config.py` now carries the
+  measurement instead of a `# unvalidated` marker.
+- Section boundaries re-run on the full 134-document PMC corpus (was 24). Order
+  identical to the pilot, every value within 0.02.
+
+**Correctness**
+- `fetch_pmc.py` trusted a committed manifest over the disk, so a fresh clone
+  downloaded nothing and scored 24 of 126 documents while looking finished. Fixed,
+  tested, and smoke-verified against the live API.
+- `refs.bib` had a **fabricated author attribution** and seven `{Anonymous}`
+  placeholders. All 24 arXiv-backed entries verified against the arXiv API.
+- PMC gold was redistributing verbatim text from 30 **No-Derivatives** articles on a
+  public repo. Now licence-filtered to the 95 papers that permit derivatives.
+- **The internal corpus was found to no longer match its own gold** — 0 of 65
+  documents. Traced through git: all 31 arXiv ids on disk are August 2026 papers,
+  against a gold committed 23 July. **56 of 92 documents recovered** by arXiv id;
+  83.8% of their gold spans are reachable.
+
+**Product**
+- `pip install docstruct-rag` — packaged, `twine check` clean, verified by a fresh-venv
+  install. New API: `parse_bytes`, `parse_many`, `to_langchain`, `to_llamaindex`,
+  `to_jsonl`, `stats`. Full reference in [`docs/API.md`](docs/API.md).
+- README leads with a demo animation rendered from a real parse, not a mock-up.
+- `ROADMAP.md` consolidates `futureplans.md` and `implementation_plan.md` after
+  re-checking every item against the code; two claims in the old audit were stale.
+
+**Two defects found by drawing the pipeline's real output**
+- Full-width elements sorted *after* the columns. **Fixed in code** by `BAND_SPLIT`;
+  needs one ablation to flip the default.
+- Full-width blocks extracted across the column gutter. A fix was written, found the
+  correct gutter, and measured **14 garbled tokens before and 14 after**. Reverted
+  rather than shipped. Recorded as a negative result.
+
+## Running right now
+
+**5-tool benchmark on the recovered 56-document corpus** — started 2026-08-16, several
+hours on CPU because the vision detector runs without a GPU.
+
+```bash
+tail -f /tmp/bench56.log                     # progress
+cat reports/v6_56doc_report.md               # when it lands
+```
+
+When it finishes, the paper's internal-corpus table (§5.4, currently the historical
+92-document figures with a caveat) should be replaced with the 56-document numbers and
+the caveat rewritten to say the subset is recovered and verified.
+
+## What needs you — in priority order
+
+| # | Task | Why it is yours |
+|---|---|---|
+| 1 | **Send the paper to your professors** | It will not improve by waiting. The open question is framing, and that is what they answer. Tell them Table 3 is historical and being re-measured; every external result is unaffected. |
+| 2 | **`twine upload dist/*`** | Needs your PyPI token. Everything else is built and validated. TestPyPI first. |
+| 3 | **Affiliation and co-authors** in `paper/main.tex` | The only remaining `\todo`. |
+| 4 | **Hand `paper/REFERENCES_TO_VERIFY.md` to another model** | 7 entries have no arXiv id or DOI and could not be machine-checked. |
+| 5 | **Check Colab Drive for a corpus backup** | `docstruct_bench/corpora/` may hold the 36 unrecovered documents. If it does, the full 92-document table is restorable. |
+
+Nothing else needs a human. Everything remaining is either running, or is GPU work
+listed in `ROADMAP.md` §3.
+
+---
 
 Running log of what was changed, why, what it measured, and whether it was kept.
 Newest stage at the bottom. Every stage ends in a commit.
 
 Goal for this pass: **DocStruct should not lose the cross-tool retrieval benchmark
 to any provider**, and the package should be installable and usable as
-`pip install docstruct` → `import docstruct`.
+`pip install docstruct-rag` → `import docstruct` (the PyPI name `docstruct` was taken).
 
 ---
 

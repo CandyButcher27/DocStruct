@@ -217,10 +217,14 @@ work.
 
 ## Ablation workflow
 
-> **⚠ Ablations cannot run as of 2026-08-16.** The internal arXiv corpus on disk no
-> longer matches `benchmark_qa_v6.json`: a re-fetch reused the `doc<N>.pdf` filenames
-> for different papers, so every ablation returns `MRR=0.0`. Recover the corpus by
-> `arxiv_id` from `dataset_manifest_v2.json` first. `notes.md` Stage 24.
+> **⚠ Ablations must run against `data/arxiv-v6/`, not `data/raw-pdfs/`.** The latter no
+> longer matches `benchmark_qa_v6.json` — a re-fetch reused the `doc<N>.pdf` filenames
+> for different papers, so ablations against it return `MRR=0.0` (`notes.md` Stage
+> 24/25). `scripts/recover_v6_corpus.py` rebuilt the matching 56-document subset:
+>
+> ```bash
+> python scripts/ablate.py --name <label> --set KEY=VALUE >     --pdfs-dir data/arxiv-v6 --qa data/qa/benchmark_qa_v6.json
+> ```
 
 
 `scripts/ablate.py` runs **one** adapter with `docstruct.config` overrides applied
