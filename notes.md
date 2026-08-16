@@ -1617,3 +1617,48 @@ document set is recoverable even though the files are not.
 Until then the honest move is to say so in the paper rather than present internal
 numbers as reproducible, and this is a second instance of the failure class from
 Stage 20: a manifest treated as evidence about files it does not actually describe.
+
+---
+
+## Stage 25 — where the corpus went, traced through git (2026-08-16)
+
+**The 65 documents were never committed.** `data/raw-pdfs/` has been in `.gitignore`
+since `03a6bc9`, and the only PDFs ever tracked are four arXiv samples and three
+fixtures from the initial commits. So the originals cannot be restored from git
+directly. What *is* tracked is the manifest that describes them, and that is enough to
+date the break and to recover most of the corpus.
+
+**Timeline, from the manifests' own history:**
+
+| date | commit | state |
+|---|---|---|
+| 2026-06-26 | `d82c25d` | v1 manifest, 24 entries, `doc25 = 2606.27377v1` |
+| 2026-07-23 | `a0151b9` | **v6 gold committed** — 558 questions, 92 documents |
+| 2026-07-23 | `00e9325` | v6 benchmark run, MRR 0.8203. Corpus and gold agreed here |
+| 2026-07-23 | `03a6bc9` | manifest_v2, 47 entries |
+| 2026-07-24 | `4cc88ab` | manifest_v2, 67 entries, `doc51 = 2606.27377v1` |
+| **2026-08-06** | `dbbc979` | manifest_v2, 68 entries, **`doc1 = 2608.04010v1` (ParVL)** |
+
+**The proof is in the arXiv identifiers.** All 31 ids in the corpus now on disk are
+`2608.*` — posted in **August 2026**. The gold was committed on **23 July**. A July
+corpus cannot contain August papers, so the swap is dated to between 2026-07-24 and
+2026-08-06, and the current manifest is byte-identical to `dbbc979`'s for all 68
+entries. The v6 benchmark ran on 23 July, before the swap, which is why its numbers
+were valid and reproduced twice at the time.
+
+**The same paper appears under two filenames across manifests** — `2606.27377v1` is
+`doc25` in v1 and `doc51` in the July v2 — which is the renumbering bug visible in the
+record rather than inferred: a re-fetch that had lost its dedupe key assigned new
+positional names to papers already in the corpus.
+
+**56 of 92 documents are recoverable, and verified.** `reports/corpus_recovery_map.json`
+maps filename to arXiv id, built only from pre-August manifests and accepted only where
+the manifest's title shares content words with that document's own gold questions --
+so each entry is checked against the gold rather than assumed from filename order. The
+remaining 36 appear in no committed manifest and are lost unless they exist in a
+backup outside this repository.
+
+**Consequence.** A partial re-fetch restores 56 documents with correct identity, which
+is enough to re-run ablations on a 56-document subset and enough to state the internal
+table's provenance honestly. It is not enough to reproduce the 92-document numbers
+exactly, and the paper should not claim otherwise.

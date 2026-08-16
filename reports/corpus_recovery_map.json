@@ -1,0 +1,463 @@
+{
+ "doc51.pdf": {
+  "arxiv_id": "2606.27377v1",
+  "title": "DanceOPD: On-Policy Generative Field Distillation",
+  "matched_terms": [
+   "danceopd",
+   "field"
+  ]
+ },
+ "doc52.pdf": {
+  "arxiv_id": "2606.27347v1",
+  "title": "Mapping Political-Elite Networks in Europe with a Multilingual Joint E",
+  "matched_terms": [
+   "entity"
+  ]
+ },
+ "doc53.pdf": {
+  "arxiv_id": "2606.27330v1",
+  "title": "Empowering GUI Agents via Autonomous Experience Exploration and Hindsi",
+  "matched_terms": [
+   "task"
+  ]
+ },
+ "doc54.pdf": {
+  "arxiv_id": "2606.27316v1",
+  "title": "LLM-Based Examination of Eligibility Criteria from Securities Prospect",
+  "matched_terms": [
+   "bank",
+   "central",
+   "criteria",
+   "german"
+  ]
+ },
+ "doc55.pdf": {
+  "arxiv_id": "2606.27314v1",
+  "title": "Beyond Surface Forms: A Comprehensive, Mechanism-Oriented Taxonomy of ",
+  "matched_terms": [
+   "language",
+   "taxonomy"
+  ]
+ },
+ "doc56.pdf": {
+  "arxiv_id": "2606.27306v1",
+  "title": "Multilingual Reasoning Cascades Need More Context",
+  "matched_terms": [
+   "context"
+  ]
+ },
+ "doc57.pdf": {
+  "arxiv_id": "2606.27275v1",
+  "title": "How Surprising Is Historical Italian to Language Models? Tokenization ",
+  "matched_terms": [
+   "historical",
+   "italian",
+   "tokenization"
+  ]
+ },
+ "doc60.pdf": {
+  "arxiv_id": "2606.27361v1",
+  "title": "Autoregressive Boltzmann Generators",
+  "matched_terms": [
+   "autoregressive",
+   "boltzmann",
+   "generators"
+  ]
+ },
+ "doc61.pdf": {
+  "arxiv_id": "2606.27359v1",
+  "title": "When are likely answers right? On Sequence Probability and Correctness",
+  "matched_terms": [
+   "correctness",
+   "probability",
+   "sequence"
+  ]
+ },
+ "doc62.pdf": {
+  "arxiv_id": "2606.27354v1",
+  "title": "Error-Conditioned Neural Solvers",
+  "matched_terms": [
+   "error"
+  ]
+ },
+ "doc64.pdf": {
+  "arxiv_id": "2606.27376v1",
+  "title": "Ask, Solve, Generate: Self-Evolving Unified Multimodal Understanding a",
+  "matched_terms": [
+   "consistency",
+   "generation",
+   "understanding"
+  ]
+ },
+ "doc65.pdf": {
+  "arxiv_id": "2606.27374v1",
+  "title": "World Action Models Enable Continual Imitation Learning with Recurrent",
+  "matched_terms": [
+   "world"
+  ]
+ },
+ "doc67.pdf": {
+  "arxiv_id": "2606.27372v1",
+  "title": "DnA: Denoising Attention for Visual Tasks",
+  "matched_terms": [
+   "attention"
+  ]
+ },
+ "doc68.pdf": {
+  "arxiv_id": "2606.27371v1",
+  "title": "Don't Settle at the Mode! Mitigating Diversity Collapse in Pretrained ",
+  "matched_terms": [
+   "diversity",
+   "feature",
+   "flow",
+   "models"
+  ]
+ },
+ "doc70.pdf": {
+  "arxiv_id": "2606.27298v1",
+  "title": "Fast algorithms for learning a Gaussian under halfspace truncation wit",
+  "matched_terms": [
+   "sample",
+   "truncation"
+  ]
+ },
+ "doc71.pdf": {
+  "arxiv_id": "2606.27269v1",
+  "title": "Ribbon: Scalable Approximation and Robust Uncertainty Quantification",
+  "matched_terms": [
+   "ribbon",
+   "uncertainty"
+  ]
+ },
+ "doc72.pdf": {
+  "arxiv_id": "2606.26733v1",
+  "title": "Surviving by Serving: Functional Relevance Drives Self-Organization in",
+  "matched_terms": [
+   "serving",
+   "surviving"
+  ]
+ },
+ "doc73.pdf": {
+  "arxiv_id": "2606.26448v1",
+  "title": "Closing the Loop to Discover Psychological Theories with an Automated ",
+  "matched_terms": [
+   "theories"
+  ]
+ },
+ "doc74.pdf": {
+  "arxiv_id": "2606.26279v1",
+  "title": "Beyond Single-Source Cognitive Taskonomy:Multi-Source Task Relations t",
+  "matched_terms": [
+   "cognitive",
+   "fmri",
+   "relations",
+   "task"
+  ]
+ },
+ "doc75.pdf": {
+  "arxiv_id": "2606.25874v1",
+  "title": "Topology-Dependent Emergence of Polychronous Neuronal Groups: A Recurr",
+  "matched_terms": [
+   "neuronal"
+  ]
+ },
+ "doc76.pdf": {
+  "arxiv_id": "2606.25826v1",
+  "title": "Weight geometry governs functional memory in complex systems",
+  "matched_terms": [
+   "functional",
+   "memory",
+   "weight"
+  ]
+ },
+ "doc77.pdf": {
+  "arxiv_id": "2606.26432v1",
+  "title": "Embedding Foundation Model Predictions in Discrete-Choice Models with ",
+  "matched_terms": [
+   "model",
+   "structural"
+  ]
+ },
+ "doc79.pdf": {
+  "arxiv_id": "2606.25292v1",
+  "title": "Time-Varying Model Averaging of Multi-layer Network Vector Autoregress",
+  "matched_terms": [
+   "layer",
+   "model",
+   "multi",
+   "network"
+  ]
+ },
+ "doc80.pdf": {
+  "arxiv_id": "2606.24867v1",
+  "title": "Bounds for Standard Errors in Combined Data",
+  "matched_terms": [
+   "bounds",
+   "errors"
+  ]
+ },
+ "doc81.pdf": {
+  "arxiv_id": "2606.24850v1",
+  "title": "Heterogeneous Peer Effects with Endogenous Network Formation",
+  "matched_terms": [
+   "network",
+   "peer"
+  ]
+ },
+ "doc82.pdf": {
+  "arxiv_id": "2606.27367v1",
+  "title": "Accessing both electrochemical SEIRA and SERS with ultrasensitive meta",
+  "matched_terms": [
+   "seira",
+   "sers"
+  ]
+ },
+ "doc83.pdf": {
+  "arxiv_id": "2606.27218v1",
+  "title": "Plasmonic coated scatterers for tunable coherent perfect absorption",
+  "matched_terms": [
+   "absorption",
+   "coated",
+   "perfect"
+  ]
+ },
+ "doc84.pdf": {
+  "arxiv_id": "2606.27099v1",
+  "title": "Neural Networks for Inverse Design of Cascaded-Mode Near-Field Landsca",
+  "matched_terms": [
+   "design",
+   "field",
+   "inverse",
+   "landscapes"
+  ]
+ },
+ "doc85.pdf": {
+  "arxiv_id": "2606.27043v1",
+  "title": "Observation of Non-Hermitian Skin Dynamics in the Liouvillian Regime",
+  "matched_terms": [
+   "hermitian"
+  ]
+ },
+ "doc86.pdf": {
+  "arxiv_id": "2606.27312v1",
+  "title": "A Verification Theorem for an Optimal Control Problem Governed by the ",
+  "matched_terms": [
+   "convective",
+   "equations",
+   "forchheimer"
+  ]
+ },
+ "doc87.pdf": {
+  "arxiv_id": "2606.27260v1",
+  "title": "Conjecture About Arbitrary Even-Order Convexity of $w$-Optimization of",
+  "matched_terms": [
+   "about",
+   "conjecture",
+   "convexity",
+   "optimization"
+  ]
+ },
+ "doc88.pdf": {
+  "arxiv_id": "2606.27217v1",
+  "title": "CHAMB-GA: A Containerized HPC Scalable Microservice-Based Framework fo",
+  "matched_terms": [
+   "chamb"
+  ]
+ },
+ "doc89.pdf": {
+  "arxiv_id": "2606.27196v1",
+  "title": "Optimizing Accessibility and Maximum Travel Times in Transit Networks:",
+  "matched_terms": [
+   "accessibility",
+   "transit"
+  ]
+ },
+ "doc90.pdf": {
+  "arxiv_id": "2606.27375v1",
+  "title": "Scalable Behavior Cloning with Open Data, Training, and Evaluation",
+  "matched_terms": [
+   "data",
+   "training"
+  ]
+ },
+ "doc92.pdf": {
+  "arxiv_id": "2606.27311v1",
+  "title": "Massive Cosmological Correlators from Flat Space: a Laplace-Space Appr",
+  "matched_terms": [
+   "laplace",
+   "massive",
+   "space"
+  ]
+ },
+ "doc93.pdf": {
+  "arxiv_id": "2606.27309v1",
+  "title": "Laplace Space for Cosmological Correlators",
+  "matched_terms": [
+   "laplace"
+  ]
+ },
+ "doc94.pdf": {
+  "arxiv_id": "2606.27290v1",
+  "title": "A solid unification of the dark sector",
+  "matched_terms": [
+   "dark",
+   "solid",
+   "unification"
+  ]
+ },
+ "doc25.pdf": {
+  "arxiv_id": "2606.27377v1",
+  "title": "DanceOPD: On-Policy Generative Field Distillation",
+  "matched_terms": [
+   "danceopd",
+   "field"
+  ]
+ },
+ "doc27.pdf": {
+  "arxiv_id": "2606.27330v1",
+  "title": "Empowering GUI Agents via Autonomous Experience Exploration and Hindsi",
+  "matched_terms": [
+   "task"
+  ]
+ },
+ "doc28.pdf": {
+  "arxiv_id": "2606.27316v1",
+  "title": "LLM-Based Examination of Eligibility Criteria from Securities Prospect",
+  "matched_terms": [
+   "bank",
+   "central",
+   "german",
+   "securities"
+  ]
+ },
+ "doc29.pdf": {
+  "arxiv_id": "2606.27314v1",
+  "title": "Beyond Surface Forms: A Comprehensive, Mechanism-Oriented Taxonomy of ",
+  "matched_terms": [
+   "taxonomy"
+  ]
+ },
+ "doc30.pdf": {
+  "arxiv_id": "2606.27306v1",
+  "title": "Multilingual Reasoning Cascades Need More Context",
+  "matched_terms": [
+   "multilingual"
+  ]
+ },
+ "doc32.pdf": {
+  "arxiv_id": "2606.27369v1",
+  "title": "Reinforcement Learning without Ground-Truth Solutions can Improve LLMs",
+  "matched_terms": [
+   "llms"
+  ]
+ },
+ "doc34.pdf": {
+  "arxiv_id": "2606.27359v1",
+  "title": "When are likely answers right? On Sequence Probability and Correctness",
+  "matched_terms": [
+   "correctness",
+   "probability",
+   "sequence"
+  ]
+ },
+ "doc35.pdf": {
+  "arxiv_id": "2606.27354v1",
+  "title": "Error-Conditioned Neural Solvers",
+  "matched_terms": [
+   "conditioned"
+  ]
+ },
+ "doc38.pdf": {
+  "arxiv_id": "2606.27298v1",
+  "title": "Fast algorithms for learning a Gaussian under halfspace truncation wit",
+  "matched_terms": [
+   "sample",
+   "truncation"
+  ]
+ },
+ "doc39.pdf": {
+  "arxiv_id": "2606.27269v1",
+  "title": "Ribbon: Scalable Approximation and Robust Uncertainty Quantification",
+  "matched_terms": [
+   "ribbon",
+   "uncertainty"
+  ]
+ },
+ "doc40.pdf": {
+  "arxiv_id": "2606.26733v1",
+  "title": "Surviving by Serving: Functional Relevance Drives Self-Organization in",
+  "matched_terms": [
+   "adaptive",
+   "complex",
+   "functional",
+   "self"
+  ]
+ },
+ "doc41.pdf": {
+  "arxiv_id": "2606.26448v1",
+  "title": "Closing the Loop to Discover Psychological Theories with an Automated ",
+  "matched_terms": [
+   "automated"
+  ]
+ },
+ "doc42.pdf": {
+  "arxiv_id": "2606.26279v1",
+  "title": "Beyond Single-Source Cognitive Taskonomy:Multi-Source Task Relations t",
+  "matched_terms": [
+   "cognitive",
+   "fmri",
+   "relations",
+   "task"
+  ]
+ },
+ "doc44.pdf": {
+  "arxiv_id": "2606.26432v1",
+  "title": "Embedding Foundation Model Predictions in Discrete-Choice Models with ",
+  "matched_terms": [
+   "foundation",
+   "models"
+  ]
+ },
+ "doc45.pdf": {
+  "arxiv_id": "2606.25688v1",
+  "title": "Choosing What to Calibrate and What to Estimate in Structural Models",
+  "matched_terms": [
+   "structural"
+  ]
+ },
+ "doc47.pdf": {
+  "arxiv_id": "2606.24867v1",
+  "title": "Bounds for Standard Errors in Combined Data",
+  "matched_terms": [
+   "bounds"
+  ]
+ },
+ "doc48.pdf": {
+  "arxiv_id": "2606.27312v1",
+  "title": "A Verification Theorem for an Optimal Control Problem Governed by the ",
+  "matched_terms": [
+   "equations",
+   "optimal",
+   "theorem",
+   "verification"
+  ]
+ },
+ "doc49.pdf": {
+  "arxiv_id": "2606.27260v1",
+  "title": "Conjecture About Arbitrary Even-Order Convexity of $w$-Optimization of",
+  "matched_terms": [
+   "arbitrary",
+   "conjecture",
+   "convexity",
+   "even"
+  ]
+ },
+ "doc50.pdf": {
+  "arxiv_id": "2606.27217v1",
+  "title": "CHAMB-GA: A Containerized HPC Scalable Microservice-Based Framework fo",
+  "matched_terms": [
+   "chamb",
+   "genetic"
+  ]
+ }
+}
