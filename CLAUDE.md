@@ -81,7 +81,15 @@ was updated last.
    These belong in the main table, not an appendix.
    `memory/related-work.md` keeps the list of who beats us where.
 
-10. **Two known extraction defects are open and must not be forgotten**
+10. **The internal arXiv corpus does not match its own gold** (measured 2026-08-16,
+    `notes.md` Stage 24): 0 of 65 shared filenames have findable gold, because a
+    re-fetch reused `doc<N>.pdf` names for different papers. **Every ablation returns
+    MRR=0.0 until this is repaired**, and `datasets/verify.py` will not catch it — the
+    manifest was regenerated from the new files, so manifest and disk agree and neither
+    agrees with the gold. Recover by `arxiv_id` from `dataset_manifest_v2.json`.
+    A manifest is evidence about the files it was written from, and nothing else.
+
+11. **Two known extraction defects are open and must not be forgotten**
     (`to-do.md` 6 and 7, `notes.md` Stage 22): a block spanning both columns has its
     text extracted across the gutter, interleaving the columns into an unreadable
     section heading; and full-width elements above a two-column body sort *after* the

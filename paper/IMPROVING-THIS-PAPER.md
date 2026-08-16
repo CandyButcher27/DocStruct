@@ -6,6 +6,65 @@ This is a work plan, not a critique. The question behind it — *is this a good 
 a list of failures?* — is answered first, because the answer changes what the work is
 for.
 
+
+---
+
+## STATUS — 2026-08-16 (read this first; the sections below predate it)
+
+**The paper is submittable to a workshop today.** 8 pages, builds clean, 0 undefined
+references, one `\todo` (affiliation). Reframed around the relevance-rule finding.
+
+### Done since this document was written
+
+| | |
+|---|---|
+| Determinism | **95/95** documents byte-identical across independent processes, 5,810 chunks per run. Cross-checks exactly against the benchmark's own chunk count from a different machine and code path. |
+| Region threshold | Swept 0.1–1.0; a DocStruct variant leads at all ten. The constant does not choose the winner. |
+| Section boundaries | Full corpus: 134 PMC papers, we lead Pk and WindowDiff. |
+| Reframe | Title, abstract, contributions, §6 retitle, §6+§7 merged. |
+| Length | 9 → 8 pages. |
+| Bibliography | All 24 arXiv entries verified against the API; one fabricated attribution corrected, seven placeholders filled. |
+| Library | `pip install docstruct-rag` — built, `twine check` clean, verified in a fresh venv. **Not yet published.** |
+
+### Blocked, and it is the top priority
+
+**The internal arXiv corpus does not match its own gold.** 0 of 65 shared filenames
+have findable gold; a re-fetch reused `doc<N>.pdf` names for different papers
+(`notes.md` Stage 24). Consequences:
+
+- Table 3 and three ablation deltas — including the vision detector's +0.0443, the
+  only corpus where it shows an effect — are **not reproducible today**. The paper now
+  says so where the table appears.
+- **No ablation can run**, which blocks the reading-order fix below.
+
+Repair: recover by `arxiv_id` from `dataset_manifest_v2.json`, which still records it.
+Estimated half a day, mostly download time.
+
+### The two extraction defects, after attempting both
+
+**Reading order (full-width elements sort after columns): solved in code, unmeasured.**
+`BAND_SPLIT=True` fixes it — verified, the title moves from 7th to 1st. It is
+default-OFF pending an ablation that cannot run until the corpus is repaired. This is
+now a measurement task, not a coding one.
+
+**Column-gutter extraction: attempted, measured, reverted.** A gutter-splitting
+extractor was written and did find the correct gutter, and the left column came out
+clean — but document-wide the garbled-token count was **14 before and 14 after**. It
+moved text without fixing the defect, so it was reverted rather than shipped behind a
+flag. Recorded as a negative result: *a naive gutter split does not solve this.*
+Whoever takes it next should start by asking why the right-hand crop remains
+interleaved even when the split point is correct.
+
+### Recommended order from here
+
+1. **Send the paper for review now.** It will not get better by waiting for items 2–4,
+   and the feedback most likely to change the work is framing feedback, which is
+   available today.
+2. **Repair the internal corpus** (half a day). Unblocks everything else.
+3. **Measure `BAND_SPLIT`** and, if it holds, flip the default. Lands a real fix.
+4. **Publish to PyPI** — one command, needs your token.
+5. Then Tier 2 below, if aiming beyond a workshop.
+
 ---
 
 ## 1. Is this a failure paper? No. But it reads like one, and that is a bug.

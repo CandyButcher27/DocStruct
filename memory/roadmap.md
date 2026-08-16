@@ -5,6 +5,19 @@ Ranked by expected value. Everything here has been audited against the actual co
 
 ## Next up
 
+> **Blocking, added 2026-08-16: the internal arXiv corpus does not match its own gold.**
+> 0 of 65 shared filenames have findable gold; a re-fetch reused `doc<N>.pdf` names for
+> different papers. This blocks *every* ablation, including the `BAND_SPLIT` measurement
+> that would land the reading-order fix. `dataset_manifest_v2.json` still records
+> `arxiv_id` per entry, so the original set is recoverable — `fetch_dataset_v2.py` must
+> key on that, not on positional filename. `notes.md` Stage 24.
+>
+> **Done since the last revision:** determinism measured (95/95, `results.md`); the
+> region threshold swept; section boundaries scored on 134 PMC papers; the paper
+> reframed around the relevance-rule finding and cut to 8 pages; the library made
+> pip-installable as `docstruct-rag`.
+
+
 > **Item 0 is done (2026-08-11).** OHR-Bench, not FinanceBench, became the primary
 > external corpus: 95 docs, 3,558 human questions, seven tools, **all three
 > relevance modes**. DocStruct is 1st under `span` and `region`, 6th of 7 under

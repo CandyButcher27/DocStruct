@@ -217,6 +217,12 @@ work.
 
 ## Ablation workflow
 
+> **⚠ Ablations cannot run as of 2026-08-16.** The internal arXiv corpus on disk no
+> longer matches `benchmark_qa_v6.json`: a re-fetch reused the `doc<N>.pdf` filenames
+> for different papers, so every ablation returns `MRR=0.0`. Recover the corpus by
+> `arxiv_id` from `dataset_manifest_v2.json` first. `notes.md` Stage 24.
+
+
 `scripts/ablate.py` runs **one** adapter with `docstruct.config` overrides applied
 before chunking, and writes metrics + a per-doc breakdown to
 `reports/ablations/<name>.json`.
