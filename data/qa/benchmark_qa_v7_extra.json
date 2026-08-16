@@ -318,5 +318,45 @@
     "source_chunk_id": "part_2",
     "page_num": -1,
     "section_path": ""
+  },
+  {
+    "question": "What does the document say about its purpose concerning GNU compilers?",
+    "answer_span": "This file documents the use of the GNU compilers.",
+    "source_doc": "doc108.pdf",
+    "source_chunk_id": "part_0",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What freedom does the document claim the reader has regarding the GNU Manual?",
+    "answer_span": "You have freedom to copy and modify this GNU Manual, like GNU software.",
+    "source_doc": "doc108.pdf",
+    "source_chunk_id": "part_0",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does the -fsanitize=undefined option cause the GCC driver to do when linking a program?",
+    "answer_span": "When the -fsanitize=undefined option is used to link a program, the GCC driver automatically links against libubsan.",
+    "source_doc": "doc108.pdf",
+    "source_chunk_id": "part_41",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What does GCC allow as a GNU extension regarding compound literals?",
+    "answer_span": "As a GNU extension, GCC allows compound literals with a variable size.",
+    "source_doc": "doc108.pdf",
+    "source_chunk_id": "part_82",
+    "page_num": -1,
+    "section_path": ""
+  },
+  {
+    "question": "What happens to pointer p in the call to f1 inside f2?",
+    "answer_span": "In the call to f1 inside f2, the pointer p is converted into a pointer to the anonymous field.",
+    "source_doc": "doc108.pdf",
+    "source_chunk_id": "part_82",
+    "page_num": -1,
+    "section_path": ""
   }
 ]
