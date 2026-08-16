@@ -34,6 +34,10 @@ _MIN_COLUMN_WORDS = 40      # too few words to trust a whitespace band as a gutt
 # equation, table or figure) and still count as a gutter. Requiring zero crossings
 # vetoes the split on almost every real paper.
 _MAX_GUTTER_CROSSING_RATIO = 0.02
+# Points of *entirely* word-free width a band must have before it counts as a
+# gutter. Two-column gutters in this corpus run 10-20pt; a false gutter on a
+# single-column page has a zero-crossing run of 0-2pt (measured, doc3.pdf).
+_MIN_GUTTER_BAND_PT = 5
 
 _SYSTEM = (
     "You write evaluation questions for a document retrieval benchmark. "
@@ -104,10 +108,33 @@ def _column_gutter(page) -> Optional[float]:
     if crossings[best] > len(words) * _MAX_GUTTER_CROSSING_RATIO:
         return None
 
-    # Centre the split in the low-crossing band rather than at its first point.
-    threshold = crossings[best]
-    band = [i for i in middle if crossings[i] <= threshold]
-    return page_x0 + (band[0] + band[-1]) / 2.0
+    # A minimum is not a gutter. On a single-column page the crossing count still
+    # bottoms out somewhere in the middle band -- measured on doc3.pdf p2, at a
+    # point with one word lying across it -- and cropping there cuts that word in
+    # half, so every line comes back truncated ("Coordinated Vulnerability" for
+    # "Coordinated Vulnerability Disclosure"). The model then repairs the broken
+    # text into fluent prose, the span is no longer verbatim, and the document
+    # silently yields no gold at all: 19% of documents in one run.
+    #
+    # A real gutter is a band of genuine whitespace, so require one: the widest
+    # run of exactly-zero crossings in the middle band, at least
+    # _MIN_GUTTER_BAND_PT wide. Split at its centre, which is by construction a
+    # point no word crosses.
+    runs, start = [], None
+    for i in middle:
+        if crossings[i] == 0:
+            start = i if start is None else start
+        elif start is not None:
+            runs.append((start, i - 1))
+            start = None
+    if start is not None:
+        runs.append((start, middle[-1]))
+    if not runs:
+        return None
+    lo_i, hi_i = max(runs, key=lambda r: r[1] - r[0])
+    if (hi_i - lo_i + 1) < _MIN_GUTTER_BAND_PT:
+        return None
+    return page_x0 + (lo_i + hi_i) / 2.0
 
 
 def _page_text(page) -> str:
