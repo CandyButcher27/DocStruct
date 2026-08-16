@@ -1,5 +1,16 @@
 # DocStruct Optimization Blueprint & Implementation Plan
 
+> **SUPERSEDED 2026-08-16 by [`ROADMAP.md`](ROADMAP.md) for planning purposes.** Kept
+> for history and for §8/§9, which are still accurate.
+>
+> **§10's audit is partly stale.** Re-checked 2026-08-16: `pipeline_mode` *is* built
+> (15 references in `docstruct/`) and bootstrap CIs *are* built (`eval/stats.py`
+> provides `bootstrap_ci` and `paired_bootstrap`, both reported in the paper) — the
+> audit says neither landed. Still accurate: `suppress_contained` remains a dead
+> import, and `PREPEND_SECTION_PATH` / `POOLED_CORPUS` were never built.
+
+
+
 This document serves as a complete technical blueprint for the layout parsing, reading order, and retrieval improvements in DocStruct. It compiles all recommendations from the Codex review and our proposed optimizations, detailing the precise code structures, algorithms, and configuration keys to be updated.
 
 ---

@@ -1,0 +1,394 @@
+[
+  {
+    "file": "doc25.pdf",
+    "arxiv_id": "2606.27377v1",
+    "title": "DanceOPD: On-Policy Generative Field Distillation",
+    "source": "https://arxiv.org/pdf/2606.27377v1",
+    "sha256": "2545e43b4c4cfe5265bbb1337166742a5fe38d79c1bec514e4a7ac02fc3865f4"
+  },
+  {
+    "file": "doc27.pdf",
+    "arxiv_id": "2606.27330v1",
+    "title": "Empowering GUI Agents via Autonomous Experience Exploration and Hindsi",
+    "source": "https://arxiv.org/pdf/2606.27330v1",
+    "sha256": "81030f5733f3d44e36858aebcb86fc876b72bcb84708f9db819eb3e0ba90b48c"
+  },
+  {
+    "file": "doc28.pdf",
+    "arxiv_id": "2606.27316v1",
+    "title": "LLM-Based Examination of Eligibility Criteria from Securities Prospect",
+    "source": "https://arxiv.org/pdf/2606.27316v1",
+    "sha256": "71b96243e1104050f555e809ab995f1326d01b7998adaa0b5d6a176c4bcea9da"
+  },
+  {
+    "file": "doc29.pdf",
+    "arxiv_id": "2606.27314v1",
+    "title": "Beyond Surface Forms: A Comprehensive, Mechanism-Oriented Taxonomy of ",
+    "source": "https://arxiv.org/pdf/2606.27314v1",
+    "sha256": "bc3ed1a939d51bd7ec2663417e227b79e714ec46fbbdad8a04d2b090da2db90b"
+  },
+  {
+    "file": "doc30.pdf",
+    "arxiv_id": "2606.27306v1",
+    "title": "Multilingual Reasoning Cascades Need More Context",
+    "source": "https://arxiv.org/pdf/2606.27306v1",
+    "sha256": "34de8b83d1f7c4a6bdb68ead83ebdaf176e8370cac8468f81d3160effbecc6a3"
+  },
+  {
+    "file": "doc32.pdf",
+    "arxiv_id": "2606.27369v1",
+    "title": "Reinforcement Learning without Ground-Truth Solutions can Improve LLMs",
+    "source": "https://arxiv.org/pdf/2606.27369v1",
+    "sha256": "506212f309d35b42931682c3151c55cece9c028a3828562f94e5db9569ce1426"
+  },
+  {
+    "file": "doc34.pdf",
+    "arxiv_id": "2606.27359v1",
+    "title": "When are likely answers right? On Sequence Probability and Correctness",
+    "source": "https://arxiv.org/pdf/2606.27359v1",
+    "sha256": "f82dd94845fa5eeb13c62908d10df0ff4211ee159d09d7993fd831a1845e8db7"
+  },
+  {
+    "file": "doc35.pdf",
+    "arxiv_id": "2606.27354v1",
+    "title": "Error-Conditioned Neural Solvers",
+    "source": "https://arxiv.org/pdf/2606.27354v1",
+    "sha256": "5d66632483eda4b2842e9dd66a07a41b51e4dc103ddab112811f45459202a432"
+  },
+  {
+    "file": "doc38.pdf",
+    "arxiv_id": "2606.27298v1",
+    "title": "Fast algorithms for learning a Gaussian under halfspace truncation wit",
+    "source": "https://arxiv.org/pdf/2606.27298v1",
+    "sha256": "9318b7fa8efe024a351eeeee1d396a181af3b063eedd750075f8eb407594811b"
+  },
+  {
+    "file": "doc39.pdf",
+    "arxiv_id": "2606.27269v1",
+    "title": "Ribbon: Scalable Approximation and Robust Uncertainty Quantification",
+    "source": "https://arxiv.org/pdf/2606.27269v1",
+    "sha256": "327d213d88e45c46609897e71bb4ec6db609710e0523499ce659e3e714829d17"
+  },
+  {
+    "file": "doc40.pdf",
+    "arxiv_id": "2606.26733v1",
+    "title": "Surviving by Serving: Functional Relevance Drives Self-Organization in",
+    "source": "https://arxiv.org/pdf/2606.26733v1",
+    "sha256": "e934bd251b2a371c86da477e6f5bfce7dad244dcebdd077c394e1f32d691213d"
+  },
+  {
+    "file": "doc41.pdf",
+    "arxiv_id": "2606.26448v1",
+    "title": "Closing the Loop to Discover Psychological Theories with an Automated ",
+    "source": "https://arxiv.org/pdf/2606.26448v1",
+    "sha256": "7b1717d4c4707e5a1b0e68ad8112cceac90758cfc6bffeae65b967ce8a1fb9ed"
+  },
+  {
+    "file": "doc42.pdf",
+    "arxiv_id": "2606.26279v1",
+    "title": "Beyond Single-Source Cognitive Taskonomy:Multi-Source Task Relations t",
+    "source": "https://arxiv.org/pdf/2606.26279v1",
+    "sha256": "fe4441625977d6a3c5c86a4c3e07f5e7b98ffaaf614d9174fca9834d35ce8e50"
+  },
+  {
+    "file": "doc44.pdf",
+    "arxiv_id": "2606.26432v1",
+    "title": "Embedding Foundation Model Predictions in Discrete-Choice Models with ",
+    "source": "https://arxiv.org/pdf/2606.26432v1",
+    "sha256": "178bd657363aafc0afc98f90e2ba1a295654a2e31f148943b51d8bc955a56d57"
+  },
+  {
+    "file": "doc45.pdf",
+    "arxiv_id": "2606.25688v1",
+    "title": "Choosing What to Calibrate and What to Estimate in Structural Models",
+    "source": "https://arxiv.org/pdf/2606.25688v1",
+    "sha256": "f32bbf08aeca19f55f97b151c6b7c7c15e412f449147cfa8daa5d0ff83224bd2"
+  },
+  {
+    "file": "doc47.pdf",
+    "arxiv_id": "2606.24867v1",
+    "title": "Bounds for Standard Errors in Combined Data",
+    "source": "https://arxiv.org/pdf/2606.24867v1",
+    "sha256": "c9750ef31e1dabe19398ab843fa7465ef38c11e3ec9ba479c1af50e503fb9219"
+  },
+  {
+    "file": "doc48.pdf",
+    "arxiv_id": "2606.27312v1",
+    "title": "A Verification Theorem for an Optimal Control Problem Governed by the ",
+    "source": "https://arxiv.org/pdf/2606.27312v1",
+    "sha256": "749246ab0c3e2f4f69d8e7ba10107289ed78536a3dc550648b39eecb5466fb9b"
+  },
+  {
+    "file": "doc49.pdf",
+    "arxiv_id": "2606.27260v1",
+    "title": "Conjecture About Arbitrary Even-Order Convexity of $w$-Optimization of",
+    "source": "https://arxiv.org/pdf/2606.27260v1",
+    "sha256": "850e61c3e8a6b66658296438a643eb8637c1944926613e1e12ae92cbb9fb7567"
+  },
+  {
+    "file": "doc50.pdf",
+    "arxiv_id": "2606.27217v1",
+    "title": "CHAMB-GA: A Containerized HPC Scalable Microservice-Based Framework fo",
+    "source": "https://arxiv.org/pdf/2606.27217v1",
+    "sha256": "486c11bbeb102e18222f029e6236af3a16316aef3a4894b56b726755eae15365"
+  },
+  {
+    "file": "doc51.pdf",
+    "arxiv_id": "2606.27377v1",
+    "title": "DanceOPD: On-Policy Generative Field Distillation",
+    "source": "https://arxiv.org/pdf/2606.27377v1",
+    "sha256": "2545e43b4c4cfe5265bbb1337166742a5fe38d79c1bec514e4a7ac02fc3865f4"
+  },
+  {
+    "file": "doc52.pdf",
+    "arxiv_id": "2606.27347v1",
+    "title": "Mapping Political-Elite Networks in Europe with a Multilingual Joint E",
+    "source": "https://arxiv.org/pdf/2606.27347v1",
+    "sha256": "ff4566d309cb1f17c261c24f07f4da7d4a1774ac3807db3274d22729b2372d1a"
+  },
+  {
+    "file": "doc53.pdf",
+    "arxiv_id": "2606.27330v1",
+    "title": "Empowering GUI Agents via Autonomous Experience Exploration and Hindsi",
+    "source": "https://arxiv.org/pdf/2606.27330v1",
+    "sha256": "81030f5733f3d44e36858aebcb86fc876b72bcb84708f9db819eb3e0ba90b48c"
+  },
+  {
+    "file": "doc54.pdf",
+    "arxiv_id": "2606.27316v1",
+    "title": "LLM-Based Examination of Eligibility Criteria from Securities Prospect",
+    "source": "https://arxiv.org/pdf/2606.27316v1",
+    "sha256": "71b96243e1104050f555e809ab995f1326d01b7998adaa0b5d6a176c4bcea9da"
+  },
+  {
+    "file": "doc55.pdf",
+    "arxiv_id": "2606.27314v1",
+    "title": "Beyond Surface Forms: A Comprehensive, Mechanism-Oriented Taxonomy of ",
+    "source": "https://arxiv.org/pdf/2606.27314v1",
+    "sha256": "bc3ed1a939d51bd7ec2663417e227b79e714ec46fbbdad8a04d2b090da2db90b"
+  },
+  {
+    "file": "doc56.pdf",
+    "arxiv_id": "2606.27306v1",
+    "title": "Multilingual Reasoning Cascades Need More Context",
+    "source": "https://arxiv.org/pdf/2606.27306v1",
+    "sha256": "34de8b83d1f7c4a6bdb68ead83ebdaf176e8370cac8468f81d3160effbecc6a3"
+  },
+  {
+    "file": "doc57.pdf",
+    "arxiv_id": "2606.27275v1",
+    "title": "How Surprising Is Historical Italian to Language Models? Tokenization ",
+    "source": "https://arxiv.org/pdf/2606.27275v1",
+    "sha256": "2cc193697f10e7ec743abb181610faa6cc4ef515fa51b64eda12fd3cb78bae51"
+  },
+  {
+    "file": "doc60.pdf",
+    "arxiv_id": "2606.27361v1",
+    "title": "Autoregressive Boltzmann Generators",
+    "source": "https://arxiv.org/pdf/2606.27361v1",
+    "sha256": "8d79eb8e2f67404f6fcf2aa57db292b09bc274ce386ebd6e91d10539c86d3248"
+  },
+  {
+    "file": "doc61.pdf",
+    "arxiv_id": "2606.27359v1",
+    "title": "When are likely answers right? On Sequence Probability and Correctness",
+    "source": "https://arxiv.org/pdf/2606.27359v1",
+    "sha256": "f82dd94845fa5eeb13c62908d10df0ff4211ee159d09d7993fd831a1845e8db7"
+  },
+  {
+    "file": "doc62.pdf",
+    "arxiv_id": "2606.27354v1",
+    "title": "Error-Conditioned Neural Solvers",
+    "source": "https://arxiv.org/pdf/2606.27354v1",
+    "sha256": "5d66632483eda4b2842e9dd66a07a41b51e4dc103ddab112811f45459202a432"
+  },
+  {
+    "file": "doc64.pdf",
+    "arxiv_id": "2606.27376v1",
+    "title": "Ask, Solve, Generate: Self-Evolving Unified Multimodal Understanding a",
+    "source": "https://arxiv.org/pdf/2606.27376v1",
+    "sha256": "5bb0b644d1bc340c887cbe7b2612bbe9a369a21951c0cd1a14463395e80418c9"
+  },
+  {
+    "file": "doc65.pdf",
+    "arxiv_id": "2606.27374v1",
+    "title": "World Action Models Enable Continual Imitation Learning with Recurrent",
+    "source": "https://arxiv.org/pdf/2606.27374v1",
+    "sha256": "b003b876ee0587bc5c068ebb42540ff8391d1fcb9d1ee647a3b4a6d6e32da6b1"
+  },
+  {
+    "file": "doc67.pdf",
+    "arxiv_id": "2606.27372v1",
+    "title": "DnA: Denoising Attention for Visual Tasks",
+    "source": "https://arxiv.org/pdf/2606.27372v1",
+    "sha256": "dd52c911bcd811b2cd19de861aff8896f046f333a6fdad790ce3f2365650a658"
+  },
+  {
+    "file": "doc68.pdf",
+    "arxiv_id": "2606.27371v1",
+    "title": "Don't Settle at the Mode! Mitigating Diversity Collapse in Pretrained ",
+    "source": "https://arxiv.org/pdf/2606.27371v1",
+    "sha256": "da6ae5bbc3fb973e8e8f7474f73349a027fb727d600c54c7421abdb711a46eaf"
+  },
+  {
+    "file": "doc70.pdf",
+    "arxiv_id": "2606.27298v1",
+    "title": "Fast algorithms for learning a Gaussian under halfspace truncation wit",
+    "source": "https://arxiv.org/pdf/2606.27298v1",
+    "sha256": "9318b7fa8efe024a351eeeee1d396a181af3b063eedd750075f8eb407594811b"
+  },
+  {
+    "file": "doc71.pdf",
+    "arxiv_id": "2606.27269v1",
+    "title": "Ribbon: Scalable Approximation and Robust Uncertainty Quantification",
+    "source": "https://arxiv.org/pdf/2606.27269v1",
+    "sha256": "327d213d88e45c46609897e71bb4ec6db609710e0523499ce659e3e714829d17"
+  },
+  {
+    "file": "doc72.pdf",
+    "arxiv_id": "2606.26733v1",
+    "title": "Surviving by Serving: Functional Relevance Drives Self-Organization in",
+    "source": "https://arxiv.org/pdf/2606.26733v1",
+    "sha256": "e934bd251b2a371c86da477e6f5bfce7dad244dcebdd077c394e1f32d691213d"
+  },
+  {
+    "file": "doc73.pdf",
+    "arxiv_id": "2606.26448v1",
+    "title": "Closing the Loop to Discover Psychological Theories with an Automated ",
+    "source": "https://arxiv.org/pdf/2606.26448v1",
+    "sha256": "7b1717d4c4707e5a1b0e68ad8112cceac90758cfc6bffeae65b967ce8a1fb9ed"
+  },
+  {
+    "file": "doc74.pdf",
+    "arxiv_id": "2606.26279v1",
+    "title": "Beyond Single-Source Cognitive Taskonomy:Multi-Source Task Relations t",
+    "source": "https://arxiv.org/pdf/2606.26279v1",
+    "sha256": "fe4441625977d6a3c5c86a4c3e07f5e7b98ffaaf614d9174fca9834d35ce8e50"
+  },
+  {
+    "file": "doc75.pdf",
+    "arxiv_id": "2606.25874v1",
+    "title": "Topology-Dependent Emergence of Polychronous Neuronal Groups: A Recurr",
+    "source": "https://arxiv.org/pdf/2606.25874v1",
+    "sha256": "e6a15f4c0e937b752125bf4e7cc069fd6b84d51bd9d737313986f849017b0034"
+  },
+  {
+    "file": "doc76.pdf",
+    "arxiv_id": "2606.25826v1",
+    "title": "Weight geometry governs functional memory in complex systems",
+    "source": "https://arxiv.org/pdf/2606.25826v1",
+    "sha256": "6e981b13008e910bc60e99a0fe9f4700372dfbfbc2d8cd63da0238f093ee1ca7"
+  },
+  {
+    "file": "doc77.pdf",
+    "arxiv_id": "2606.26432v1",
+    "title": "Embedding Foundation Model Predictions in Discrete-Choice Models with ",
+    "source": "https://arxiv.org/pdf/2606.26432v1",
+    "sha256": "178bd657363aafc0afc98f90e2ba1a295654a2e31f148943b51d8bc955a56d57"
+  },
+  {
+    "file": "doc79.pdf",
+    "arxiv_id": "2606.25292v1",
+    "title": "Time-Varying Model Averaging of Multi-layer Network Vector Autoregress",
+    "source": "https://arxiv.org/pdf/2606.25292v1",
+    "sha256": "acc32f2ac8a3a671d98fe8b36432a41259855d295bfecd49362d59a592960e3a"
+  },
+  {
+    "file": "doc80.pdf",
+    "arxiv_id": "2606.24867v1",
+    "title": "Bounds for Standard Errors in Combined Data",
+    "source": "https://arxiv.org/pdf/2606.24867v1",
+    "sha256": "c9750ef31e1dabe19398ab843fa7465ef38c11e3ec9ba479c1af50e503fb9219"
+  },
+  {
+    "file": "doc81.pdf",
+    "arxiv_id": "2606.24850v1",
+    "title": "Heterogeneous Peer Effects with Endogenous Network Formation",
+    "source": "https://arxiv.org/pdf/2606.24850v1",
+    "sha256": "97ca12dc00b48cd8a7d47de8956291b64746f9df23158160a2e16c8ecd90f4b9"
+  },
+  {
+    "file": "doc82.pdf",
+    "arxiv_id": "2606.27367v1",
+    "title": "Accessing both electrochemical SEIRA and SERS with ultrasensitive meta",
+    "source": "https://arxiv.org/pdf/2606.27367v1",
+    "sha256": "43c9e27f79292bf925f174694abe21337fbfa7b239709ea2baa048f8af723d83"
+  },
+  {
+    "file": "doc83.pdf",
+    "arxiv_id": "2606.27218v1",
+    "title": "Plasmonic coated scatterers for tunable coherent perfect absorption",
+    "source": "https://arxiv.org/pdf/2606.27218v1",
+    "sha256": "a1eabeb2df7a0991d6b554f20123024f72341ab28824fd9a8e547de6aa3b9daa"
+  },
+  {
+    "file": "doc84.pdf",
+    "arxiv_id": "2606.27099v1",
+    "title": "Neural Networks for Inverse Design of Cascaded-Mode Near-Field Landsca",
+    "source": "https://arxiv.org/pdf/2606.27099v1",
+    "sha256": "65740f9b166db5d66fad6d131786d66f1a736a7c976685b977122276d00bb9ee"
+  },
+  {
+    "file": "doc85.pdf",
+    "arxiv_id": "2606.27043v1",
+    "title": "Observation of Non-Hermitian Skin Dynamics in the Liouvillian Regime",
+    "source": "https://arxiv.org/pdf/2606.27043v1",
+    "sha256": "a3b9d774e5f5a6055bf67817d0db49d3fb7a80edc2f43069375a2df040c200ec"
+  },
+  {
+    "file": "doc86.pdf",
+    "arxiv_id": "2606.27312v1",
+    "title": "A Verification Theorem for an Optimal Control Problem Governed by the ",
+    "source": "https://arxiv.org/pdf/2606.27312v1",
+    "sha256": "749246ab0c3e2f4f69d8e7ba10107289ed78536a3dc550648b39eecb5466fb9b"
+  },
+  {
+    "file": "doc87.pdf",
+    "arxiv_id": "2606.27260v1",
+    "title": "Conjecture About Arbitrary Even-Order Convexity of $w$-Optimization of",
+    "source": "https://arxiv.org/pdf/2606.27260v1",
+    "sha256": "850e61c3e8a6b66658296438a643eb8637c1944926613e1e12ae92cbb9fb7567"
+  },
+  {
+    "file": "doc88.pdf",
+    "arxiv_id": "2606.27217v1",
+    "title": "CHAMB-GA: A Containerized HPC Scalable Microservice-Based Framework fo",
+    "source": "https://arxiv.org/pdf/2606.27217v1",
+    "sha256": "486c11bbeb102e18222f029e6236af3a16316aef3a4894b56b726755eae15365"
+  },
+  {
+    "file": "doc89.pdf",
+    "arxiv_id": "2606.27196v1",
+    "title": "Optimizing Accessibility and Maximum Travel Times in Transit Networks:",
+    "source": "https://arxiv.org/pdf/2606.27196v1",
+    "sha256": "863d568ce7104252ed5194e557404948c3a61cab05f9ac9641db83133ab4d14e"
+  },
+  {
+    "file": "doc90.pdf",
+    "arxiv_id": "2606.27375v1",
+    "title": "Scalable Behavior Cloning with Open Data, Training, and Evaluation",
+    "source": "https://arxiv.org/pdf/2606.27375v1",
+    "sha256": "1c8bb93951c617c76581bbf809fd95d38a711f57d9a5840ce83c08a0179d3895"
+  },
+  {
+    "file": "doc92.pdf",
+    "arxiv_id": "2606.27311v1",
+    "title": "Massive Cosmological Correlators from Flat Space: a Laplace-Space Appr",
+    "source": "https://arxiv.org/pdf/2606.27311v1",
+    "sha256": "c5942c892385d4e330931693c483d9580303f85cc8836b6525577daf202a36b7"
+  },
+  {
+    "file": "doc93.pdf",
+    "arxiv_id": "2606.27309v1",
+    "title": "Laplace Space for Cosmological Correlators",
+    "source": "https://arxiv.org/pdf/2606.27309v1",
+    "sha256": "4a21cdbfc275b0a9df49c984bdef09e4f2b1468a9f239cbd9927680745b6fcff"
+  },
+  {
+    "file": "doc94.pdf",
+    "arxiv_id": "2606.27290v1",
+    "title": "A solid unification of the dark sector",
+    "source": "https://arxiv.org/pdf/2606.27290v1",
+    "sha256": "965b1a3fee1b33996599c44f86510447eb77068933e08e954ba8733bb8d5a1a3"
+  }
+]

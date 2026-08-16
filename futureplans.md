@@ -1,5 +1,15 @@
 # Future plans — what the next session does
 
+> **SUPERSEDED 2026-08-16 by [`ROADMAP.md`](ROADMAP.md).** Kept for history. Its live
+> items were folded into that file after being re-checked against the code; several
+> were already done. Its §4 MinerU suggestion and §5 open decisions survived the check.
+> Its warning about `fetch_dataset_v2.py` deduping against the manifest rather than the
+> disk turned out to be the exact mechanism that destroyed the internal corpus
+> (`notes.md` Stage 24/25) — the bug was documented here and its consequence was not
+> foreseen.
+
+
+
 Written 2026-08-06 at the end of the infrastructure session. Read this first, then
 `memory/benchmark-datasets.md` and `memory/evaluation.md`. `to-do.md` is the older
 scratchpad; where they disagree, this file is newer.
