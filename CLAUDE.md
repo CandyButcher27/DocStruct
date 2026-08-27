@@ -71,7 +71,8 @@ was updated last.
    the output of a tool being benchmarked. Prefer a public human-annotated corpus
    (FinanceBench first — see `memory/benchmark-datasets.md`) over LLM-generated gold
    for any headline number in the paper.
-9. **Report the losses.** Coverage 0.817 vs LangChain's 1.00, duplication 2.06, no
+9. **Report the losses.** Coverage 0.9632 vs LangChain's 1.00 and duplication 1.83
+   (both OHR-Bench; the old 0.817/2.06 came from the withdrawn internal table), no
    parse-fidelity number, born-digital only, **6th of 7 under page relevance**, and
    **the model detector is not significant on any corpus but arXiv** — +0.0012 span /
    +0.0090 region on OHR-Bench, and on PMC section boundaries geometry-only *beats*
@@ -98,10 +99,21 @@ was updated last.
 
 ## The paper
 
-A first draft lives in `paper/` (`main.tex` + `refs.bib`, plain `article` class so
-it builds anywhere). `\todo{}` marks open work; `refs.bib` has a header listing the
+The draft lives in `paper/` and is **on the ACL 2023 template** as of 2026-08-28:
+`main.tex` + `refs.bib` + `ACL2023.sty` + `acl_natbib.bst`, built with
+`pdflatex → bibtex → pdflatex → pdflatex`. Title: *Relevance Rules Confound PDF
+Chunker Evaluation*. Citations are author-year via `acl_natbib`, not numeric.
+
+**The venue limit is 8 pages for the whole PDF, references included** — not 8 body
+pages with the tail free. It lands at exactly 8, so every addition must be paid for
+by a cut.
+
+`.claude/skills/acl-paper/` is the contract for editing it: the ACL layout diff, a
+claim ledger mapping every number in the draft to the report that produced it, and
+`scripts/gate.py`, a runnable anti-slop gate. **Run the gate on every `.tex` edit and
+report its counts.** `\todo{}` marks open work; `refs.bib` has a header listing the
 entries whose author lists are still unverified. The three research memory files
-above are its source of truth — update them, then the draft.
+above remain the source of truth for content — update them, then the draft.
 
 ## Running things
 

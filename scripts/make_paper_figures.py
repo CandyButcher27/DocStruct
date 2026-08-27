@@ -99,7 +99,7 @@ def fig_mode_inversion():
             ranks.setdefault(t["name"], {})[m] = i
             mrr.setdefault(t["name"], {})[m] = t["mrr"]
 
-    fig, ax = plt.subplots(figsize=(3.3, 2.9))
+    fig, ax = plt.subplots(figsize=(3.3, 2.6))
     xs = range(len(modes))
     for tool in ORDER:
         if tool not in ranks:
@@ -108,14 +108,23 @@ def fig_mode_inversion():
         emph = tool.startswith("docstruct") or tool == "unstructured"
         ax.plot(xs, ys, "-o",
                 color=ACCENT if tool == "unstructured" else colour(tool),
-                lw=2.0 if emph else 0.9, ms=4.5 if emph else 3,
-                zorder=3 if emph else 1, alpha=1.0 if emph else 0.75)
+                lw=2.2 if emph else 0.7, ms=5 if emph else 2.5,
+                zorder=3 if emph else 1, alpha=1.0 if emph else 0.45)
         ax.annotate(PRETTY[tool], (2, ranks[tool]["region"]),
-                    xytext=(6, 0), textcoords="offset points",
+                    xytext=(7, 0), textcoords="offset points",
                     va="center", fontsize=6.8,
                     color=ACCENT if tool == "unstructured" else
-                    (INK if tool.startswith("docstruct") else "#71717a"),
+                    (INK if tool.startswith("docstruct") else "#a1a1aa"),
                     fontweight="bold" if emph else "normal")
+
+    # MRR beside each emphasised marker: the rank axis alone hides how close
+    # the span and region races are.
+    for tool in ("docstruct", "unstructured"):
+        for i, m in enumerate(modes):
+            ax.annotate(f"{mrr[tool][m]:.2f}", (i, ranks[tool][m]),
+                        xytext=(0, -11), textcoords="offset points",
+                        ha="center", fontsize=5.8,
+                        color=ACCENT if tool == "unstructured" else OURS)
 
     ax.set_xticks(list(xs))
     ax.set_xticklabels(modes, fontstyle="italic")
@@ -124,8 +133,8 @@ def fig_mode_inversion():
     ax.set_ylabel("rank of 7 (1 = best)")
     ax.set_xlabel("relevance rule")
     ax.set_xlim(-0.25, 2.95)
+    ax.set_ylim(7.6, 0.4)
     ax.grid(axis="y", color="#e4e4e7", lw=0.5, zorder=0)
-    ax.set_title("Identical chunks. Only the scoring rule changes.", pad=7)
     fig.tight_layout()
     fig.savefig(os.path.join(OUT, "mode_inversion.pdf"), bbox_inches="tight")
     plt.close(fig)
@@ -157,7 +166,7 @@ def fig_threshold_sweep():
     ax.set_ylabel("MRR")
     ax.grid(color="#e4e4e7", lw=0.5, zorder=0)
     ax.legend(frameon=False, loc="lower left")
-    ax.set_title("A DocStruct variant leads at every threshold", pad=7)
+    ax.set_ylim(0.15, 1.0)
     fig.tight_layout()
     fig.savefig(os.path.join(OUT, "threshold_sweep.pdf"), bbox_inches="tight")
     plt.close(fig)
@@ -166,31 +175,50 @@ def fig_threshold_sweep():
 # ---------------------------------------------------------------- figure 4
 def fig_size_confound():
     """Why Pk and WindowDiff must be read together."""
+    # A dumbbell sorted by chunk count. The earlier scatter put seven pairs of
+    # labelled points in one quadrant and could not be read at column width.
     sec = load("section_scores.json")["results"]
-    fig, ax = plt.subplots(figsize=(3.3, 2.5))
-    for tool, v in sec.items():
-        c = colour(tool)
-        ax.scatter(v["mean_chunks"], v["windowdiff"], s=34, color=c,
-                   zorder=3, marker="o", edgecolor="white", linewidth=0.6)
-        ax.scatter(v["mean_chunks"], v["pk"], s=34, color=c,
-                   zorder=3, marker="^", edgecolor="white", linewidth=0.6)
-        ax.plot([v["mean_chunks"]] * 2, [v["pk"], v["windowdiff"]],
-                color=c, lw=0.8, alpha=0.55, zorder=2)
-        off = SEC_LABEL.get(tool, (0, 7, "center"))
-        ax.annotate(PRETTY.get(tool, tool), (v["mean_chunks"], v["windowdiff"]),
-                    xytext=off[:2], textcoords="offset points", ha=off[2],
-                    fontsize=6.3, color=INK if tool.startswith("docstruct") else "#71717a",
-                    fontweight="bold" if tool.startswith("docstruct") else "normal")
+    tools = sorted(sec, key=lambda t: sec[t]["mean_chunks"])
+    fig, ax = plt.subplots(figsize=(3.3, 2.6))
 
-    ax.set_xlabel("mean chunks per document  (gold $\\approx$ 25 sections)")
-    ax.set_ylabel("segmentation error")
-    ax.grid(color="#e4e4e7", lw=0.5, zorder=0)
-    ax.set_ylim(0.13, 1.02)
-    ax.set_xlim(8, 118)
-    handles = [Line2D([], [], marker="o", ls="", color="#52525b", ms=5, label="WindowDiff"),
-               Line2D([], [], marker="^", ls="", color="#52525b", ms=5, label="Pk")]
-    ax.legend(handles=handles, frameon=False, loc="upper left")
-    ax.set_title("The gap between the two metrics is chunk count", pad=7)
+    for i, tool in enumerate(tools):
+        v = sec[tool]
+        c = colour(tool)
+        ax.plot([v["pk"], v["windowdiff"]], [i, i], color=c, lw=1.6,
+                alpha=0.9 if tool.startswith("docstruct") else 0.35, zorder=2)
+        ax.scatter(v["pk"], i, s=30, color=c, marker="^", zorder=3,
+                   edgecolor="white", linewidth=0.6)
+        ax.scatter(v["windowdiff"], i, s=30, color=c, marker="o", zorder=3,
+                   edgecolor="white", linewidth=0.6)
+        ax.annotate(f"{v['mean_chunks']:.0f}", (1.005, i),
+                    xycoords=("axes fraction", "data"), va="center",
+                    fontsize=6.2, color="#71717a")
+
+    ax.set_yticks(range(len(tools)))
+    ax.set_yticklabels(
+        [PRETTY.get(t, t) for t in tools],
+        fontweight="normal")
+    for lbl, t in zip(ax.get_yticklabels(), tools):
+        if t.startswith("docstruct"):
+            lbl.set_fontweight("bold")
+            lbl.set_color(INK)
+        else:
+            lbl.set_color("#71717a")
+
+    ax.annotate("chunks/doc\n(gold $\\approx$25)", (1.005, len(tools) - 0.35),
+                xycoords=("axes fraction", "data"), va="bottom",
+                fontsize=5.8, color="#a1a1aa")
+    ax.set_xlabel("segmentation error (lower is better)")
+    ax.grid(axis="x", color="#e4e4e7", lw=0.5, zorder=0)
+    ax.set_xlim(0.28, 0.95)
+    # One empty row at the bottom so the legend never sits on a dumbbell.
+    ax.set_ylim(-1.5, len(tools) - 0.3)
+    ax.spines["left"].set_visible(False)
+    ax.tick_params(axis="y", length=0)
+    handles = [Line2D([], [], marker="^", ls="", color="#52525b", ms=5, label="Pk"),
+               Line2D([], [], marker="o", ls="", color="#52525b", ms=5, label="WindowDiff")]
+    ax.legend(handles=handles, frameon=False, loc="lower center", ncol=2,
+              handletextpad=0.2, columnspacing=1.4, borderpad=0.0)
     fig.tight_layout()
     fig.savefig(os.path.join(OUT, "size_confound.pdf"), bbox_inches="tight")
     plt.close(fig)
@@ -214,7 +242,6 @@ def fig_cost():
     ax.set_xlabel("context words returned per query (top-5)")
     ax.set_ylabel("MRR  (span relevance)")
     ax.grid(color="#e4e4e7", lw=0.5, zorder=0)
-    ax.set_title("We buy accuracy with tokens", pad=7)
     fig.tight_layout()
     fig.savefig(os.path.join(OUT, "cost.pdf"), bbox_inches="tight")
     plt.close(fig)

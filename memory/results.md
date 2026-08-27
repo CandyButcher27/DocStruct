@@ -4,6 +4,8 @@
 any "did this help?" question should be answered from.
 
 > **Gated-feature sweep (2026-07 Fable session): attempted, environment-blocked.**
+> *(All MRR values in this block are v6-corpus numbers and are withdrawn — see
+> "Internal corpus headline" below. The environment finding stands; the numbers do not.)*
 > The 14-flag sweep on the 92-doc v6 corpus is **not runnable in the current
 > environment**: one `ablate.py` run is **~69 min** (embedding ~7,100 chunks per run
 > dominates; YOLO is cached), so 14 runs ≈ 16 h, and long background jobs here are
@@ -117,6 +119,70 @@ evidence the metric is not noise.
 hybrid `docstruct` on WindowDiff at 2.4× the speed, matching OHR-Bench's +0.0012 span /
 +0.0090 region.
 
+### Random-boundary floor (2026-08-28) — the section result survives its control
+
+Pk and WindowDiff both reward matching the gold segment count, and distance from the
+~25-section gold predicts the table: **ρ(|chunks − 25|, Pk) = 0.821 (p = 0.023)**,
+**ρ for WindowDiff = 0.893 (p = 0.007)**. So the ranking needed a floor. Placing N
+boundaries with no knowledge of the document, `scripts/section_random_baseline.py`,
+`reports/section_random_baseline.json`, 122 docs, 5 trials:
+
+| n | random Pk | random WD | evenly-spaced Pk | evenly-spaced WD |
+|---|---|---|---|---|
+| 18 | 0.4672 | 0.5137 | 0.4878 | 0.5228 |
+| 27 | 0.4993 | 0.5748 | 0.5501 | 0.6056 |
+| 29 | 0.5037 | 0.5858 | 0.5615 | 0.6237 |
+| 38 | 0.5295 | 0.6399 | 0.5901 | 0.6868 |
+| 43 | 0.5401 | 0.6669 | 0.6050 | 0.7246 |
+| 86 | 0.5928 | 0.8293 | 0.6240 | 0.9146 |
+| 107 | 0.6051 | 0.8734 | 0.6242 | 0.9526 |
+
+Margin over random at each tool's own chunk count (positive = beats chance):
+
+| tool | chunks | Pk margin | WD margin |
+|---|---|---|---|
+| docstruct | 37.5 | **+0.177** | **+0.158** |
+| docstruct_geo | 26.8 | **+0.157** | **+0.152** |
+| pymupdf4llm | 17.7 | +0.018 | +0.034 |
+| unstructured | 106.9 | +0.002 | −0.020 |
+| llamaindex_sem | 29.1 | −0.009 | +0.052 |
+| langchain | 85.6 | −0.027 | −0.050 |
+| llamaindex | 42.7 | −0.058 | −0.028 |
+
+**The finding is larger than "we lead the table": five of seven chunkers do not
+clearly beat random boundary placement at their own chunk count.** Evenly-spaced
+scores *worse* than random everywhere, so the metric is not merely rewarding
+regularity.
+
+> **Not yet printable.** The floor is 122 docs; the tool table is 134. The 134-doc
+> run's per-document scores are not on this machine (`.cache/section_ckpt/` holds only
+> a 6-doc pilot; the real run was the Colab notebook and only aggregates survive in
+> `reports/section_scores.json`). Both sides must be computed on one document set
+> before this goes in the paper — re-run the PMC scoring keeping per-doc output. The
+> 0.15+ margins make the direction safe; the exact numbers are not comparable yet.
+
+### Chunk size vs rank, per relevance rule (2026-08-28)
+
+Spearman ρ between mean chunk width and MRR across the seven tools, from
+`reports/ohr_results_{span,region,page}.json`:
+
+| rule | ρ(size, MRR) | p |
+|---|---|---|
+| span | +0.571 | 0.18 |
+| region | **+0.036** | 0.94 |
+| page | −0.679 | 0.09 |
+
+With n=7 nothing is significant, so **read the signs, never the magnitudes** — this
+cannot carry a headline. Its value: region at ρ≈0 is the first *measurement* that
+region relevance is size-neutral, a property the paper previously asserted by design.
+
+### Efficiency, corrected (2026-08-28)
+
+`3.9×` is `2194/560`, the raw **context ratio**, with no rank quality in it. The
+efficiency ratio is `1.1664 / 0.3217 = 3.63×` (unstructured's MRR-per-1k-words over
+ours). An earlier draft attached 3.9 to an efficiency claim; both numbers now ship
+with the right label.
+
 ## Region threshold — swept, and the ranking does not move (2026-08-16)
 
 `RELEVANCE_REGION_MIN_OVERLAP = 0.7` was `# unvalidated`; the region headline rested on
@@ -177,68 +243,46 @@ selection is not guaranteed bit-reproducible, and no GPU was available to test i
 Three dense financial filings (120–217 pages) needed a 4-hour cap instead of 30
 minutes. That is the performance limitation, measured.
 
-## Internal corpus headline (`reports/v6_report.md`)
+## Internal corpus headline — WITHHELD, being re-measured (2026-08-16)
 
-> **⚠ THE 92-DOCUMENT NUMBERS BELOW ARE HISTORICAL.** The corpus they were measured on
-> was overwritten (`notes.md` Stage 24/25). **56 of the 92 documents were recovered by
-> arXiv id on 2026-08-16** into `data/arxiv-v6/` — 83.8% of their gold spans are
-> reachable (268/320 across 54/56 documents), so the subset is sound. The re-measured
-> 56-document table is the one to quote; these 92-document figures were valid when
-> taken and were reproduced twice at the time, but cannot be re-run. The other 36
-> documents appear in no committed manifest.
-> External results (OHR-Bench, PMC, sweep, determinism) were never affected.
+**Every internal-corpus number is withdrawn.** The 92-document figures, the
+five-tool table, the "where the gain came from" deltas (+0.0429 floor, +0.0138
+word-gap, -0.0101 XY-cut) and the vision-detector's +0.0443 all measured a corpus
+that a re-fetch overwrote: it reused the `docN.pdf` filenames for different papers
+(`notes.md` Stage 24/25). Verified again on 2026-08-16 by running the real code
+path, not a filename comparison:
 
+```
+doc1.pdf   0/8 hits  MRR=0.0     # on disk: "ParVL: ... Multimodal LLMs"
+doc10.pdf  0/8 hits  MRR=0.0     # gold asks about air pollution in Macau
+doc100.pdf 5/5 hits  MRR=1.0     # one of the 9 newer docs, gold is sound
+```
 
-92 born-digital PDFs, 558 LLM-generated Q&A, identical embedder and retriever for
-every tool, only the chunker varying. Hybrid retriever, top-5. Gold generated by
-`gpt-oss:120b` on column-aware reference text.
+Do not quote any of them, including the 56-document re-measurement — that ran
+against the same v6 gold and is being superseded for consistency.
 
-| Rank | Tool | MRR | 95% CI | NDCG@5 | Recall@5 | Hit@1 | Avg words | Context words | Coverage | Duplication |
-|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | **docstruct** | **0.8203** | [0.794, 0.846] | **0.832** | **0.9427** | **0.7401** | 339.0 | 2404 | 0.817 | 2.06 |
-| 2 | docstruct_geo | 0.7760 | [0.747, 0.804] | 0.7988 | 0.9283 | 0.6756 | 335.0 | 2570 | 0.822 | 1.33 |
-| 3 | pymupdf4llm | 0.7646 | [0.736, 0.793] | 0.7897 | 0.9194 | 0.6577 | 443.1 | 2662 | 0.768 | 1.36 |
-| 4 | langchain | 0.7009 | [0.669, 0.734] | 0.7284 | 0.8477 | 0.5986 | 106.3 | 505 | 1.00 | 1.10 |
-| 5 | unstructured | 0.6948 | [0.662, 0.727] | 0.7271 | 0.8561 | 0.5920 | 84.5 | 549 | 0.833 | 1.38 |
+**Repair in progress.** Gold is being regenerated with `gpt-oss:120b` over the 102
+PDFs actually held, via `docstruct.cli gen-qa`, which reads each document's full raw
+text and never any tool's chunks. Output: `data/qa/benchmark_qa_v9.json`. When it
+lands, re-run the five-tool comparison and the 14-flag sweep against it, and restore
+this section plus `paper/main.tex` §5.4 from that measurement.
 
-DocStruct leads every quality metric, significantly (paired bootstrap p ≤ 0.001
-vs every external tool on MRR/NDCG/Hit@1), while returning less context per query
-than pymupdf4llm. docling is dropped from the default set (10× slower, always
-last, `--tools docling` still runs it).
+**What is unaffected and still quotable.** OHR-Bench (95 docs, 3,558 human
+questions, all three relevance modes), the PMC section metric (134 papers, publisher
+JATS), the region-threshold sweep, and the determinism run. Those corpora are fetched
+by scripts that key on document identity and their per-document checksums verify
+today. Coverage and duplication now come from OHR-Bench — DocStruct 0.9632 / 1.8322
+against LangChain's 1.000 / 1.1005 — not from the withdrawn internal table.
 
-**On this corpus the vision model is worth +0.0443 MRR, p = 0.0026 (significant).**
-That is the hybrid (row 1) vs geometry-only (row 2) gap. It reverses the v5 result
-— see below. **It does not replicate on OHR-Bench**, where the same ablation is
-+0.0012 (`span`, p=0.80) and +0.0090 (`region`, p=0.12). Quote it as an arXiv
-result, never as a property of the design.
+### The v5 → v6 reversal (kept for the method, not the number)
 
-**What DocStruct does not win: coverage.** langchain keeps 100% of the document's
-words (raw-text splitting drops nothing); DocStruct keeps 81.7% and has the
-highest duplication (2.06×, from inline headers + separately emitted table
-chunks). DocStruct wins retrieval, not raw preservation.
-
-### The v5 → v6 reversal (why the gold mattered)
-
-`reports/v5_report.md` (55 docs / 322 questions, gold with scrambled two-column
-reference text) reported hybrid vs geometry-only at **+0.0092 MRR, p = 0.64, not
-significant** — i.e. "the vision model doesn't pay for itself." That was a
-measurement artefact. `page.extract_text()` welds the two columns of a paper into
-one unquotable line, so gold from the two-column pages — exactly where the vision
-model helps most — was being silently rejected. Fixing the reference extraction
-(`notes.md` Stage 7) moved the effect to +0.0443 and p = 0.0026. **v5 numbers are
-superseded and not comparable to v6.**
-
-## Where the gain came from
-
-| Change | MRR | Δ |
-|---|---|---|
-| baseline at HEAD (flush on every boundary) | 0.6890 | — |
-| chunk-boundary floor + headers in chunk bodies | 0.7319 | **+0.0429** |
-| font-scaled word-gap tolerance | 0.7457 | **+0.0138** |
-| whitespace-blind relevance | 0.7457 | 0.0000 (guard, not a gain) |
-| recursive XY-cut | 0.7356 | −0.0101 → **off** |
-
-Starting point before this work: 0.6773, second place behind pymupdf4llm.
+`reports/v5_report.md` reported hybrid vs geometry-only at +0.0092 MRR, p = 0.64 —
+"the vision model doesn't pay for itself". That was a measurement artefact:
+`page.extract_text()` welds the two columns of a paper into one unquotable line, so
+gold from two-column pages — exactly where the vision model helps most — was silently
+rejected during gold generation. Fixing reference extraction reversed the sign. The
+lesson survives the corpus loss and is why a reachability ceiling is now computed
+before every leaderboard; the effect sizes do not.
 
 ## Chunk-bounds sweep (`reports/ablations/`)
 

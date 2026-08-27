@@ -203,7 +203,9 @@ actually worth?" — the first question a two-detector design invites — and ar
 question from the cross-tool leaderboard.
 
 **The current answer is uncomfortable and is not to be smoothed over.** On the
-internal arXiv corpus the model detector is worth +0.0443 MRR (p=0.0026). On
+internal arXiv corpus the model detector measured its one significant gain — that
+figure is **withdrawn** with the rest of the v6 corpus (`memory/results.md`) and is
+being re-measured on regenerated gold. On
 OHR-Bench it is worth +0.0012 under `span` (p=0.80) and +0.0090 under `region`
 (p=0.12) — **not significant in either**. Its apparent +0.1305 under `page` is a
 page-mode artefact: geometry-only emits fewer chunks and page mode rewards chunk

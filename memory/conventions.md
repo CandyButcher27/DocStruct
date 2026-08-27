@@ -19,7 +19,24 @@ python -m docstruct.cli visualize paper.pdf --out annotated.pdf
 
 python scripts/ablate.py --name <label> --set KEY=VALUE   # one-tool ablation
 python scripts/fetch_dataset_v2.py --domain arxiv          # extend the corpus
+
+python scripts/section_random_baseline.py --trials 5       # chance floor for Pk/WindowDiff
+python scripts/make_paper_figures.py                       # regenerate paper/figures/*.pdf
 ```
+
+## The paper
+
+```bash
+cd paper && pdflatex main && bibtex main && pdflatex main && pdflatex main
+grep -c Overfull main.log                    # must be 0
+grep -c 'Citation.*undefined' main.log       # must be 0
+
+.venv/Scripts/python.exe .claude/skills/acl-paper/scripts/gate.py paper/main.tex
+```
+
+The gate is the anti-slop audit; **run it on every `.tex` edit and report the counts,
+never "audited"**. `-v` lists the hits, `--selftest` checks the patterns themselves.
+The whole PDF must be ≤8 pages, references included.
 
 Full benchmark invocation: see `evaluation.md`.
 
