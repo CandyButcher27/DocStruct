@@ -41,7 +41,14 @@ _smoke*/
 /_*.py
 
 # Local Claude Code settings (CLAUDE.md and memory/ ARE tracked)
-.claude/
+# ...except project skills, which are tooling rather than personal config:
+# CLAUDE.md tells every session to run the acl-paper gate, so it has to survive
+# a fresh clone. Each parent must be un-excluded before a file inside it can be
+# re-included, which is why this is four lines and not one.
+.claude/*
+!.claude/skills
+.claude/skills/*
+!.claude/skills/acl-paper
 
 # Corpora and generated outputs — fetched with scripts/fetch_dataset_v2.py
 data/raw-pdfs/
