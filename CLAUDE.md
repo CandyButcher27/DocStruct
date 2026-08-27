@@ -99,10 +99,21 @@ was updated last.
 
 ## The paper
 
-A first draft lives in `paper/` (`main.tex` + `refs.bib`, plain `article` class so
-it builds anywhere). `\todo{}` marks open work; `refs.bib` has a header listing the
+The draft lives in `paper/` and is **on the ACL 2023 template** as of 2026-08-28:
+`main.tex` + `refs.bib` + `ACL2023.sty` + `acl_natbib.bst`, built with
+`pdflatex → bibtex → pdflatex → pdflatex`. Title: *Relevance Rules Confound PDF
+Chunker Evaluation*. Citations are author-year via `acl_natbib`, not numeric.
+
+**The venue limit is 8 pages for the whole PDF, references included** — not 8 body
+pages with the tail free. It lands at exactly 8, so every addition must be paid for
+by a cut.
+
+`.claude/skills/acl-paper/` is the contract for editing it: the ACL layout diff, a
+claim ledger mapping every number in the draft to the report that produced it, and
+`scripts/gate.py`, a runnable anti-slop gate. **Run the gate on every `.tex` edit and
+report its counts.** `\todo{}` marks open work; `refs.bib` has a header listing the
 entries whose author lists are still unverified. The three research memory files
-above are its source of truth — update them, then the draft.
+above remain the source of truth for content — update them, then the draft.
 
 ## Running things
 

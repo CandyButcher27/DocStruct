@@ -5,6 +5,30 @@ Ranked by expected value. Everything here has been audited against the actual co
 
 ## Next up
 
+> **Three GPU/Colab jobs, queued 2026-08-28 from two independent paper reviews.**
+> Both reviewers made the first one their blocking item, arriving at it separately.
+>
+> 1. **Embedder × retriever sweep.** Every number in the paper comes from one
+>    configuration (`all-MiniLM-L6-v2` + BM25 + RRF, k=5). The relevance-rule
+>    inversion may be conditional on it, and §5.5 is our own evidence that swapping
+>    small encoders can move results from a ranking to all zeros. Run the three rules
+>    under 2–3 more encoders (bge-base, e5-base). If the inversion survives, the
+>    paper's central claim is much stronger; if it does not, that is the more
+>    interesting finding. **This is the gate on submitting anywhere.**
+> 2. **Re-run PMC section scoring keeping per-document output.** Needed to print the
+>    random-boundary floor beside the tool table — the two are currently on different
+>    document sets (122 vs 134) and the per-doc scores for the 134 run were lost with
+>    the Colab session. Cheapest of the three; same job that produced the table.
+> 3. **`MIN_CHUNK_TOKENS` floor sweep on PMC.** 57.4% of gold sections fall below the
+>    floor, so the section metric partly measures how our floor negotiates with
+>    publisher structure. Worse: the floor was chosen on the withdrawn internal
+>    corpus, so it is an *inherited* constant, not one tuned to any corpus in the
+>    paper. Report Pk/WindowDiff across 3–4 floors.
+>
+> Also open from the reviews, no run required: parse fidelity on OmniDocBench/READoc
+> (a real hole — the system is a structural parser with no direct parse measurement),
+> and the DocLayNet val split to retire the `# unvalidated` fusion constants.
+
 > **Blocking, added 2026-08-16: the internal arXiv corpus does not match its own gold.**
 > 0 of 65 shared filenames have findable gold; a re-fetch reused `doc<N>.pdf` names for
 > different papers. This blocks *every* ablation, including the `BAND_SPLIT` measurement

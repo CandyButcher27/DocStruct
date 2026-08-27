@@ -119,6 +119,70 @@ evidence the metric is not noise.
 hybrid `docstruct` on WindowDiff at 2.4× the speed, matching OHR-Bench's +0.0012 span /
 +0.0090 region.
 
+### Random-boundary floor (2026-08-28) — the section result survives its control
+
+Pk and WindowDiff both reward matching the gold segment count, and distance from the
+~25-section gold predicts the table: **ρ(|chunks − 25|, Pk) = 0.821 (p = 0.023)**,
+**ρ for WindowDiff = 0.893 (p = 0.007)**. So the ranking needed a floor. Placing N
+boundaries with no knowledge of the document, `scripts/section_random_baseline.py`,
+`reports/section_random_baseline.json`, 122 docs, 5 trials:
+
+| n | random Pk | random WD | evenly-spaced Pk | evenly-spaced WD |
+|---|---|---|---|---|
+| 18 | 0.4672 | 0.5137 | 0.4878 | 0.5228 |
+| 27 | 0.4993 | 0.5748 | 0.5501 | 0.6056 |
+| 29 | 0.5037 | 0.5858 | 0.5615 | 0.6237 |
+| 38 | 0.5295 | 0.6399 | 0.5901 | 0.6868 |
+| 43 | 0.5401 | 0.6669 | 0.6050 | 0.7246 |
+| 86 | 0.5928 | 0.8293 | 0.6240 | 0.9146 |
+| 107 | 0.6051 | 0.8734 | 0.6242 | 0.9526 |
+
+Margin over random at each tool's own chunk count (positive = beats chance):
+
+| tool | chunks | Pk margin | WD margin |
+|---|---|---|---|
+| docstruct | 37.5 | **+0.177** | **+0.158** |
+| docstruct_geo | 26.8 | **+0.157** | **+0.152** |
+| pymupdf4llm | 17.7 | +0.018 | +0.034 |
+| unstructured | 106.9 | +0.002 | −0.020 |
+| llamaindex_sem | 29.1 | −0.009 | +0.052 |
+| langchain | 85.6 | −0.027 | −0.050 |
+| llamaindex | 42.7 | −0.058 | −0.028 |
+
+**The finding is larger than "we lead the table": five of seven chunkers do not
+clearly beat random boundary placement at their own chunk count.** Evenly-spaced
+scores *worse* than random everywhere, so the metric is not merely rewarding
+regularity.
+
+> **Not yet printable.** The floor is 122 docs; the tool table is 134. The 134-doc
+> run's per-document scores are not on this machine (`.cache/section_ckpt/` holds only
+> a 6-doc pilot; the real run was the Colab notebook and only aggregates survive in
+> `reports/section_scores.json`). Both sides must be computed on one document set
+> before this goes in the paper — re-run the PMC scoring keeping per-doc output. The
+> 0.15+ margins make the direction safe; the exact numbers are not comparable yet.
+
+### Chunk size vs rank, per relevance rule (2026-08-28)
+
+Spearman ρ between mean chunk width and MRR across the seven tools, from
+`reports/ohr_results_{span,region,page}.json`:
+
+| rule | ρ(size, MRR) | p |
+|---|---|---|
+| span | +0.571 | 0.18 |
+| region | **+0.036** | 0.94 |
+| page | −0.679 | 0.09 |
+
+With n=7 nothing is significant, so **read the signs, never the magnitudes** — this
+cannot carry a headline. Its value: region at ρ≈0 is the first *measurement* that
+region relevance is size-neutral, a property the paper previously asserted by design.
+
+### Efficiency, corrected (2026-08-28)
+
+`3.9×` is `2194/560`, the raw **context ratio**, with no rank quality in it. The
+efficiency ratio is `1.1664 / 0.3217 = 3.63×` (unstructured's MRR-per-1k-words over
+ours). An earlier draft attached 3.9 to an efficiency claim; both numbers now ship
+with the right label.
+
 ## Region threshold — swept, and the ranking does not move (2026-08-16)
 
 `RELEVANCE_REGION_MIN_OVERLAP = 0.7` was `# unvalidated`; the region headline rested on

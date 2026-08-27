@@ -31,18 +31,19 @@ finding rather than the system: *The Relevance Rule Decides the Leaderboard: Sev
 Chunkers, Identical Chunks, Three Rankings*. Internal-corpus figures are replaced by
 `\todo{}` markers pending the regeneration above; every external result stands.
 
-| Result | Number | Corpus |
-|---|---|---|
-| 1st of 7 under `span` | MRR 0.706 | OHR-Bench, 3,558 human questions |
-| 1st of 7 under `region` | MRR 0.666 | same |
-| 6th of 7 under `page` | MRR 0.600 | same — **this is the evidence, not an admission** |
-| 1st at all 10 region thresholds | +0.045–0.062 margin | same, re-scored offline |
-| 1st on WindowDiff and Pk | 0.4226 / 0.3418 | 134 PMC papers, publisher JATS gold |
-| Determinism | **95/95 docs, 5,810 chunks, 0 differing** | OHR-Bench, independent processes |
+| Result                          | Number                                          | Corpus                                                  |
+| ------------------------------- | ----------------------------------------------- | ------------------------------------------------------- |
+| 1st of 7 under`span`          | MRR 0.706                                       | OHR-Bench, 3,558 human questions                        |
+| 1st of 7 under`region`        | MRR 0.666                                       | same                                                    |
+| 6th of 7 under`page`          | MRR 0.600                                       | same —**this is the evidence, not an admission** |
+| 1st at all 10 region thresholds | +0.045–0.062 margin                            | same, re-scored offline                                 |
+| 1st on WindowDiff and Pk        | 0.4226 / 0.3418                                 | 134 PMC papers, publisher JATS gold                     |
+| Determinism                     | **95/95 docs, 5,810 chunks, 0 differing** | OHR-Bench, independent processes                        |
 
 ## What was done this session
 
 **Measurement**
+
 - Determinism measured for the first time: 95/95 documents byte-identical across
   independent processes. The chunk total cross-checks exactly against the benchmark's
   own count from a different machine and code path.
@@ -53,6 +54,7 @@ Chunkers, Identical Chunks, Three Rankings*. Internal-corpus figures are replace
   identical to the pilot, every value within 0.02.
 
 **Correctness**
+
 - `fetch_pmc.py` trusted a committed manifest over the disk, so a fresh clone
   downloaded nothing and scored 24 of 126 documents while looking finished. Fixed,
   tested, and smoke-verified against the live API.
@@ -66,6 +68,7 @@ Chunkers, Identical Chunks, Three Rankings*. Internal-corpus figures are replace
   83.8% of their gold spans are reachable.
 
 **Product**
+
 - `pip install docstruct-rag` — packaged, `twine check` clean, verified by a fresh-venv
   install. New API: `parse_bytes`, `parse_many`, `to_langchain`, `to_llamaindex`,
   `to_jsonl`, `stats`. Full reference in [`docs/API.md`](docs/API.md).
@@ -74,6 +77,7 @@ Chunkers, Identical Chunks, Three Rankings*. Internal-corpus figures are replace
   re-checking every item against the code; two claims in the old audit were stale.
 
 **Two defects found by drawing the pipeline's real output**
+
 - Full-width elements sorted *after* the columns. **Fixed in code** by `BAND_SPLIT`;
   needs one ablation to flip the default.
 - Full-width blocks extracted across the column gutter. A fix was written, found the
@@ -96,13 +100,13 @@ the caveat rewritten to say the subset is recovered and verified.
 
 ## What needs you — in priority order
 
-| # | Task | Why it is yours |
-|---|---|---|
-| 1 | **Send the paper to your professors** | It will not improve by waiting. The open question is framing, and that is what they answer. Tell them Table 3 is historical and being re-measured; every external result is unaffected. |
-| 2 | **`twine upload dist/*`** | Needs your PyPI token. Everything else is built and validated. TestPyPI first. |
-| 3 | **Affiliation and co-authors** in `paper/main.tex` | The only remaining `\todo`. |
-| 4 | **Hand `paper/REFERENCES_TO_VERIFY.md` to another model** | 7 entries have no arXiv id or DOI and could not be machine-checked. |
-| 5 | **Check Colab Drive for a corpus backup** | `docstruct_bench/corpora/` may hold the 36 unrecovered documents. If it does, the full 92-document table is restorable. |
+| # | Task                                                              | Why it is yours                                                                                                                                                                         |
+| - | ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 | **Send the paper to your professors**                       | It will not improve by waiting. The open question is framing, and that is what they answer. Tell them Table 3 is historical and being re-measured; every external result is unaffected. |
+| 2 | **`twine upload dist/*`**                                 | Needs your PyPI token. Everything else is built and validated. TestPyPI first.                                                                                                          |
+| 3 | **Affiliation and co-authors** in `paper/main.tex`        | The only remaining`\todo`.                                                                                                                                                            |
+| 4 | **Hand `paper/REFERENCES_TO_VERIFY.md` to another model** | 7 entries have no arXiv id or DOI and could not be machine-checked.                                                                                                                     |
+| 5 | **Check Colab Drive for a corpus backup**                   | `docstruct_bench/corpora/` may hold the 36 unrecovered documents. If it does, the full 92-document table is restorable.                                                               |
 
 Nothing else needs a human. Everything remaining is either running, or is GPU work
 listed in `ROADMAP.md` §3.
@@ -124,12 +128,12 @@ to any provider**, and the package should be installable and usable as
 
 `reports/rrf40_report.md` (last full run, 48 docs / 298 questions):
 
-| Rank | Tool | MRR (hybrid) | NDCG@5 | Recall@5 | Hit@1 | Avg words/chunk |
-|---|---|---|---|---|---|---|
-| 1 | pymupdf4llm | 0.6915 | 0.7127 | 0.8289 | 0.6107 | 457.5 |
-| 2 | **docstruct** | 0.6773 | 0.7091 | **0.8423** | 0.5738 | **164.8** |
-| 3 | langchain | 0.6515 | 0.689 | 0.8221 | 0.5369 | 102.1 |
-| 4 | unstructured | 0.6466 | 0.6718 | 0.7819 | 0.5604 | 85.2 |
+| Rank | Tool                | MRR (hybrid) | NDCG@5 | Recall@5         | Hit@1  | Avg words/chunk |
+| ---- | ------------------- | ------------ | ------ | ---------------- | ------ | --------------- |
+| 1    | pymupdf4llm         | 0.6915       | 0.7127 | 0.8289           | 0.6107 | 457.5           |
+| 2    | **docstruct** | 0.6773       | 0.7091 | **0.8423** | 0.5738 | **164.8** |
+| 3    | langchain           | 0.6515       | 0.689  | 0.8221           | 0.5369 | 102.1           |
+| 4    | unstructured        | 0.6466       | 0.6718 | 0.7819           | 0.5604 | 85.2            |
 
 The shape of the loss matters more than the size of it. DocStruct has the **best
 Recall@5 of any tool** (0.8423 vs 0.8289) but the **second-worst Hit@1** (0.5738 vs
@@ -142,23 +146,23 @@ content-extraction problem.
 Per-doc, DocStruct's MRR tracks its chunk size almost monotonically. Its worst
 documents are exactly its most fragmented ones:
 
-| Doc | docstruct avg words | docstruct MRR | pymupdf4llm avg words | pymupdf4llm MRR |
-|---|---|---|---|---|
-| doc34 | 59.8 | 0.267 | 497.7 | 0.750 |
-| doc24 | 62.4 | 0.333 | 834.6 | 0.567 |
-| doc32 | 73.5 | 0.306 | 500.4 | 0.454 |
-| doc41 | 116.4 | 0.185 | 572.2 | 0.444 |
+| Doc   | docstruct avg words | docstruct MRR | pymupdf4llm avg words | pymupdf4llm MRR |
+| ----- | ------------------- | ------------- | --------------------- | --------------- |
+| doc34 | 59.8                | 0.267         | 497.7                 | 0.750           |
+| doc24 | 62.4                | 0.333         | 834.6                 | 0.567           |
+| doc32 | 73.5                | 0.306         | 500.4                 | 0.454           |
+| doc41 | 116.4               | 0.185         | 572.2                 | 0.444           |
 
 Direct measurement of the chunk-size distribution on those documents (current HEAD,
 hybrid mode) confirms it — the mean is misleading, the **median** is the story:
 
-| Doc | chunks | mean words | median words | `<25` words |
-|---|---|---|---|---|
-| doc41 | 110 | 123.9 | 40 | 44 (40%) |
-| doc34 | 217 | 53.0 | 27 | 104 (48%) |
-| doc24 | 113 | 51.3 | 20 | 65 (58%) |
-| doc32 | 65 | 77.2 | 23 | 36 (55%) |
-| doc33 | 95 | 113.8 | 31 | 44 (46%) |
+| Doc   | chunks | mean words | median words | `<25` words |
+| ----- | ------ | ---------- | ------------ | ------------- |
+| doc41 | 110    | 123.9      | 40           | 44 (40%)      |
+| doc34 | 217    | 53.0       | 27           | 104 (48%)     |
+| doc24 | 113    | 51.3       | 20           | 65 (58%)      |
+| doc32 | 65     | 77.2       | 23           | 36 (55%)      |
+| doc33 | 95     | 113.8      | 31           | 44 (46%)      |
 
 Roughly **half of all chunks are under 25 words**. `MAX_CHUNK_TOKENS` is 800, so
 almost none of these are token-limit flushes — they are *boundary* flushes.
@@ -178,13 +182,11 @@ block text and against raw pdfplumber text, to separate "we dropped it" from
 - **7 of 9 misses are not in the raw PDF text at all** — hallucinated/paraphrased
   gold spans. Unfixable here, and they penalise every tool identically, so they do
   not affect the ranking.
-- **doc24** — `"Meng-Hao Guo, Cheng-Ze Lu, ... and Shi-Min Hu"` is `in_blocks=True,
-  in_chunks=False`. The author line was detected as a `header` block, and
+- **doc24** — `"Meng-Hao Guo, Cheng-Ze Lu, ... and Shi-Min Hu"` is `in_blocks=True, in_chunks=False`. The author line was detected as a `header` block, and
   `assembler.py` **never writes header text into any chunk body** — headers only
   update the running `SectionPath`. Any question whose answer lives in a heading
   or a heading-like line is unanswerable by construction.
-- **doc32** — a table row (`"Raw-GRPO 903 82.5 95.9 ..."`) is `in_raw=True,
-  in_blocks=False`. Table extraction is losing rows.
+- **doc32** — a table row (`"Raw-GRPO 903 82.5 95.9 ..."`) is `in_raw=True, in_blocks=False`. Table extraction is losing rows.
 
 Two real bugs, both worth fixing on their own merits.
 
@@ -240,9 +242,9 @@ JSON sidecar.
 
 **Baseline re-measured at HEAD** (the rrf40 report is old; the code moved under it):
 
-| | MRR | NDCG@5 | Recall@5 | Hit@1 | Chunks | Avg words |
-|---|---|---|---|---|---|---|
-| `00_baseline` | 0.6890 | 0.7199 | 0.8490 | 0.5872 | 3905 | 181.3 |
+|                 | MRR    | NDCG@5 | Recall@5 | Hit@1  | Chunks | Avg words |
+| --------------- | ------ | ------ | -------- | ------ | ------ | --------- |
+| `00_baseline` | 0.6890 | 0.7199 | 0.8490   | 0.5872 | 3905   | 181.3     |
 
 Still behind pymupdf4llm's 0.6915, and the shape of the loss is unchanged.
 
@@ -280,11 +282,11 @@ them. `INLINE_HEADER_TEXT=True`: the header opens the body of the chunk it
 introduces. A chunk is attributed to the section it *started* in, so crossing a
 header to reach the floor never relabels the text before it.
 
-| | MRR | NDCG@5 | Recall@5 | Hit@1 | Chunks | Avg words |
-|---|---|---|---|---|---|---|
-| `00_baseline` | 0.6890 | 0.7199 | 0.8490 | 0.5872 | 3905 | 181.3 |
-| `01_minchunk250` | **0.7257** | **0.7541** | **0.8792** | **0.6242** | 2174 | 339.6 |
-| delta | **+0.0367** | +0.0342 | +0.0302 | **+0.0370** | −44% | +87% |
+|                    | MRR               | NDCG@5           | Recall@5         | Hit@1             | Chunks | Avg words |
+| ------------------ | ----------------- | ---------------- | ---------------- | ----------------- | ------ | --------- |
+| `00_baseline`    | 0.6890            | 0.7199           | 0.8490           | 0.5872            | 3905   | 181.3     |
+| `01_minchunk250` | **0.7257**  | **0.7541** | **0.8792** | **0.6242**  | 2174   | 339.6     |
+| delta              | **+0.0367** | +0.0342          | +0.0302          | **+0.0370** | −44%  | +87%      |
 
 Everything moves the right way, and Hit@1 moves most — which is what the diagnosis
 predicted, since the complaint was never that DocStruct couldn't find the answer.
@@ -316,16 +318,16 @@ LLM than the tool it beats.
 Grid over `MIN_CHUNK_TOKENS` / `MAX_CHUNK_TOKENS`, all else fixed, 48 docs / 298
 questions each. Sorted by retrieved-context cost:
 
-| MIN/MAX | MRR | NDCG@5 | Recall@5 | Hit@1 | Chunks | Avg words | Context words | MRR/1k |
-|---|---|---|---|---|---|---|---|---|
-| baseline (flush everywhere) | 0.6890 | 0.7199 | 0.8490 | 0.5872 | 3905 | 181.3 | — | — |
-| 80 / 300 | 0.7022 | 0.7320 | 0.8658 | 0.5973 | 3440 | 218.7 | 1411 | **0.4978** |
-| 120 / 400 | 0.7086 | 0.7431 | 0.8859 | 0.5940 | 2945 | 253.6 | 1686 | 0.4203 |
-| **200 / 500** | **0.7319** | 0.7560 | 0.8826 | **0.6342** | 2519 | 294.7 | 2050 | 0.3571 |
-| 120 / 800 | 0.7203 | 0.7513 | 0.8758 | 0.6141 | 2533 | 291.2 | 2170 | 0.3319 |
-| 250 / 800 | 0.7257 | 0.7541 | 0.8792 | 0.6242 | 2174 | 339.6 | 2555 | 0.2841 |
-| 400 / 800 | 0.7277 | 0.7612 | 0.8993 | 0.6174 | 1992 | 370.7 | 2873 | 0.2533 |
-| 600 / 800 | **0.7584** | 0.7886 | 0.9128 | 0.6477 | 1832 | 403.6 | 3251 | 0.2333 |
+| MIN/MAX                     | MRR              | NDCG@5 | Recall@5 | Hit@1            | Chunks | Avg words | Context words | MRR/1k           |
+| --------------------------- | ---------------- | ------ | -------- | ---------------- | ------ | --------- | ------------- | ---------------- |
+| baseline (flush everywhere) | 0.6890           | 0.7199 | 0.8490   | 0.5872           | 3905   | 181.3     | —            | —               |
+| 80 / 300                    | 0.7022           | 0.7320 | 0.8658   | 0.5973           | 3440   | 218.7     | 1411          | **0.4978** |
+| 120 / 400                   | 0.7086           | 0.7431 | 0.8859   | 0.5940           | 2945   | 253.6     | 1686          | 0.4203           |
+| **200 / 500**         | **0.7319** | 0.7560 | 0.8826   | **0.6342** | 2519   | 294.7     | 2050          | 0.3571           |
+| 120 / 800                   | 0.7203           | 0.7513 | 0.8758   | 0.6141           | 2533   | 291.2     | 2170          | 0.3319           |
+| 250 / 800                   | 0.7257           | 0.7541 | 0.8792   | 0.6242           | 2174   | 339.6     | 2555          | 0.2841           |
+| 400 / 800                   | 0.7277           | 0.7612 | 0.8993   | 0.6174           | 1992   | 370.7     | 2873          | 0.2533           |
+| 600 / 800                   | **0.7584** | 0.7886 | 0.9128   | 0.6477           | 1832   | 403.6     | 3251          | 0.2333           |
 
 **Raw MRR rises monotonically with chunk size, and MRR-per-1k-words falls
 monotonically.** Read only the MRR column and the "right" answer is MIN=600 —
@@ -388,10 +390,10 @@ tolerance with font size and fixes it without over-splitting large headings.
 This was not only cosmetic. BM25 cannot match a term that has been concatenated to
 its neighbour, so it was costing real retrieval hits:
 
-| | MRR | NDCG@5 | Recall@5 | Hit@1 |
-|---|---|---|---|---|
-| `03_min200_max500` | 0.7319 | 0.7560 | 0.8826 | 0.6342 |
-| `04_xtolerance` | **0.7457** | **0.7708** | **0.8859** | **0.6409** |
+|                      | MRR              | NDCG@5           | Recall@5         | Hit@1            |
+| -------------------- | ---------------- | ---------------- | ---------------- | ---------------- |
+| `03_min200_max500` | 0.7319           | 0.7560           | 0.8826           | 0.6342           |
+| `04_xtolerance`    | **0.7457** | **0.7708** | **0.8859** | **0.6409** |
 
 ### A metric that would have punished the fix
 
@@ -443,11 +445,11 @@ legacy splitter gets wrong. They pass.
 
 **And then it lost.**
 
-| | MRR | NDCG@5 | Recall@5 | Hit@1 | Chunks |
-|---|---|---|---|---|---|
-| legacy column split | **0.7457** | **0.7708** | 0.8859 | **0.6409** | 3070 |
-| `06_xycut` | 0.7356 | 0.7666 | 0.8859 | 0.6275 | 3132 |
-| `07_xycut_rowgap12` | 0.7356 | 0.7666 | 0.8859 | 0.6275 | 3132 |
+|                       | MRR              | NDCG@5           | Recall@5 | Hit@1            | Chunks |
+| --------------------- | ---------------- | ---------------- | -------- | ---------------- | ------ |
+| legacy column split   | **0.7457** | **0.7708** | 0.8859   | **0.6409** | 3070   |
+| `06_xycut`          | 0.7356           | 0.7666           | 0.8859   | 0.6275           | 3132   |
+| `07_xycut_rowgap12` | 0.7356           | 0.7666           | 0.8859   | 0.6275           | 3132   |
 
 Recall is identical — the same content is reachable either way — but rank quality
 drops. Raising `XY_CUT_MIN_ROW_GAP` 4× produced **byte-identical results**, which
@@ -467,13 +469,13 @@ it on would have been choosing the more elegant implementation over the measurem
 Full five-tool run, 48 PDFs / 298 questions, identical embedder and retriever,
 only the chunker varying (`reports/v4_report.md`):
 
-| Rank | Tool | MRR | NDCG@5 | Recall@5 | Hit@1 | Avg words/chunk | Context words |
-|---|---|---|---|---|---|---|---|
-| 1 | **docstruct** | **0.7457** | **0.7708** | **0.8859** | **0.6409** | 355.2 | 2346 |
-| 2 | pymupdf4llm | 0.6941 | 0.7160 | 0.8356 | 0.6107 | 455.2 | 2576 |
-| 3 | unstructured | 0.6508 | 0.6766 | 0.7886 | 0.5638 | 85.2 | 549 |
-| 4 | langchain | 0.6493 | 0.6884 | 0.8221 | 0.5336 | 102.1 | 524 |
-| 5 | docling | 0.5652 | 0.5814 | 0.6577 | 0.4966 | 114.2 | 674 |
+| Rank | Tool                | MRR              | NDCG@5           | Recall@5         | Hit@1            | Avg words/chunk | Context words |
+| ---- | ------------------- | ---------------- | ---------------- | ---------------- | ---------------- | --------------- | ------------- |
+| 1    | **docstruct** | **0.7457** | **0.7708** | **0.8859** | **0.6409** | 355.2           | 2346          |
+| 2    | pymupdf4llm         | 0.6941           | 0.7160           | 0.8356           | 0.6107           | 455.2           | 2576          |
+| 3    | unstructured        | 0.6508           | 0.6766           | 0.7886           | 0.5638           | 85.2            | 549           |
+| 4    | langchain           | 0.6493           | 0.6884           | 0.8221           | 0.5336           | 102.1           | 524           |
+| 5    | docling             | 0.5652           | 0.5814           | 0.6577           | 0.4966           | 114.2           | 674           |
 
 DocStruct went from **0.6890 → 0.7457** and from second place to first on every
 quality metric, while returning **less** retrieved context per query than the tool
@@ -483,13 +485,13 @@ measurement.
 
 Where the +0.0567 came from:
 
-| Change | MRR | Δ |
-|---|---|---|
-| baseline at HEAD | 0.6890 | — |
+| Change                                   | MRR    | Δ                |
+| ---------------------------------------- | ------ | ----------------- |
+| baseline at HEAD                         | 0.6890 | —                |
 | chunk-boundary floor + headers in bodies | 0.7319 | **+0.0429** |
-| font-scaled word-gap tolerance | 0.7457 | **+0.0138** |
-| whitespace-blind relevance | 0.7457 | 0.0000 |
-| recursive XY-cut | 0.7356 | −0.0101 (off) |
+| font-scaled word-gap tolerance           | 0.7457 | **+0.0138** |
+| whitespace-blind relevance               | 0.7457 | 0.0000            |
+| recursive XY-cut                         | 0.7356 | −0.0101 (off)    |
 
 ### Things I am not claiming
 
@@ -653,10 +655,10 @@ default, with no measurement behind that default — the plan (§7.3) argued for
 on intuition: the first chunk of a new section loses the last sentence of the one
 before it. Intuition is not a result, so it was run.
 
-| | MRR | NDCG@5 | Recall@5 | Hit@1 | Chunks | Context words |
-|---|---|---|---|---|---|---|
-| off (`04_xtolerance`, current default) | **0.7457** | **0.7708** | **0.8859** | 0.6409 | 3070 | 2346 |
-| on (`08_overlap_on_boundary`) | 0.7432 | 0.7658 | 0.8826 | 0.6409 | 3156 | 2354 |
+|                                          | MRR              | NDCG@5           | Recall@5         | Hit@1  | Chunks | Context words |
+| ---------------------------------------- | ---------------- | ---------------- | ---------------- | ------ | ------ | ------------- |
+| off (`04_xtolerance`, current default) | **0.7457** | **0.7708** | **0.8859** | 0.6409 | 3070   | 2346          |
+| on (`08_overlap_on_boundary`)          | 0.7432           | 0.7658           | 0.8826           | 0.6409 | 3156   | 2354          |
 
 Worse on every metric that moved, Hit@1 identical, and it costs 86 extra chunks
 and slightly more retrieved context to get there.
@@ -706,13 +708,13 @@ on Ollama (the better generator, and the one that wrote the original 298).
 
 Full run, five tools (`reports/v6_report.md`), hybrid retriever, top-5:
 
-| Tool | MRR | 95% CI | Hit@1 | Coverage |
-|---|---|---|---|---|
-| **docstruct** | **0.8203** | [0.794, 0.846] | **0.7401** | 0.817 |
-| docstruct_geo | 0.7760 | [0.747, 0.804] | 0.6756 | 0.822 |
-| pymupdf4llm | 0.7646 | [0.736, 0.793] | 0.6577 | 0.768 |
-| langchain | 0.7009 | [0.669, 0.734] | 0.5986 | 1.000 |
-| unstructured | 0.6948 | [0.662, 0.727] | 0.5920 | 0.833 |
+| Tool                | MRR              | 95% CI         | Hit@1            | Coverage |
+| ------------------- | ---------------- | -------------- | ---------------- | -------- |
+| **docstruct** | **0.8203** | [0.794, 0.846] | **0.7401** | 0.817    |
+| docstruct_geo       | 0.7760           | [0.747, 0.804] | 0.6756           | 0.822    |
+| pymupdf4llm         | 0.7646           | [0.736, 0.793] | 0.6577           | 0.768    |
+| langchain           | 0.7009           | [0.669, 0.734] | 0.5986           | 1.000    |
+| unstructured        | 0.6948           | [0.662, 0.727] | 0.5920           | 0.833    |
 
 DocStruct's lead over every external tool is significant on MRR/NDCG/Hit@1
 (p 0.0008 → 0.0001). That part is the expected result at more than double the
@@ -823,6 +825,7 @@ The contract stays intact: default `docstruct.parse` output is byte-identical ex
 for the two deterministic bug fixes below, and the golden test pins that.
 
 **Deterministic bug fixes (default on):**
+
 - `_cluster_graphics` merges to a fixed point — figure regions were order-dependent
   and non-transitive (two clusters that only grew into overlap never merged).
 - Proposal matching is confidence-ordered — a low-conf model box could steal the
@@ -831,6 +834,7 @@ for the two deterministic bug fixes below, and the golden test pins that.
 **Config-gated, default off — each carries its `[MEASURE]` justification in
 `config.py` and must clear `scripts/ablate.py` against `memory/results.md` before its
 flag is flipped on:**
+
 - Text quality: `DEDUPE_CHARS`, `DEHYPHENATE`, `NORMALIZE_TEXT` (NFKC + soft hyphen).
 - Figures: `FIGURE_OVERLAP_BY_AREA` (density-independent text-overlap semantics).
 - Reading order: `MULTI_COLUMN` (k-column), `BAND_SPLIT` (band-then-column — the
@@ -850,6 +854,7 @@ fuzz corpus (zero-byte / corrupt / truncated → typed error or empty Document, 
 a crash or hang), GitHub Actions CI, seeded CHANGELOG.
 
 **Deferred deliberately, with reasons:**
+
 - §1.8 `ParseConfig` — a frozen per-parse config threaded through every module. The
   review itself calls it "its own branch, purely mechanical"; it is a sweep across
   every `config.*` read and does not belong bundled with feature work. Not started.
@@ -1068,10 +1073,10 @@ in the fairness calculation above, which is a useful independent check on it.
 
 **The headline finding.** On `3M_2018_10K` (160 pages), hybrid vs geometry-only:
 
-| | chunks | mean | table chunks | time |
-|---|---|---|---|---|
-| docstruct | 384 | 397 w | **122** | 367.7 s (2.30 s/page) |
-| docstruct_geo | 169 | 529 w | **4** | 168.5 s (1.05 s/page) |
+|               | chunks | mean  | table chunks  | time                  |
+| ------------- | ------ | ----- | ------------- | --------------------- |
+| docstruct     | 384    | 397 w | **122** | 367.7 s (2.30 s/page) |
+| docstruct_geo | 169    | 529 w | **4**   | 168.5 s (1.05 s/page) |
 
 **30× more tables.** SEC tables are borderless and `find_tables()` is ruled-line
 based. arXiv papers rule their tables, so an arXiv-only evaluation has been
@@ -1129,14 +1134,14 @@ scoring it zero — a silent zero reads as a result.
 
 **The finding, from the 3-doc page-mode smoke (not a result, but a real signal):**
 
-| tool | MRR | chunks | mean |
-|---|---|---|---|
-| unstructured | **0.817** | 397 | 84 w |
-| docstruct | 0.598 | 154 | 290 w |
-| pymupdf4llm | 0.595 | 66 | 484 w |
-| llamaindex | 0.572 | 140 | 99 w |
-| langchain | 0.544 | 251 | 57 w |
-| docstruct_geo | 0.343 | 96 | 333 w |
+| tool          | MRR             | chunks | mean  |
+| ------------- | --------------- | ------ | ----- |
+| unstructured  | **0.817** | 397    | 84 w  |
+| docstruct     | 0.598           | 154    | 290 w |
+| pymupdf4llm   | 0.595           | 66     | 484 w |
+| llamaindex    | 0.572           | 140    | 99 w  |
+| langchain     | 0.544           | 251    | 57 w  |
+| docstruct_geo | 0.343           | 96     | 333 w |
 
 The prediction going in was that page mode would favour `pymupdf4llm`, which emits
 one chunk per page. Wrong: **it favours small chunks.** Unstructured wins by 0.22 MRR
@@ -1187,10 +1192,10 @@ this.
 
 Measured on `doc1.pdf` locally:
 
-| | pages | chars | wall |
-|---|---|---|---|
-| `use_ocr=False` | 14 | 75,953 | 9.7 s |
-| default | 14 | 72,425 | 13.1 s |
+|                   | pages | chars  | wall   |
+| ----------------- | ----- | ------ | ------ |
+| `use_ocr=False` | 14    | 75,953 | 9.7 s  |
+| default           | 14    | 72,425 | 13.1 s |
 
 OCR was **35% slower and lost 3,528 characters**. It did not fill a gap; it replaced
 a good text layer with a worse transcription. On Colab with RapidOCR the cost is far
@@ -1230,15 +1235,15 @@ modes, because chunking came from the warm cache and only scoring changed. So th
 relevance rule is the sole variable, and the result is the cleanest experiment this
 project has run.
 
-| tool | `page` | `span` | `region` |
-|---|---|---|---|
-| docstruct | 0.6004 (6th) | **0.7059 (1st)** | **0.6657 (1st)** |
-| docstruct_geo | 0.4703 (7th) | 0.7047 | 0.6567 |
-| pymupdf4llm | 0.6684 | 0.6992 | 0.6040 |
-| unstructured | **0.7950 (1st)** | 0.6539 | 0.6006 |
-| langchain | 0.7562 | 0.6406 | 0.6029 |
-| llamaindex | 0.7294 | 0.6483 | 0.5887 |
-| llamaindex_semantic | 0.6515 | 0.6540 | 0.5749 |
+| tool                | `page`               | `span`               | `region`             |
+| ------------------- | ---------------------- | ---------------------- | ---------------------- |
+| docstruct           | 0.6004 (6th)           | **0.7059 (1st)** | **0.6657 (1st)** |
+| docstruct_geo       | 0.4703 (7th)           | 0.7047                 | 0.6567                 |
+| pymupdf4llm         | 0.6684                 | 0.6992                 | 0.6040                 |
+| unstructured        | **0.7950 (1st)** | 0.6539                 | 0.6006                 |
+| langchain           | 0.7562                 | 0.6406                 | 0.6029                 |
+| llamaindex          | 0.7294                 | 0.6483                 | 0.5887                 |
+| llamaindex_semantic | 0.6515                 | 0.6540                 | 0.5749                 |
 
 **First becomes fifth and sixth becomes first, on identical chunks.** Stated
 precisely: under `region` DocStruct beats all five external tools significantly;
@@ -1306,12 +1311,12 @@ its whole life inside one document. `natcomm__PMC12855844.pdf`, **18 pages**, ta
 The document carries **422,340 vector primitives** against a typical 5,763, with
 **134,164 on one page** — a Nature Communications figure page. Stage breakdown:
 
-| stage | time |
-|---|---|
-| `detect` | 362.5 s |
-| `fuse` + reading order | 0.0 s |
-| `populate_text` | 271.4 s |
-| `populate_tables` | 1.7 s |
+| stage                    | time    |
+| ------------------------ | ------- |
+| `detect`               | 362.5 s |
+| `fuse` + reading order | 0.0 s   |
+| `populate_text`        | 271.4 s |
+| `populate_tables`      | 1.7 s   |
 
 **Two separate costs, and one of them is pure waste.** `detect_page` collects
 `images + curves + rects + lines`, finds the count over `FIGURE_CLUSTER_MAX_PRIMITIVES`
@@ -1357,11 +1362,11 @@ langchain's chunks is 0.990 and 1.000, well over the 0.7 threshold.
 over dense + BM25, five questions across `3M_2018_10K` (729 chunks) and
 `3M_2022_10K` (1,176 chunks):
 
-| embedder | ranks | recall@5 | recall@50 | recall@100 | MRR@5 |
-|---|---|---|---|---|---|
-| all-MiniLM-L6-v2 | 81, 83, 163, 239, 299, 299, 299 | 0/5 | 0/5 | 2/5 | 0.0000 |
-| BAAI/bge-small-en-v1.5 | 63, 146, 173, 173, 173, 181, 222 | 0/5 | 0/5 | 1/5 | 0.0000 |
-| intfloat/e5-small-v2 | 42, 62, 128, 128, 128, 175, 252 | 0/5 | 1/5 | 2/5 | 0.0000 |
+| embedder               | ranks                            | recall@5 | recall@50 | recall@100 | MRR@5  |
+| ---------------------- | -------------------------------- | -------- | --------- | ---------- | ------ |
+| all-MiniLM-L6-v2       | 81, 83, 163, 239, 299, 299, 299  | 0/5      | 0/5       | 2/5        | 0.0000 |
+| BAAI/bge-small-en-v1.5 | 63, 146, 173, 173, 173, 181, 222 | 0/5      | 0/5       | 1/5        | 0.0000 |
+| intfloat/e5-small-v2   | 42, 62, 128, 128, 128, 175, 252  | 0/5      | 1/5       | 2/5        | 0.0000 |
 
 Chunking was done once and every embedder scored on the identical chunk set, so
 the embedder is the only variable. A stronger one moves the best rank from 81 to
@@ -1401,15 +1406,15 @@ The Colab section run came back (`docstruct_results (1).zip`, now unpacked into
 `reports/`). Seven tools, PMC papers, scored against the publisher's own JATS section
 boundaries. Pk and WindowDiff are *error* rates -- lower is better.
 
-| Tool | WindowDiff | Pk | Straddle | Mean chunks | Docs | Errors | Seconds |
-|---|---|---|---|---|---|---|---|
-| docstruct_geo **(ours)** | **0.4362** | **0.3525** | 0.527 | 25.5 | 24 | 0 | 132.5 |
-| pymupdf4llm | 0.4928 | 0.4661 | 0.6005 | 15.9 | 24 | 0 | 253.0 |
-| docstruct **(ours)** | 0.4934 | 0.3641 | 0.4484 | 35.4 | 24 | 0 | 312.0 |
-| llamaindex_semantic | 0.5334 | 0.5134 | 0.2496 | 24.7 | 24 | 0 | 273.3 |
-| llamaindex | 0.6959 | 0.5938 | 0.3828 | 37.9 | 24 | 0 | 115.0 |
-| langchain | 0.8821 | 0.6183 | 0.2227 | 73.9 | 24 | 0 | 117.7 |
-| unstructured | 0.8839 | 0.5974 | 0.1924 | 92.4 | 18 | 6 | 91.3 |
+| Tool                          | WindowDiff       | Pk               | Straddle | Mean chunks | Docs | Errors | Seconds |
+| ----------------------------- | ---------------- | ---------------- | -------- | ----------- | ---- | ------ | ------- |
+| docstruct_geo**(ours)** | **0.4362** | **0.3525** | 0.527    | 25.5        | 24   | 0      | 132.5   |
+| pymupdf4llm                   | 0.4928           | 0.4661           | 0.6005   | 15.9        | 24   | 0      | 253.0   |
+| docstruct**(ours)**     | 0.4934           | 0.3641           | 0.4484   | 35.4        | 24   | 0      | 312.0   |
+| llamaindex_semantic           | 0.5334           | 0.5134           | 0.2496   | 24.7        | 24   | 0      | 273.3   |
+| llamaindex                    | 0.6959           | 0.5938           | 0.3828   | 37.9        | 24   | 0      | 115.0   |
+| langchain                     | 0.8821           | 0.6183           | 0.2227   | 73.9        | 24   | 0      | 117.7   |
+| unstructured                  | 0.8839           | 0.5974           | 0.1924   | 92.4        | 18   | 6      | 91.3    |
 
 **What is new here.** Every external number so far has been retrieval, which means it
 is entangled with an embedder and a relevance rule -- and Stage 17 showed the ranking
@@ -1482,15 +1487,15 @@ outcome that was worth paying for.
 The `fetch_pmc.py` manifest fix (Stage 20 addendum) did what it was supposed to --
 the corpus went from 29 paired documents to the full set.
 
-| Tool | WindowDiff | Pk | Straddle | Mean chunks | Docs | Errors |
-|---|---|---|---|---|---|---|
-| docstruct_geo **(ours)** | **0.4226** | **0.3418** | 0.5129 | 26.8 | 134 | 0 |
-| pymupdf4llm | 0.4800 | 0.4490 | 0.5734 | 17.7 | 134 | 0 |
-| docstruct **(ours)** | 0.4818 | 0.3531 | 0.4385 | 37.5 | 134 | 0 |
-| llamaindex_semantic | 0.5337 | 0.5128 | 0.1889 | 29.1 | 134 | 0 |
-| llamaindex | 0.6952 | 0.5979 | 0.3660 | 42.7 | 134 | 0 |
-| langchain | 0.8787 | 0.6200 | 0.2202 | 85.6 | 134 | 0 |
-| unstructured | 0.8933 | 0.6025 | 0.1820 | 106.9 | **99** | **35** |
+| Tool                          | WindowDiff       | Pk               | Straddle | Mean chunks | Docs         | Errors       |
+| ----------------------------- | ---------------- | ---------------- | -------- | ----------- | ------------ | ------------ |
+| docstruct_geo**(ours)** | **0.4226** | **0.3418** | 0.5129   | 26.8        | 134          | 0            |
+| pymupdf4llm                   | 0.4800           | 0.4490           | 0.5734   | 17.7        | 134          | 0            |
+| docstruct**(ours)**     | 0.4818           | 0.3531           | 0.4385   | 37.5        | 134          | 0            |
+| llamaindex_semantic           | 0.5337           | 0.5128           | 0.1889   | 29.1        | 134          | 0            |
+| llamaindex                    | 0.6952           | 0.5979           | 0.3660   | 42.7        | 134          | 0            |
+| langchain                     | 0.8787           | 0.6200           | 0.2202   | 85.6        | 134          | 0            |
+| unstructured                  | 0.8933           | 0.6025           | 0.1820   | 106.9       | **99** | **35** |
 
 Against the 24-document run: order identical, every value within 0.02. WindowDiff
 0.4362 -> 0.4226, Pk 0.3525 -> 0.3418. A 5.6x larger corpus that reproduces the small
@@ -1524,15 +1529,15 @@ and the sweep over it would have looked exactly as convincing while meaning noth
 
 MRR by threshold:
 
-| tool | 0.1 | 0.3 | 0.5 | 0.7 | 0.9 | 1.0 |
-|---|---|---|---|---|---|---|
-| docstruct | 0.9590 | 0.8803 | 0.7888 | **0.6659** | **0.5275** | **0.3890** |
-| docstruct_geo | **0.9666** | **0.8926** | **0.7995** | 0.6567 | 0.5076 | 0.3704 |
-| pymupdf4llm | 0.9455 | 0.8543 | 0.7468 | 0.6040 | 0.4821 | 0.3263 |
-| llamaindex_semantic | 0.9617 | 0.8661 | 0.7400 | 0.5747 | 0.4297 | 0.3098 |
-| unstructured | 0.9365 | 0.8339 | 0.7213 | 0.6008 | 0.3911 | 0.2127 |
-| llamaindex | 0.9463 | 0.8407 | 0.7263 | 0.5885 | 0.4604 | 0.3401 |
-| langchain | 0.9357 | 0.8137 | 0.7111 | 0.6031 | 0.4662 | 0.3370 |
+| tool                | 0.1              | 0.3              | 0.5              | 0.7              | 0.9              | 1.0              |
+| ------------------- | ---------------- | ---------------- | ---------------- | ---------------- | ---------------- | ---------------- |
+| docstruct           | 0.9590           | 0.8803           | 0.7888           | **0.6659** | **0.5275** | **0.3890** |
+| docstruct_geo       | **0.9666** | **0.8926** | **0.7995** | 0.6567           | 0.5076           | 0.3704           |
+| pymupdf4llm         | 0.9455           | 0.8543           | 0.7468           | 0.6040           | 0.4821           | 0.3263           |
+| llamaindex_semantic | 0.9617           | 0.8661           | 0.7400           | 0.5747           | 0.4297           | 0.3098           |
+| unstructured        | 0.9365           | 0.8339           | 0.7213           | 0.6008           | 0.3911           | 0.2127           |
+| llamaindex          | 0.9463           | 0.8407           | 0.7263           | 0.5885           | 0.4604           | 0.3401           |
+| langchain           | 0.9357           | 0.8137           | 0.7111           | 0.6031           | 0.4662           | 0.3370           |
 
 **A DocStruct variant is 1st at all ten thresholds, and the two of them hold both top
 places at all ten.** Margin over the best external tool: +0.045 to +0.062 across
@@ -1604,8 +1609,7 @@ that result is unaffected.
 
 ### 2. Full-width elements above columns are ordered after them
 
-Same page, reading order: `1 Abstract, 2 body, 3 sidebar, 4 Introduction, 5, 6, then
-7 = the paper title, 8 = the author block`. The title is at `y0=97`, above everything
+Same page, reading order: `1 Abstract, 2 body, 3 sidebar, 4 Introduction, 5, 6, then 7 = the paper title, 8 = the author block`. The title is at `y0=97`, above everything
 else on the page, and comes out seventh.
 
 The column-aware sweep assigns full-width elements to a column band and reads bands in
@@ -1639,13 +1643,13 @@ digest of the content. Two runs agree only if every chunk matches on all of them
 
 **Result, OHR-Bench, geometry-only, 2 runs:**
 
-| | |
-|---|---|
-| documents scored | **95 of 95** |
-| byte-identical across independent processes | **95 (100.0%)** |
-| differing | **0** |
-| chunks per run | 5,810 |
-| wall time | 6,810 s for 92 docs + a 4h-cap re-run for the last 3 |
+|                                             |                                                      |
+| ------------------------------------------- | ---------------------------------------------------- |
+| documents scored                            | **95 of 95**                                   |
+| byte-identical across independent processes | **95 (100.0%)**                                |
+| differing                                   | **0**                                          |
+| chunks per run                              | 5,810                                                |
+| wall time                                   | 6,810 s for 92 docs + a 4h-cap re-run for the last 3 |
 
 **This is now a table row no LLM- or embedding-based chunker can fill**, and it is
 cheap to re-verify. It also closes the largest hole in the paper: a contract asserted
@@ -1689,10 +1693,10 @@ Expandable Compute Allocation for Multimodal LLMs*.
 
 Measured across every document the gold and the disk share a filename with:
 
-| | |
-|---|---|
-| documents whose gold is findable in the PDF | **0** |
-| documents whose gold matches nothing | **65** |
+|                                             |              |
+| ------------------------------------------- | ------------ |
+| documents whose gold is findable in the PDF | **0**  |
+| documents whose gold matches nothing        | **65** |
 
 Not partial drift. The filenames were reused for entirely different papers, almost
 certainly by a re-fetch that renumbered `doc<N>.pdf` positionally instead of keying on
@@ -1739,14 +1743,14 @@ date the break and to recover most of the corpus.
 
 **Timeline, from the manifests' own history:**
 
-| date | commit | state |
-|---|---|---|
-| 2026-06-26 | `d82c25d` | v1 manifest, 24 entries, `doc25 = 2606.27377v1` |
-| 2026-07-23 | `a0151b9` | **v6 gold committed** — 558 questions, 92 documents |
-| 2026-07-23 | `00e9325` | v6 benchmark run, MRR 0.8203. Corpus and gold agreed here |
-| 2026-07-23 | `03a6bc9` | manifest_v2, 47 entries |
-| 2026-07-24 | `4cc88ab` | manifest_v2, 67 entries, `doc51 = 2606.27377v1` |
-| **2026-08-06** | `dbbc979` | manifest_v2, 68 entries, **`doc1 = 2608.04010v1` (ParVL)** |
+| date                 | commit      | state                                                             |
+| -------------------- | ----------- | ----------------------------------------------------------------- |
+| 2026-06-26           | `d82c25d` | v1 manifest, 24 entries,`doc25 = 2606.27377v1`                  |
+| 2026-07-23           | `a0151b9` | **v6 gold committed** — 558 questions, 92 documents        |
+| 2026-07-23           | `00e9325` | v6 benchmark run, MRR 0.8203. Corpus and gold agreed here         |
+| 2026-07-23           | `03a6bc9` | manifest_v2, 47 entries                                           |
+| 2026-07-24           | `4cc88ab` | manifest_v2, 67 entries,`doc51 = 2606.27377v1`                  |
+| **2026-08-06** | `dbbc979` | manifest_v2, 68 entries,**`doc1 = 2608.04010v1` (ParVL)** |
 
 **The proof is in the arXiv identifiers.** All 31 ids in the corpus now on disk are
 `2608.*` — posted in **August 2026**. The gold was committed on **23 July**. A July
@@ -1771,3 +1775,74 @@ backup outside this repository.
 is enough to re-run ablations on a 56-document subset and enough to state the internal
 table's provenance honestly. It is not enough to reproduce the 92-document numbers
 exactly, and the paper should not claim otherwise.
+
+## Stage 26
+
+**2026-08-28 — Paper ported to the ACL 2023 template, rewritten, and cut to 8 pages
+total; two review rounds answered; the section result given a chance floor.**
+
+Supervisor feedback opened this stage: the abstract was too long, the title odd, and
+the method, corpora and results sections read as jumbled AI prose. The draft was also
+still on stock `article` with a hand-rolled two-column geometry.
+
+**Template.** `paper/` now builds on `ACL2023.sty` with `acl_natbib` author-year
+citations. That is not a class swap: numeric citations had to become author-year at
+every site, `geometry` and the duplicate `natbib`/`hyperref` loads had to go, the
+negative-results section became the mandatory unnumbered `Limitations`, an Ethics
+Statement was written, and the appendix was folded into a footnote. `anthology.bib`
+from the venue zip is the right source for *ACL entries and is deliberately not
+committed (43 MB).
+
+**Page budget.** The venue limit turned out to be 8 pages for the *whole PDF*,
+references included — not 8 body pages with a free tail, which is what the ACL 2023
+instructions describe and what the first port assumed. That is a materially tighter
+constraint and cost real content: two figures (threshold sweep, size confound, both
+kept as prose), eight references, the Reproducibility appendix, and a compression pass
+over every section. Recorded in `CLAUDE.md` so the next session does not re-learn it.
+
+**Anti-slop.** The rewrite ran against a mechanical gate now living in
+`.claude/skills/acl-paper/scripts/gate.py`. Em-dashes went 40 → 0, bolded list
+lead-ins 7 → 0, weak qualifiers 18 → 0; total hits 88 → 11, the remainder being
+`rather than` constructions that carry factual contrast and one statistical
+"significant". The gate itself had two false positives worth fixing: `rather` inside
+`rather than`, and `significant` beside a p-value.
+
+**A real error, found by review.** The claim "unstructured is 3.9× more efficient on
+rank quality per token" attached the raw context ratio (2194/560) to an efficiency
+claim. The efficiency ratio is 1.1664/0.3217 = **3.63×**. Both numbers now ship with
+the right label. This is the failure mode the claim ledger exists to catch, and it
+survived several drafts before an outside reader caught it.
+
+**Chance floor for the section metric.** A reviewer argued §5.3 might be a chunk-count
+contest, since Pk and WindowDiff both reward matching the gold segment count. The
+correlation is real — ρ(|chunks − 25|, Pk) = 0.821, p = 0.023 — so the objection
+needed an answer rather than a rebuttal. `scripts/section_random_baseline.py` places N
+boundaries with no knowledge of the document. Random at n=27 scores Pk 0.499;
+`docstruct_geo` scores 0.342. The result survives, and it is bigger than the paper
+claims: **five of the seven chunkers do not clearly beat random placement at their own
+chunk count**, and llamaindex is 0.058 Pk *worse* than chance.
+
+**But it cannot be printed yet.** The floor is 122 documents, the tool table is 134,
+and the 134-run's per-document scores did not survive its Colab session —
+`.cache/section_ckpt/` holds a 6-document pilot and `reports/section_scores.json` holds
+only aggregates. A floor measured on a different subset than the tools is not a floor.
+Re-running the PMC scoring with per-document output retained is now the cheapest of
+the three queued GPU jobs. **Lesson: an aggregate-only report cannot be re-cut later;
+keep per-document output from any run that might need a baseline beside it.**
+
+**Size-neutrality, measured rather than assumed.** Spearman ρ between mean chunk width
+and MRR is +0.571 under span, −0.679 under page, and **+0.036 under region** (n=7,
+none significant). The sign reversal is the paper's thesis; region sitting at zero is
+the first measurement that the region rule behaves as designed. Signs only — seven
+tools cannot support a magnitude claim, and a reviewer proposing this as the headline
+number had assumed ±0.85.
+
+**Scope hedges added.** Every number comes from one retrieval configuration, and the
+paper now says so where the claim is made. The PMC section is now explicit that it
+measures structural fidelity and not retrieval quality: a publisher wrote those
+sections for a human reader, and a chunk that spans two of them may still serve a
+question needing both.
+
+**What both reviews converged on independently:** the embedder is a live, untested
+variable, and the fixed-encoder protocol may itself be conditioning the inversion.
+That is now the gate on submission (`memory/roadmap.md`), not a revision to promise.
