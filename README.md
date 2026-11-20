@@ -88,7 +88,12 @@ Context volume matters here. DocStruct hands the retriever 2,194 words per query
 unstructured 561, so part of our `span` lead may come from returning more text. Across
 the seven tools, chunk size and MRR correlate at +0.57 under `span`, −0.68 under `page`
 and +0.04 under `region` (n=7, none significant), which is why `region` is the rule we
-lead with. An equal-context-budget rerun is in progress (`scripts/run_budget_matched.sh`).
+lead with. At a matched budget the lead holds: raising the baselines' top-k until their
+context matches `docstruct_geo` (2,328 words; unstructured k=20, langchain k=17,
+llamaindex k=8) leaves `docstruct_geo` ahead by 0.043–0.060 MRR under `span` and
+0.047–0.064 under `region`, every paired 95% interval above zero. Unstructured at k=20
+does recall more answers under `span` (0.800 against 0.789). Numbers in
+[`reports/budget/summary.md`](reports/budget/summary.md).
 
 We could find no prior chunking evaluation that varies the rule, so we publish all
 three. Read [`gpt.md` §4.2 and §6.1](gpt.md) before quoting

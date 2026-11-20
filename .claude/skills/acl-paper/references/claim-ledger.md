@@ -48,6 +48,25 @@ Derived, safe to state: context cost $3.9\times$ the leanest baseline
 (2194 / 560 = 3.92, leanest is unstructured). Duplication 1.83 is the highest of
 the seven. Coverage 0.9632 against LangChain's 1.00.
 
+## OHR-Bench equal context budget (review 1, R2)
+
+Source: `reports/budget/ohr_<tool>_k<k>_<mode>.json`, summary and paired bootstrap in
+`reports/budget/summary.md` (`python scripts/budget_compare.py`). GitHub Actions run
+44727565429, one CPU install for all 14 runs. Hybrid `docstruct` was not rerun; the
+comparison is `docstruct_geo` at k=5 (2,328 words/query).
+
+| tool | k | words | span MRR | region MRR | span Recall@k |
+|---|---|---|---|---|---|
+| docstruct_geo | 5 | 2328 | 0.7048 | 0.6568 | 0.7889 |
+| unstructured | 20 | 2193 | 0.6616 | 0.6091 | 0.8002 |
+| langchain | 17 | 2137 | 0.6450 | 0.6080 | 0.7648 |
+| llamaindex | 8 | 2264 | 0.6525 | 0.5932 | 0.7591 |
+
+Safe to state: lead 0.043-0.060 MRR (span), 0.047-0.064 (region), every paired 95%
+interval above zero. k=5 reruns reproduce the headline within 0.003 MRR (largest gap
+unstructured span 0.6567 vs 0.6539; this install makes 19,036 chunks vs 18,424).
+Loss to state: under span, unstructured k=20 recall 0.800 beats docstruct_geo 0.789.
+
 ## OHR-Bench region threshold sweep
 
 Source: `reports/ohr_region_threshold_sweep.json`.

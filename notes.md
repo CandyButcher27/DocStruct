@@ -1992,3 +1992,31 @@ Pages split: 266 old, 395 new. The crop-at-tolerant variant lost 2 finance spans
 words; band reading is best or tied in every domain. Gold already generated
 (`benchmark_qa_v9.json`) used the old extractor; spans are verbatim-validated either
 way, so they stay valid, but the new extractor yields gold from more two-column pages.
+
+## Stage 30
+
+**2026-11-20 — Equal-context-budget rerun (review 1, R2).**
+
+The reviewer's point: DocStruct returns about four times more context per query than
+Unstructured at k=5, so the span lead could be context volume, not layout. We raised
+each small-chunk baseline's top-k until its context words matched `docstruct_geo` at
+k=5 (2,328 words): unstructured k=20, langchain k=17, llamaindex k=8. Every tool was
+also rerun at k=5 on the same install, so no comparison mixes library versions.
+
+The 14 runs (7 configurations x span/region) ran in parallel on GitHub Actions
+(`.github/workflows/budget-matched.yml` on `bench/budget-matched`, run 44727565429,
+33 minutes; the laptop needed 4-6 hours serially). The k=5 reruns reproduce the
+headline within 0.003 MRR; langchain and llamaindex are identical to four places.
+
+| tool | k | words | span MRR | region MRR |
+|---|---|---|---|---|
+| docstruct_geo | 5 | 2328 | 0.7048 | 0.6568 |
+| unstructured | 20 | 2193 | 0.6616 | 0.6091 |
+| langchain | 17 | 2137 | 0.6450 | 0.6080 |
+| llamaindex | 8 | 2264 | 0.6525 | 0.5932 |
+
+The lead holds under both rules, every paired 95% interval above zero
+(`reports/budget/summary.md`, `scripts/budget_compare.py`). Raising k moves MRR little
+by construction; recall is where it shows, and unstructured k=20 recalls more under
+span (0.800 vs 0.789). Not covered: the hybrid `docstruct` (not rerun), and matching by
+resizing the baselines' chunks. Paper §5.1 and Limitations updated.
