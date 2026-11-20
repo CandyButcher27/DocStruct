@@ -3,7 +3,7 @@
 Written 2026-08-16. **This file supersedes `futureplans.md` and
 `implementation_plan.md` §1–§7 as the work queue.** Both are kept for their history;
 where they disagree with this file, this file is newer. `to-do.md` remains the short
-"where we are" scratchpad, `memory/` remains the durable reference, and
+"where we are" scratchpad, `notes.md` remains the durable record, and
 `paper/IMPROVING-THIS-PAPER.md` remains the paper-specific plan.
 
 Every item below was checked against the code on 2026-08-16, not carried forward on
@@ -75,7 +75,7 @@ Dump their block/chunk output and find the real failure mode before touching gen
 heuristics. Re-identify the outliers on the recovered corpus first — the old document
 numbers refer to papers that are no longer on disk.
 
-### 2.5 Paper edit list (`memory/paper-structure-survey.md` §5)
+### 2.5 Paper edit list (paper-structure survey, notes.md)
 Explicit research questions; limitations split into internal / external / construct
 validity; corpus prose turned into a table; an artifact statement. All writing.
 

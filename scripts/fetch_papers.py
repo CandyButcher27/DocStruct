@@ -1,6 +1,6 @@
 """Fetch open-access research papers from non-arXiv publishers.
 
-The internal corpus is arXiv-heavy, and `memory/results.md` records that the XY-cut
+The internal corpus is arXiv-heavy, and `notes.md` records that the XY-cut
 result flipped on corpus shape alone -- so "works on research papers" currently means
 "works on one LaTeX template family". Publisher matters more than field here: MDPI,
 IEEE, PLOS and Frontiers each run a different typesetting engine, so their column

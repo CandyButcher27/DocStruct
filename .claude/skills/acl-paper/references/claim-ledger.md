@@ -5,7 +5,7 @@ names the artifact that produced it. A number with no row ships as `\unverified{
 or does not ship. Verified against the artifacts on 2026-08-27.
 
 **Regenerate a row, never retype one.** If a rerun changes a value, update the row
-and `memory/results.md` together, then the prose.
+and `mimi/memory/results.md` together, then the prose.
 
 ## OHR-Bench — the headline
 

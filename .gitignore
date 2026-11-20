@@ -40,7 +40,7 @@ _smoke*/
 /check_*.py
 /_*.py
 
-# Local Claude Code settings (CLAUDE.md and memory/ ARE tracked)
+# Local Claude Code settings (CLAUDE.md IS tracked)
 # ...except project skills, which are tooling rather than personal config:
 # CLAUDE.md tells every session to run the acl-paper gate, so it has to survive
 # a fresh clone. Each parent must be un-excluded before a file inside it can be

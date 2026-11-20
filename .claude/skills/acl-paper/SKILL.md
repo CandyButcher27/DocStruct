@@ -50,13 +50,13 @@ These come from `CLAUDE.md` rules 7 and 9 and are not negotiable in prose.
 **No leaderboard number without its relevance mode.** Any MRR, NDCG, Recall or
 Hit@1 from OHR-Bench is meaningless unless the sentence, the table column or the
 caption names `span`, `page` or `region`. A number carried across modes is a
-wrong number. See `memory/relevance-modes.md`.
+wrong number. See `mimi/memory/relevance-modes.md`.
 
 **Losses go in the main text.** Coverage 0.9632 against LangChain's 1.00, the
 highest duplication of the seven, 6th of 7 under page relevance, the vision
 detector null on every corpus but arXiv, no parse-fidelity number, born-digital
 only. These belong in the body and in Limitations, never buried in an appendix.
-`memory/related-work.md` keeps the list of who beats us where.
+`mimi/memory/related-work.md` keeps the list of who beats us where.
 
 **Name the N when it moved.** `unstructured` hard-fails on 26% of PMC PDFs, so
 its section row covers 99 of 134 documents. Any table row with a different N
