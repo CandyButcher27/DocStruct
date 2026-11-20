@@ -34,10 +34,14 @@ _MIN_COLUMN_WORDS = 40      # too few words to trust a whitespace band as a gutt
 # equation, table or figure) and still count as a gutter. Requiring zero crossings
 # vetoes the split on almost every real paper.
 _MAX_GUTTER_CROSSING_RATIO = 0.02
-# Points of *entirely* word-free width a band must have before it counts as a
-# gutter. Two-column gutters in this corpus run 10-20pt; a false gutter on a
-# single-column page has a zero-crossing run of 0-2pt (measured, doc3.pdf).
+# Width a band of at-most-_MAX_GUTTER_CROSSING_RATIO crossings must have before it
+# counts as a gutter. Two-column gutters in this corpus run 10-20pt; the false
+# gutter on single-column doc3.pdf p2 is narrower and stays rejected (re-measured
+# 2026-11-20).
 _MIN_GUTTER_BAND_PT = 5
+# Words whose tops differ by at most this many points share a line. pdfplumber's
+# own default y_tolerance, so lines group the way extract_text() groups them.
+_LINE_TOP_TOLERANCE = 3
 
 _SYSTEM = (
     "You write evaluation questions for a document retrieval benchmark. "
@@ -104,8 +108,9 @@ def _column_gutter(page) -> Optional[float]:
             crossings[i] += 1
 
     middle = range(bucket(low), bucket(high) + 1)
+    limit = len(words) * _MAX_GUTTER_CROSSING_RATIO
     best = min(middle, key=lambda i: crossings[i])
-    if crossings[best] > len(words) * _MAX_GUTTER_CROSSING_RATIO:
+    if crossings[best] > limit:
         return None
 
     # A minimum is not a gutter. On a single-column page the crossing count still
@@ -116,13 +121,14 @@ def _column_gutter(page) -> Optional[float]:
     # text into fluent prose, the span is no longer verbatim, and the document
     # silently yields no gold at all: 19% of documents in one run.
     #
-    # A real gutter is a band of genuine whitespace, so require one: the widest
-    # run of exactly-zero crossings in the middle band, at least
-    # _MIN_GUTTER_BAND_PT wide. Split at its centre, which is by construction a
-    # point no word crosses.
+    # A real gutter is a band, not a point: the widest run of the middle band that
+    # stays within the crossing limit, at least _MIN_GUTTER_BAND_PT wide. The limit
+    # and not zero, because a few full-width lines (title, equation, footer) cross
+    # every point of a real gutter. Those lines are not cut: _page_text keeps any
+    # line that crosses the split whole.
     runs, start = [], None
     for i in middle:
-        if crossings[i] == 0:
+        if crossings[i] <= limit:
             start = i if start is None else start
         elif start is not None:
             runs.append((start, i - 1))
@@ -138,14 +144,39 @@ def _column_gutter(page) -> Optional[float]:
 
 
 def _page_text(page) -> str:
-    """Page text with two-column layouts read left column first, then right."""
+    """Page text with two-column layouts read column by column.
+
+    Lines that cross the gutter (a title, a full-width equation, a footer) are kept
+    whole and act as band breaks: the left column above them is emitted, then the
+    right, then the line itself. Cropping at the gutter instead cut those lines'
+    words in half. Measured 2026-11-20 on the 3,558 OHR-Bench human gold spans
+    (whitespace-blind, on the span's own page): crop 1,825 found, band 1,846.
+    """
     gutter = _column_gutter(page)
     if gutter is None:
         return page.extract_text() or ""
-    x0, top, x1, bottom = page.bbox
-    left = page.crop((x0, top, gutter, bottom)).extract_text() or ""
-    right = page.crop((gutter, top, x1, bottom)).extract_text() or ""
-    return f"{left}\n{right}"
+    lines: list = []
+    for word in sorted(page.extract_words(), key=lambda w: (w["top"], w["x0"])):
+        if lines and abs(word["top"] - lines[-1][0]) <= _LINE_TOP_TOLERANCE:
+            lines[-1][1].append(word)
+        else:
+            lines.append([word["top"], [word]])
+    out: List[str] = []
+    left: List[str] = []
+    right: List[str] = []
+    for _, words in lines:
+        words.sort(key=lambda w: w["x0"])
+        if any(w["x0"] < gutter < w["x1"] for w in words):
+            out += left + right + [" ".join(w["text"] for w in words)]
+            left, right = [], []
+            continue
+        lw = [w["text"] for w in words if w["x1"] <= gutter]
+        rw = [w["text"] for w in words if w["x1"] > gutter]
+        if lw:
+            left.append(" ".join(lw))
+        if rw:
+            right.append(" ".join(rw))
+    return "\n".join(out + left + right)
 
 
 def _extract_full_text(pdf_path: str) -> str:
