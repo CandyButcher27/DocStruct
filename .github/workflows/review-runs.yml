@@ -1,0 +1,209 @@
+name: review runs
+
+# Review 1 follow-ups: MIN/MAX_CHUNK_TOKENS sweep on OHR-Bench and PMC (geometry-only),
+# Docling as a layout-aware baseline, and baselines resized to DocStruct's context
+# budget. Runs on push to bench/review-runs or by hand.
+
+on:
+  push:
+    branches: ["bench/review-runs"]
+  workflow_dispatch:
+
+env:
+  LIMIT: "1"   # 0 = full corpora; 1 = smoke test
+  NLTK_DATA: /home/runner/nltk_data
+  UNSTRUCTURED_DISABLE_NOTICE: "1"
+
+jobs:
+  fetch-ohr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/cache@v4
+        with:
+          path: data/ohrbench/_download
+          key: ohrbench-download-v1
+      - run: |
+          pip install pyarrow pdfplumber
+          python scripts/fetch_ohrbench.py --limit "$LIMIT"
+          git checkout -- data/qa/ohrbench.json reports/ohrbench_manifest.json
+          ls data/ohrbench/*.pdf | wc -l
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ohrbench-pdfs
+          path: data/ohrbench/*.pdf
+          retention-days: 3
+
+  fetch-pmc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch the PMC PDFs named in the committed gold, checksum-verified
+        run: |
+          python - <<'PY'
+          import hashlib, json, os, time, urllib.request
+          gold = json.load(open("datasets/gold/pmc_sections.json"))
+          man = {m["file"]: m for m in json.load(open("reports/pmc_manifest.json"))}
+          limit = int(os.environ["LIMIT"]) or None
+          os.makedirs("data/pmc", exist_ok=True)
+          ok = bad = 0
+          for doc in sorted(gold)[:limit]:
+              m = man.get(doc)
+              if not m:
+                  print("not in manifest:", doc); bad += 1; continue
+              for attempt in range(4):
+                  try:
+                      req = urllib.request.Request(m["source"], headers={"User-Agent": "docstruct-bench/0.1"})
+                      data = urllib.request.urlopen(req, timeout=120).read()
+                      break
+                  except Exception as e:
+                      print(doc, type(e).__name__, e); time.sleep(5 * (attempt + 1))
+              else:
+                  bad += 1; continue
+              if hashlib.sha256(data).hexdigest() != m["sha256"]:
+                  print("checksum mismatch:", doc); bad += 1; continue
+              open(f"data/pmc/{doc}", "wb").write(data); ok += 1
+              time.sleep(0.5)
+          print(f"fetched {ok}, failed {bad}")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pmc-pdfs
+          path: data/pmc/*.pdf
+          retention-days: 3
+
+  floor-ohr:
+    needs: fetch-ohr
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [span, region, page]
+        cfg:
+          - {min: 100, max: 500}
+          - {min: 150, max: 500}
+          - {min: 200, max: 500}
+          - {min: 300, max: 500}
+          - {min: 400, max: 500}
+          - {min: 200, max: 800}
+    name: floor-ohr min=${{ matrix.cfg.min }} max=${{ matrix.cfg.max }} ${{ matrix.mode }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bench-setup
+      - uses: actions/download-artifact@v4
+        with:
+          name: ohrbench-pdfs
+          path: data/ohrbench
+      - run: |
+          python scripts/ablate.py --tool docstruct_geo \
+            --name "floor_min${{ matrix.cfg.min }}_max${{ matrix.cfg.max }}_${{ matrix.mode }}" \
+            --set MIN_CHUNK_TOKENS=${{ matrix.cfg.min }} --set MAX_CHUNK_TOKENS=${{ matrix.cfg.max }} \
+            --relevance ${{ matrix.mode }} --pdfs-dir data/ohrbench --qa data/qa/ohrbench.json \
+            --cache-dir "" --out-dir reports/review/floor_ohr
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: floor-ohr-min${{ matrix.cfg.min }}-max${{ matrix.cfg.max }}-${{ matrix.mode }}
+          path: reports/review/
+
+  floor-pmc:
+    needs: fetch-pmc
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        cfg:
+          - {min: 100, max: 500}
+          - {min: 150, max: 500}
+          - {min: 200, max: 500}
+          - {min: 300, max: 500}
+          - {min: 400, max: 500}
+          - {min: 200, max: 800}
+    name: floor-pmc min=${{ matrix.cfg.min }} max=${{ matrix.cfg.max }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bench-setup
+      - uses: actions/download-artifact@v4
+        with:
+          name: pmc-pdfs
+          path: data/pmc
+      - run: |
+          out="reports/review/floor_pmc/pmc_min${{ matrix.cfg.min }}_max${{ matrix.cfg.max }}"
+          mkdir -p reports/review/floor_pmc
+          python scripts/score_sections.py --tools docstruct_geo --gold datasets/gold/pmc_sections.json \
+            --set MIN_CHUNK_TOKENS=${{ matrix.cfg.min }} --set MAX_CHUNK_TOKENS=${{ matrix.cfg.max }} \
+            --ckpt-dir .cache/section_ckpt --out "$out.json" --report-md "$out.md"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: floor-pmc-min${{ matrix.cfg.min }}-max${{ matrix.cfg.max }}
+          path: reports/review/
+
+  resized:
+    needs: fetch-ohr
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [span, region]
+        run:
+          - {tool: unstructured, args: "--adapter-arg max_characters=4400 --adapter-arg combine_text_under_n_chars=3200"}
+          - {tool: langchain, args: "--adapter-arg chunk_size=8500"}
+          - {tool: llamaindex, args: "--adapter-arg chunk_size=2400"}
+    name: resized ${{ matrix.run.tool }} ${{ matrix.mode }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bench-setup
+      - uses: actions/download-artifact@v4
+        with:
+          name: ohrbench-pdfs
+          path: data/ohrbench
+      - run: |
+          python scripts/ablate.py --tool ${{ matrix.run.tool }} ${{ matrix.run.args }} \
+            --name "resized_${{ matrix.run.tool }}_${{ matrix.mode }}" --relevance ${{ matrix.mode }} \
+            --pdfs-dir data/ohrbench --qa data/qa/ohrbench.json --cache-dir "" --out-dir reports/review/resized
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: resized-${{ matrix.run.tool }}-${{ matrix.mode }}
+          path: reports/review/
+
+  docling:
+    needs: fetch-ohr
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [span, region, page]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    name: docling shard ${{ matrix.shard }} ${{ matrix.mode }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bench-setup
+        with:
+          extra: docling
+      - uses: actions/download-artifact@v4
+        with:
+          name: ohrbench-pdfs
+          path: data/ohrbench
+      - name: Keep this shard's documents
+        run: |
+          mkdir -p data/shard
+          ls data/ohrbench/*.pdf | sort | awk 'NR % 8 == ${{ matrix.shard }}' | xargs -I{} cp {} data/shard/
+          ls data/shard | wc -l
+      - run: |
+          python scripts/ablate.py --tool docling \
+            --name "docling_s${{ matrix.shard }}_${{ matrix.mode }}" --relevance ${{ matrix.mode }} \
+            --pdfs-dir data/shard --qa data/qa/ohrbench.json --cache-dir "" --out-dir reports/review/docling
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: docling-s${{ matrix.shard }}-${{ matrix.mode }}
+          path: reports/review/
