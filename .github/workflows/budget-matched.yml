@@ -68,8 +68,8 @@ jobs:
         run: |
           sudo apt-get update -q && sudo apt-get install -y -q libgl1 poppler-utils
           pip install uv
-          uv pip install --system torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
-          uv pip install --system -c .github/bench-constraints.txt -e ".[retrieval,benchmark]" "unstructured[pdf]" unstructured-inference llama-index-core
+          uv pip install --system torch==2.15.0 torchvision==0.29.2 --index-url https://download.pytorch.org/whl/cpu
+          uv pip install --system -c .github/bench-constraints.txt --extra-index-url https://download.pytorch.org/whl/cpu --index-strategy unsafe-best-match -e ".[retrieval,benchmark]" "unstructured[pdf]" unstructured-inference llama-index-core
           python -c "from sentence_transformers import SentenceTransformer; import torch, transformers; print(torch.__version__, transformers.__version__)"
           uv pip freeze --system > env-freeze.txt
       - name: Benchmark
