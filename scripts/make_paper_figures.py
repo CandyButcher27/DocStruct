@@ -26,13 +26,15 @@ ACCENT = "#be123c"
 INK = "#18181b"
 
 PRETTY = {
-    "docstruct": "DocStruct",
-    "docstruct_geo": "DocStruct-geo",
+    "docstruct_geo": "DocStruct",
+    "docstruct": "DocStruct+vision",
     "pymupdf4llm": "PyMuPDF4LLM",
     "unstructured": "Unstructured",
     "langchain": "LangChain",
     "llamaindex": "LlamaIndex",
     "llamaindex_semantic": "LlamaIndex-sem",
+    "docling": "Docling",
+    "lumberchunker": "LumberChunker",
 }
 ORDER = list(PRETTY)
 
@@ -79,7 +81,7 @@ def style():
 
 
 def colour(tool):
-    return OURS if tool == "docstruct" else OURS_GEO if tool == "docstruct_geo" else OTHER
+    return OURS if tool == "docstruct_geo" else OURS_GEO if tool == "docstruct" else OTHER
 
 
 def load(name):
@@ -91,13 +93,10 @@ def load(name):
 def fig_mode_inversion():
     """The central claim: identical chunks, three rules, the ranking flips."""
     modes = ["page", "span", "region"]
-    ranks, mrr = {}, {}
-    for m in modes:
-        d = load(f"ohr_results_{m}.json")
-        rows = sorted(d["results"], key=lambda t: -t["mrr"])
-        for i, t in enumerate(rows, 1):
-            ranks.setdefault(t["name"], {})[m] = i
-            mrr.setdefault(t["name"], {})[m] = t["mrr"]
+    rows = load("review/table1.json")["rows"]
+    ranks = {t: r["rank"] for t, r in rows.items()}
+    mrr = {t: r["mrr"] for t, r in rows.items()}
+    n = len(rows)
 
     fig, ax = plt.subplots(figsize=(3.3, 2.6))
     xs = range(len(modes))
@@ -105,7 +104,7 @@ def fig_mode_inversion():
         if tool not in ranks:
             continue
         ys = [ranks[tool][m] for m in modes]
-        emph = tool.startswith("docstruct") or tool == "unstructured"
+        emph = tool == "docstruct_geo" or tool == "unstructured"
         ax.plot(xs, ys, "-o",
                 color=ACCENT if tool == "unstructured" else colour(tool),
                 lw=2.2 if emph else 0.7, ms=5 if emph else 2.5,
@@ -114,12 +113,12 @@ def fig_mode_inversion():
                     xytext=(7, 0), textcoords="offset points",
                     va="center", fontsize=6.8,
                     color=ACCENT if tool == "unstructured" else
-                    (INK if tool.startswith("docstruct") else "#a1a1aa"),
+                    (INK if tool == "docstruct_geo" else "#a1a1aa"),
                     fontweight="bold" if emph else "normal")
 
     # MRR beside each emphasised marker: the rank axis alone hides how close
     # the span and region races are.
-    for tool in ("docstruct", "unstructured"):
+    for tool in ("docstruct_geo", "unstructured"):
         for i, m in enumerate(modes):
             ax.annotate(f"{mrr[tool][m]:.2f}", (i, ranks[tool][m]),
                         xytext=(0, -11), textcoords="offset points",
@@ -128,17 +127,17 @@ def fig_mode_inversion():
 
     ax.set_xticks(list(xs))
     ax.set_xticklabels(modes, fontstyle="italic")
-    ax.set_yticks(range(1, 8))
+    ax.set_yticks(range(1, n + 1))
     ax.invert_yaxis()
-    ax.set_ylabel("rank of 7 (1 = best)")
+    ax.set_ylabel(f"rank of {n} (1 = best)")
     ax.set_xlabel("relevance rule")
     ax.set_xlim(-0.25, 2.95)
-    ax.set_ylim(7.6, 0.4)
+    ax.set_ylim(n + 0.6, 0.4)
     ax.grid(axis="y", color="#e4e4e7", lw=0.5, zorder=0)
     fig.tight_layout()
     fig.savefig(os.path.join(OUT, "mode_inversion.pdf"), bbox_inches="tight")
     plt.close(fig)
-    return {t: ranks[t] for t in ("docstruct", "unstructured")}
+    return {t: ranks[t] for t in ("docstruct_geo", "unstructured")}
 
 
 # ---------------------------------------------------------------- figure 3
@@ -256,7 +255,7 @@ def main() -> int:
     fig_size_confound()
     fig_cost()
     print("wrote:", ", ".join(sorted(os.listdir(OUT))))
-    print("rank check (must be 1st/1st/6th vs 1st/4th/5th):")
+    print("rank check (from reports/review/table1.json):")
     for t, r in inv.items():
         print(f"  {t:<14} page={r['page']} span={r['span']} region={r['region']}")
     return 0
