@@ -28,11 +28,11 @@ INK = "#18181b"
 PRETTY = {
     "docstruct": "DocStruct",
     "docstruct_geo": "DocStruct-geo",
-    "pymupdf4llm": "pymupdf4llm",
-    "unstructured": "unstructured",
-    "langchain": "langchain",
-    "llamaindex": "llamaindex",
-    "llamaindex_semantic": "llamaindex-sem",
+    "pymupdf4llm": "PyMuPDF4LLM",
+    "unstructured": "Unstructured",
+    "langchain": "LangChain",
+    "llamaindex": "LlamaIndex",
+    "llamaindex_semantic": "LlamaIndex-sem",
 }
 ORDER = list(PRETTY)
 
