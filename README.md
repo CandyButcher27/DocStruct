@@ -56,66 +56,80 @@ boundaries instead.
 |---|---|
 | LangChain recursive splitter | respects structure; carries section-path metadata |
 | Unstructured.io / LlamaParse | fully local, free, deterministic, section-filtered retrieval |
-| pymupdf4llm | tied under span relevance (p=0.23), ahead under region; similar context per query |
+| pymupdf4llm | tied under span relevance (p=0.33), ahead under region; similar context per query |
+| LumberChunker (LLM-guided) | ties us under span, beats us under region and page, but needs ~9,500 model calls on OHR-Bench and its chunks change between runs |
 
 ## Results
 
 The embedder and both retrievers are **held constant across every tool** — only the
-chunker varies — so the tables below measure chunking and nothing else.
+chunker varies — so the tables below measure chunking and nothing else. DocStruct
+below is the default, geometry-only pipeline; the optional vision detector is
+reported separately.
 
 ### The headline, and the catch: the relevance rule decides the winner
 
-OHR-Bench: 95 born-digital documents, **3,558 human-authored questions**, seven
-chunkers. All three columns are scored on **identical chunks** — only the rule that
-decides "is this chunk relevant?" changes.
+OHR-Bench: 95 born-digital documents, **3,558 human-authored questions**, eight
+chunkers, one software install. All three columns are scored on **identical chunks**
+— only the rule that decides "is this chunk relevant?" changes.
 
 | Tool | `page` | `span` | `region` | ctx words |
 |---|---|---|---|---|
-| **docstruct** | 0.600 (6th) | **0.706 (1st)** | **0.666 (1st)** | 2194 |
-| docstruct_geo | 0.470 (7th) | 0.705 (2nd) | 0.657 (2nd) | 2328 |
-| pymupdf4llm | 0.668 | 0.699 (3rd) | 0.604 (3rd) | 2424 |
-| unstructured | **0.795 (1st)** | 0.654 | 0.601 | **561** |
-| langchain | 0.756 | 0.641 | 0.603 | 638 |
-| llamaindex | 0.729 | 0.648 | 0.589 | 1430 |
-| llamaindex_semantic | 0.652 | 0.654 | 0.575 | 4698 |
+| **docstruct** | 0.724 (6th) | 0.705 (2nd) | 0.657 (2nd) | 2328 |
+| pymupdf4llm | 0.671 (7th) | 0.699 (3rd) | 0.604 (4th) | 2432 |
+| docling | **0.797 (1st)** | 0.666 (4th) | 0.629 (3rd) | 631 |
+| unstructured | 0.796 (2nd) | 0.657 (5th) | 0.603 (5th) | **556** |
+| langchain | 0.756 (4th) | 0.641 (8th) | 0.603 (6th) | 638 |
+| llamaindex | 0.729 (5th) | 0.648 (7th) | 0.589 (7th) | 1430 |
+| llamaindex_semantic | 0.651 (8th) | 0.654 (6th) | 0.575 (8th) | 4698 |
+| lumberchunker (LLM) | 0.785 (3rd) | **0.710 (1st)** | **0.699 (1st)** | 1057 |
 
-**We are 1st of 7 under two rules and 6th of 7 under the third.** No relevance rule
-is neutral to chunk size: `span` rewards large chunks, `page` rewards small ones, and
-unstructured wins `page` with the smallest chunks in the field. A leaderboard that
-reports one rule reports a ranking and a size preference at the same time.
+**Among the seven model-free chunkers we are 1st under `span` and `region` and 5th
+under `page`.** Under `region` we beat every model-free tool significantly (p≤0.001);
+under `span` we tie pymupdf4llm (p=0.33). LumberChunker, which asks an LLM (Gemini
+3.5 Flash-Lite here) where each chunk should end, ties us under `span` and beats us by
+0.043 under `region` and 0.063 under `page`, with less than half our context. Numbers,
+p-values and slices: [`reports/review/summary.md`](reports/review/summary.md).
 
-Context volume matters here. DocStruct hands the retriever 2,194 words per query and
-unstructured 561, so part of our `span` lead may come from returning more text. Across
-the seven tools, chunk size and MRR correlate at +0.57 under `span`, −0.68 under `page`
-and +0.04 under `region` (n=7, none significant), which is why `region` is the rule we
-lead with. At a matched budget the lead holds: raising the baselines' top-k until their
-context matches `docstruct_geo` (2,328 words; unstructured k=20, langchain k=17,
-llamaindex k=8) leaves `docstruct_geo` ahead by 0.043–0.060 MRR under `span` and
-0.047–0.064 under `region`, every paired 95% interval above zero. Unstructured at k=20
-does recall more answers under `span` (0.800 against 0.789). Numbers in
-[`reports/budget/summary.md`](reports/budget/summary.md).
+The `page` rule ranks chunkers almost exactly by chunk size: Spearman ρ = −0.95
+(p<0.001, n=8) between mean chunk length and MRR, against +0.12 under `span` and
+−0.24 under `region`. Larger chunks could still help under `span`, so we matched
+budgets two ways. Raising the baselines' top-k until their context matches ours
+(unstructured k=20, langchain k=17, llamaindex k=8) leaves us ahead by 0.043–0.060
+MRR under `span` and 0.047–0.064 under `region`
+([`reports/budget/summary.md`](reports/budget/summary.md)). Enlarging their chunks
+instead removes the `span` lead (every p>0.3) but not the `region` lead (+0.027 to
++0.052), which is why `region` is the rule we lead with.
+
+The page column replaced an earlier one (0.600 / 0.470) that came from benchmark
+checkpoints written before DocStruct chunks declared every page they span; see
+`notes.md` Stage 31.
 
 We could find no prior chunking evaluation that varies the rule, so we publish all
 three. Read [`gpt.md` §4.2 and §6.1](gpt.md) before quoting
 any row.
 
-The `region` threshold of 0.7 was fixed before any scoring, and it is also where our
-margin peaks. Swept from 0.1 to 1.0, a DocStruct variant is 1st at all ten thresholds
-([`reports/ohr_region_threshold_sweep.json`](reports/ohr_region_threshold_sweep.json)),
-but the hybrid leads only from 0.6 up; below that the geometry-only variant does.
+The `region` threshold of 0.7 was fixed before any scoring. Swept from 0.1 to 1.0 on
+an earlier run without Docling or LumberChunker, a DocStruct configuration is 1st among
+the model-free tools at all ten thresholds
+([`reports/ohr_region_threshold_sweep.json`](reports/ohr_region_threshold_sweep.json)).
+
+The 200/500-word chunk bounds, first chosen on a withdrawn corpus, were re-swept on
+OHR-Bench and PMC: no setting beats them significantly on retrieval; smaller minimums
+and an 800-word maximum do slightly better on section boundaries.
 
 ### Section boundaries, with no retriever involved
 
 Do the chunk boundaries land where the *document's own* boundaries land? Scored
 against section boundaries the publishers wrote in JATS XML for **134 PubMed Central
 papers** — gold that predates this project and was written for an unrelated purpose.
-Pk and WindowDiff are **error** rates; lower is better.
+Pk and WindowDiff are **error** rates; lower is better. Docling and LumberChunker were
+not run here.
 
 | Tool | WindowDiff | Pk | Chunks | Docs |
 |---|---|---|---|---|
-| **docstruct_geo** | **0.4226** | **0.3418** | 26.8 | 134 |
+| **docstruct** | **0.4226** | **0.3418** | 26.8 | 134 |
 | pymupdf4llm | 0.4800 | 0.4490 | 17.7 | 134 |
-| **docstruct** | 0.4818 | 0.3531 | 37.5 | 134 |
+| docstruct + vision | 0.4818 | 0.3531 | 37.5 | 134 |
 | llamaindex_semantic | 0.5337 | 0.5128 | 29.1 | 134 |
 | llamaindex | 0.6952 | 0.5979 | 42.7 | 134 |
 | langchain | 0.8787 | 0.6200 | 85.6 | 134 |
@@ -135,17 +149,19 @@ exact margin is not yet quotable.
 
 ### What we lose
 
-- **Coverage and duplication.** On OHR-Bench, DocStruct keeps 0.9632 of the document's
-  word instances at 1.8322× duplication, against LangChain's 1.000 / 1.1005. LangChain
-  splits raw text and drops nothing; our duplication comes from inline headers and
-  separately emitted table chunks. We win *retrieval*, not raw preservation.
-- **Context cost.** We retrieve 2,194 words per query against unstructured's 561 —
-  they are 3.63× more efficient on MRR per 1k context words. We win accuracy and lose
-  token cost.
-- **Academic is our weakest domain** in every relevance mode (span 0.4526, 5th of 7).
+- **An LLM chunker beats us.** LumberChunker leads under `region` and `page` and ties
+  under `span`. Its price: ~9,500 model calls on OHR-Bench, a hosted-model dependency,
+  and chunks that change between runs (52 vs 55 on one paper at temperature 0).
+- **Coverage and duplication.** On OHR-Bench, DocStruct keeps 0.9638 of the document's
+  word instances at 1.13× duplication (second highest of eight, after Docling), against
+  LangChain's 1.000 / 1.10. Our duplication comes from inline headers and separately
+  emitted table chunks.
+- **Context cost.** We retrieve 2,328 words per query against unstructured's 556 —
+  4.2× the token bill.
+- **Academic is our weakest domain** (span 0.457, 5th of 8, LumberChunker 0.535).
   We win overall by winning law and manuals.
-- **The vision detector does not pay for itself outside arXiv.** On OHR-Bench it is
-  worth +0.0012 span (p=0.80) and +0.0090 region (p=0.12) — not significant. On PMC
+- **The vision detector does not pay for itself**, so it is off by default. On
+  OHR-Bench it is worth +0.0012 span (p=0.80) and +0.0090 region (p=0.12). On PMC
   section boundaries, geometry-only *beats* the hybrid at 2.4× the speed.
 
 Full runs with per-document breakdowns, paired-significance tables, extraction

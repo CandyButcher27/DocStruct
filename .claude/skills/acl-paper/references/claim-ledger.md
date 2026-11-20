@@ -48,6 +48,35 @@ Derived, safe to state: context cost $3.9\times$ the leanest baseline
 (2194 / 560 = 3.92, leanest is unstructured). Duplication 1.83 is the highest of
 the seven. Coverage 0.9632 against LangChain's 1.00.
 
+## OHR-Bench Table 1 on one install (2026-11-20) — supersedes the page column above
+
+Source: `reports/review/table1.json`, `reports/review/summary.md`
+(`python scripts/review_summary.py`). Cells: docstruct_geo from
+`reports/review/floor_ohr/floor_min200_max500_<mode>.json`; unstructured/langchain/
+llamaindex span+region from `reports/budget/ohr_<tool>_k5_<mode>.json`, page from
+`reports/review/table1/`; pymupdf4llm and llamaindex_semantic all modes from
+`reports/review/table1/`; Docling = 8 merged shards in `reports/review/docling/`;
+LumberChunker from `reports/review/lumberchunker/`.
+
+| system | page | span | region | ctx |
+|---|---|---|---|---|
+| DocStruct (geometry-only) | 0.7235 (6) | 0.7048 (2) | 0.6566 (2) | 2328 |
+| PyMuPDF4LLM | 0.6715 (7) | 0.6988 (3) | 0.6036 (4) | 2432 |
+| Docling | 0.7969 (1) | 0.6658 (4) | 0.6291 (3) | 631 |
+| Unstructured | 0.7957 (2) | 0.6567 (5) | 0.6032 (5) | 556 |
+| LangChain | 0.7560 (4) | 0.6407 (8) | 0.6029 (6) | 638 |
+| LlamaIndex | 0.7294 (5) | 0.6483 (7) | 0.5887 (7) | 1430 |
+| LlamaIndex-sem | 0.6515 (8) | 0.6540 (6) | 0.5749 (8) | 4698 |
+| LumberChunker | 0.7852 (3) | 0.7098 (1) | 0.6992 (1) | 1057 |
+
+Safe to state: geo vs pymupdf4llm span +0.0057 p=0.33; geo beats every model-free tool
+under region p<=0.001; LumberChunker minus geo: span +0.0050 p=0.38, region +0.0427,
+page +0.0628. Spearman(mean chunk words, MRR), n=8: page -0.952 (p<0.001), span +0.119
+(p=0.78), region -0.238 (p=0.57). Enlarged-chunk baselines: span diffs -0.0056..-0.0004
+(p 0.37..0.97), region +0.0274..+0.0517. Chunk-size sweep and PMC sweep: summary.md.
+Coverage 0.9638, duplication 1.1320 (Docling 1.1518 highest). Context ratio 2328/556 =
+4.19. Withdrawn: page 0.600 (hybrid) and 0.470 (geo) — stale checkpoints (notes.md Stage 31).
+
 ## OHR-Bench equal context budget (review 1, R2)
 
 Source: `reports/budget/ohr_<tool>_k<k>_<mode>.json`, summary and paired bootstrap in

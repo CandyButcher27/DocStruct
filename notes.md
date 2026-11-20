@@ -2020,3 +2020,48 @@ The lead holds under both rules, every paired 95% interval above zero
 by construction; recall is where it shows, and unstructured k=20 recalls more under
 span (0.800 vs 0.789). Not covered: the hybrid `docstruct` (not rerun), and matching by
 resizing the baselines' chunks. Paper §5.1 and Limitations updated.
+
+## Stage 31
+
+**2026-11-20 — Review follow-ups: one-install Table 1, Docling, LumberChunker, chunk-size sweep; geometry-only by default.**
+
+**Runs.** GitHub Actions: `bench/review-runs` (run 44739832582: chunk-size sweep on
+OHR-Bench, Docling in 8 shards, baselines with enlarged chunks), `bench/table1` (run
+44752243853: every Table 1 cell not yet on the pinned install) and `bench/lumberchunker`
+(runs 44747858298 and 44759967198). PMC sweep ran locally because Europe PMC returns
+HTTP 403 to runner IPs. Everything is summarised by `scripts/review_summary.py` in
+`reports/review/summary.md` and `reports/review/table1.json`.
+
+**The published page column was stale.** `docstruct_geo` scored 0.4703 under `page` in
+`reports/ohr_results_page.json`; the identical chunks (5,810, 2,328 words/query) score
+0.7235 on current code, reproduced locally through `docstruct.cli benchmark`. fec63ae
+(2026-08-07) made DocStruct chunks declare every page they span; the 2026-08-11 page run
+resumed from `bench_ckpt_<tool>_<relevance>.json` checkpoints written before it. The
+other tools' page scores reproduce (unstructured 0.7957 vs 0.795, langchain 0.756,
+llamaindex 0.7294). Span and region were never affected.
+
+**Table 1 (one install).** span / region / page MRR: docstruct (geometry-only) 0.705 /
+0.657 / 0.724; LumberChunker 0.710 / 0.699 / 0.785; Docling 0.666 / 0.629 / 0.797;
+pymupdf4llm 0.699 / 0.604 / 0.671; unstructured 0.657 / 0.603 / 0.796. Among model-free
+tools DocStruct is 1st under span (tied with pymupdf4llm, p=0.33) and region (every
+p≤0.001) and 5th under page. LumberChunker (Gemini 3.5 Flash-Lite, temperature 0, paper
+prompt, 550-token windows over PyMuPDF blocks, ~9,500 calls) ties us under span and
+beats us by 0.043 region and 0.063 page with 1,057 words/query; it leads region in all
+four domains. Its chunks are not repeatable: 52 vs 55 on one paper in two runs.
+Spearman(mean chunk words, MRR) over eight systems: page −0.95 (p<0.001), span +0.12,
+region −0.24.
+
+**Enlarged baseline chunks** (unstructured 4400/3200 chars, langchain 8500, llamaindex
+2400; calibrated on 4 docs, so langchain and llamaindex overshoot to 4,488 and 6,031
+words/query): span lead gone (−0.006 to 0.000, every p>0.3), region lead holds (+0.027
+to +0.052).
+
+**Chunk-size sweep** (docstruct_geo, MIN 100/150/200/300/400 at MAX 500, plus 200/800).
+OHR-Bench: nothing beats 200/500 significantly; MIN 300/400 lose 0.007/0.012 under
+region. PMC (122 of 126 docs with gold on this machine): Pk 0.329 at MIN 100 vs 0.345 at
+200; WindowDiff best at 200/800 (0.413 vs 0.424). Kept 200/500.
+
+**Decision.** Geometry-only is the default and the paper's DocStruct; the vision
+detector is reported only as DocStruct+vision in the failure analysis. Paper rewritten
+around the trade-off: best model-free chunker, beaten by an LLM chunker that costs
+model calls and repeatability.
