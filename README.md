@@ -28,7 +28,7 @@
 <p align="center">
   <img alt="Python 3.11+" src="https://img.shields.io/badge/python-3.11%2B-blue">
   <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-green">
-  <img alt="Tests" src="https://img.shields.io/badge/tests-220%20passing-brightgreen">
+  <img alt="Tests" src="https://img.shields.io/badge/tests-227%20passing-brightgreen">
 </p>
 
 ---
@@ -56,7 +56,7 @@ boundaries instead.
 |---|---|
 | LangChain recursive splitter | respects structure; carries section-path metadata |
 | Unstructured.io / LlamaParse | fully local, free, deterministic, section-filtered retrieval |
-| pymupdf4llm | higher MRR under span and region relevance, on *less* retrieved context |
+| pymupdf4llm | tied under span relevance (p=0.23), ahead under region; similar context per query |
 
 ## Results
 
@@ -79,20 +79,25 @@ decides "is this chunk relevant?" changes.
 | llamaindex | 0.729 | 0.648 | 0.589 | 1430 |
 | llamaindex_semantic | 0.652 | 0.654 | 0.575 | 4698 |
 
-**We are 1st of 7 under two rules and 6th of 7 under the third.** That is not noise
-and it is not a bug — no relevance rule is size-neutral. `span` rewards large chunks,
-`page` rewards small ones, and unstructured wins `page` with the smallest chunks in
-the field. A chunking leaderboard that reports one rule has reported a ranking *and* a
-size preference, tangled together.
+**We are 1st of 7 under two rules and 6th of 7 under the third.** No relevance rule
+is neutral to chunk size: `span` rewards large chunks, `page` rewards small ones, and
+unstructured wins `page` with the smallest chunks in the field. A leaderboard that
+reports one rule reports a ranking and a size preference at the same time.
+
+Context volume matters here. DocStruct hands the retriever 2,194 words per query and
+unstructured 561, so part of our `span` lead may come from returning more text. Across
+the seven tools, chunk size and MRR correlate at +0.57 under `span`, −0.68 under `page`
+and +0.04 under `region` (n=7, none significant), which is why `region` is the rule we
+lead with. An equal-context-budget rerun is in progress (`scripts/run_budget_matched.sh`).
 
 We could find no prior chunking evaluation that varies the rule, so we publish all
 three. Read [`gpt.md` §4.2 and §6.1](gpt.md) before quoting
 any row.
 
-Is the `region` win a lucky threshold? No — swept 0.1→1.0, a DocStruct variant is
-**1st at all ten thresholds**
-([`reports/ohr_region_threshold_sweep.json`](reports/ohr_region_threshold_sweep.json)).
-Worth stating plainly: 0.7 is where our margin happens to peak.
+The `region` threshold of 0.7 was fixed before any scoring, and it is also where our
+margin peaks. Swept from 0.1 to 1.0, a DocStruct variant is 1st at all ten thresholds
+([`reports/ohr_region_threshold_sweep.json`](reports/ohr_region_threshold_sweep.json)),
+but the hybrid leads only from 0.6 up; below that the geometry-only variant does.
 
 ### Section boundaries, with no retriever involved
 
@@ -111,10 +116,10 @@ Pk and WindowDiff are **error** rates; lower is better.
 | langchain | 0.8787 | 0.6200 | 85.6 | 134 |
 | unstructured | 0.8933 | 0.6025 | 106.9 | **99** |
 
-No embedder, no relevance rule, nothing of ours in the gold. Two caveats we would
-rather state than have found: WindowDiff punishes over-segmentation, so read it beside
-Pk or not at all; and unstructured's row covers 99 of 134 documents because it
-hard-failed on 35 (26%).
+No embedder, no relevance rule, nothing of ours in the gold. Two caveats: WindowDiff
+punishes over-segmentation, so read it beside Pk; and unstructured's row covers 99 of
+134 documents because it hard-failed on 35 (26%). Also, 57% of the gold sections are
+shorter than our 200-word chunk floor, so DocStruct merges them by design.
 
 Against a chance floor that places N boundaries at random
 ([`scripts/section_random_baseline.py`](scripts/section_random_baseline.py), 122 docs),
@@ -229,11 +234,11 @@ model's softmax renamed.
 | Disputed | both detect, different label, IoU ≥ 0.35 | `winner_conf × 0.85` |
 | Unilateral | one detector only | source-scaled and bounded (see `config.py`) |
 
-**The single most important chunking rule**: a structural boundary only *ends* a chunk
-once it already holds `MIN_CHUNK_TOKENS` words. Without that floor, a page of prose
-interleaved with three figures becomes four unretrievable stubs — which is what the
-earliest versions of this project did, and fixing it was worth more than every other
-change combined.
+**The chunk-size floor**: a structural boundary only *ends* a chunk once it already
+holds `MIN_CHUNK_TOKENS` (200) words. Without it, a page of prose interleaved with three
+figures becomes four tiny chunks that rank poorly. The 200/500 bounds were chosen on an
+internal corpus whose gold was later withdrawn, and have not been re-tuned on a public
+benchmark yet.
 
 Coordinates are **top-left** throughout (`y0` = top, y increasing downward), matching
 pdfplumber, so geometry, model (after a pixel→point transform), extraction and
@@ -274,7 +279,8 @@ python -m docstruct.cli benchmark \
   --report-md reports/run.md --report-json reports/run.json
 ```
 
-Run it once per relevance mode; the chunk cache makes modes 2 and 3 cheap. Before any
+Run it once per relevance mode. DocStruct's block cache makes modes 2 and 3 cheap for
+DocStruct; the baselines re-chunk every run. Before any
 new corpus's first leaderboard, run `scripts/gold_reachability.py` — it reports what
 fraction of the gold each rule can reach at all, identically for every tool, and warns
 when the question is circular.
@@ -296,8 +302,8 @@ full protocol: [`gpt.md` §4](gpt.md).
   forms/invoices.
 - Borderless tables are caught by the model, not by geometry (`find_tables` is
   ruled-line based) — a concrete motivation for the hybrid design.
-- Geometry-only hierarchy is font-driven, so it can conflate title / author / section
-  headers; the model resolves these semantically.
+- Geometry-only hierarchy is font-driven, so it can conflate title, author and section
+  headers.
 - Rotated and margin text is filtered out of the reading flow.
 - **Every number above comes from one retrieval configuration** (`all-MiniLM-L6-v2` +
   BM25 + RRF, k=5). Whether the relevance-rule inversion survives other encoders is
@@ -312,7 +318,7 @@ full protocol: [`gpt.md` §4](gpt.md).
 
 ```
 docstruct/          the library (geometry, model, fusion, chunking, eval, cli)
-tests/              pytest suite, 220 tests
+tests/              pytest suite, 227 tests
 scripts/            corpus fetching, scoring, and the single-tool ablation runner
 tools/annotate.html browser UI for correcting detection ground truth
 reports/            benchmark reports, each with its full config snapshot
@@ -325,9 +331,9 @@ ROADMAP.md          current work queue
 ## Development
 
 ```bash
-python -m venv .venv && .venv/Scripts/activate      # Windows
-pip install -e ".[all]"
-pytest -q                                            # 220 tests, ~4 min
+pip install uv
+uv venv && uv pip install -e ".[all]"
+uv run pytest -q                                     # 227 tests, ~4 min
 ```
 
 Tests that need optional extras, real PDFs or an LLM self-skip when those are absent,
