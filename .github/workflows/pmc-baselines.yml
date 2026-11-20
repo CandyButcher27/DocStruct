@@ -1,0 +1,65 @@
+name: pmc baselines
+
+# Docling and LumberChunker on PMC section boundaries (Table 2). Europe PMC refuses
+# runner IPs, so the PDFs and gold come from an AES-256 encrypted release asset whose
+# passphrase is a repository secret. Eight shards per tool; results merge offline.
+
+on:
+  push:
+    branches: ["bench/pmc"]
+
+env:
+  LIMIT: "1"   # documents per shard; 0 = all
+  NLTK_DATA: /home/runner/nltk_data
+  LUMBER_MODEL: gemini-3.5-flash-lite
+  LUMBER_CACHE_DIR: .cache/lumberchunker
+
+jobs:
+  score:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        tool: [docling, lumberchunker]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    name: ${{ matrix.tool }} shard ${{ matrix.shard }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bench-setup
+        with:
+          extra: ${{ matrix.tool == 'docling' && 'docling' || '' }}
+          constraints: ${{ matrix.tool == 'docling' && ' ' || '-c .github/bench-constraints.txt' }}
+      - name: Fetch and decrypt the PMC data
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PMC_PASSPHRASE: ${{ secrets.PMC_PASSPHRASE }}
+        run: |
+          gh release download pmc-data-v1 -p pmc.tar.gpg -D /tmp
+          printf '%s' "$PMC_PASSPHRASE" > /tmp/pass
+          gpg --batch --pinentry-mode loopback --passphrase-file /tmp/pass -d /tmp/pmc.tar.gpg | tar -x
+          rm /tmp/pass /tmp/pmc.tar.gpg
+          ls data/pmc | wc -l
+      - name: This shard's gold
+        run: |
+          python - <<'PY'
+          import json
+          g = json.load(open("data/qa/pmc_sections.json", encoding="utf-8"))
+          keep = {k: v for i, (k, v) in enumerate(sorted(g.items())) if i % 8 == ${{ matrix.shard }}}
+          json.dump(keep, open("shard_gold.json", "w", encoding="utf-8"))
+          print(len(keep), "documents")
+          PY
+      - name: Score section boundaries
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          out="reports/review/pmc_baselines/pmc_${{ matrix.tool }}_s${{ matrix.shard }}"
+          mkdir -p reports/review/pmc_baselines
+          python scripts/score_sections.py --tools ${{ matrix.tool }} --gold shard_gold.json \
+            --pdfs-dir data/pmc --limit "$LIMIT" --ckpt-dir .cache/section_ckpt \
+            --out "$out.json" --report-md "$out.md"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pmc-${{ matrix.tool }}-s${{ matrix.shard }}
+          path: reports/review/pmc_baselines/
