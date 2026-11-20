@@ -12,6 +12,9 @@ on:
 
 env:
   LIMIT: "1"   # documents to fetch; 1 = smoke test, 0 = full 95-document corpus
+  # NLTK 3.10 refuses data dirs that are group-writable, which the runner's Python
+  # toolcache is; llama-index then fails with an empty error. Use a private dir.
+  NLTK_DATA: /home/runner/nltk_data
 
 jobs:
   fetch:
@@ -71,6 +74,8 @@ jobs:
           uv pip install --system torch==2.15.0 torchvision==0.29.2 --index-url https://download.pytorch.org/whl/cpu
           uv pip install --system -c .github/bench-constraints.txt --extra-index-url https://download.pytorch.org/whl/cpu --index-strategy unsafe-best-match -e ".[retrieval,benchmark]" "unstructured[pdf]" unstructured-inference llama-index-core
           python -c "from sentence_transformers import SentenceTransformer; import torch, transformers; print(torch.__version__, transformers.__version__)"
+          mkdir -p "$NLTK_DATA" && chmod 700 "$NLTK_DATA"
+          python -m nltk.downloader -d "$NLTK_DATA" stopwords punkt_tab
           uv pip freeze --system > env-freeze.txt
       - name: Adapter probe (traceback on failure)
         if: matrix.run.tool == 'llamaindex'
