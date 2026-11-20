@@ -93,7 +93,15 @@ def main() -> int:
     ap.add_argument("--ckpt-dir", default=".cache/section_ckpt")
     ap.add_argument("--out", default="reports/section_scores.json")
     ap.add_argument("--report-md", default="reports/section_scores.md")
+    ap.add_argument("--set", action="append", default=[], metavar="KEY=VALUE",
+                    help="config override applied before chunking, e.g. MIN_CHUNK_TOKENS=150")
     args = ap.parse_args()
+    from docstruct import config
+    for item in args.set:
+        key, _, value = item.partition("=")
+        if not hasattr(config, key):
+            raise SystemExit(f"unknown config key: {key}")
+        setattr(config, key, type(getattr(config, key))(value))
 
     with open(args.gold, encoding="utf-8") as f:
         gold = json.load(f)
@@ -185,6 +193,7 @@ def main() -> int:
             "mean_chunks": round(statistics.fmean(n_chunks), 1),
             "n_docs": len(pks), "errors": errors,
             "seconds": round(time.perf_counter() - t0, 1),
+            "per_doc": {d: ckpt[d] for d in prepared if d in ckpt},
         }
         r = results[name]
         print(f"  => Pk={r['pk']}  WindowDiff={r['windowdiff']}  "
