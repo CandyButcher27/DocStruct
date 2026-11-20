@@ -15,6 +15,10 @@ from docstruct.eval.adapters.base import ChunkAdapter, EvalChunk
 class UnstructuredAdapter(ChunkAdapter):
     name = "unstructured"
 
+    def __init__(self, max_characters: int = 1000, combine_text_under_n_chars: int = 200) -> None:
+        self.max_characters = max_characters
+        self.combine_text_under_n_chars = combine_text_under_n_chars
+
     def available(self) -> bool:
         return importlib.util.find_spec("unstructured") is not None
 
@@ -23,7 +27,8 @@ class UnstructuredAdapter(ChunkAdapter):
         from unstructured.chunking.title import chunk_by_title
 
         elements = partition_pdf(filename=pdf_path, strategy="fast")
-        chunks = chunk_by_title(elements, max_characters=1000, combine_text_under_n_chars=200)
+        chunks = chunk_by_title(elements, max_characters=self.max_characters,
+                                combine_text_under_n_chars=self.combine_text_under_n_chars)
         out: List[EvalChunk] = []
         for i, c in enumerate(chunks):
             text = getattr(c, "text", "") or ""

@@ -48,6 +48,9 @@ def build_adapter(
     if name == "llamaindex":
         from docstruct.eval.adapters.llamaindex_adapter import LlamaIndexAdapter
         return LlamaIndexAdapter()
+    if name == "lumberchunker":
+        from docstruct.eval.adapters.lumberchunker_adapter import LumberChunkerAdapter
+        return LumberChunkerAdapter()
     if name == "llamaindex_semantic":
         from docstruct.eval.adapters.llamaindex_adapter import LlamaIndexSemanticAdapter
         return LlamaIndexSemanticAdapter()

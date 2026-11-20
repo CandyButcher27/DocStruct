@@ -1,0 +1,98 @@
+name: lumberchunker
+
+# LumberChunker baseline (review 1, R9) on OHR-Bench with Gemini Flash-Lite.
+# LLM answers are cached per PDF and persisted with actions/cache, so a run that hits
+# a quota or the job time limit resumes where it stopped: it waits and retries
+# inside the job for up to ~5 h; a fresh push to the branch continues from the cache.
+# Scoring of the three relevance rules runs only once every document is chunked.
+# (workflow_dispatch would need this file on the default branch.)
+
+on:
+  push:
+    branches: ["bench/lumberchunker"]
+
+env:
+  LIMIT: "0"   # 0 = all 95 documents; 1 = smoke test
+  NLTK_DATA: /home/runner/nltk_data
+  LUMBER_MODEL: gemini-3.5-flash-lite
+  LUMBER_CACHE_DIR: .cache/lumberchunker
+  LUMBER_THREADS: "8"
+
+jobs:
+  lumberchunker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bench-setup
+      - uses: actions/cache@v4
+        with:
+          path: data/ohrbench/_download
+          key: ohrbench-download-v1
+      - name: Fetch OHR-Bench PDFs
+        run: |
+          pip install pyarrow
+          python scripts/fetch_ohrbench.py --limit "$LIMIT"
+          git checkout -- data/qa/ohrbench.json reports/ohrbench_manifest.json
+      - uses: actions/cache/restore@v4
+        with:
+          path: .cache/lumberchunker
+          key: lumber-${{ env.LIMIT }}-${{ github.run_id }}
+          restore-keys: lumber-${{ env.LIMIT }}-
+      - name: Chunk with the LLM (retries until done or 5 h)
+        id: chunk
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          start=$(date +%s)
+          while true; do
+            if python scripts/lumber_prechunk.py data/ohrbench; then
+              echo "complete=true" >> "$GITHUB_OUTPUT"; break
+            fi
+            if [ $(( $(date +%s) - start )) -gt 17000 ]; then
+              echo "complete=false" >> "$GITHUB_OUTPUT"; break
+            fi
+            echo "incomplete; retrying in 20 min"; sleep 1200
+          done
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: .cache/lumberchunker
+          key: lumber-${{ env.LIMIT }}-${{ github.run_id }}
+    outputs:
+      complete: ${{ steps.chunk.outputs.complete }}
+
+  score:
+    needs: lumberchunker
+    if: needs.lumberchunker.outputs.complete == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [span, region, page]
+    name: score ${{ matrix.mode }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bench-setup
+      - uses: actions/cache@v4
+        with:
+          path: data/ohrbench/_download
+          key: ohrbench-download-v1
+      - run: |
+          pip install pyarrow
+          python scripts/fetch_ohrbench.py --limit "$LIMIT"
+          git checkout -- data/qa/ohrbench.json reports/ohrbench_manifest.json
+      - uses: actions/cache/restore@v4
+        with:
+          path: .cache/lumberchunker
+          key: lumber-${{ env.LIMIT }}-${{ github.run_id }}
+          restore-keys: lumber-${{ env.LIMIT }}-
+      - env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python scripts/ablate.py --tool lumberchunker --name "lumberchunker_${{ matrix.mode }}"             --relevance ${{ matrix.mode }} --pdfs-dir data/ohrbench --qa data/qa/ohrbench.json             --cache-dir "" --out-dir reports/review/lumberchunker
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lumberchunker-${{ matrix.mode }}
+          path: reports/review/lumberchunker/

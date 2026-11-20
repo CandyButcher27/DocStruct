@@ -1,0 +1,139 @@
+name: review runs
+
+# Review 1 follow-ups: MIN/MAX_CHUNK_TOKENS sweep on OHR-Bench (geometry-only),
+# Docling as a layout-aware baseline, and baselines resized to DocStruct's context
+# budget. PMC refuses downloads from runner IPs (HTTP 403), so its sweep runs locally.
+# Runs on push to bench/review-runs or by hand.
+
+on:
+  push:
+    branches: ["bench/review-runs"]
+  workflow_dispatch:
+
+env:
+  LIMIT: "0"   # 0 = full corpora; 1 = smoke test
+  NLTK_DATA: /home/runner/nltk_data
+  UNSTRUCTURED_DISABLE_NOTICE: "1"
+
+jobs:
+  fetch-ohr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/cache@v4
+        with:
+          path: data/ohrbench/_download
+          key: ohrbench-download-v1
+      - run: |
+          pip install pyarrow pdfplumber
+          python scripts/fetch_ohrbench.py --limit "$LIMIT"
+          git checkout -- data/qa/ohrbench.json reports/ohrbench_manifest.json
+          ls data/ohrbench/*.pdf | wc -l
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ohrbench-pdfs
+          path: data/ohrbench/*.pdf
+          retention-days: 3
+
+  floor-ohr:
+    needs: fetch-ohr
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [span, region, page]
+        cfg:
+          - {min: 100, max: 500}
+          - {min: 150, max: 500}
+          - {min: 200, max: 500}
+          - {min: 300, max: 500}
+          - {min: 400, max: 500}
+          - {min: 200, max: 800}
+    name: floor-ohr min=${{ matrix.cfg.min }} max=${{ matrix.cfg.max }} ${{ matrix.mode }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bench-setup
+      - uses: actions/download-artifact@v4
+        with:
+          name: ohrbench-pdfs
+          path: data/ohrbench
+      - run: |
+          python scripts/ablate.py --tool docstruct_geo \
+            --name "floor_min${{ matrix.cfg.min }}_max${{ matrix.cfg.max }}_${{ matrix.mode }}" \
+            --set MIN_CHUNK_TOKENS=${{ matrix.cfg.min }} --set MAX_CHUNK_TOKENS=${{ matrix.cfg.max }} \
+            --relevance ${{ matrix.mode }} --pdfs-dir data/ohrbench --qa data/qa/ohrbench.json \
+            --cache-dir "" --out-dir reports/review/floor_ohr
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: floor-ohr-min${{ matrix.cfg.min }}-max${{ matrix.cfg.max }}-${{ matrix.mode }}
+          path: reports/review/
+
+  resized:
+    needs: fetch-ohr
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [span, region]
+        run:
+          - {tool: unstructured, args: "--adapter-arg max_characters=4400 --adapter-arg combine_text_under_n_chars=3200"}
+          - {tool: langchain, args: "--adapter-arg chunk_size=8500"}
+          - {tool: llamaindex, args: "--adapter-arg chunk_size=2400"}
+    name: resized ${{ matrix.run.tool }} ${{ matrix.mode }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bench-setup
+      - uses: actions/download-artifact@v4
+        with:
+          name: ohrbench-pdfs
+          path: data/ohrbench
+      - run: |
+          python scripts/ablate.py --tool ${{ matrix.run.tool }} ${{ matrix.run.args }} \
+            --name "resized_${{ matrix.run.tool }}_${{ matrix.mode }}" --relevance ${{ matrix.mode }} \
+            --pdfs-dir data/ohrbench --qa data/qa/ohrbench.json --cache-dir "" --out-dir reports/review/resized
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: resized-${{ matrix.run.tool }}-${{ matrix.mode }}
+          path: reports/review/
+
+  docling:
+    needs: fetch-ohr
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [span, region, page]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+    name: docling shard ${{ matrix.shard }} ${{ matrix.mode }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bench-setup
+        with:
+          extra: docling
+          constraints: ""
+      - uses: actions/download-artifact@v4
+        with:
+          name: ohrbench-pdfs
+          path: data/ohrbench
+      - name: Keep this shard's documents
+        run: |
+          mkdir -p data/shard
+          ls data/ohrbench/*.pdf | sort | awk 'NR % 8 == ${{ matrix.shard }}' | xargs -I{} cp {} data/shard/
+          ls data/shard | wc -l
+      - run: |
+          python scripts/ablate.py --tool docling \
+            --name "docling_s${{ matrix.shard }}_${{ matrix.mode }}" --relevance ${{ matrix.mode }} \
+            --pdfs-dir data/shard --qa data/qa/ohrbench.json --cache-dir "" --out-dir reports/review/docling
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: docling-s${{ matrix.shard }}-${{ matrix.mode }}
+          path: reports/review/

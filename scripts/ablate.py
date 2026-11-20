@@ -53,6 +53,10 @@ def main() -> int:
     p.add_argument("--limit-docs", type=int, default=0, help="0 = all docs with questions")
     p.add_argument("--out-dir", default="reports/ablations")
     p.add_argument("--rerank-model", default=None)
+    p.add_argument("--relevance", default="span", choices=["span", "region", "page"])
+    p.add_argument("--top-k", type=int, default=config.BENCHMARK_TOP_K)
+    p.add_argument("--adapter-arg", action="append", default=[], metavar="KEY=VALUE",
+                   help="set an attribute on the adapter, e.g. chunk_size=3600")
     args = p.parse_args()
 
     overrides = {}
@@ -75,6 +79,13 @@ def main() -> int:
     adapters = get_adapters([args.tool], weights=args.weights, cache_dir=args.cache_dir)
     if args.tool not in adapters:
         raise SystemExit(f"adapter unavailable: {args.tool}")
+    adapter_args = {}
+    for item in args.adapter_arg:
+        key, _, value = item.partition("=")
+        if not hasattr(adapters[args.tool], key):
+            raise SystemExit(f"{args.tool} has no attribute {key}")
+        adapter_args[key] = _coerce(value)
+        setattr(adapters[args.tool], key, adapter_args[key])
 
     from sentence_transformers import SentenceTransformer
 
@@ -90,7 +101,8 @@ def main() -> int:
     # cache_dir=None so the benchmark checkpoint never leaks results between ablations;
     # the adapter still gets the detector-proposal cache.
     result = benchmark_tool(adapters[args.tool], pdfs, qa, embedder,
-                            cache_dir=None, reranker=reranker)
+                            cache_dir=None, reranker=reranker,
+                            relevance=args.relevance, top_k=args.top_k)
     elapsed = time.perf_counter() - t0
 
     print(f"\n--- {args.name} ---")
@@ -110,6 +122,9 @@ def main() -> int:
         "name": args.name,
         "tool": args.tool,
         "overrides": overrides,
+        "adapter_args": adapter_args,
+        "relevance": args.relevance,
+        "top_k": args.top_k,
         "config": {k: v for k, v in vars(config).items() if k.isupper()},
         "metrics": {
             "mrr": result.mrr, "ndcg": result.ndcg, "recall": result.recall,
@@ -119,6 +134,7 @@ def main() -> int:
             "n_questions": result.n_questions, "errors": result.errors,
         },
         "per_doc": result.per_doc,
+        "per_question": result.per_question,
         "wall_seconds": round(elapsed, 1),
     }
     out = os.path.join(args.out_dir, f"{args.name}.json")

@@ -1,0 +1,73 @@
+name: table1
+
+# Fills every OHR-Bench Table 1 cell not yet measured on the current code and the
+# pinned CPU install: the page rule for the k=5 baselines, and all three rules for
+# PyMuPDF4LLM and LlamaIndex-semantic. The 2026-08-11 page column was resumed from
+# checkpoints written before fec63ae, so it is not reused.
+
+on:
+  push:
+    branches: ["bench/table1"]
+
+env:
+  NLTK_DATA: /home/runner/nltk_data
+  UNSTRUCTURED_DISABLE_NOTICE: "1"
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/cache@v4
+        with:
+          path: data/ohrbench/_download
+          key: ohrbench-download-v1
+      - run: |
+          pip install pyarrow pdfplumber
+          python scripts/fetch_ohrbench.py --limit 0
+          git checkout -- data/qa/ohrbench.json reports/ohrbench_manifest.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ohrbench-pdfs
+          path: data/ohrbench/*.pdf
+          retention-days: 3
+
+  run:
+    needs: fetch
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {tool: unstructured, mode: page}
+          - {tool: langchain, mode: page}
+          - {tool: llamaindex, mode: page}
+          - {tool: pymupdf4llm, mode: span}
+          - {tool: pymupdf4llm, mode: region}
+          - {tool: pymupdf4llm, mode: page}
+          - {tool: llamaindex_semantic, mode: span}
+          - {tool: llamaindex_semantic, mode: region}
+          - {tool: llamaindex_semantic, mode: page}
+    name: ${{ matrix.tool }} ${{ matrix.mode }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bench-setup
+        with:
+          extra: llama-index-embeddings-huggingface
+      - uses: actions/download-artifact@v4
+        with:
+          name: ohrbench-pdfs
+          path: data/ohrbench
+      - run: |
+          python scripts/ablate.py --tool ${{ matrix.tool }} --name "t1_${{ matrix.tool }}_${{ matrix.mode }}" \
+            --relevance ${{ matrix.mode }} --pdfs-dir data/ohrbench --qa data/qa/ohrbench.json \
+            --cache-dir "" --out-dir reports/review/table1
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: t1-${{ matrix.tool }}-${{ matrix.mode }}
+          path: reports/review/table1/
