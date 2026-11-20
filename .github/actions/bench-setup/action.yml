@@ -4,6 +4,9 @@ inputs:
   extra:
     description: extra packages to install (e.g. docling)
     default: ""
+  constraints:
+    description: pin to the laptop versions; docling conflicts with them
+    default: "-c .github/bench-constraints.txt"
 runs:
   using: composite
   steps:
@@ -15,7 +18,8 @@ runs:
         sudo apt-get update -q && sudo apt-get install -y -q libgl1 poppler-utils
         pip install uv
         uv pip install --system torch==2.15.0 torchvision==0.29.2 --index-url https://download.pytorch.org/whl/cpu
-        uv pip install --system -c .github/bench-constraints.txt --extra-index-url https://download.pytorch.org/whl/cpu --index-strategy unsafe-best-match -e ".[retrieval,benchmark]" "unstructured[pdf]" unstructured-inference llama-index-core ${{ inputs.extra }}
+        uv pip install --system ${{ inputs.constraints }} --extra-index-url https://download.pytorch.org/whl/cpu --index-strategy unsafe-best-match -e ".[retrieval,benchmark]" "unstructured[pdf]" unstructured-inference llama-index-core ${{ inputs.extra }}
         python -c "import torch, transformers; print(torch.__version__, transformers.__version__)"
         mkdir -p "$NLTK_DATA" && chmod 700 "$NLTK_DATA"
         python -m nltk.downloader -d "$NLTK_DATA" stopwords punkt_tab
+        mkdir -p reports/review && uv pip freeze --system > reports/review/env-freeze-${{ github.job }}.txt
