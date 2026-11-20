@@ -12,7 +12,7 @@ on:
     branches: ["bench/lumberchunker"]
 
 env:
-  LIMIT: "1"   # 0 = all 95 documents; 1 = smoke test
+  LIMIT: "0"   # 0 = all 95 documents; 1 = smoke test
   NLTK_DATA: /home/runner/nltk_data
   LUMBER_MODEL: gemini-3.5-flash-lite
   LUMBER_CACHE_DIR: .cache/lumberchunker
