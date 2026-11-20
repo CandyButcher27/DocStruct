@@ -112,8 +112,11 @@ verbatim" figure compared spans to the normalised `gt_text` rather than to
 ## FinanceBench — do not quote as a leaderboard
 
 Source: `reports/gold_reachability_financebench.json`, `notes.md` Stage 19.
-84 PDFs, 189 rows. Every tool scores MRR 0.0 at top-5 under three embedders on
-identical chunks, which measures the retriever, not the chunker. Gold occupies
+84 PDFs, 189 rows. The measured zero is a pilot, not a seven-tool run: 2 filings
+(`3M_2018_10K`, `3M_2022_10K`, 729 and 1,176 chunks), 7 questions, 2 tools, MRR@5 0.0.
+A relevant chunk exists (region overlap 0.990 and 1.000) and is ranked 42nd to 299th
+under all-MiniLM-L6-v2, bge-small-en-v1.5 and e5-small-v2, so the harness scores it;
+it is outside the top five. Never write "all seven tools" or "every tool". Gold occupies
 69% of its page, so span and region reachability are ~100% by construction and
 prove nothing — the circularity warning in `scripts/gold_reachability.py` fires
 here. Usable for parse fidelity and borderless-table detection only. A published
@@ -142,3 +145,17 @@ Ship these as `\unverified{}` or as stated absences, never as prose values:
 - Token-level IoU and Precision-Omega. The dumped runs record the overlap score
   per retrieved chunk but not the chunk and gold token sets, so this needs a
   re-run, not a re-analysis. Report it missing rather than approximating it.
+
+## Added 2026-11-20 for review 1 (`paper/reviews/review-01.md`)
+
+- Spearman rho(mean chunk width, MRR) across the 7 tools: span +0.571 (p=0.18), region
+  +0.036 (p=0.94), page -0.679 (p=0.09). Recomputed 2026-11-20 from
+  `reports/ohr_results_{span,region,page}.json`. n=7: quote signs, not as significant.
+- Span top three within 0.007 MRR: 0.7059, 0.7047, 0.6992 (`reports/ohr_results_span.json`).
+- Region margin over best external tool >= 0.045 from threshold 0.4 up
+  (`reports/ohr_region_threshold_sweep.json`).
+- 122 tables (hybrid) vs 4 (geometry-only) on `3M_2018_10K`: notes.md Stage 13. A
+  detection count, not a retrieval result.
+- Table-sourced OHR questions: span MRR 0.19-0.31 for every tool
+  (`reports/ohr_slices_span.md`); 35.7% of table gold span-reachable
+  (`reports/gold_reachability.json`).

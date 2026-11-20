@@ -52,7 +52,7 @@
 \maketitle
 
 \begin{abstract}
-PDF documents encode information through both textual content and spatial layout, but conventional extraction can lose this structure before the document reaches downstream retrieval systems. This can cause column interleaving, fragmented tables, incorrect reading order, and content from different sections to be mixed during chunking. We present \ds{}, a deterministic document-structuring and chunking engine that preserves layout information throughout the extraction pipeline. \ds{} first identifies structural blocks using geometry-based methods and validates these detections with a vision model running in parallel. The resulting blocks are fused, arranged into reading order, and used to reconstruct the document hierarchy before generating structure-aware chunks. The complete processing path is deterministic and does not use language models, ensuring consistent outputs for the same input document. We evaluate \ds{} against six existing chunking approaches using retrieval-based relevance evaluation across three relevance modes. \ds{} ranks first under two modes and sixth under a third, showing that a deterministic, layout-aware pipeline can achieve competitive retrieval performance without relying on language models during chunk generation.
+PDF documents encode information through both text and spatial layout, but conventional extraction loses the layout before the text reaches a retrieval system: columns interleave, tables fragment, and sections mix during chunking. We present \ds{}, a deterministic chunking engine that recovers layout first. A geometry-based detector finds structural blocks, an optional vision model proposes blocks in parallel, and the fused blocks are ordered and used to rebuild the heading hierarchy before any chunk is cut. No language model runs on this path, so the same PDF always yields the same chunks. Against five existing chunkers and a geometry-only variant of our own, on 3{,}558 human-written questions, \ds{} ranks first under two relevance rules and sixth under a third, on identical chunks. It also returns about four times more context per query than the leanest baseline, which the first two rules reward, and the vision model adds no measurable retrieval gain.
 \end{abstract}
 
 % =====================================================================
@@ -65,7 +65,7 @@ There are two broad approaches to this problem. The first is to accept this loss
 
 \ds{} takes a third approach by recovering document structure before performing chunking. In born-digital PDFs, much of the information needed to reconstruct this structure is available through the document geometry, including font properties, ruling lines, whitespace, and the positions of text elements. \ds{} uses geometry-based methods to identify blocks on each page and can optionally incorporate proposals from a vision model. These signals are then reconciled before the blocks are arranged into a reader-oriented order. The pipeline subsequently extracts text and tables, reconstructs the document's heading hierarchy, and generates chunks only after this structure has been established (Figure~\ref{fig:pipeline}). Each resulting chunk retains information about its page, position in reading order, block type, and associated headings.
 
-Keeping language models out of the main parsing path provides two practical advantages. First, the pipeline is deterministic: the same input document produces the same structural representation and chunks across runs. Second, the pipeline does not require network access or GPU resources for its core processing. Intermediate results can also be cached, making repeated experiments more efficient and reducing the cost of large-scale evaluation.
+Keeping language models off the parsing path makes the pipeline deterministic, and its core needs no network or GPU.
 
 We evaluate \ds{} using three relevance criteria: whether the chunk directly contains the answer, whether it overlaps with an annotated evidence region, and whether it originates from the annotated page. Using the same chunks, retriever, and evaluation framework across all three criteria, \ds{} ranks first under the first two criteria and sixth under the third. This variation highlights how the measured performance of a chunking system can depend strongly on how relevance is defined.\footnote{Code, every report cited here, the corpus-fetch scripts, checksums, and the script that draws every figure from those reports will be released with the paper. Corpora are fetched by script instead of redistributed, so each is reconstructible byte for byte.}
 
@@ -73,26 +73,24 @@ We evaluate \ds{} using three relevance criteria: whether the chunk directly con
 This work makes three main contributions:
 
 \begin{enumerate}\itemsep2pt
-\item \textbf{A deterministic, layout-aware chunking pipeline.} \ds{} reconstructs document structure before chunking, combining page-level layout analysis with optional vision-based detection, reading-order reconstruction, and hierarchy-aware chunk assembly. Each chunk retains its section path, page, reading-order position, and structural type (\S\ref{sec:method}).
+\item A deterministic, layout-aware chunking pipeline. \ds{} reconstructs document structure before chunking, combining page-level layout analysis with optional vision-based detection, reading-order reconstruction, and hierarchy-aware chunk assembly. Each chunk retains its section path, page, reading-order position, and structural type (\S\ref{sec:method}).
 
-\item \textbf{A multi-faceted evaluation of document chunking.} We evaluate \ds{} using three complementary protocols: retrieval performance on 3{,}558 human-written questions, agreement with publisher-provided section boundaries across 134 papers without relying on retrieval, and a two-process reproducibility check (\S\ref{sec:results}).
+\item An evaluation of document chunking on three protocols. We evaluate \ds{} using three complementary protocols: retrieval performance on 3{,}558 human-written questions, agreement with publisher-provided section boundaries across 134 papers without relying on retrieval, and a two-process reproducibility check (\S\ref{sec:results}).
 
-\item \textbf{An analysis of how relevance definitions affect chunker evaluation.} Across the three retrieval relevance criteria, \ds{}'s ranking changes substantially. A threshold sweep further shows that this effect is driven by the choice of relevance rule rather than by changes in the underlying chunks or retriever (\S\ref{sec:inversion}).
+\item An analysis of how relevance definitions affect chunker evaluation. The chunks and the retriever stay fixed across the three relevance criteria, yet \ds{} moves from first to sixth, so the rule alone changes the ranking (\S\ref{sec:inversion}).
 \end{enumerate}
 
 % =====================================================================
 \section{Related Work}
 \label{sec:related}
 
-\ds{} lies at the intersection of PDF structure recovery, retrieval-oriented chunking, and chunking evaluation. These areas have largely developed independently, with PDF parsing work focusing on recovering document structure, chunking work focusing on how text should be divided for retrieval, and evaluation work studying how the resulting chunks should be measured.
-
 \subsection{PDF Structure Recovery}
 
-A substantial body of work focuses on recovering the structure of PDF documents and measuring the fidelity of the resulting representations. OmniDocBench \citep{ouyang2025omnidocbench} and READoc \citep{li2025readoc}, for example, evaluate text, table, and reading-order extraction, while Docling \citep{auer2024docling} provides a practical document-conversion pipeline built around similar structural representations. \ds{} operates downstream of this parsing problem: rather than introducing another parse-fidelity benchmark, it uses recovered layout structure as the basis for constructing retrieval-oriented chunks. Its optional vision component also draws on established document-layout analysis methods and models trained on datasets such as DocLayNet \citep{pfitzmann2022doclaynet}.
+Much prior work recovers the structure of PDF documents and measures the fidelity of the result. OmniDocBench \citep{ouyang2025omnidocbench} and READoc \citep{li2025readoc}, for example, evaluate text, table, and reading-order extraction, while Docling \citep{auer2024docling} provides a practical document-conversion pipeline built around similar structural representations. \ds{} works downstream of this parsing problem and uses the recovered layout to build retrieval chunks. Its optional vision component also draws on established document-layout analysis methods and models trained on datasets such as DocLayNet \citep{pfitzmann2022doclaynet}.
 
 \subsection{Retrieval-Oriented Chunking}
 
-A second line of work studies how extracted text should be divided for retrieval-augmented generation \citep{lewis2020rag}. Approaches range from simple structural or fixed-size splitting to methods that use semantic information. LumberChunker \citep{duarte2024lumberchunker}, for example, uses a language model to identify topic boundaries, while \citet{smith2024chunking} investigate embedding-based chunking. Other studies have examined the effect of element-aware splitting, semantic chunking, overlap, and chunk size on retrieval performance \citep{jimeno2024financialchunking, chunkingcost2026, chunkingqa2026, rethinkingchunksize2025}. \ds{} differs from these approaches primarily in where it places the structural reasoning: rather than determining boundaries from the semantics of already-flattened text, it reconstructs document structure before chunking.
+A second line of work studies how extracted text should be divided for retrieval-augmented generation \citep{lewis2020rag}. Approaches range from simple structural or fixed-size splitting to methods that use semantic information. LumberChunker \citep{duarte2024lumberchunker}, for example, uses a language model to identify topic boundaries, while \citet{smith2024chunking} investigate embedding-based chunking. Other studies have examined the effect of element-aware splitting, semantic chunking, overlap, and chunk size on retrieval performance \citep{jimeno2024financialchunking, chunkingcost2026, chunkingqa2026, rethinkingchunksize2025}. These methods find boundaries in text that has already been flattened; \ds{} recovers document structure first and chunks afterwards.
 
 \subsection{Evaluating Chunking}
 
@@ -162,8 +160,6 @@ the block centres, and the four chunks it cuts.}
 
 \ds{} represents each chunk as a structured object containing its text, page number, reading-order position, block type, source block identifiers, and section path. The section path records the hierarchy of headings associated with the chunk. This structural information is preserved alongside the text and can therefore be used by downstream retrieval. Figure~\ref{fig:pipeline} shows the stages of the pipeline, and Figure~\ref{fig:realpage} shows the same path applied to a real page.
 
-A central design constraint is that the core parsing pipeline is deterministic: the same PDF produces the same structural representation and chunks without requiring network access or language-model calls. Intermediate results are cached using a content hash, so changing chunking parameters does not require repeating the earlier parsing stages.
-
 \subsection{Finding the Blocks}
 \label{sec:detect}
 
@@ -176,14 +172,14 @@ The second detector is a YOLOv8 model trained on DocLayNet \citep{pfitzmann2022d
 
 The two sets of detected regions are reconciled using bounding-box overlap. Matching regions are merged, while regions detected by only one detector are retained. This allows, for example, a borderless table identified by the vision detector to survive even when the geometry-based detector cannot detect it.
 
-The resulting blocks are then ordered according to the page layout rather than simply by their coordinates in the PDF. For pages with multiple columns, \ds{} identifies column bands from horizontal gaps between blocks and reads each band from top to bottom. Captions are associated with nearby figures or tables. Page-level orders are then combined into a document-wide reading order.
+The resulting blocks are then ordered by page layout. For pages with multiple columns, \ds{} identifies column bands from horizontal gaps between blocks and reads each band from top to bottom. Captions are associated with nearby figures or tables. Page-level orders are then combined into a document-wide reading order.
 
 \subsection{Extracting Text and Tables}
 \label{sec:extract}
 
 Once the blocks have been identified and ordered, their contents are extracted using \texttt{pdfplumber}. Text extraction uses a font-size-aware word-spacing tolerance to reduce cases where closely spaced words are incorrectly merged.
 
-Tables are extracted as grids when ruling lines provide sufficient structure. When the grid representation covers only part of a table, \ds{} falls back to the raw text extracted from the region rather than silently discarding content. The resulting table text is used for retrieval, while a separate Markdown representation can be generated for structured presentation.
+Tables are extracted as grids when ruling lines provide sufficient structure. When the grid representation covers only part of a table, \ds{} falls back to the raw text of the whole region, so the unruled rows are kept. The resulting table text is used for retrieval, while a separate Markdown representation can be generated for structured presentation.
 
 \subsection{Reconstructing the Outline and Chunking}
 \label{sec:chunking}
@@ -192,17 +188,17 @@ Tables are extracted as grids when ruling lines provide sufficient structure. Wh
 
 Chunks are then assembled in reading order. Headings normally close the current text buffer and update the active section path, while body text accumulates up to a 500-word limit with a 75-word carry-over. Tables are kept as independent chunks, captions remain associated with their figures, and the reference list is excluded.
 
-To avoid producing very short chunks around headings, a heading does not close the current buffer until it contains at least 200 words. Chunk sizes are measured in whitespace-separated words rather than model tokens, keeping boundaries independent of tokenizer versions. Because parsing and structure recovery occur before chunk assembly, changes to chunking parameters require only the final assembly stage to be rerun.
+To avoid producing short chunks around headings, a heading does not close the current buffer until it contains at least 200 words. Chunk sizes are counted in whitespace-separated words, so boundaries do not depend on a tokenizer version. Parsed blocks are cached under a content hash, so a change to chunking parameters reruns only this last stage.
 
 % =====================================================================
 \section{Experimental Setup}
 \label{sec:setup}
 
-We evaluate \ds{} against five existing chunking approaches: PyMuPDF4LLM, Unstructured, LangChain's recursive splitter, LlamaIndex's sentence splitter, and LlamaIndex's semantic splitter. We also report our own geometry-only variant, \dsg{}, as a separate system, giving seven systems in total. All systems are evaluated through the same retrieval harness, so only the chunking method varies. Chunks are indexed using both BM25 \citep{robertson2009bm25} and embeddings from \texttt{all-MiniLM-L6-v2} \citep{reimers2019sbert}, with the rankings combined using reciprocal rank fusion at $k{=}60$ \citep{cormack2009rrf}. The retriever returns the top five chunks per question, and performance is measured using mean reciprocal rank (MRR) with bootstrap confidence intervals and paired bootstrap significance tests \citep{efron1993bootstrap}.
+We evaluate \ds{} against five existing chunking approaches: PyMuPDF4LLM, Unstructured, LangChain's recursive splitter, LlamaIndex's sentence splitter, and LlamaIndex's semantic splitter. We also report our own geometry-only variant, \dsg{}, as a separate system, giving seven systems in total. All systems are evaluated through the same retrieval harness, so only the chunking method varies. Chunks are indexed using both BM25 \citep{robertson2009bm25} and embeddings from \texttt{all-MiniLM-L6-v2} \citep{reimers2019sbert}, with the rankings combined using reciprocal rank fusion at $k{=}60$ \citep{cormack2009rrf}. The retriever returns the top five chunks per question, and performance is measured using mean reciprocal rank (MRR) with bootstrap confidence intervals and paired bootstrap significance tests \citep{efron1993bootstrap}. Two baselines are absent. LumberChunker \citep{duarte2024lumberchunker} calls a language model for every document, which our compute budget did not cover; LlamaIndex's semantic splitter is the only model-based chunker we compare. Docling \citep{auer2024docling}, the closest layout-aware baseline, has an adapter in our harness but never completed a run on our hardware.
 
 We use three complementary datasets. OHR-Bench \citep{zhang2025ocrhindersrag} provides the primary retrieval evaluation, containing 95 born-digital documents and 3{,}558 human-written questions with annotated evidence. For structural evaluation, we use 134 papers from PubMed Central together with their publisher-provided JATS XML, fetched through Europe PMC \citep{europepmc}, allowing chunk boundaries to be compared against the original section structure without involving a retriever. FinanceBench \citep{islam2023financebench} is evaluated separately to determine whether the retrieval protocol is suitable for financial question answering (\S\ref{sec:financebench}).
 
-Retrieval relevance is measured using three criteria. Under the \textbf{span} rule, a chunk is relevant if it contains the gold answer sentence. Under the \textbf{region} rule, it is relevant if it overlaps at least $70\%$ of the annotated evidence region. Under the \textbf{page} rule, it is relevant if it comes from the annotated page. All three rules are applied to the same retrieved chunks, allowing the effect of the relevance definition itself to be isolated.
+Retrieval relevance is measured using three criteria. Under the \textbf{span} rule, a chunk is relevant if it contains the gold answer sentence. Under the \textbf{region} rule, it is relevant if its overlap coefficient with the annotated evidence (shared words over the smaller of the two) is at least $0.7$, a value we fixed before scoring any system. Under the \textbf{page} rule, it is relevant if it comes from the annotated page. All three rules are applied to the same retrieved chunks, allowing the effect of the relevance definition itself to be isolated.
 
 We additionally evaluate structural recovery using Pk \citep{beeferman1999statistical} and WindowDiff \citep{pevzner2002critique}, and test reproducibility by processing the OHR-Bench documents twice in separate processes and comparing the resulting chunk identifiers, metadata, and content.
 
@@ -218,20 +214,21 @@ We additionally evaluate structural recovery using Pk \citep{beeferman1999statis
 \small
 \caption{OHR-Bench: 95 documents, 3{,}558 human-written questions, seven
 chunkers, MRR under three relevance rules on \emph{identical chunks}. Rank in
-parentheses; ctx is the number of context words returned per query.}
+parentheses; best MRR per rule in bold. Ctx is the number of context words
+returned per query (top five chunks).}
 \label{tab:ohr}
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}lcccr@{}}
 \toprule
-Tool & page & span & region & ctx \\
+System & page & span & region & ctx \\
 \midrule
 \ds{}            & 0.600 (6) & \best{0.706 (1)} & \best{0.666 (1)} & 2194 \\
 \dsg{}           & 0.470 (7) & 0.705 (2) & 0.657 (2) & 2328 \\
-pymupdf4llm      & 0.668 (4) & 0.699 (3) & 0.604 (3) & 2424 \\
-unstructured     & \best{0.795 (1)} & 0.654 (5) & 0.601 (5) & \best{560} \\
-langchain        & 0.756 (2) & 0.641 (7) & 0.603 (4) & 638 \\
-llamaindex       & 0.729 (3) & 0.648 (6) & 0.589 (6) & 1430 \\
-llamaindex\_sem  & 0.652 (5) & 0.654 (4) & 0.575 (7) & 4698 \\
+PyMuPDF4LLM      & 0.668 (4) & 0.699 (3) & 0.604 (3) & 2424 \\
+Unstructured     & \best{0.795 (1)} & 0.654 (5) & 0.601 (5) & 560 \\
+LangChain        & 0.756 (2) & 0.641 (7) & 0.603 (4) & 638 \\
+LlamaIndex       & 0.729 (3) & 0.648 (6) & 0.589 (6) & 1430 \\
+LlamaIndex-sem   & 0.652 (5) & 0.654 (4) & 0.575 (7) & 4698 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -248,7 +245,7 @@ counts.}
 
 The choice of relevance criterion substantially changes the chunker leaderboard (Table~\ref{tab:ohr}, Figure~\ref{fig:inversion}). \ds{} ranks first under both the span and region rules but sixth under the page rule, while Unstructured shows the opposite pattern. Under the region rule, \ds{} significantly outperforms every external system; under span, it significantly outperforms four of the five external systems, with PyMuPDF4LLM statistically indistinguishable from it ($p=0.23$). Under page, \ds{} is outperformed by four systems.
 
-This reversal is closely related to chunk size. \ds{} produces larger structural chunks, averaging 2{,}194 context words per query, while Unstructured produces approximately 560. The span and region criteria therefore favor larger chunks more than the page criterion, which tends to favor smaller chunks. The same effect is visible within the \ds{} variants: under the page rule the hybrid scores $0.600$ against the geometry-only $0.470$, and the gap follows chunk count rather than detection quality, since the hybrid cuts 9{,}080 chunks against the geometry-only 5{,}810.
+The reversal tracks chunk size. \ds{} returns 2{,}194 context words per query and Unstructured 560, and a larger chunk contains more answer sentences, so the span rule rewards size directly. Our span lead therefore cannot be separated from context volume, and under span the top three systems sit within $0.007$ MRR of each other. The region rule normalises overlap by the smaller side and should not reward size. Across the seven systems, the Spearman correlation between mean chunk width and MRR is $+0.571$ under span, $-0.679$ under page and $+0.036$ under region ($n{=}7$; no correlation reaches $p<0.05$), so region shows no size trend in our data and is the rule our claim rests on. A comparison at matched context budgets would settle the question directly; we have not run it (Limitations). Within the \ds{} variants, the page-rule gap ($0.600$ against $0.470$) follows chunk count, 9{,}080 against 5{,}810.
 
 \begin{figure}[t]
 \centering
@@ -259,7 +256,7 @@ the family leads does not. Below $0.6$ it is \dsg{}.}
 \label{fig:sweep}
 \end{figure}
 
-We sweep the region threshold from $0.1$ to $1.0$ using the same retrieved results (Figure~\ref{fig:sweep}). The \ds{} variants remain ahead of the external systems across the sweep, although the relative ordering of the two \ds{} variants changes: \dsg{} leads below $0.6$, so the hybrid's first place under region is specific to the $0.7$ threshold we ship, which is also where our margin over the field peaks. This indicates that the overall result is not dependent on the chosen $0.7$ threshold, while also showing that the precise ranking can depend on the relevance definition.
+The $0.7$ threshold predates every score in this paper, but it also happens to be where our margin over the field peaks, so we sweep it from $0.1$ to $1.0$ on the same retrieved results (Figure~\ref{fig:sweep}). One of the two \ds{} variants leads at every value, with a margin of $0.045$ or more over the best external system from $0.4$ up. Which variant leads changes: \dsg{} leads below $0.6$, so the hybrid's first place in Table~\ref{tab:ohr} holds only for strict thresholds.
 
 The aggregate retrieval advantage is strongest on law and manuals. \ds{} trails Unstructured on academic papers and LlamaIndex's semantic splitter on finance, and performs below the best external system on questions whose evidence is contained in tables, where the best external score is $0.307$ against our $0.288$. These results suggest that chunk size and document type both influence retrieval performance.
 
@@ -271,19 +268,19 @@ The aggregate retrieval advantage is strongest on law and manuals. \ds{} trails 
 \small
 \caption{Section-boundary agreement with publisher-written JATS gold on 134
 PubMed Central papers. Pk and WindowDiff are error rates; lower is better.
-\texttt{unstructured} covers 99 documents because it hard-failed on 35.}
+Unstructured covers 99 documents because it hard-failed on 35.}
 \label{tab:sections}
 \begin{tabular}{@{}lccr@{}}
 \toprule
-Tool & WinDiff & Pk & Chunks/doc \\
+System & WinDiff & Pk & Chunks/doc \\
 \midrule
 \dsg{}            & \best{0.423} & \best{0.342} & 26.8 \\
-pymupdf4llm       & 0.480 & 0.449 & 17.7 \\
+PyMuPDF4LLM       & 0.480 & 0.449 & 17.7 \\
 \ds{}             & 0.482 & 0.353 & 37.5 \\
-llamaindex\_sem   & 0.534 & 0.513 & 29.1 \\
-llamaindex        & 0.695 & 0.598 & 42.7 \\
-langchain         & 0.879 & 0.620 & 85.6 \\
-unstructured$^{*}$ & 0.893 & 0.603 & 106.9 \\
+LlamaIndex-sem    & 0.534 & 0.513 & 29.1 \\
+LlamaIndex        & 0.695 & 0.598 & 42.7 \\
+LangChain         & 0.879 & 0.620 & 85.6 \\
+Unstructured$^{*}$ & 0.893 & 0.603 & 106.9 \\
 \bottomrule
 \multicolumn{4}{@{}l@{}}{\scriptsize $^{*}$ 99 of 134 documents; 35 hard failures.} \\
 \end{tabular}
@@ -301,49 +298,47 @@ under the other.}
 
 To evaluate structure independently of retrieval, we compare each chunker's boundaries with the section boundaries recorded in the publisher-provided JATS XML. \dsg{} achieves the best scores on both Pk and WindowDiff (Table~\ref{tab:sections}, Figure~\ref{fig:sections}), ahead of our own hybrid at $2.4\times$ the speed. This provides evidence that the layout-based pipeline can recover document structure without relying on retrieval performance.
 
-The evaluation has an important limitation: $57.4\%$ of the gold sections are shorter than \ds{}'s 200-word minimum, meaning some publisher boundaries cannot be reproduced by design. Moreover, agreement with publisher-defined sections measures structural recovery, not whether those boundaries are optimal for retrieval.
+The metric and the design do not fully match: $57.4\%$ of the gold sections are shorter than \ds{}'s 200-word minimum, so \ds{} merges them by construction and the score partly measures how the floor treats short sections. Agreement with publisher sections also measures structural recovery, and says nothing about whether those boundaries suit retrieval.
 
 \subsection{Reproducibility}
 \label{sec:determinism}
 
-The geometry-only pipeline produces identical output across independent processes. We parse all 95 OHR-Bench documents twice and compare every chunk's identifier, type, page, reading-order position, section path, and content. All 5{,}810 chunks are byte-identical across the two runs.
-
-This reproducibility claim applies to a fixed version of the code and the geometry-only path. The hybrid pipeline uses GPU-based vision inference and is therefore not covered by the same bit-level reproducibility test.
+We parse all 95 OHR-Bench documents twice in independent processes with the geometry-only pipeline and compare every chunk's identifier, type, page, reading-order position, section path and content. All 5{,}810 chunks are byte-identical. The claim covers one code version and the geometry-only path; the hybrid runs GPU inference, which this test does not cover.
 
 \subsection{Failure Analysis}
 \label{sec:cost}
 
-The vision detector does not produce a measurable retrieval improvement on OHR-Bench: adding it changes MRR by only $+0.0012$ under span ($p=0.80$) and $+0.0090$ under region ($p=0.12$). Geometry-only also performs better on the structural evaluation while running faster. We retain the vision path because it can identify structures such as borderless tables that are difficult to detect geometrically, but the retrieval results do not justify its computational cost on the evaluated corpus.
+The vision detector does not produce a measurable retrieval improvement on OHR-Bench: adding it changes MRR by only $+0.0012$ under span ($p=0.80$) and $+0.0090$ under region ($p=0.12$). Geometry-only also scores better on section boundaries while running faster, so none of our three corpora shows the vision path paying for itself. The one place it changes the output is borderless tables: on a single SEC filing (3M's 2018 10-K) it finds 122 tables where geometry finds 4. That is a detection count, and testing whether it helps retrieval needs a table-heavy corpus whose questions our retriever can reach.
 
 \ds{} also uses substantially more retrieval context than the smallest baseline. It produces approximately 2{,}194 context words per query compared with 560 for Unstructured, a $3.9\times$ larger context bill. Its word coverage is $0.9632$ compared with $1.000$ for LangChain, while its duplication rate is $1.83\times$, the highest of the seven systems compared. These trade-offs indicate that \ds{}'s retrieval gains come with increased context and some intentional loss of non-content elements such as references and page headers.
 
-Finally, FinanceBench could not produce a meaningful leaderboard under our protocol.
+Finally, we do not report a FinanceBench leaderboard.
 \label{sec:financebench}
-Although the relevant chunks exist, at region overlap $0.99$--$1.00$, none of the systems retrieved them within the top five, producing MRR of $0.0000$ across all tools under three separate encoders. \citet{elbachyr2026empirical} reach MRR $0.700$--$0.844$ on these same filings under a different protocol. This indicates a limitation of the retrieval setup for questions whose answers depend heavily on numerical tables rather than textual overlap, rather than evidence that the chunks themselves are absent.
+A pilot on two 10-K filings and seven questions scored MRR $0$ for both systems we ran. We checked the harness first. Each question has a chunk whose region overlap with the evidence is $0.990$ or $1.000$, and the retriever does rank it, at positions 42 to 299 under three different encoders, so the scoring works and the evidence sits outside the top five. The questions are analyst prompts with little word overlap with their evidence, the evidence is a numeric table, and one filing yields 729 to 1{,}176 chunks. \citet{elbachyr2026empirical} reach MRR $0.700$--$0.844$ on these filings with a different retriever and page-level gold. The same weakness appears on OHR-Bench as table-sourced questions, where every system scores between $0.19$ and $0.31$ span MRR and only $35.7\%$ of the table evidence appears in the raw text at all.
 
 % =====================================================================
 \section{Conclusion}
 \label{sec:conclusion}
 
-\ds{} shows that document layout can be recovered before chunking to produce structured, deterministic chunks without a language model on the parsing path. It ranks first under two of three relevance rules, recovers publisher-defined section structure, and produces identical output across independent processes. The vision component provides no measurable retrieval gain, and the approach requires more retrieval context than the leanest baseline.
+\ds{} recovers layout before chunking and produces deterministic chunks with no language model on the parsing path. It ranks first under two of three relevance rules, leads on publisher section boundaries, and reproduces byte for byte. Its vision component adds no measurable retrieval gain, and it spends about four times the context of the leanest baseline.
 
-The broader finding is about evaluation itself: chunker rankings depend on how relevance is defined, and no relevance rule is neutral to chunk size. The same chunks rank very differently under reasonable criteria, so chunking comparisons should state their relevance rule and evaluate under more than one.
+The broader finding is about evaluation itself: chunker rankings depend on how relevance is defined, and no relevance rule is neutral to chunk size. The same chunks rank differently under reasonable criteria, so chunking comparisons should state their relevance rule and evaluate under more than one.
 
 % =====================================================================
 \section*{Limitations}
 \label{sec:limitations}
 
-\paragraph{Scope.} \ds{} operates on PDF text and layout primitives and does not perform OCR, so scanned PDFs without a text layer are out of scope. All evaluated corpora are English, with limited representation of complex multi-column layouts.
+\paragraph{Scope.} \ds{} reads the PDF text layer and performs no OCR, which keeps it deterministic; scanned PDFs without a text layer are out of scope, and every baseline also runs with OCR off. All corpora are English. Two parts of the pipeline assume a space-delimited Latin script: chunk sizes count whitespace-separated words, and heading levels read Arabic, Roman and appendix numbering. Neither has been tested on other scripts, and a language without spaces between words would break the size floor. Layouts beyond two columns are outside what the reading-order heuristic handles.
+
+\paragraph{Context budget and baselines.} \ds{} returns about four times more context per query than Unstructured, and we have not run an equal-budget comparison, either by raising the top-$k$ of small-chunk systems or by resizing their chunks. Until that run exists, the span result may reflect context volume as much as layout. LumberChunker and Docling are missing for the reasons in \S\ref{sec:setup}.
 
 \paragraph{Parse fidelity.} We do not evaluate PDF parsing fidelity with benchmarks such as OmniDocBench or READoc; our structural evaluation instead measures agreement with publisher-provided section boundaries. The layout detector was checked only on a small hand-annotated sample, and the detector-fusion weights remain unvalidated (\S\ref{sec:fusion}).
 
-\paragraph{Chunking parameters.} The 200-word minimum and 500-word maximum were selected during development on an internal corpus whose annotations were later found unreliable, and results from that corpus are excluded here. They should be re-evaluated by ablation on an independent benchmark.
+\paragraph{Chunking and fusion parameters.} The 200-word minimum and 500-word maximum were chosen on an internal corpus whose annotations we later found unreliable, and we exclude its results. No benchmark in this paper has tuned or ablated them, and the fusion overlap threshold has not been ablated either.
 
-\paragraph{Reading order.} The column heuristic supports at most two columns and can misplace full-width elements above multi-column content. A more general recursive XY-cut implementation exists but was not used: it reduced retrieval performance on the development corpus.
+\paragraph{Reading order.} The column heuristic can misplace full-width elements above a two-column body. A recursive XY-cut is implemented but off, since it scored lower on the development corpus.
 
 \paragraph{Computational cost.} Dense, table-heavy financial documents can take far longer to parse than academic papers; three long filings exceeded the 30-minute limit in the determinism evaluation. This limits practicality for some large documents.
-
-These limitations bound the conclusions to the evaluated born-digital English documents rather than to PDF parsing or chunking in general.
 
 % =====================================================================
 \section*{Ethics Statement}
