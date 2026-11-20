@@ -72,6 +72,19 @@ jobs:
           uv pip install --system -c .github/bench-constraints.txt --extra-index-url https://download.pytorch.org/whl/cpu --index-strategy unsafe-best-match -e ".[retrieval,benchmark]" "unstructured[pdf]" unstructured-inference llama-index-core
           python -c "from sentence_transformers import SentenceTransformer; import torch, transformers; print(torch.__version__, transformers.__version__)"
           uv pip freeze --system > env-freeze.txt
+      - name: Adapter probe (traceback on failure)
+        if: matrix.run.tool == 'llamaindex'
+        run: |
+          python - <<'PY'
+          import glob, traceback
+          from docstruct.eval.adapters import build_adapter
+          pdf = sorted(glob.glob("data/ohrbench/*.pdf"))[0]
+          try:
+              print(len(build_adapter("llamaindex").chunk(pdf)), "chunks")
+          except Exception:
+              traceback.print_exc()
+              raise
+          PY
       - name: Benchmark
         env:
           UNSTRUCTURED_DISABLE_NOTICE: "1"
