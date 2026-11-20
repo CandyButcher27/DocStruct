@@ -1,0 +1,89 @@
+name: budget-matched benchmark
+
+# Equal-context-budget rerun for review 1 (R2). Small-chunk baselines get a larger
+# top-k so their context words per query match DocStruct's ~2,194 at k=5 on OHR-Bench;
+# every tool is also rerun at k=5 on the same install, so the comparison does not mix
+# library versions. Runs on push to bench/** or by hand.
+
+on:
+  push:
+    branches: ["bench/**"]
+  workflow_dispatch:
+
+env:
+  LIMIT: "1"   # documents to fetch; 1 = smoke test, 0 = full 95-document corpus
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/cache@v4
+        with:
+          path: data/ohrbench/_download
+          key: ohrbench-download-v1
+      - name: Fetch OHR-Bench PDFs
+        run: |
+          pip install pyarrow pdfplumber
+          python scripts/fetch_ohrbench.py --limit "$LIMIT"
+          # Score against the committed gold, not a regenerated copy.
+          git checkout -- data/qa/ohrbench.json reports/ohrbench_manifest.json
+          ls data/ohrbench/*.pdf | wc -l
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ohrbench-pdfs
+          path: data/ohrbench/*.pdf
+          retention-days: 3
+
+  bench:
+    needs: fetch
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [span, region]
+        run:
+          - {tool: unstructured, k: 20}
+          - {tool: unstructured, k: 5}
+          - {tool: langchain, k: 17}
+          - {tool: langchain, k: 5}
+          - {tool: llamaindex, k: 8}
+          - {tool: llamaindex, k: 5}
+          - {tool: docstruct_geo, k: 5}
+    name: ${{ matrix.run.tool }} k=${{ matrix.run.k }} ${{ matrix.mode }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/download-artifact@v4
+        with:
+          name: ohrbench-pdfs
+          path: data/ohrbench
+      - name: Install
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q libgl1 poppler-utils
+          pip install uv
+          uv pip install --system torch --index-url https://download.pytorch.org/whl/cpu
+          uv pip install --system -e ".[retrieval,benchmark]" "unstructured[pdf]>=0.15" "unstructured-inference>=0.7" llama-index-core
+          uv pip freeze --system > env-freeze.txt
+      - name: Benchmark
+        env:
+          UNSTRUCTURED_DISABLE_NOTICE: "1"
+        run: |
+          out="reports/budget/ohr_${{ matrix.run.tool }}_k${{ matrix.run.k }}_${{ matrix.mode }}"
+          mkdir -p reports/budget
+          python -m docstruct.cli benchmark --pdfs-dir data/ohrbench --qa data/qa/ohrbench.json \
+            --tools "${{ matrix.run.tool }}" --top-k "${{ matrix.run.k }}" --relevance "${{ matrix.mode }}" \
+            --cache-dir .bench_cache_budget \
+            --report-md "$out.md" --report-json "$out.json"
+          cp env-freeze.txt "$out.freeze.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: budget-${{ matrix.run.tool }}-k${{ matrix.run.k }}-${{ matrix.mode }}
+          path: reports/budget/
