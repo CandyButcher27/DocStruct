@@ -171,6 +171,16 @@ def test_full_width_line_is_kept_whole_and_breaks_the_columns():
     assert lines[21] == "R0a R0b R0c"
 
 
+def test_zero_width_word_on_the_gutter_is_emitted_once():
+    from docstruct.eval.qa_generator import _column_gutter, _page_text
+
+    words = [{"x0": x, "x1": x + 200, "top": 40 + 12 * row, "text": f"w{row}{x}"}
+             for row in range(40) for x in (50, 320)]
+    gutter = _column_gutter(_FakePage(words))
+    words.append({"x0": gutter, "x1": gutter, "top": 40, "text": "ZW"})
+    assert _page_text(_FakePage(words)).split().count("ZW") == 1
+
+
 def test_load_qa_ignores_extra_provenance_fields(tmp_path):
     # Gold converted from a public corpus carries fields the benchmark does not
     # consume. They belong in the file (for slicing results by evidence type), so

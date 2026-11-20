@@ -171,7 +171,7 @@ def _page_text(page) -> str:
             left, right = [], []
             continue
         lw = [w["text"] for w in words if w["x1"] <= gutter]
-        rw = [w["text"] for w in words if w["x0"] >= gutter]
+        rw = [w["text"] for w in words if w["x1"] > gutter]
         if lw:
             left.append(" ".join(lw))
         if rw:
