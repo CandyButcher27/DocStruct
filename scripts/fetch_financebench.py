@@ -1,6 +1,6 @@
 """Fetch the FinanceBench open-source split (150 QA / 84 born-digital SEC PDFs).
 
-Public human-annotated gold, CC-BY-NC-4.0. See memory/benchmark-datasets.md.
+Public human-annotated gold, CC-BY-NC-4.0. See notes.md Stage 19.
 Writes PDFs to data/financebench/ and gold in DocStruct's QA schema to
 data/qa/financebench.json, plus a sha256 manifest.
 

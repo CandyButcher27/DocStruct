@@ -233,7 +233,7 @@ detector shows no significant gain, so geometry-only is a legitimate default, no
 degraded mode.
 
 **Why config is a dict and not a `ParseConfig` object.** A typed config was designed and
-deliberately not built — see `memory/decisions.md`. Threading a frozen dataclass through
+deliberately not built — see `gpt.md` §7. Threading a frozen dataclass through
 every function is a large refactor whose only payoff is autocomplete, and the per-call
 override dict already gives thread safety. Revisit if the option count grows.
 

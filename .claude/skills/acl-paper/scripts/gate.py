@@ -15,8 +15,8 @@ CHECKS = [
     # "rather than" is a construction, caught by M2; only bare "rather" is a qualifier.
     ("M13 weak qualifier", r"\brather\b(?! than)|\b(very|quite|somewhat|fairly|pretty)\b"),
     ("bold list lead-in",  r"\\item\s+\\textbf"),
-    ("todo",               r"\\todo\\{"),
-    ("unverified",         r"\\unverified\\{"),
+    ("todo",               r"\\todo\{"),
+    ("unverified",         r"\\unverified\{"),
 ]
 
 path = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else "paper/main.tex")

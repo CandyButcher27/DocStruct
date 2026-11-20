@@ -3,7 +3,7 @@
 OHR-Bench (arXiv:2412.02592, ICCV 2025, CC-BY-4.0, research-only) ships 1,261 PDFs
 across 7 domains with human-written QA. We keep the part that is actually a
 chunking benchmark: documents that have QA, live in a multi-page domain, and are
-born-digital. See memory/benchmark-datasets.md for why each filter is there.
+born-digital. See notes.md Stage 17 for why each filter is there.
 
 Needs `pyarrow` (parquet), which is not a core dependency:
     pip install pyarrow
