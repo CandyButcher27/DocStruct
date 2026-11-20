@@ -1846,3 +1846,36 @@ question needing both.
 **What both reviews converged on independently:** the embedder is a live, untested
 variable, and the fixed-encoder protocol may itself be conditioning the inversion.
 That is now the gate on submission (`memory/roadmap.md`), not a revision to promise.
+
+---
+
+## Stage 29
+
+**2026-11-20 — Gold extraction: a few full-width lines no longer veto the column split.**
+
+`test_a_few_full_width_lines_do_not_veto_the_gutter` had been failing on `main` since
+3c7ded8. That commit stopped the gold extractor cutting words on single-column pages by
+requiring a band of exactly-zero word crossings, but a title, a full-width equation or
+a footer crosses every point of a real gutter, so those two-column pages were read as
+one column again and their lines welded together.
+
+**Fix.** `_column_gutter` accepts the widest middle band that stays under the existing
+2%-of-words crossing limit, at least 5pt wide. `_page_text` no longer crops at the
+gutter: it groups words into lines, keeps any line that crosses the gutter whole, and
+emits left column, right column, then that line, so nothing is cut in half. doc3.pdf
+p2, the page 3c7ded8 was written for, is still read as one column.
+
+**Measured** on the 3,558 OHR-Bench human gold spans, whitespace-blind, on the span's
+own page, pdfplumber text only (no tool involved):
+
+| page text | found | plain substring |
+|---|---|---|
+| no split | 1,730 | 1,453 |
+| crop at zero-crossing gutter (old) | 1,825 | 1,507 |
+| crop at tolerant gutter | 1,833 | 1,512 |
+| **band reading at tolerant gutter (kept)** | **1,846** | **1,524** |
+
+Pages split: 266 old, 395 new. The crop-at-tolerant variant lost 2 finance spans to cut
+words; band reading is best or tied in every domain. Gold already generated
+(`benchmark_qa_v9.json`) used the old extractor; spans are verbatim-validated either
+way, so they stay valid, but the new extractor yields gold from more two-column pages.
