@@ -324,14 +324,18 @@ def fig_pipeline(pdf="data/raw-pdfs/doc1.pdf", page=1,
     crop = int(panels[0].height * 0.52)
     panels = [im.crop((0, 0, im.width, crop)) for im in panels]
 
-    fig, axes = plt.subplots(1, 3, figsize=(6.9, 2.9))
+    # Two rows, not three columns. Panel scale is set by panel width alone, so
+    # (c) -- the densest panel -- gets the full figure width to itself.
+    fig = plt.figure(figsize=(6.9, 5.2))
+    gs = fig.add_gridspec(2, 2, height_ratios=[1.0, 1.72], hspace=0.22, wspace=0.06)
+    axes = [fig.add_subplot(gs[0, 0]), fig.add_subplot(gs[0, 1]),
+            fig.add_subplot(gs[1, :])]
     for ax, img, t in zip(axes, panels, titles):
         ax.imshow(img)
-        ax.set_title(t, fontsize=7.5, pad=4)
+        ax.set_title(t, fontsize=8, pad=4)
         ax.set_xticks([]); ax.set_yticks([])
         for sp in ax.spines.values():
             sp.set_visible(True); sp.set_color("#d4d4d8"); sp.set_linewidth(0.6)
-    fig.tight_layout(w_pad=1.0)
     fig.savefig(os.path.join(OUT, "pipeline.pdf"), bbox_inches="tight")
     plt.close(fig)
     print(f"  pipeline: {len(blocks)} blocks, {conf} confirmed, weights={'on' if w else 'OFF'}")

@@ -1846,3 +1846,116 @@ question needing both.
 **What both reviews converged on independently:** the embedder is a live, untested
 variable, and the fixed-encoder protocol may itself be conditioning the inversion.
 That is now the gate on submission (`memory/roadmap.md`), not a revision to promise.
+
+---
+
+## Stage 27
+
+**2026-09-02 — The paper rewritten around the system instead of the finding.**
+
+The draft had been reframed in Stage 26 to lead with the relevance-rule inversion,
+with DocStruct introduced as "our instrument". A rewrite brief
+(`paper/DocStruct_Claude_Rewrite_Prompt.md`) asked for the opposite ordering: the reader
+should understand the whole pipeline before meeting the leaderboard analysis, and the
+inversion should read as something the evaluation revealed.
+
+**What changed.** Title is now *DocStruct: Deterministic Structure-Aware Chunking of
+PDFs for Retrieval*. The abstract opens on lost page structure and reaches the
+inversion in its last sentence. The introduction states the parsing problem for four
+paragraphs before any evaluation appears. Method grew from five compressed paragraph
+stubs to six subsections plus caching, each naming the object it hands the next stage:
+detection → proposals, fusion → blocks, ordering, extraction, hierarchy →
+`SectionPath`, assembly → chunks. Results is organised by question, and the negative
+results keep their place in the body per repo rule 9. Contributions now list the
+system first and the methodology finding fourth.
+
+**New figure.** Figure 1 is a full end-to-end architecture diagram in TikZ: the two
+detectors inside a dashed "layout evidence" group, then the vertical chain with the
+intermediate object named on each arrow. It replaces the compact five-stage sketch,
+which showed the stages but not what flowed between them.
+
+**Content restored from the codebase, not invented.** Caching now has a subsection,
+because it is what made the ablations affordable and it explains why chunking config
+is excluded from the `BlockCache` fingerprint. Extraction gained the font-scaled
+word-gap tolerance, the raw-text coverage guard on partly ruled tables, the gated
+furniture and multi-page-table passes, and the containment pass that dropped 28% of
+content and was reverted. Hierarchy gained the numbering-before-font-rank rule and the
+reverted breadcrumb-injection experiment.
+
+**Where the brief and the repo contract disagreed, the contract won.** The brief
+permitted quoting +0.0429 MRR for the `MIN_CHUNK_TOKENS` floor and the MIN=600
+comparison. Both come from the internal arXiv corpus withdrawn in Stage 24, so neither
+is in the paper. The floor is now argued from its mechanism, the withdrawal is stated
+in Limitations as its own paragraph, and one `\todo{}` marks the ablation for re-running
+on OHR-Bench. Same treatment for the font-spacing and XY-cut deltas: described
+qualitatively, no numbers.
+
+**Two defects fixed while checking the build.** `\S\ref{sec:limitations}` resolved to
+the Conclusion's number, since a `\label` after `\section*` picks up the previous
+counter; both sites now say "Limitations" in words. And `gate.py`'s `todo` /
+`unverified` patterns were written `r"\todo\{"`, which matches the literal string
+`\todo\{` and can never fire, so the gate had been reporting 0 markers regardless of
+the file. Fixed; it now reports the 1 real `\todo{}`.
+
+**State.** Mechanical gate 11 → 0 style hits (1 `\todo`, 0 `\unverified`).
+`pdflatex` + `bibtex` clean: 0 errors, 0 overfull boxes, 0 undefined references.
+**12 pages, Limitations starting on page 11.** The Stage 26 budget is 8 pages for the
+whole PDF, so this draft is roughly 4 pages over and is explicitly a first pass: the
+brief asked for narrative completeness before compression. The compression pass is the
+next piece of work, and `compression_patterns.md` is the tool for it.
+
+---
+
+## Stage 28
+
+**2026-09-03 -- Pass 2: the paper compressed by ChatGPT, 12 pages to 9.**
+
+Pass 1 (Stage 27) traded page count for narrative completeness and landed at 12 pages
+against an 8-page whole-PDF budget. Pass 2 was run through the ChatGPT bridge
+(`gpt automation/gpt.ps1`) under the /gpt protocol: GPT authored every compression, this
+session only adjudicated, validated and assembled. No paragraph was shortened locally.
+
+**Protocol.** All 74 prose paragraphs were extracted with IDs and word counts. Round 0
+asked GPT for an allocation plan only, one line per paragraph, plus a verdict on each
+float. It returned a plan summing to 4,000 words and proposed cutting Table 3 and
+Figure 2 and shrinking Figure 1. Rounds 1 to 11 sent the paragraphs themselves in
+batches with per-paragraph targets and a hard output contract.
+
+**Adjudication.** Accepted: the word allocation, the Figure 1 shrink (11cm to 8cm), and
+the P37/P38 corpora merge. Rejected: cutting Figure 2, because it is the visual
+statement of the headline claim and GPT priced the saving at 0.10 page. Rejected:
+cutting Table 3, because the condition attached to that acceptance, moving the domain
+losses into P49 as explicit numbers, was not met. Rejected: the P70/P72 merge, which put
+domain coverage under a heading about withdrawn chunking parameters. Six GPT targets
+were larger than the current text and were reset to KEEP, since a compression pass does
+not expand.
+
+**Result.** Prose 7,219 -> 4,087 words, a 43% cut. 12 pages -> 9. Body ends on page 7,
+Limitations and Ethics run to page 8, references end on page 9. Mechanical gate 0 style
+hits, 1 `\todo{}`, 0 `\unverified{}`. `pdflatex` + `bibtex` clean: 0 errors, 0 overfull
+boxes, 0 undefined references. Still one page over budget; the unspent levers are the two
+float cuts above plus roughly 350 further prose words.
+
+**Two failure modes worth recording.**
+
+*The bridge returns stale replies.* Sending batches in a loop returned the previous
+message's answer several times, because `gpt_bridge.py` clicks send with a 15s wait on
+the send button and that button is hidden while a reply is still streaming. The timeout
+propagates, the scrape then reads the old message, and it looks like a successful round.
+`send.ps1` now verifies that the reply contains the batch's first paragraph ID and
+retries. Coverage was audited against the full ID set before assembly. **Lesson: a
+browser-scraping bridge needs an application-level identity check on every reply; a
+non-empty response is not evidence that your message was answered.**
+
+*The bridge silently eats LaTeX escapes.* ChatGPT renders replies as markdown, and
+markdown consumes a backslash before ASCII punctuation, so `\%`, `\_` and `\#` all
+arrive bare in the scraped text. Eight bare `%` (each one a comment that eats the rest
+of its line), the underscores in `RELEVANCE_REGION_MIN_OVERLAP` and `llamaindex_sem`,
+and `\# unvalidated` all came back broken. A repair round did not fix it, because GPT
+was emitting the escapes correctly and the transport was removing them. Restored
+mechanically on the way in. **Lesson: any character markdown escapes cannot round-trip
+through this bridge; validate against the source paragraph, not against what the model
+appears to have written.**
+
+Backups of the pass-1 draft are `paper/main_backup_pass1.pdf` and
+`paper/main_backup_pass1.tex`.

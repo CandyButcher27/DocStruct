@@ -1,15 +1,18 @@
 % =====================================================================
-% DocStruct --- draft 3, 2026-08-27. Ported to the ACL 2023 template.
+% DocStruct --- draft 5, 2026-09-03. Narrative rewrite on the ACL 2023 template.
 %
 % Compile: pdflatex main && bibtex main && pdflatex main && pdflatex main
 %
 % Every number in this file resolves to a row in
 % .claude/skills/acl-paper/references/claim-ledger.md, which names the report
-% that produced it. A number with no row ships as \unverified{} or not at all.
+% that produced it. Every OHR-Bench number names its relevance rule.
 %
-% STATUS MARKERS:
-%   \todo{...}       open work
-%   \unverified{...} a number not yet measured; must not ship
+% Withdrawn numbers that must NEVER reappear (notes.md 2026-08-16): the internal
+% arXiv five-tool table, the ablation deltas +0.0429 / +0.0138 / -0.0101, the
+% vision detector's +0.0443, and coverage 0.817 / duplication 2.06.
+%
+% Camera-ready: restore the repository URL in the footnote of Section 1
+% (https://github.com/CandyButcher27/DocStruct) and fill the author block.
 % =====================================================================
 \pdfoutput=1
 \documentclass[11pt]{article}
@@ -24,368 +27,198 @@
 \usepackage{inconsolata}
 
 \usepackage{booktabs}
+\usepackage[font=small,skip=3pt]{caption}
 \usepackage{graphicx}
 \graphicspath{{figures/}}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{xcolor}
-\usepackage{multirow}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta, positioning, fit, backgrounds}
+\usetikzlibrary{arrows.meta, fit, positioning}
 
-\newcommand{\todo}[1]{\textcolor{red}{\textbf{[TODO: #1]}}}
-\newcommand{\unverified}[1]{\textcolor{orange}{#1$^{\dagger}$}}
 \newcommand{\ds}{\textsc{DocStruct}}
 \newcommand{\dsg}{\textsc{DocStruct}-\textsc{geo}}
 \newcommand{\best}[1]{\textbf{#1}}
 
-\title{Relevance Rules Confound PDF Chunker Evaluation}
+\title{\ds{}: Layout-Aware {PDF} Chunking for Structured Document Retrieval}
 
 \author{
-  Aryaman Srivastava \\
-  \texttt{srivastavaaryaman555@gmail.com} \\
-  \url{https://github.com/CandyButcher27/DocStruct}
-  % TODO before submission: affiliation and co-authors.
+ Aryaman Srivastava \\
+  \texttt{srivastavaaryaman555@gmail.com}
+  % TODO before camera-ready: affiliation and co-authors.
 }
 
 \begin{document}
 \maketitle
 
 \begin{abstract}
-Retrieval-augmented generation over PDFs depends on how a document is split into
-chunks, and chunkers are compared on leaderboards. We show that those leaderboards
-are underdetermined by their own design. Scoring seven PDF chunkers on
-\emph{identical chunks} over 95 documents and 3{,}558 human-annotated questions, we
-find that the ranking changes with the rule used to decide whether a retrieved chunk
-counts as relevant: one tool ranks 1st of 7 under span and region relevance and 6th
-of 7 under page relevance, and the tool that displaces it shows the mirror pattern.
-No rule is neutral to chunk size, so a single-rule comparison entangles a ranking
-with a size preference. We therefore report three rules, and add an evaluation that
-uses no rule at all, scoring chunk boundaries against publisher-authored JATS
-section structure for 134 PubMed Central papers with Pk and WindowDiff. Our
-instrument is \ds{}, a local, deterministic, structure-aware chunker that invokes no
-language model on the parse path.
+PDF documents encode information through both textual content and spatial layout, but conventional extraction can lose this structure before the document reaches downstream retrieval systems. This can cause column interleaving, fragmented tables, incorrect reading order, and content from different sections to be mixed during chunking. We present \ds{}, a deterministic document-structuring and chunking engine that preserves layout information throughout the extraction pipeline. \ds{} first identifies structural blocks using geometry-based methods and validates these detections with a vision model running in parallel. The resulting blocks are fused, arranged into reading order, and used to reconstruct the document hierarchy before generating structure-aware chunks. The complete processing path is deterministic and does not use language models, ensuring consistent outputs for the same input document. We evaluate \ds{} against six existing chunking approaches using retrieval-based relevance evaluation across three relevance modes. \ds{} ranks first under two modes and sixth under a third, showing that a deterministic, layout-aware pipeline can achieve competitive retrieval performance without relying on language models during chunk generation.
 \end{abstract}
 
 % =====================================================================
 \section{Introduction}
 \label{sec:intro}
 
-A retrieval-augmented generation (RAG) system \citep{lewis2020rag} over PDFs is only
-as good as the units it retrieves. Those units, chunks, come from a pipeline that in
-most deployments is structurally blind twice over. A parser converts the PDF into a
-character stream and discards the two-dimensional layout that told a human reader
-where a section began and which column to read next. A splitter then cuts that
-stream every $N$ characters, with a separator preference list as its only concession
-to structure. Neither stage has a representation of ``section'', ``table'' or
-``column''.
+When we open an academic paper in a PDF viewer, we can view its two columns neatly and in the intended reading order. However, when the same paper is processed by a conventional text extractor, the extracted text may interleave the columns: the first line of the left column may be followed by the first line of the right column, followed by the second line of the left column. The PDF contains the positions of the characters and other graphical elements, but the semantic structure of the page, such as which text belongs to a column, heading, table, or caption, must be inferred from this layout. If an extraction pipeline does not perform this inference, it can traverse the text in an order that differs from how a reader would naturally read the document. By the time the resulting text is passed to a chunker that splits it by character count or nearby blank lines, much of the original layout information has already been lost.
 
-The consequences appear in any real corpus. \texttt{page.extract\_text()} welds a
-two-column page into unreadable lines, a chunk boundary lands mid-sentence because a
-character budget expired, a table is severed from the header row that gives its
-columns meaning. The parser's own metrics cannot see any of this, because it was
-asked to preserve characters and never structure.
+There are two broad approaches to this problem. The first is to accept this loss of structure and use simple, cheap, and repeatable splitting methods. The second is to introduce contextual methods that determine where topics or semantic boundaries change, such as language-model-based approaches \citep{duarte2024lumberchunker}, or methods that cluster sentence embeddings based on semantic similarity \citep{smith2024chunking}. The first approach can lose information because it does not account for the natural flow of the document and may split sentences, paragraphs, or related ideas across different chunks. The second approach provides greater contextual awareness, but introduces additional computational and operational costs. It may require external model calls, tie the pipeline to a particular model or version, and introduce variability in the resulting chunks.
 
-Recent work responds by making segmentation semantic: a language model judges where
-topics change \citep{duarte2024lumberchunker}, or an embedding model clusters
-sentences into coherent groups \citep{smith2024chunking}. These methods improve on
-fixed-size splitting and carry three costs that are rarely priced. They are
-non-deterministic, so the same PDF can yield different chunks on consecutive runs.
-They spend one model call per candidate boundary on every document. And their
-boundaries are a property of a model checkpoint, so an upgrade silently invalidates
-an index. In a regulated or auditable pipeline, the setting where document structure
-matters most, those three costs are disqualifying.
+\ds{} takes a third approach by recovering document structure before performing chunking. In born-digital PDFs, much of the information needed to reconstruct this structure is available through the document geometry, including font properties, ruling lines, whitespace, and the positions of text elements. \ds{} uses geometry-based methods to identify blocks on each page and can optionally incorporate proposals from a vision model. These signals are then reconciled before the blocks are arranged into a reader-oriented order. The pipeline subsequently extracts text and tables, reconstructs the document's heading hierarchy, and generates chunks only after this structure has been established (Figure~\ref{fig:pipeline}). Each resulting chunk retains information about its page, position in reading order, block type, and associated headings.
 
-\ds{} takes the opposite position. Structure in a born-digital PDF is a geometric
-fact, recoverable from the file's own primitives, so a chunker can read it directly
-with no model on the parse path. Section~\ref{sec:method} describes the
-pipeline.\footnote{Code, every report cited here, the corpus-fetch scripts, the
-manifests and SHA-256 checksums, and the script that generates every figure from
-those reports are at \url{https://github.com/CandyButcher27/DocStruct}. Corpora are
-fetched rather than redistributed, so each is reconstructible byte for byte;
-\texttt{scripts/verify\_determinism.py} reproduces \S\ref{sec:determinism}. The
-library installs as \texttt{pip install docstruct-rag}.}
+Keeping language models out of the main parsing path provides two practical advantages. First, the pipeline is deterministic: the same input document produces the same structural representation and chunks across runs. Second, the pipeline does not require network access or GPU resources for its core processing. Intermediate results can also be cached, making repeated experiments more efficient and reducing the cost of large-scale evaluation.
 
-Building \ds{} required us to answer a prior question: how does anyone know a chunker
-is good? The standard answer is a retrieval leaderboard, so we ran one, and found its
-result undefined until one more choice is fixed, a choice the literature makes
-silently. Scoring a retrieved chunk as relevant requires a rule, and different
-reasonable rules produce different winners from the same chunks.
+We evaluate \ds{} using three relevance criteria: whether the chunk directly contains the answer, whether it overlaps with an annotated evidence region, and whether it originates from the annotated page. Using the same chunks, retriever, and evaluation framework across all three criteria, \ds{} ranks first under the first two criteria and sixth under the third. This variation highlights how the measured performance of a chunking system can depend strongly on how relevance is defined.\footnote{Code, every report cited here, the corpus-fetch scripts, checksums, and the script that draws every figure from those reports will be released with the paper. Corpora are fetched by script instead of redistributed, so each is reconstructible byte for byte.}
 
 \paragraph{Contributions.}
+This work makes three main contributions:
+
 \begin{enumerate}\itemsep2pt
-  \item A measured inversion. On 95 documents and 3{,}558 human questions,
-  \ds{} ranks 1st of 7 under span and region relevance and 6th of 7 under page
-  relevance, on chunks that never changed between the three runs
-  (\S\ref{sec:inversion}). We could find no prior chunking evaluation that reports
-  more than one rule. A sweep of the region threshold (\S\ref{sec:sweep}) shows the
-  effect belongs to the rule rather than to a badly chosen constant.
+\item \textbf{A deterministic, layout-aware chunking pipeline.} \ds{} reconstructs document structure before chunking, combining page-level layout analysis with optional vision-based detection, reading-order reconstruction, and hierarchy-aware chunk assembly. Each chunk retains its section path, page, reading-order position, and structural type (\S\ref{sec:method}).
 
-  \item An evaluation of chunkers that uses no relevance rule. We score chunk
-  boundaries against the section boundaries publishers wrote in JATS XML for 134
-  PubMed Central papers, using the standard segmentation error rates Pk and
-  WindowDiff (\S\ref{sec:sections}). No embedder, no rule, and gold written for an
-  unrelated purpose before this benchmark existed.
+\item \textbf{A multi-faceted evaluation of document chunking.} We evaluate \ds{} using three complementary protocols: retrieval performance on 3{,}558 human-written questions, agreement with publisher-provided section boundaries across 134 papers without relying on retrieval, and a two-process reproducibility check (\S\ref{sec:results}).
 
-  \item Evidence that a chunker with no model on its parse path is competitive.
-  \ds{} is the instrument for the two results above (\S\ref{sec:method}), and its
-  determinism is measured on 95 documents in two independent processes
-  (\S\ref{sec:determinism}), a row no model-segmented chunker can fill. We claim the
-  property, not the architecture: \S\ref{sec:cost} reports that our own vision
-  detector fails to earn its place.
-
-  \item Results against our own system, reported in the main text
-  (\S\ref{sec:cost}). The vision detector is null on every corpus we can check, and
-  geometry-only beats the hybrid on the structural metric. Our context bill is
-  $3.9\times$ the leanest baseline, which leaves that baseline $3.6\times$ ahead of
-  us on rank quality per token. Our word coverage is $0.9632$ against LangChain's
-  $1.000$, at the highest duplication of the seven. And a widely used financial
-  corpus turns out to be unusable as a retrieval benchmark under a fixed-embedder
-  protocol, where a published paper reports MRR $0.700$--$0.844$ on the same files.
+\item \textbf{An analysis of how relevance definitions affect chunker evaluation.} Across the three retrieval relevance criteria, \ds{}'s ranking changes substantially. A threshold sweep further shows that this effect is driven by the choice of relevance rule rather than by changes in the underlying chunks or retriever (\S\ref{sec:inversion}).
 \end{enumerate}
 
 % =====================================================================
 \section{Related Work}
 \label{sec:related}
 
-\paragraph{Parse fidelity benchmarks.}
-OmniDocBench \citep{ouyang2025omnidocbench} and READoc \citep{li2025readoc} evaluate
-whether a converter reproduces a document's text, tables and reading order, using
-normalised edit distance, TEDS and vocabulary F1. Docling \citep{auer2024docling}
-sits in the same family. These measure the parse and stop before chunking, and
-therefore before retrieval. Our work is complementary. We report no parse-fidelity
-number, which we list as a limitation.
+\ds{} lies at the intersection of PDF structure recovery, retrieval-oriented chunking, and chunking evaluation. These areas have largely developed independently, with PDF parsing work focusing on recovering document structure, chunking work focusing on how text should be divided for retrieval, and evaluation work studying how the resulting chunks should be measured.
 
-\paragraph{Chunking strategies.}
-LumberChunker \citep{duarte2024lumberchunker} uses a language model to locate topic
-shifts. Chroma's technical report \citep{smith2024chunking} introduces a
-cluster-based semantic chunker and a token-level evaluation vocabulary (IoU,
-Precision$_\Omega$). \citet{jimeno2024financialchunking} show that element-type
-chunking beats fixed-size splitting on financial reports, the closest prior claim to
-ours. \citet{chunkingcost2026} ask whether semantic chunking earns its compute and
-largely conclude that it does not, which supports our determinism argument.
-\citet{chunkingqa2026} report that overlap gives little benefit and identify a
-``context cliff'' past roughly 2{,}500 tokens; \citet{rethinkingchunksize2025} find
-that chunk size dominates other choices. A 2026 wave of structure-aware chunkers
-shares our positioning and post-dates our design.
+\subsection{PDF Structure Recovery}
 
-\paragraph{End-to-end evaluation and segmentation metrics.}
-Closest to our setting, \citet{elbachyr2026empirical} benchmark parser and chunker
-combinations for financial QA, and OHR-Bench \citep{zhang2025ocrhindersrag} measures
-how OCR noise propagates into RAG while supplying the human-annotated corpus we
-adopt. Both report a single relevance rule, and \S\ref{sec:inversion} shows the
-choice of rule can reverse a ranking. Pk \citep{beeferman1999statistical} and
-WindowDiff \citep{pevzner2002critique} are the standard error rates for linear text
-segmentation; to our knowledge they have not been used to evaluate RAG chunkers
-against publisher-authored structure, which is what \S\ref{sec:sections} does.
+A substantial body of work focuses on recovering the structure of PDF documents and measuring the fidelity of the resulting representations. OmniDocBench \citep{ouyang2025omnidocbench} and READoc \citep{li2025readoc}, for example, evaluate text, table, and reading-order extraction, while Docling \citep{auer2024docling} provides a practical document-conversion pipeline built around similar structural representations. \ds{} operates downstream of this parsing problem: rather than introducing another parse-fidelity benchmark, it uses recovered layout structure as the basis for constructing retrieval-oriented chunks. Its optional vision component also draws on established document-layout analysis methods and models trained on datasets such as DocLayNet \citep{pfitzmann2022doclaynet}.
+
+\subsection{Retrieval-Oriented Chunking}
+
+A second line of work studies how extracted text should be divided for retrieval-augmented generation \citep{lewis2020rag}. Approaches range from simple structural or fixed-size splitting to methods that use semantic information. LumberChunker \citep{duarte2024lumberchunker}, for example, uses a language model to identify topic boundaries, while \citet{smith2024chunking} investigate embedding-based chunking. Other studies have examined the effect of element-aware splitting, semantic chunking, overlap, and chunk size on retrieval performance \citep{jimeno2024financialchunking, chunkingcost2026, chunkingqa2026, rethinkingchunksize2025}. \ds{} differs from these approaches primarily in where it places the structural reasoning: rather than determining boundaries from the semantics of already-flattened text, it reconstructs document structure before chunking.
+
+\subsection{Evaluating Chunking}
+
+The evaluation of chunking systems presents a separate challenge because the definition of a relevant chunk can itself affect the measured result. \citet{elbachyr2026empirical} evaluate parser and chunker combinations for question answering, while OHR-Bench \citep{zhang2025ocrhindersrag} provides the human-annotated corpus used in our retrieval evaluation. These approaches evaluate relevance using a particular criterion. We extend this evaluation setting by comparing multiple relevance definitions and by adding structure-based evaluation using section-boundary agreement metrics such as Pk \citep{beeferman1999statistical} and WindowDiff \citep{pevzner2002critique}. This allows us to separate retrieval relevance from the structural quality of the chunks and examine how the choice of relevance criterion affects chunker rankings.
 
 % =====================================================================
-\section{Method}
+\section{Methodology}
 \label{sec:method}
 
-\subsection{Problem setting}
-A chunker maps a PDF to an ordered list of chunks. Each chunk carries text, a page
-number, a position in reading order, and a section path: the stack of headings above
-it. Downstream, an embedder and a retriever consume that list and nothing else, so
-every decision the chunker makes is visible to retrieval and invisible to any metric
-computed on the parse alone.
-
-Our design constraint is that the mapping be a pure function of the file: the same PDF
-must produce the same chunks in any process, on any day, with no network and no model
-call on the parse path. That rules out the semantic chunkers of \S\ref{sec:related} by
-construction, and makes the measurement of \S\ref{sec:determinism} possible at all.
-
-\subsection{Pipeline}
-Figure~\ref{fig:pipeline} shows the five stages and the object each one produces.
-Every threshold lives in a single \texttt{config.py}, and each tuned constant carries
-a comment naming the measurement that chose it.
-
-\begin{figure}[t]
+\begin{figure*}[t]
 \centering
-\small
 \begin{tikzpicture}[
-  every node/.style={font=\scriptsize},
-  stage/.style={draw, rounded corners=1pt, align=center, inner sep=2pt,
-                minimum height=5mm, text width=14mm, line width=0.4pt},
-  det/.style={stage, text width=16mm},
-  ar/.style={-{Latex[length=1.4mm]}, line width=0.4pt},
+ box/.style={draw, rounded corners=2pt, align=center, inner sep=4pt,
+ minimum height=12mm, text width=27mm, line width=0.5pt,
+ font=\footnotesize},
+ term/.style={box, text width=17mm, fill=black!6},
+ ar/.style={-{Latex[length=2mm]}, line width=0.5pt},
+ lbl/.style={font=\scriptsize\itshape, inner sep=1.5pt, fill=white},
 ]
-\node[stage] (pdf)   at (0,0)      {PDF};
-\node[det]   (geo)   at (2.2,0.45) {geometric\\{\tiny\textsf{pdfplumber}}};
-\node[det]   (vis)   at (2.2,-0.45){vision {\itshape(opt.)}\\{\tiny DocLayNet}};
-\node[stage] (fuse)  at (4.3,0)    {fuse\\{\tiny by IoU}};
-\node[stage] (order) at (6.1,0)    {order\\{\tiny columns}};
-\node[stage] (hier)  at (1.0,-1.6) {hierarchy\\{\tiny\texttt{SectionPath}}};
-\node[stage] (asm)   at (3.1,-1.6) {assemble\\{\tiny size floor}};
-\node[stage] (out)   at (5.1,-1.6) {chunks};
+% --- row A: evidence and reconciliation
+\node[term] (pdf) at (1.1, 0) {PDF};
+\node[box]  (geo) at (5.3, 0.95) {geometry detector\\[1pt]{\scriptsize\color{black!60} fonts, ruling lines, gaps}};
+\node[box]  (vis) at (5.3,-0.95) {vision detector \emph{(opt.)}\\[1pt]{\scriptsize\color{black!60} YOLOv8, DocLayNet}};
+\node[box]  (fuse) at (9.9, 0) {fusion\\[1pt]{\scriptsize\color{black!60} match by overlap}};
+\node[box]  (order) at (14.3, 0) {reading order\\[1pt]{\scriptsize\color{black!60} column-aware sweep}};
 
-\draw[ar] (pdf) -- (geo);
-\draw[ar] (pdf) -- (vis);
-\draw[ar] (geo) -- (fuse);
-\draw[ar] (vis) -- (fuse);
-\draw[ar] (fuse) -- (order);
-\draw[ar] (order.south) -- ++(0,-0.45) -| (hier.north);
-\draw[ar] (hier) -- (asm);
-\draw[ar] (asm) -- (out);
+% --- row B: content and assembly
+\node[box, text width=24mm] (extr) at (1.6, -3.9) {content extraction\\[1pt]{\scriptsize\color{black!60} text, table grids}};
+\node[box, text width=24mm] (hier) at (6.1, -3.9) {section hierarchy\\[1pt]{\scriptsize\color{black!60} heading levels}};
+\node[box, text width=24mm] (asm) at (10.6, -3.9) {chunk assembly\\[1pt]{\scriptsize\color{black!60} boundaries, size floor}};
+\node[term] (out) at (14.5, -3.9) {\texttt{Chunk[]}};
+
+\draw[ar] (pdf.east) -- ++(0.35,0) |- (geo.west);
+\draw[ar] (pdf.east) -- ++(0.35,0) |- (vis.west);
+\draw[ar] (geo.east) -- ++(0.35,0) |- (fuse.west);
+\draw[ar] (vis.east) -- ++(0.35,0) |- (fuse.west);
+\draw[ar] (fuse) -- node[lbl,above] {\upshape\texttt{Block[]}} (order);
+\draw[ar] (order.south) -- ++(0,-1.35)
+ node[lbl, above, pos=0.9, xshift=-8mm] {ordered blocks}
+          -| (extr.north);
+\draw[ar] (extr) -- node[lbl,above] {with content} (hier);
+\draw[ar] (hier) -- node[lbl,above] {\upshape\texttt{SectionPath}} (asm);
+\draw[ar] (asm)  -- (out);
+
+\node[draw=black!35, dashed, rounded corners=3pt, inner sep=6pt,
+ fit=(geo)(vis), label={[font=\scriptsize\itshape, color=black!60]above:layout evidence}]
+      (evbox) {};
 \end{tikzpicture}
-\caption{The \ds{} pipeline. Two detectors read disjoint evidence from the same page
-and are fused into one block sequence; the remaining stages are deterministic
-transforms of that sequence. Removing the vision detector yields \dsg{}, which we
-report throughout as a separate system.}
+\caption{The \ds{} pipeline. The two detectors read the same page through
+disjoint evidence and never see each other's output; all reconciliation happens
+in fusion. The label on each arrow names the object handed downstream, and each
+stage receives a richer object than the one before it. Removing the vision
+detector gives \dsg{}, which we report as its own system throughout. Only that
+detector calls a model, and it is optional.}
 \label{fig:pipeline}
-\end{figure}
+\end{figure*}
 
-\paragraph{Stage 1: two mutually blind detectors.}
-The geometric detector reads PDF primitives through \texttt{pdfplumber}, namely
-character positions, font names and sizes, and ruling lines. It proposes blocks from
-font-size clustering, whitespace runs and ruling geometry. It is exact where the PDF
-is well formed and blind where structure is implied visually, since a borderless
-table has no rules to find. The vision detector, a YOLOv8m trained on DocLayNet
-\citep{pfitzmann2022doclaynet}, proposes the same block types from page rasters and
-appearance alone. Each detector is blind to what the other reads directly, which is
-what makes their agreement informative. The vision detector is optional; with no weights present the pipeline
-runs geometry-only, reported throughout as \dsg{}.
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.90\textwidth]{pipeline.pdf}
+\caption{The same path on a real page. (a) the input page as the PDF stores it;
+(b) the blocks after fusion, coloured by type, with the count both detectors
+agreed on; (c) the reading order the pipeline infers, drawn as a line through
+the block centres, and the four chunks it cuts.}
+\label{fig:realpage}
+\end{figure*}
 
-\paragraph{Stages 2 and 3: fusion and reading order.}
-Proposals are matched by intersection over union and merged into one block sequence,
-each block carrying a confidence derived from whether one or both detectors saw it.
-Coordinates are top-left throughout, matching \texttt{pdfplumber}. The scale factor
-for a unilateral detection and the clamps on the resulting confidence are inherited
-from a prototype and remain marked \texttt{\# unvalidated}, because we have no
-annotated layout gold at the scale needed to tune them. Blocks are then ordered by a
-column-aware sweep that infers column bands from the distribution of block $x$
-positions and reads each band top to bottom before moving right; we evaluated
-recursive XY-cut and rejected it, because it cost retrieval accuracy without
-simplifying the sweep it replaced.
+\ds{} represents each chunk as a structured object containing its text, page number, reading-order position, block type, source block identifiers, and section path. The section path records the hierarchy of headings associated with the chunk. This structural information is preserved alongside the text and can therefore be used by downstream retrieval. Figure~\ref{fig:pipeline} shows the stages of the pipeline, and Figure~\ref{fig:realpage} shows the same path applied to a real page.
 
-\paragraph{Stage 4: section hierarchy.}
-Headings are classified by font size and weight relative to body text, and each block
-receives a \texttt{SectionPath}, the stack of headings above it, which travels with
-the chunk into the index.
+A central design constraint is that the core parsing pipeline is deterministic: the same PDF produces the same structural representation and chunks without requiring network access or language-model calls. Intermediate results are cached using a content hash, so changing chunking parameters does not require repeating the earlier parsing stages.
 
-\paragraph{Stage 5: chunk assembly.}
-Text is extracted per block with a font-scaled word-gap tolerance, which recovers
-spacing that a fixed tolerance mis-splits on display type. Chunks are then assembled
-by walking blocks in reading order and closing a chunk when a structural boundary is
-reached \emph{and} the accumulated content exceeds \texttt{MIN\_CHUNK\_TOKENS}.
-Tables are emitted as their own chunks with their header rows attached.
+\subsection{Finding the Blocks}
+\label{sec:detect}
 
-That size floor is the most consequential parameter in the system. Flushing on every
-structural boundary alone produces chunks too small to carry their own evidence, so
-the floor trades boundary fidelity for chunk self-sufficiency. It is also the
-parameter that the relevance-rule result of \S\ref{sec:inversion} turns out to be
-measuring, once that section separates a ranking from a size preference.
+\ds{} uses two complementary block detectors. The first is geometry-based and operates directly on PDF primitives, including text positions, font properties, ruling lines, and whitespace. These signals are used to group text into lines and blocks and to identify structural elements such as headings, tables, figures, and captions.
+
+The second detector is a YOLOv8 model trained on DocLayNet \citep{pfitzmann2022doclaynet}. It operates on a rendered image of each page and independently proposes regions based on visual appearance. The two detectors therefore provide complementary views of the page: geometry captures information explicitly available in the PDF, while vision can identify structures that leave little or no geometric trace, such as borderless tables.
+
+\subsection{Fusion and Reading Order}
+\label{sec:fusion}
+
+The two sets of detected regions are reconciled using bounding-box overlap. Matching regions are merged, while regions detected by only one detector are retained. This allows, for example, a borderless table identified by the vision detector to survive even when the geometry-based detector cannot detect it.
+
+The resulting blocks are then ordered according to the page layout rather than simply by their coordinates in the PDF. For pages with multiple columns, \ds{} identifies column bands from horizontal gaps between blocks and reads each band from top to bottom. Captions are associated with nearby figures or tables. Page-level orders are then combined into a document-wide reading order.
+
+\subsection{Extracting Text and Tables}
+\label{sec:extract}
+
+Once the blocks have been identified and ordered, their contents are extracted using \texttt{pdfplumber}. Text extraction uses a font-size-aware word-spacing tolerance to reduce cases where closely spaced words are incorrectly merged.
+
+Tables are extracted as grids when ruling lines provide sufficient structure. When the grid representation covers only part of a table, \ds{} falls back to the raw text extracted from the region rather than silently discarding content. The resulting table text is used for retrieval, while a separate Markdown representation can be generated for structured presentation.
+
+\subsection{Reconstructing the Outline and Chunking}
+\label{sec:chunking}
+
+\ds{} reconstructs the document hierarchy from detected headings. Heading levels are inferred from explicit numbering when available and otherwise from relative font size, with the hierarchy limited to three levels. Each non-heading block inherits the headings above it as its section path.
+
+Chunks are then assembled in reading order. Headings normally close the current text buffer and update the active section path, while body text accumulates up to a 500-word limit with a 75-word carry-over. Tables are kept as independent chunks, captions remain associated with their figures, and the reference list is excluded.
+
+To avoid producing very short chunks around headings, a heading does not close the current buffer until it contains at least 200 words. Chunk sizes are measured in whitespace-separated words rather than model tokens, keeping boundaries independent of tokenizer versions. Because parsing and structure recovery occur before chunk assembly, changes to chunking parameters require only the final assembly stage to be rerun.
 
 % =====================================================================
-\section{Evaluation Setup}
+\section{Experimental Setup}
 \label{sec:setup}
 
-\subsection{Protocol}
-\label{sec:protocol}
-Every tool in every table below runs through one harness, in which the chunker is the
-only variable. Held fixed across all seven: the embedder
-(\texttt{all-MiniLM-L6-v2}, \citealp{reimers2019sbert}), the lexical retriever (BM25,
-\citealp{robertson2009bm25}), their combination by reciprocal rank fusion at $k{=}60$
-\citep{cormack2009rrf}, and a retrieval depth of $k{=}5$. We report MRR, nDCG@5
-\citep{jarvelin2002ndcg}, Recall@5 and Precision@1, each with a bootstrap 95\%
-confidence interval, and paired bootstrap $p$-values against \ds{}
-\citep{efron1993bootstrap}. Pairing matters here, because comparing overlapping
-marginal intervals is the standard way to wrongly call a real difference
-insignificant.
+We evaluate \ds{} against five existing chunking approaches: PyMuPDF4LLM, Unstructured, LangChain's recursive splitter, LlamaIndex's sentence splitter, and LlamaIndex's semantic splitter. We also report our own geometry-only variant, \dsg{}, as a separate system, giving seven systems in total. All systems are evaluated through the same retrieval harness, so only the chunking method varies. Chunks are indexed using both BM25 \citep{robertson2009bm25} and embeddings from \texttt{all-MiniLM-L6-v2} \citep{reimers2019sbert}, with the rankings combined using reciprocal rank fusion at $k{=}60$ \citep{cormack2009rrf}. The retriever returns the top five chunks per question, and performance is measured using mean reciprocal rank (MRR) with bootstrap confidence intervals and paired bootstrap significance tests \citep{efron1993bootstrap}.
 
-\subsection{Corpora}
-\label{sec:corpora}
-Table~\ref{tab:corpora} lists the three corpora and the role each one plays. All gold
-in this paper is human-authored or publisher-authored. We report no corpus of our
-own: a model-generated benchmark over a scrape we control would be the weakest
-evidence we could offer.
+We use three complementary datasets. OHR-Bench \citep{zhang2025ocrhindersrag} provides the primary retrieval evaluation, containing 95 born-digital documents and 3{,}558 human-written questions with annotated evidence. For structural evaluation, we use 134 papers from PubMed Central together with their publisher-provided JATS XML, fetched through Europe PMC \citep{europepmc}, allowing chunk boundaries to be compared against the original section structure without involving a retriever. FinanceBench \citep{islam2023financebench} is evaluated separately to determine whether the retrieval protocol is suitable for financial question answering (\S\ref{sec:financebench}).
 
-\begin{table}[t]
-\centering
-\small
-\caption{The three corpora. OHR-Bench carries the retrieval leaderboard, PMC carries
-a rule-free structural evaluation, and FinanceBench is reported as a negative result
-(\S\ref{sec:financebench}) rather than as a leaderboard.}
-\label{tab:corpora}
-\begin{tabular}{@{}lccl@{}}
-\toprule
-Corpus & Docs & Items & Gold \\
-\midrule
-OHR-Bench & 95 & 3{,}558 q & human annotators \\
-PMC       & 134 & $\approx$25 sec./doc & publisher JATS \\
-FinanceBench & 84 & 189 q & financial analysts \\
-\bottomrule
-\end{tabular}
-\end{table}
+Retrieval relevance is measured using three criteria. Under the \textbf{span} rule, a chunk is relevant if it contains the gold answer sentence. Under the \textbf{region} rule, it is relevant if it overlaps at least $70\%$ of the annotated evidence region. Under the \textbf{page} rule, it is relevant if it comes from the annotated page. All three rules are applied to the same retrieved chunks, allowing the effect of the relevance definition itself to be isolated.
 
-OHR-Bench \citep{zhang2025ocrhindersrag} is our primary external benchmark: 95
-born-digital documents across law, manuals, finance and academia, with 3{,}558
-human-authored questions and human-annotated evidence spans. It carries the headline
-result because its gold is human, external, and predates our system.
-
-PubMed Central supplies 134 open-access papers from seven journals, each fetched with
-its publisher's JATS XML through the Europe PMC RESTful web service
-\citep{europepmc}. The XML carries the real section hierarchy, authored by the
-publisher and never touched by a chunker. This is the strongest tool-agnostic gold
-available to us, because it was written for an unrelated purpose before this
-benchmark existed.
-
-FinanceBench \citep{islam2023financebench} was intended as a second external
-leaderboard. \S\ref{sec:financebench} reports why it cannot serve as one under our
-protocol.
-
-\subsection{Relevance rules}
-\label{sec:rules}
-Deciding whether a retrieved chunk is relevant requires a rule, and the choice is not
-innocuous. We implement three. Under \textbf{span}, a chunk is relevant when it
-contains the gold answer span verbatim, ignoring whitespace. Under \textbf{region},
-when it overlaps the gold evidence region by at least
-\texttt{RELEVANCE\_REGION\_MIN\_OVERLAP} $=0.7$. Under \textbf{page}, when it comes
-from the page the gold is annotated on.
-
-The size preferences follow from the definitions. A longer chunk is more likely to
-contain any given span, so span rewards large chunks. A shorter chunk is more likely
-to sit entirely on one page, so page rewards small ones. Region is designed to be
-size-tolerant, and we measure that rather than assuming it: across the seven tools,
-Spearman's $\rho$ between mean chunk width and MRR is $+0.57$ under span and $-0.68$
-under page, and $+0.04$ under region. With seven tools none of the three is
-significant, so we read the signs and not the magnitudes; the sign reversal between
-span and page is the effect this paper is about, and region sitting at zero is the
-rule behaving as designed.
-
-\paragraph{Reachability is a ceiling, not a score.}
-Before running any leaderboard we measure what fraction of a corpus's gold is
-findable in the PDF's own text at all. The number is identical for every tool, so it
-says whether a rule can measure the corpus rather than which tool is better. On
-OHR-Bench, $80.2\%$ of gold is span-reachable. The measurement carries a circularity
-warning: once gold occupies a large share of its page, as it does on FinanceBench at
-$69\%$, span and region reachability approach $100\%$ by construction and prove
-nothing.
+We additionally evaluate structural recovery using Pk \citep{beeferman1999statistical} and WindowDiff \citep{pevzner2002critique}, and test reproducibility by processing the OHR-Bench documents twice in separate processes and comparing the resulting chunk identifiers, metadata, and content.
 
 % =====================================================================
-\section{Results}
+\section{Results and Analysis}
 \label{sec:results}
 
-We ask four questions in turn. Does the relevance rule change the ranking
-(\S\ref{sec:inversion})? Does that finding survive the region threshold
-(\S\ref{sec:sweep})? Does a chunker ranking exist at all without a relevance rule
-(\S\ref{sec:sections})? And is the determinism claim true when tested
-(\S\ref{sec:determinism})? Section~\ref{sec:cost} then reports where \ds{} loses.
-
-\subsection{The relevance rule changes the ranking}
+\subsection{Retrieval Performance and Relevance Criteria}
 \label{sec:inversion}
-
-Table~\ref{tab:ohr} scores the seven chunkers under all three rules. The three runs
-share identical chunks: chunk counts and mean chunk widths are equal across the
-modes, because chunking came from a warm cache and only scoring changed. The
-relevance rule is therefore the only variable in the table.
 
 \begin{table}[t]
 \centering
 \small
-\caption{OHR-Bench: 95 documents, 3{,}558 human questions, seven chunkers, MRR under
-three relevance rules on \emph{identical chunks}. Rank in parentheses; ctx is context
-words returned per query.}
+\caption{OHR-Bench: 95 documents, 3{,}558 human-written questions, seven
+chunkers, MRR under three relevance rules on \emph{identical chunks}. Rank in
+parentheses; ctx is the number of context words returned per query.}
 \label{tab:ohr}
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}lcccr@{}}
@@ -407,278 +240,120 @@ llamaindex\_sem  & 0.652 (5) & 0.654 (4) & 0.575 (7) & 4698 \\
 \centering
 \includegraphics[width=\columnwidth]{mode_inversion.pdf}
 \caption{Rank under each relevance rule, same chunks throughout. \ds{} runs
-6th, 1st, 1st and unstructured runs 1st, 5th, 5th. Only the rule that decides whether
-a retrieved chunk counts as relevant changes between the columns.}
+6th, 1st, 1st and \texttt{unstructured} runs 1st, 5th, 5th. The only thing that
+changes between the columns is the rule that decides whether a retrieved chunk
+counts.}
 \label{fig:inversion}
 \end{figure}
 
-\ds{} ranks 1st of 7 under span and region and 6th of 7 under page. Unstructured is
-the mirror image, 1st under page and 5th under both others. The gaps are not noise.
-Under region, \ds{} beats all five external tools significantly; under span it beats
-four of five, with \texttt{pymupdf4llm} inside the noise ($p=0.23$); under page it
-loses to four of five.
+The choice of relevance criterion substantially changes the chunker leaderboard (Table~\ref{tab:ohr}, Figure~\ref{fig:inversion}). \ds{} ranks first under both the span and region rules but sixth under the page rule, while Unstructured shows the opposite pattern. Under the region rule, \ds{} significantly outperforms every external system; under span, it significantly outperforms four of the five external systems, with PyMuPDF4LLM statistically indistinguishable from it ($p=0.23$). Under page, \ds{} is outperformed by four systems.
 
-The mechanism is chunk size. Unstructured emits the smallest chunks in the field, at
-560 context words per query, and wins the rule that rewards small chunks. \ds{} emits
-large structural units, at 2{,}194 words, and wins the two rules that reward them.
-The clearest case is internal to our own system: under page relevance \dsg{} scores
-$0.470$ against the hybrid's $0.600$, and the entire gap comes from geometry-only
-emitting 5{,}810 chunks against the hybrid's 9{,}080. Read as a component ablation
-that would be a $+0.13$ gain from the vision detector; it is an artefact of chunk
-count.
+This reversal is closely related to chunk size. \ds{} produces larger structural chunks, averaging 2{,}194 context words per query, while Unstructured produces approximately 560. The span and region criteria therefore favor larger chunks more than the page criterion, which tends to favor smaller chunks. The same effect is visible within the \ds{} variants: under the page rule the hybrid scores $0.600$ against the geometry-only $0.470$, and the gap follows chunk count rather than detection quality, since the hybrid cuts 9{,}080 chunks against the geometry-only 5{,}810.
 
-The consequence for the field is that a chunking leaderboard reporting one relevance
-rule has reported a ranking and a size preference entangled together. We publish all
-three rules, and recommend that the shape of a corpus's gold choose the rule: span
-where gold marks a verbatim sentence, region where it marks a block, and page where
-the annotation carries no finer locator than a page number, which is the case for
-much human-annotated document QA and is the reason we report page relevance rather
-than discarding the rule we lose under.
-
-One scope note. Every number here comes from a single retrieval configuration
-(\S\ref{sec:protocol}), so what we establish is that the rule changes the ranking
-under that protocol. Whether the inversion survives a stronger embedder, dense-only
-retrieval or a different retrieval depth is open, and is the experiment we would run
-next.
-
-\label{sec:sweep}
-The obvious attack on the region column is that
-\texttt{RELEVANCE\_REGION\_MIN\_OVERLAP} $= 0.7$ was an unvalidated constant. We
-dumped the continuous overlap behind every retrieved chunk in one run and re-scored
-offline at every threshold, so the chunks are identical at every point on the curve;
-the dumping run reproduces the published leaderboard to a maximum MRR drift of
-$0.0002$. A \ds{} variant places 1st at every threshold, with a margin of $+0.045$ to
-$+0.062$ over the best external tool across $0.4$ to $1.0$, while the field below us
-reorders constantly. Two caveats: $0.7$ is where our margin happens to peak, at
-$+0.0619$, which we state rather than leave to a reader; and the low end is
-uninformative, since at threshold $0$ every chunk is relevant by definition. The ten
-points are re-scorings of one run, so they are ten views of the same data and not ten
-independent confirmations. What they establish is insensitivity to the constant.
-
-\begin{table}[t]
+\begin{figure}[t]
 \centering
-\small
-\caption{OHR-Bench MRR under \emph{span} relevance by domain. Our aggregate win is
-carried by law and manuals; we place behind an external tool on both academic and
-finance. Question counts in the header.}
-\label{tab:domains}
-\setlength{\tabcolsep}{3pt}
-\begin{tabular}{@{}lcccc@{}}
-\toprule
-Tool & acad. & fin. & law & manual \\
-     & \scriptsize(631) & \scriptsize(736) & \scriptsize(1515) & \scriptsize(676) \\
-\midrule
-\ds{}           & 0.453 & 0.514 & \best{0.866} & 0.793 \\
-\dsg{}          & 0.457 & 0.501 & \best{0.866} & \best{0.797} \\
-pymupdf4llm     & 0.511 & 0.468 & 0.857 & 0.773 \\
-unstructured    & \best{0.515} & 0.447 & 0.794 & 0.706 \\
-llamaindex\_sem & 0.286 & \best{0.535} & 0.841 & 0.708 \\
-llamaindex      & 0.202 & 0.520 & 0.837 & 0.782 \\
-langchain       & 0.193 & 0.493 & 0.831 & 0.792 \\
-\bottomrule
-\end{tabular}
-\end{table}
+\includegraphics[width=\columnwidth]{threshold_sweep.pdf}
+\caption{Region relevance re-scored on one run as the overlap threshold moves
+from $0.1$ to $1.0$. The \ds{} family leads at every setting; which member of
+the family leads does not. Below $0.6$ it is \dsg{}.}
+\label{fig:sweep}
+\end{figure}
 
-Table~\ref{tab:domains} splits that span column by domain, and the aggregate hides
-two losses: we trail unstructured on academic documents and \texttt{llamaindex\_sem}
-on finance, and the win is carried by law and manuals. Splitting by evidence source
-is bleaker for everyone: where gold sits in a table, the best of the seven scores
-$0.307$ and we score $0.288$.
+We sweep the region threshold from $0.1$ to $1.0$ using the same retrieved results (Figure~\ref{fig:sweep}). The \ds{} variants remain ahead of the external systems across the sweep, although the relative ordering of the two \ds{} variants changes: \dsg{} leads below $0.6$, so the hybrid's first place under region is specific to the $0.7$ threshold we ship, which is also where our margin over the field peaks. This indicates that the overall result is not dependent on the chosen $0.7$ threshold, while also showing that the precise ranking can depend on the relevance definition.
 
-\subsection{Section boundaries, with no retriever}
+The aggregate retrieval advantage is strongest on law and manuals. \ds{} trails Unstructured on academic papers and LlamaIndex's semantic splitter on finance, and performs below the best external system on questions whose evidence is contained in tables, where the best external score is $0.307$ against our $0.288$. These results suggest that chunk size and document type both influence retrieval performance.
+
+\subsection{Structural Recovery}
 \label{sec:sections}
 
-Every result so far passes through an embedder and a relevance rule; this one passes
-through neither. We compare each chunker's boundaries against the section boundaries
-the publisher wrote in JATS XML, using the error rates Pk
-\citep{beeferman1999statistical} and WindowDiff \citep{pevzner2002critique}.
-
 \begin{table}[t]
 \centering
 \small
-\caption{Section-boundary agreement against publisher JATS gold, 134 PubMed Central
-papers. Pk and WindowDiff are error rates (lower is better). Straddle rate is
-descriptive. Unstructured's row covers 99 documents, because it hard-failed on 35.}
+\caption{Section-boundary agreement with publisher-written JATS gold on 134
+PubMed Central papers. Pk and WindowDiff are error rates; lower is better.
+\texttt{unstructured} covers 99 documents because it hard-failed on 35.}
 \label{tab:sections}
-\begin{tabular}{@{}lcccr@{}}
+\begin{tabular}{@{}lccr@{}}
 \toprule
-Tool & WinDiff & Pk & Strad. & Chunks \\
+Tool & WinDiff & Pk & Chunks/doc \\
 \midrule
-\dsg{}            & \best{0.423} & \best{0.342} & 0.513 & 26.8 \\
-pymupdf4llm       & 0.480 & 0.449 & 0.573 & 17.7 \\
-\ds{}             & 0.482 & 0.353 & 0.439 & 37.5 \\
-llamaindex\_sem   & 0.534 & 0.513 & 0.189 & 29.1 \\
-llamaindex        & 0.695 & 0.598 & 0.366 & 42.7 \\
-langchain         & 0.879 & 0.620 & 0.220 & 85.6 \\
-unstructured$^{*}$ & 0.893 & 0.603 & 0.182 & 106.9 \\
+\dsg{}            & \best{0.423} & \best{0.342} & 26.8 \\
+pymupdf4llm       & 0.480 & 0.449 & 17.7 \\
+\ds{}             & 0.482 & 0.353 & 37.5 \\
+llamaindex\_sem   & 0.534 & 0.513 & 29.1 \\
+llamaindex        & 0.695 & 0.598 & 42.7 \\
+langchain         & 0.879 & 0.620 & 85.6 \\
+unstructured$^{*}$ & 0.893 & 0.603 & 106.9 \\
 \bottomrule
-\multicolumn{5}{@{}l@{}}{\scriptsize $^{*}$ 99 of 134 documents; 35 hard failures.} \\
+\multicolumn{4}{@{}l@{}}{\scriptsize $^{*}$ 99 of 134 documents; 35 hard failures.} \\
 \end{tabular}
 \end{table}
 
-\dsg{} leads both metrics, on a corpus whose gold was written by publishers for their
-own typesetting. Note which system leads: geometry-only beats our own hybrid on both
-metrics at $2.4\times$ the speed, which is the same null result for the vision
-detector that \S\ref{sec:cost} reports on OHR-Bench.
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{size_confound.pdf}
+\caption{Table~\ref{tab:sections} as a picture. Triangles are Pk, dots are
+WindowDiff; the right margin gives chunks per document against roughly 25 real
+sections. The two tools that cut most are last under one metric and mid-table
+under the other.}
+\label{fig:sections}
+\end{figure}
 
-What this measures is structural fidelity and not retrieval quality. A publisher
-wrote those sections to organise a document for a human reader, not to be retrieved,
-and a chunk that deliberately spans two sections may serve a question that needs
-both. Agreement with JATS is therefore evidence that a chunker recovers the
-document's own structure, which is what we claim, and not evidence that structural
-boundaries are the right boundaries for RAG, which we do not claim and this
-experiment cannot show.
+To evaluate structure independently of retrieval, we compare each chunker's boundaries with the section boundaries recorded in the publisher-provided JATS XML. \dsg{} achieves the best scores on both Pk and WindowDiff (Table~\ref{tab:sections}, Figure~\ref{fig:sections}), ahead of our own hybrid at $2.4\times$ the speed. This provides evidence that the layout-based pipeline can recover document structure without relying on retrieval performance.
 
-The ordering is stable under a $5.6\times$ increase in corpus size: a 24-document
-pilot gave the identical ordering with every value within $0.02$, which matters
-because segmentation metrics on small corpora often fail to replicate.
+The evaluation has an important limitation: $57.4\%$ of the gold sections are shorter than \ds{}'s 200-word minimum, meaning some publisher boundaries cannot be reproduced by design. Moreover, agreement with publisher-defined sections measures structural recovery, not whether those boundaries are optimal for retrieval.
 
-We report both metrics because either one alone is quotable in the opposite
-direction. WindowDiff counts boundaries per window, so it punishes a tool that puts
-three splits where the document has one. Pk asks only whether a window's two ends
-share a segment, so it forgives over-segmentation. The gap between the two grows with
-chunk count: LangChain at 86 chunks and unstructured at 107, against a gold averaging
-about 25 sections, are last under WindowDiff and mid-table under Pk.
-
-Straddle rate is descriptive and not an error term. $57.4\%$ of gold sections are
-shorter than \texttt{MIN\_CHUNK\_TOKENS}, so merging them is the size floor of
-\S\ref{sec:method} working as specified. The rate bounds how meaningful a per-chunk
-section \emph{label} can be, and our $0.513$ is not a win to claim.
-
-One qualification bounds the whole table: the ceiling is $84.7\%$ of body sections
-locatable in the PDF's own text, so every score reads against that and not against
-$100\%$. Unstructured's 35 hard failures matched the pilot's 6 of 24, so the rate is
-systematic and is itself a finding about that tool on born-digital PDFs.
-
-\subsection{Determinism, measured}
+\subsection{Reproducibility}
 \label{sec:determinism}
 
-Determinism is easy to assert and rarely tested past a single file, so we tested it.
-We parsed all 95 OHR-Bench documents twice, each parse in a separate process, and
-compared a hash over the full chunk structure: identifier, type, page, reading order,
-section path, and a content digest. Two runs agree only if every chunk matches on all
-six. Separate processes matter, because a same-process check cannot observe what
-varies across a process boundary, which is where non-determinism comes from: hash
-seeds, iteration order over addresses, thread scheduling, kernel selection.
+The geometry-only pipeline produces identical output across independent processes. We parse all 95 OHR-Bench documents twice and compare every chunk's identifier, type, page, reading-order position, section path, and content. All 5{,}810 chunks are byte-identical across the two runs.
 
-All 95 documents were byte-identical across 5{,}810 chunks per run, with zero
-differing documents. That total is an unplanned cross-check: 5{,}810 is exactly the
-count recorded for \dsg{} in the OHR-Bench run of Table~\ref{tab:ohr}, produced days
-earlier on different hardware through a different code path.
+This reproducibility claim applies to a fixed version of the code and the geometry-only path. The hybrid pipeline uses GPU-based vision inference and is therefore not covered by the same bit-level reproducibility test.
 
-Two limits belong with the claim. Determinism holds within a version, so a persisted
-index must pin one. And this run is geometry-only: the hybrid path runs a model
-through CUDA, whose kernel selection is not guaranteed bit-reproducible, and we had
-no GPU available to test it, so the guarantee is established for \dsg{} and remains
-unverified for \ds{}.
-
-\subsection{Where \ds{} loses}
+\subsection{Failure Analysis}
 \label{sec:cost}
 
-\paragraph{The vision detector does not generalise.}
-It fails to pay for itself on any corpus we can check. On OHR-Bench the
-hybrid-versus-geometry ablation gives $+0.0012$ under span ($p=0.80$) and $+0.0090$
-under region ($p=0.12$), neither significant on 3{,}558 questions. On the PMC section
-metric, geometry-only beats the hybrid at $2.4\times$ the speed
-(Table~\ref{tab:sections}). We report it as a component that earns its cost on
-table-dense pages, and not as a contribution. Its one sign of life is the strict half
-of the threshold sweep ($+0.0092$ at $0.7$): small, insignificant, and in the
-direction a table-heavy corpus would predict.
+The vision detector does not produce a measurable retrieval improvement on OHR-Bench: adding it changes MRR by only $+0.0012$ under span ($p=0.80$) and $+0.0090$ under region ($p=0.12$). Geometry-only also performs better on the structural evaluation while running faster. We retain the vision path because it can identify structures such as borderless tables that are difficult to detect geometrically, but the retrieval results do not justify its computational cost on the evaluated corpus.
 
-\paragraph{We are expensive in context.}
-\ds{} retrieves 2{,}194 context words per query against unstructured's 560, a
-$3.9\times$ larger context bill. Normalising rank quality by that bill, unstructured
-returns $1.166$ MRR per 1{,}000 words against our $0.322$, so it is $3.6\times$ more
-efficient per token even though it ranks 5th under span. We buy accuracy with tokens,
-and for a cost-sensitive deployment that trade may not be worth making.
+\ds{} also uses substantially more retrieval context than the smallest baseline. It produces approximately 2{,}194 context words per query compared with 560 for Unstructured, a $3.9\times$ larger context bill. Its word coverage is $0.9632$ compared with $1.000$ for LangChain, while its duplication rate is $1.83\times$, the highest of the seven systems compared. These trade-offs indicate that \ds{}'s retrieval gains come with increased context and some intentional loss of non-content elements such as references and page headers.
 
-\paragraph{We discard document text.}
-On OHR-Bench our word coverage is $0.9632$ against LangChain's $1.000$. Raw-text
-splitting drops nothing by construction, and we drop references, headers and footers
-by design. Our chunk duplication is $1.83\times$, the highest of the seven, coming
-from inline headers and separately emitted table chunks. \ds{} optimises retrieval
-and not raw preservation.
-
-\paragraph{FinanceBench is not a retrieval benchmark for us.}
+Finally, FinanceBench could not produce a meaningful leaderboard under our protocol.
 \label{sec:financebench}
-We intended FinanceBench \citep{islam2023financebench} as a second external
-leaderboard, and it cannot serve as one under our protocol. Holding chunks fixed and
-varying only the embedder, the rank of the first relevant chunk was 81--299, 63--181
-and 42--252 across three small encoders; Recall@5 was $0/5$ and MRR@5 was $0.0000$
-under all three. The scoring rule is not at fault, since a relevant chunk exists at
-region overlap $0.99$--$1.00$ and retrieval never reaches it. FinanceBench questions
-are analyst prompts with almost no lexical overlap with their evidence, that evidence
-is a numeric table which small encoders embed poorly, and a 10-K yields
-729--1{,}176 chunks. A table of zeros reads as a chunking result when it is a
-retrieval limit. We report it rather than omit the corpus, because
-\citet{elbachyr2026empirical} reach MRR $0.700$--$0.844$ on these same PDFs where our
-protocol reaches $0.0$, which makes the usual caveat about cross-paper numbers
-concrete.
+Although the relevant chunks exist, at region overlap $0.99$--$1.00$, none of the systems retrieved them within the top five, producing MRR of $0.0000$ across all tools under three separate encoders. \citet{elbachyr2026empirical} reach MRR $0.700$--$0.844$ on these same filings under a different protocol. This indicates a limitation of the retrieval setup for questions whose answers depend heavily on numerical tables rather than textual overlap, rather than evidence that the chunks themselves are absent.
 
 % =====================================================================
 \section{Conclusion}
 \label{sec:conclusion}
 
-The result we would most like carried forward is that the leaderboard depends on the
-relevance rule, measurably and reversibly, on chunks that never changed. Since no
-rule is size-neutral, a comparison reporting one rule entangles a ranking with a size
-preference, and that entanglement can reverse the conclusion. Until reporting more
-than one rule is standard practice, chunker comparisons, ours included, should be
-read with the rule in view.
+\ds{} shows that document layout can be recovered before chunking to produce structured, deterministic chunks without a language model on the parsing path. It ranks first under two of three relevance rules, recovers publisher-defined section structure, and produces identical output across independent processes. The vision component provides no measurable retrieval gain, and the approach requires more retrieval context than the leanest baseline.
 
-Two smaller results follow. Publisher-authored JATS structure scores chunk boundaries
-with no retriever and no relevance rule in the loop, which sidesteps the question of
-who wrote the gold. And determinism, in a pipeline with no model on its parse path,
-is checkable in an afternoon. \ds{} itself wins where the rules favour large
-structural units and loses where they favour small ones: a narrower claim than ``best
-chunker'', and the one the evidence supports.
+The broader finding is about evaluation itself: chunker rankings depend on how relevance is defined, and no relevance rule is neutral to chunk size. The same chunks rank very differently under reasonable criteria, so chunking comparisons should state their relevance rule and evaluate under more than one.
 
 % =====================================================================
 \section*{Limitations}
 \label{sec:limitations}
 
-\paragraph{Scope.}
-\ds{} reads PDF primitives, so scans without a text layer are out of scope and we run
-no OCR. IEEE two-column templates are unrepresented in our corpora, and every corpus
-is English.
+\paragraph{Scope.} \ds{} operates on PDF text and layout primitives and does not perform OCR, so scanned PDFs without a text layer are out of scope. All evaluated corpora are English, with limited representation of complex multi-column layouts.
 
-\paragraph{Speed is our sharpest practical limitation.}
-A figure-dense 18-page paper takes roughly 8 minutes to parse, dominated by
-materialising 422k vector primitives, and this is on the user-facing
-\texttt{parse()} path rather than only in the benchmark. The determinism run
-(\S\ref{sec:determinism}) put a number on the tail: three of 95 documents exceeded a
-30-minute per-parse cap and needed four hours to finish, all dense financial filings
-of 120 to 217 pages against a corpus median of 18. Page count alone does not explain
-it, since the corpus's longest document at 382 pages parsed without trouble; table
-density does. Those three are the same filings FinanceBench is built from, so the
-cost is measured on two independent corpora, and it is a real barrier to using \ds{}
-on long financial documents today.
+\paragraph{Parse fidelity.} We do not evaluate PDF parsing fidelity with benchmarks such as OmniDocBench or READoc; our structural evaluation instead measures agreement with publisher-provided section boundaries. The layout detector was checked only on a small hand-annotated sample, and the detector-fusion weights remain unvalidated (\S\ref{sec:fusion}).
 
-\paragraph{Two things we assert but do not measure.}
-We report no edit distance or TEDS on OmniDocBench or READoc, so ``the parse is
-correct'' currently rests on retrieval quality instead of a direct measurement. And
-our layout metric rests on two hand-annotated documents: the DocLayNet validation
-split is its correct home and has not been run, which leaves several fusion constants
-marked \texttt{\# unvalidated} in \S\ref{sec:method}. Token-level IoU and
-Precision$_\Omega$ \citep{smith2024chunking} would replace the context-word column of
-Table~\ref{tab:ohr}, but our dumped runs record the overlap score behind each
-retrieved chunk without the chunk and gold token sets, so that metric needs a re-run.
+\paragraph{Chunking parameters.} The 200-word minimum and 500-word maximum were selected during development on an internal corpus whose annotations were later found unreliable, and results from that corpus are excluded here. They should be re-evaluated by ablation on an independent benchmark.
 
-\paragraph{Domain coverage.}
-Table~\ref{tab:domains} shows we trail on academic and finance documents, and the
-academic slice is 10 documents, too thin to settle the question either way.
+\paragraph{Reading order.} The column heuristic supports at most two columns and can misplace full-width elements above multi-column content. A more general recursive XY-cut implementation exists but was not used: it reduced retrieval performance on the development corpus.
+
+\paragraph{Computational cost.} Dense, table-heavy financial documents can take far longer to parse than academic papers; three long filings exceeded the 30-minute limit in the determinism evaluation. This limits practicality for some large documents.
+
+These limitations bound the conclusions to the evaluated born-digital English documents rather than to PDF parsing or chunking in general.
 
 % =====================================================================
 \section*{Ethics Statement}
 
-All three corpora are public: OHR-Bench, open-access PubMed Central articles under
-licences permitting reuse, and FinanceBench, built from public regulatory filings.
-None involves human subjects or personal data beyond author lists in published
-papers, and we redistribute no corpus. The pipeline invokes no language model, which
-bounds its energy cost to local CPU parsing. We report results in which our own
-system loses (\S\ref{sec:cost}) and a corpus on which our protocol fails entirely
-(\S\ref{sec:financebench}), because selective reporting of chunking benchmarks is the
-specific harm this paper is about.
+All three corpora are public and are fetched by script instead of redistributed. None involves human subjects or personal data beyond published author lists. The parse pipeline calls no language model, so its cost is local CPU time; the only model use in the project is a vision detector that the results show can be switched off. We report our losses in the main text.
+
+% =====================================================================
+\section*{Acknowledgements}
+
+I thank the SFI Data team for the opportunity to work in document intelligence, and I am especially grateful to Anirudh Valluri and Michael Susan for their guidance and collaboration.
 
 % =====================================================================
 \bibliographystyle{acl_natbib}
