@@ -38,8 +38,101 @@ def merge_shards(mode):
         "n_questions": n,
         "n_chunks": sum(r["metrics"]["n_chunks"] for r in runs),
         "context_words": words / n,
+        "mean_chunk_words": sum(r["metrics"]["mean_chunk_words"] * r["metrics"]["n_chunks"] for r in runs)
+        / sum(r["metrics"]["n_chunks"] for r in runs),
         "errors": sum(r["metrics"]["errors"] for r in runs),
     }
+
+
+def budget_run(tool, mode):
+    r = load(f"reports/budget/ohr_{tool}_k5_{mode}.json")["results"]
+    r = r[0] if isinstance(r, list) else next(iter(r.values()))
+    return {"metrics": r, "per_question": r["per_question"]}
+
+
+def system_runs(name):
+    if name == "docstruct_geo":
+        return {m: load(REVIEW / f"floor_ohr/floor_min200_max500_{m}.json") for m in MODES}
+    if name == "docling":
+        merged = {m: merge_shards(m) for m in MODES}
+        return {m: {"metrics": merged[m], "per_question": merged[m]["per_question"]} for m in MODES}
+    if name == "lumberchunker":
+        return {m: load(REVIEW / f"lumberchunker/lumberchunker_{m}.json") for m in MODES}
+    if name in ("unstructured", "langchain", "llamaindex"):
+        runs = {m: budget_run(name, m) for m in ("span", "region")}
+        runs["page"] = load(REVIEW / f"table1/t1_{name}_page.json")
+        return runs
+    return {m: load(REVIEW / f"table1/t1_{name}_{m}.json") for m in MODES}
+
+
+def p_two_sided(a, b, rng):
+    d = [a[q] - b[q] for q in a if q in b]
+    means = [sum(rng.choices(d, k=len(d))) / len(d) for _ in range(RESAMPLES)]
+    tail = min(sum(x <= 0 for x in means), sum(x >= 0 for x in means))
+    return sum(d) / len(d), min(1.0, 2 * tail / RESAMPLES)
+
+
+def table1(rng):
+    from scipy.stats import spearmanr
+
+    names = ["docstruct_geo", "pymupdf4llm", "unstructured", "langchain", "llamaindex",
+             "llamaindex_semantic", "docling"]
+    if (REVIEW / "lumberchunker/lumberchunker_span.json").exists():
+        names.append("lumberchunker")
+    runs = {n: system_runs(n) for n in names}
+    rows = {}
+    for n in names:
+        span = runs[n]["span"]["metrics"]
+        rows[n] = {"mrr": {m: runs[n][m]["metrics"]["mrr"] for m in MODES},
+                   "context_words": span["context_words"], "mean_chunk_words": span["mean_chunk_words"],
+                   "n_chunks": span["n_chunks"]}
+    for m in MODES:
+        for i, n in enumerate(sorted(names, key=lambda n: -rows[n]["mrr"][m]), 1):
+            rows[n].setdefault("rank", {})[m] = i
+        ours = rr(runs["docstruct_geo"][m])
+        for n in names[1:]:
+            diff, p = p_two_sided(ours, rr(runs[n][m]), rng)
+            rows[n].setdefault("geo_minus", {})[m] = {"diff": round(diff, 4), "p": round(p, 4)}
+    widths = [rows[n]["mean_chunk_words"] for n in names]
+    corr = {}
+    for m in MODES:
+        rho, p = spearmanr(widths, [rows[n]["mrr"][m] for n in names])
+        corr[m] = {"rho": round(float(rho), 3), "p": round(float(p), 3), "n": len(names)}
+    (REVIEW / "table1.json").write_text(json.dumps({"rows": rows, "spearman_width_mrr": corr}, indent=2),
+                                        encoding="utf-8")
+    out = ["", "## Table 1 on one install (current code)", "",
+           "| system | span | region | page | ctx | geo minus (span / region / page) |",
+           "|---|---|---|---|---|---|"]
+    for n in names:
+        r = rows[n]
+        cells = " | ".join(f"{r['mrr'][m]:.4f} ({r['rank'][m]})" for m in MODES)
+        sig = "" if n == "docstruct_geo" else ", ".join(
+            f"{r['geo_minus'][m]['diff']:+.4f} p={r['geo_minus'][m]['p']}" for m in MODES)
+        out.append(f"| {n} | {cells} | {r['context_words']:.0f} | {sig} |")
+    out += ["", "Spearman(mean chunk words, MRR): " + ", ".join(
+        f"{m} rho={c['rho']} p={c['p']} (n={c['n']})" for m, c in corr.items())]
+
+    gold = {(q["source_doc"], q["question"]): q for q in load("data/qa/ohrbench.json")}
+    out += ["", "## Span MRR by domain and evidence type", "",
+            "| system | academic | finance | law | manual | text | table | coverage | duplication |",
+            "|---|---|---|---|---|---|---|---|---|"]
+    for n in names:
+        acc = {}
+        for q in runs[n]["span"]["per_question"]:
+            g = gold.get((q["doc"], q["question"]))
+            if g:
+                acc.setdefault(g["domain"], []).append(q["hyb_rr"])
+                acc.setdefault(g["evidence_source"], []).append(q["hyb_rr"])
+        per_doc = runs[n]["span"].get("per_doc") or runs[n]["span"]["metrics"].get("per_doc") or []
+        if n == "docling":
+            per_doc = [d for p in sorted(glob.glob(str(REVIEW / "docling/docling_s*_span.json")))
+                       for d in load(p)["per_doc"]]
+        cov = sum(d["coverage"] for d in per_doc) / len(per_doc)
+        dup = sum(d["duplication"] for d in per_doc) / len(per_doc)
+        cells = " | ".join(f"{sum(acc[k]) / len(acc[k]):.4f}" for k in
+                           ("academic", "finance", "law", "manual", "text", "table"))
+        out.append(f"| {n} | {cells} | {cov:.4f} | {dup:.4f} |")
+    return out
 
 
 def main():
@@ -88,6 +181,7 @@ def main():
         out.append(f"| {tool} | {setting} | {r['span']['metrics']['context_words']:.0f} | "
                    f"{r['span']['metrics']['mrr']:.4f} | {r['region']['metrics']['mrr']:.4f} | {diffs[0]} | {diffs[1]} |")
 
+    out += table1(rng)
     (REVIEW / "summary.md").write_text("\n".join(out) + "\n", encoding="utf-8")
     print("\n".join(out))
 

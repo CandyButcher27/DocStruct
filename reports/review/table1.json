@@ -1,0 +1,239 @@
+{
+  "rows": {
+    "docstruct_geo": {
+      "mrr": {
+        "span": 0.7048,
+        "region": 0.6566,
+        "page": 0.7235
+      },
+      "context_words": 2328.4,
+      "mean_chunk_words": 306.0,
+      "n_chunks": 5810,
+      "rank": {
+        "span": 2,
+        "region": 2,
+        "page": 6
+      }
+    },
+    "pymupdf4llm": {
+      "mrr": {
+        "span": 0.6988,
+        "region": 0.6036,
+        "page": 0.6715
+      },
+      "context_words": 2432.3,
+      "mean_chunk_words": 425.1,
+      "n_chunks": 3756,
+      "rank": {
+        "span": 3,
+        "region": 4,
+        "page": 7
+      },
+      "geo_minus": {
+        "span": {
+          "diff": 0.0057,
+          "p": 0.327
+        },
+        "region": {
+          "diff": 0.0529,
+          "p": 0.0
+        },
+        "page": {
+          "diff": 0.0511,
+          "p": 0.0
+        }
+      }
+    },
+    "unstructured": {
+      "mrr": {
+        "span": 0.6567,
+        "region": 0.6032,
+        "page": 0.7957
+      },
+      "context_words": 555.8,
+      "mean_chunk_words": 86.8,
+      "n_chunks": 19036,
+      "rank": {
+        "span": 5,
+        "region": 5,
+        "page": 2
+      },
+      "geo_minus": {
+        "span": {
+          "diff": 0.0478,
+          "p": 0.0
+        },
+        "region": {
+          "diff": 0.0523,
+          "p": 0.0
+        },
+        "page": {
+          "diff": -0.074,
+          "p": 0.0
+        }
+      }
+    },
+    "langchain": {
+      "mrr": {
+        "span": 0.6407,
+        "region": 0.6029,
+        "page": 0.756
+      },
+      "context_words": 637.6,
+      "mean_chunk_words": 128.5,
+      "n_chunks": 13877,
+      "rank": {
+        "span": 8,
+        "region": 6,
+        "page": 4
+      },
+      "geo_minus": {
+        "span": {
+          "diff": 0.0641,
+          "p": 0.0
+        },
+        "region": {
+          "diff": 0.0537,
+          "p": 0.0
+        },
+        "page": {
+          "diff": -0.0337,
+          "p": 0.0
+        }
+      }
+    },
+    "llamaindex": {
+      "mrr": {
+        "span": 0.6483,
+        "region": 0.5887,
+        "page": 0.7294
+      },
+      "context_words": 1430.1,
+      "mean_chunk_words": 295.2,
+      "n_chunks": 5794,
+      "rank": {
+        "span": 7,
+        "region": 7,
+        "page": 5
+      },
+      "geo_minus": {
+        "span": {
+          "diff": 0.0567,
+          "p": 0.0
+        },
+        "region": {
+          "diff": 0.068,
+          "p": 0.0
+        },
+        "page": {
+          "diff": -0.0064,
+          "p": 0.34
+        }
+      }
+    },
+    "llamaindex_semantic": {
+      "mrr": {
+        "span": 0.654,
+        "region": 0.5749,
+        "page": 0.6515
+      },
+      "context_words": 4697.7,
+      "mean_chunk_words": 482.0,
+      "n_chunks": 3366,
+      "rank": {
+        "span": 6,
+        "region": 8,
+        "page": 8
+      },
+      "geo_minus": {
+        "span": {
+          "diff": 0.0505,
+          "p": 0.0
+        },
+        "region": {
+          "diff": 0.0816,
+          "p": 0.0
+        },
+        "page": {
+          "diff": 0.0722,
+          "p": 0.0
+        }
+      }
+    },
+    "docling": {
+      "mrr": {
+        "span": 0.665841174817313,
+        "region": 0.6291397414277682,
+        "page": 0.7968739460370965
+      },
+      "context_words": 631.1620854412591,
+      "mean_chunk_words": 116.06295834731343,
+      "n_chunks": 20863,
+      "rank": {
+        "span": 4,
+        "region": 3,
+        "page": 1
+      },
+      "geo_minus": {
+        "span": {
+          "diff": 0.0388,
+          "p": 0.0
+        },
+        "region": {
+          "diff": 0.0272,
+          "p": 0.0
+        },
+        "page": {
+          "diff": -0.0749,
+          "p": 0.0
+        }
+      }
+    },
+    "lumberchunker": {
+      "mrr": {
+        "span": 0.7098,
+        "region": 0.6992,
+        "page": 0.7852
+      },
+      "context_words": 1057.3,
+      "mean_chunk_words": 168.1,
+      "n_chunks": 10019,
+      "rank": {
+        "span": 1,
+        "region": 1,
+        "page": 3
+      },
+      "geo_minus": {
+        "span": {
+          "diff": -0.005,
+          "p": 0.379
+        },
+        "region": {
+          "diff": -0.0427,
+          "p": 0.0
+        },
+        "page": {
+          "diff": -0.0628,
+          "p": 0.0
+        }
+      }
+    }
+  },
+  "spearman_width_mrr": {
+    "span": {
+      "rho": 0.119,
+      "p": 0.779,
+      "n": 8
+    },
+    "region": {
+      "rho": -0.238,
+      "p": 0.57,
+      "n": 8
+    },
+    "page": {
+      "rho": -0.952,
+      "p": 0.0,
+      "n": 8
+    }
+  }
+}
