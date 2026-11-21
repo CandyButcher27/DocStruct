@@ -1,0 +1,77 @@
+{
+  "n_docs": 15,
+  "gold": "shard_gold.json",
+  "results": {
+    "lumberchunker": {
+      "pk": 0.4849,
+      "windowdiff": 0.6514,
+      "straddle_rate": 0.3109,
+      "mean_chunks": 64.0,
+      "n_docs": 10,
+      "errors": 5,
+      "seconds": 1793.1,
+      "per_doc": {
+        "bmc__PMC12750718.pdf": {
+          "pk": 0.4467153284671533,
+          "windowdiff": 0.5692889970262233,
+          "straddle": 0.39215686274509803,
+          "n_chunks": 51
+        },
+        "bmc__PMC12849458.pdf": {
+          "pk": 0.41066789817006294,
+          "windowdiff": 0.532490523196521,
+          "straddle": 0.4166666666666667,
+          "n_chunks": 48
+        },
+        "elife__PMC12726829.pdf": {
+          "pk": 0.5484051122328428,
+          "windowdiff": 0.7348082912683922,
+          "straddle": 0.2604166666666667,
+          "n_chunks": 99
+        },
+        "elife__PMC12747522.pdf": {
+          "pk": 0.48343124071059523,
+          "windowdiff": 0.621544341425437,
+          "straddle": 0.3055555555555556,
+          "n_chunks": 79
+        },
+        "elife__PMC12755883.pdf": {
+          "pk": 0.4980818213263734,
+          "windowdiff": 0.6344611804660231,
+          "straddle": 0.28169014084507044,
+          "n_chunks": 76
+        },
+        "frontiers__PMC12757289.pdf": {
+          "pk": 0.5797043547742708,
+          "windowdiff": 0.8075262066472614,
+          "straddle": 0.21568627450980393,
+          "n_chunks": 56
+        },
+        "frontiers__PMC12791166.pdf": {
+          "pk": 0.3596534388704674,
+          "windowdiff": 0.4857203979035191,
+          "straddle": 0.42857142857142855,
+          "n_chunks": 51
+        },
+        "natcomm__PMC12830622.pdf": {
+          "pk": 0.509125667291877,
+          "windowdiff": 0.7036683018323474,
+          "straddle": 0.2222222222222222,
+          "n_chunks": 52
+        },
+        "natcomm__PMC12864811.pdf": {
+          "pk": 0.5278133187107781,
+          "windowdiff": 0.7949998984544772,
+          "straddle": 0.2391304347826087,
+          "n_chunks": 54
+        },
+        "peerj__PMC12988728.pdf": {
+          "pk": 0.48582148154611293,
+          "windowdiff": 0.6290608731058953,
+          "straddle": 0.3472222222222222,
+          "n_chunks": 74
+        }
+      }
+    }
+  }
+}

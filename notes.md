@@ -2065,3 +2065,21 @@ region. PMC (122 of 126 docs with gold on this machine): Pk 0.329 at MIN 100 vs 
 detector is reported only as DocStruct+vision in the failure analysis. Paper rewritten
 around the trade-off: best model-free chunker, beaten by an LLM chunker that costs
 model calls and repeatability.
+
+## Stage 32 -- Docling and LumberChunker on PMC section boundaries (2026-11-21)
+
+Same gold as Stage 20 (`data/qa/pmc_sections.json`, 122 scorable papers), eight shards per
+tool on Actions (run 44773185163). LumberChunker lost 38 papers when Gemini credits ran
+out; after topping up, the missing papers were rerun on their own (run 44864250733,
+`.github/pmc_missing.txt`) with 0 errors. Pk / WindowDiff, lower is better:
+
+| System | Pk | WindowDiff | Chunks/doc | Docs |
+| --- | --- | --- | --- | --- |
+| docstruct_geo | 0.3447 | 0.4240 | 27.0 | 122 |
+| LumberChunker | 0.4793 | 0.6486 | 60.6 | 122 |
+| Docling | 0.5926 | 0.8706 | 106.5 | 122 |
+
+Paired bootstrap against docstruct_geo, Pk: LumberChunker +0.135, Docling +0.248;
+WindowDiff +0.225 and +0.447; all intervals exclude zero. Kept: a structure result in
+our favour against both, unlike retrieval where LumberChunker leads. Added to paper
+Table 2, README, claim ledger. The row N differs from the 134-paper rows and is shown.

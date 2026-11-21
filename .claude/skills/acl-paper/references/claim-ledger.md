@@ -132,11 +132,17 @@ no embedder and no relevance rule.
 | docstruct_geo | **0.3418** | **0.4226** | 26.8 | 134 |
 | docstruct | 0.3531 | 0.4818 | 37.5 | 134 |
 | pymupdf4llm | 0.4490 | 0.4800 | 17.7 | 134 |
+| lumberchunker | 0.4793 | 0.6486 | 60.6 | 122 |
 | llamaindex | 0.5979 | 0.6952 | — | 134 |
+| docling | 0.5926 | 0.8706 | 106.5 | 122 |
 | unstructured | 0.6025 | 0.8933 | 106.9 | **99** |
 | langchain | 0.6200 | 0.8787 | 85.6 | 134 |
 
-Lower is better for both metrics.
+Lower is better for both metrics. Docling and lumberchunker rows: Actions run
+44773185163 plus retry 44864250733 (`reports/review/pmc_baselines/`), 122 scorable papers;
+docstruct_geo on the same 122 is 0.3447 Pk / 0.4240 WindowDiff. Paired bootstrap, Pk diff
+(tool minus geo): lumberchunker +0.135 [+0.110, +0.161], docling +0.248 [+0.227, +0.270];
+WindowDiff +0.225 and +0.447, all intervals exclude zero.
 
 Two things the prose must get right. **The leader is `docstruct_geo`, not
 `docstruct`** — geometry-only beats the hybrid on both metrics, at 2.4x the speed.
