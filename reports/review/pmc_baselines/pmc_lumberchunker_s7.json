@@ -1,0 +1,71 @@
+{
+  "n_docs": 14,
+  "gold": "shard_gold.json",
+  "results": {
+    "lumberchunker": {
+      "pk": 0.4655,
+      "windowdiff": 0.6471,
+      "straddle_rate": 0.3185,
+      "mean_chunks": 58.0,
+      "n_docs": 9,
+      "errors": 5,
+      "seconds": 1850.2,
+      "per_doc": {
+        "bmc__PMC12752283.pdf": {
+          "pk": 0.3719795773935901,
+          "windowdiff": 0.4732837933474876,
+          "straddle": 0.4444444444444444,
+          "n_chunks": 41
+        },
+        "bmc__PMC12859988.pdf": {
+          "pk": 0.6011507143205422,
+          "windowdiff": 0.8340403400133275,
+          "straddle": 0.22413793103448276,
+          "n_chunks": 59
+        },
+        "elife__PMC12747517.pdf": {
+          "pk": 0.4365566096773386,
+          "windowdiff": 0.5595884753060152,
+          "straddle": 0.36363636363636365,
+          "n_chunks": 44
+        },
+        "elife__PMC12753105.pdf": {
+          "pk": 0.6114086015444451,
+          "windowdiff": 0.837438701313342,
+          "straddle": 0.2018348623853211,
+          "n_chunks": 109
+        },
+        "frontiers__PMC12757407.pdf": {
+          "pk": 0.45646373999514916,
+          "windowdiff": 0.7751367666478023,
+          "straddle": 0.21428571428571427,
+          "n_chunks": 78
+        },
+        "frontiers__PMC12799491.pdf": {
+          "pk": 0.47168711000524854,
+          "windowdiff": 0.6418365958439438,
+          "straddle": 0.3148148148148148,
+          "n_chunks": 59
+        },
+        "natcomm__PMC12855986.pdf": {
+          "pk": 0.39898755227311633,
+          "windowdiff": 0.5783668777970703,
+          "straddle": 0.35,
+          "n_chunks": 45
+        },
+        "peerj__PMC12721126.pdf": {
+          "pk": 0.45154899135446686,
+          "windowdiff": 0.6181813503499383,
+          "straddle": 0.38095238095238093,
+          "n_chunks": 44
+        },
+        "peerj__PMC13094554.pdf": {
+          "pk": 0.39004790604234274,
+          "windowdiff": 0.5058723535774996,
+          "straddle": 0.37209302325581395,
+          "n_chunks": 43
+        }
+      }
+    }
+  }
+}

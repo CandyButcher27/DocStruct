@@ -263,25 +263,28 @@ The retrieval advantage comes mainly from law and manuals: \ds{} has the best sp
 \small
 \caption{Section-boundary agreement with publisher-written JATS gold on 134
 PubMed Central papers. Pk and WindowDiff are error rates; lower is better.
-Docling and LumberChunker were not run on this corpus.}
+Docling and LumberChunker were scored later, on the 122 papers with locatable gold, where \ds{} scores $0.424$ and $0.345$.}
 \label{tab:sections}
-\begin{tabular}{@{}lccr@{}}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lcccr@{}}
 \toprule
-System & WinDiff & Pk & Chunks/doc \\
+System & WinDiff & Pk & Chunks & Docs \\
 \midrule
-\ds{}             & \best{0.423} & \best{0.342} & 26.8 \\
-PyMuPDF4LLM       & 0.480 & 0.449 & 17.7 \\
-\dsv{}            & 0.482 & 0.353 & 37.5 \\
-LlamaIndex-sem    & 0.534 & 0.513 & 29.1 \\
-LlamaIndex        & 0.695 & 0.598 & 42.7 \\
-LangChain         & 0.879 & 0.620 & 85.6 \\
-Unstructured$^{*}$ & 0.893 & 0.603 & 106.9 \\
+\ds{}             & \best{0.423} & \best{0.342} & 26.8 & 134 \\
+PyMuPDF4LLM       & 0.480 & 0.449 & 17.7 & 134 \\
+\dsv{}            & 0.482 & 0.353 & 37.5 & 134 \\
+LlamaIndex-sem    & 0.534 & 0.513 & 29.1 & 134 \\
+LumberChunker    & 0.649 & 0.479 & 60.6 & 122 \\
+LlamaIndex        & 0.695 & 0.598 & 42.7 & 134 \\
+Docling           & 0.871 & 0.593 & 106.5 & 122 \\
+LangChain         & 0.879 & 0.620 & 85.6 & 134 \\
+Unstructured$^{*}$ & 0.893 & 0.603 & 106.9 & 99 \\
 \bottomrule
-\multicolumn{4}{@{}l@{}}{\scriptsize $^{*}$ 99 of 134 documents; 35 hard failures.} \\
+\multicolumn{5}{@{}l@{}}{\scriptsize $^{*}$ 99 of 134 documents; 35 hard failures.} \\
 \end{tabular}
 \end{table}
 
-To evaluate structure independently of retrieval, we compare each chunker's boundaries with the section boundaries recorded in the publisher-provided JATS XML. \ds{} achieves the best Pk and WindowDiff (Table~\ref{tab:sections}), ahead of \dsv{}, at $2.4\times$ its speed. WindowDiff punishes the systems that cut most, so the two metrics should be read together.
+To evaluate structure independently of retrieval, we compare each chunker's boundaries with the section boundaries recorded in the publisher-provided JATS XML. \ds{} achieves the best Pk and WindowDiff (Table~\ref{tab:sections}), ahead of \dsv{}, at $2.4\times$ its speed. On the 122 papers that Docling and LumberChunker also scored, \ds{} beats both in a paired bootstrap: Pk by $0.135$ against LumberChunker and $0.248$ against Docling, WindowDiff by $0.225$ and $0.447$ (all 95\% intervals exclude zero). WindowDiff punishes the systems that cut most, so the two metrics should be read together.
 
 The metric and the design do not fully match: $57.4\%$ of the gold sections are shorter than \ds{}'s 200-word minimum, so \ds{} merges them by construction and the score partly measures how the floor treats short sections. Agreement with publisher sections also measures structural recovery, and says nothing about whether those boundaries suit retrieval.
 
@@ -315,7 +318,7 @@ The broader finding is about evaluation itself: chunker rankings depend on how r
 
 \paragraph{Scope.} \ds{} reads the PDF text layer and performs no OCR, which keeps it deterministic; scanned PDFs without a text layer are out of scope, and every baseline also runs with OCR off. All corpora are English. Two parts of the pipeline assume a space-delimited Latin script: chunk sizes count whitespace-separated words, and heading levels read Arabic, Roman and appendix numbering. Neither has been tested on other scripts, and a language without spaces between words would break the size floor. The reading-order heuristic handles at most two columns and can misplace full-width elements above a two-column body.
 
-\paragraph{Context budget and baselines.} At $k{=}5$ \ds{} returns about four times more context per query than Unstructured. Raising the baselines' top-$k$ leaves our lead in place; enlarging their chunks removes the span lead and keeps the region lead (\S\ref{sec:inversion}). Neither control scores the page rule, and the enlarged LangChain and LlamaIndex chunks overshoot our budget. LumberChunker's numbers come from one run of one model, and a different model or run would give different chunks. Docling and LumberChunker were not run on PMC.
+\paragraph{Context budget and baselines.} At $k{=}5$ \ds{} returns about four times more context per query than Unstructured. Raising the baselines' top-$k$ leaves our lead in place; enlarging their chunks removes the span lead and keeps the region lead (\S\ref{sec:inversion}). Neither control scores the page rule, and the enlarged LangChain and LlamaIndex chunks overshoot our budget. LumberChunker's numbers come from one run of one model, and a different model or run would give different chunks.
 
 \paragraph{Parse fidelity.} We do not evaluate PDF parsing fidelity with benchmarks such as OmniDocBench or READoc; our structural evaluation instead measures agreement with publisher-provided section boundaries. We report no layout detection accuracy: our two annotated documents were drafted from the pipeline's output, so a score would favour \ds{}, and DocLayNet is the vision detector's training data.
 

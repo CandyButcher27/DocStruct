@@ -1,0 +1,107 @@
+{
+  "n_docs": 15,
+  "gold": "shard_gold.json",
+  "results": {
+    "docling": {
+      "pk": 0.5996,
+      "windowdiff": 0.8777,
+      "straddle_rate": 0.0569,
+      "mean_chunks": 129.2,
+      "n_docs": 15,
+      "errors": 0,
+      "seconds": 572.0,
+      "per_doc": {
+        "bmc__PMC12751606.pdf": {
+          "pk": 0.5876036479044621,
+          "windowdiff": 0.8506968400717538,
+          "straddle": 0.0,
+          "n_chunks": 143
+        },
+        "bmc__PMC12859858.pdf": {
+          "pk": 0.5719014383554186,
+          "windowdiff": 0.9461460567720299,
+          "straddle": 0.0072992700729927005,
+          "n_chunks": 168
+        },
+        "elife__PMC12726831.pdf": {
+          "pk": 0.6125545204889343,
+          "windowdiff": 0.8563216843465619,
+          "straddle": 0.022388059701492536,
+          "n_chunks": 147
+        },
+        "elife__PMC12747526.pdf": {
+          "pk": 0.6072718979197427,
+          "windowdiff": 0.8715474089812381,
+          "straddle": 0.03164556962025317,
+          "n_chunks": 159
+        },
+        "elife__PMC12755884.pdf": {
+          "pk": 0.7577555316523358,
+          "windowdiff": 1.0,
+          "straddle": 0.004081632653061225,
+          "n_chunks": 253
+        },
+        "frontiers__PMC12757385.pdf": {
+          "pk": 0.5503768688990486,
+          "windowdiff": 0.8414185098233041,
+          "straddle": 0.17142857142857143,
+          "n_chunks": 77
+        },
+        "frontiers__PMC12794290.pdf": {
+          "pk": 0.43411784107239615,
+          "windowdiff": 0.6749829198765519,
+          "straddle": 0.2962962962962963,
+          "n_chunks": 86
+        },
+        "natcomm__PMC12847928.pdf": {
+          "pk": 0.5638978963997672,
+          "windowdiff": 0.9516920262742163,
+          "straddle": 0.009259259259259259,
+          "n_chunks": 125
+        },
+        "natcomm__PMC12868822.pdf": {
+          "pk": 0.6365812113240906,
+          "windowdiff": 0.9818452316781302,
+          "straddle": 0.012345679012345678,
+          "n_chunks": 84
+        },
+        "peerj__PMC12721105.pdf": {
+          "pk": 0.6391418860262201,
+          "windowdiff": 0.9816959227815135,
+          "straddle": 0.0,
+          "n_chunks": 153
+        },
+        "peerj__PMC12988730.pdf": {
+          "pk": 0.6136046244409482,
+          "windowdiff": 0.8790503632731708,
+          "straddle": 0.01020408163265306,
+          "n_chunks": 99
+        },
+        "peerj__PMC13245425.pdf": {
+          "pk": 0.6480369780778305,
+          "windowdiff": 0.8353439843495273,
+          "straddle": 0.020618556701030927,
+          "n_chunks": 115
+        },
+        "plos__PMC13298746.pdf": {
+          "pk": 0.5169885883650005,
+          "windowdiff": 0.669463495654415,
+          "straddle": 0.20588235294117646,
+          "n_chunks": 121
+        },
+        "plos__PMC13298937.pdf": {
+          "pk": 0.6081394210371724,
+          "windowdiff": 0.8561731014000848,
+          "straddle": 0.034482758620689655,
+          "n_chunks": 63
+        },
+        "scirep__PMC12834942.pdf": {
+          "pk": 0.6466276845140255,
+          "windowdiff": 0.9697798496402684,
+          "straddle": 0.02702702702702703,
+          "n_chunks": 145
+        }
+      }
+    }
+  }
+}
