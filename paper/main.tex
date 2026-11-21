@@ -253,7 +253,7 @@ The $0.7$ region threshold predates every score here. Re-scoring one earlier run
 
 \paragraph{Chunk-size bounds.} We re-swept the 200/500-word bounds, which were first chosen on an internal corpus we later excluded. On OHR-Bench, no minimum from 100 to 400 words, and no 800-word maximum, beats 200/500 significantly under span or region (the largest gain is $+0.005$, at 150/500), while minimums of 300 and 400 lose $0.007$ and $0.012$ under region. On PMC section boundaries (122 papers), smaller minimums lower Pk ($0.329$ at 100 against $0.345$ at 200) and an 800-word maximum gives the best WindowDiff ($0.413$ against $0.424$). The shipped bounds are therefore within noise of the best retrieval setting and slightly behind the best boundary settings.
 
-\paragraph{Embedder and retriever.} The rankings above use one embedder, so we repeated the five model-free systems that run on every document with \texttt{bge-base-en-v1.5} and \texttt{e5-base-v2} and scored dense, BM25 and fused retrieval under all three rules, 27 cells in all. \ds{} ranks first in 20 of the 27. It is first in all nine region cells (eight significant at $p<0.05$, the exception being MiniLM dense, $p=0.72$) and in eight of nine span cells, six of them significant; the exception is MiniLM dense, where PyMuPDF4LLM is ahead by $0.005$ ($p=0.46$). Under page it is first only with BM25 ($+0.017$ over Unstructured) and fourth in all six dense and fused cells, behind Unstructured by $0.040$ to $0.133$ (every $p<0.001$). Moving from MiniLM to the larger embedders changes fused MRR by at most $0.06$ for any system and leaves the page ranking unchanged, so the page loss is not a property of the small embedder.
+\paragraph{Embedder and retriever.} Repeating the five model-free systems that run on every document with 	exttt{bge-base-en-v1.5} and 	exttt{e5-base-v2}, and scoring dense, BM25 and fused retrieval under all three rules (27 cells), \ds{} ranks first in 20. It leads all nine region cells (eight significant at $p<0.05$) and eight of nine span cells (six significant); the exception, MiniLM dense, is a $0.005$ deficit to PyMuPDF4LLM ($p=0.46$). Under page it leads only with BM25 and is fourth in all six dense and fused cells, behind Unstructured by $0.040$ to $0.133$ (every $p<0.001$). Larger embedders move fused MRR by at most $0.06$ and leave the page ranking unchanged.
 
 The retrieval advantage comes mainly from law and manuals: \ds{} has the best span MRR on law ($0.866$) and is second to LumberChunker on manuals. It is fifth on academic papers ($0.457$ against LumberChunker's $0.535$) and fourth on finance, and on questions whose evidence is a table it scores $0.286$ against $0.311$ for LumberChunker.
 
@@ -265,25 +265,28 @@ The retrieval advantage comes mainly from law and manuals: \ds{} has the best sp
 \small
 \caption{Section-boundary agreement with publisher-written JATS gold on 134
 PubMed Central papers. Pk and WindowDiff are error rates; lower is better.
-Docling and LumberChunker were not run on this corpus.}
+Docling and LumberChunker were scored later, on the 122 papers with locatable gold, where \ds{} scores $0.424$ and $0.345$.}
 \label{tab:sections}
-\begin{tabular}{@{}lccr@{}}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lcccr@{}}
 \toprule
-System & WinDiff & Pk & Chunks/doc \\
+System & WinDiff & Pk & Chunks & Docs \\
 \midrule
-\ds{}             & \best{0.423} & \best{0.342} & 26.8 \\
-PyMuPDF4LLM       & 0.480 & 0.449 & 17.7 \\
-\dsv{}            & 0.482 & 0.353 & 37.5 \\
-LlamaIndex-sem    & 0.534 & 0.513 & 29.1 \\
-LlamaIndex        & 0.695 & 0.598 & 42.7 \\
-LangChain         & 0.879 & 0.620 & 85.6 \\
-Unstructured$^{*}$ & 0.893 & 0.603 & 106.9 \\
+\ds{}             & \best{0.423} & \best{0.342} & 26.8 & 134 \\
+PyMuPDF4LLM       & 0.480 & 0.449 & 17.7 & 134 \\
+\dsv{}            & 0.482 & 0.353 & 37.5 & 134 \\
+LlamaIndex-sem    & 0.534 & 0.513 & 29.1 & 134 \\
+LumberChunker    & 0.649 & 0.479 & 60.6 & 122 \\
+LlamaIndex        & 0.695 & 0.598 & 42.7 & 134 \\
+Docling           & 0.871 & 0.593 & 106.5 & 122 \\
+LangChain         & 0.879 & 0.620 & 85.6 & 134 \\
+Unstructured$^{*}$ & 0.893 & 0.603 & 106.9 & 99 \\
 \bottomrule
-\multicolumn{4}{@{}l@{}}{\scriptsize $^{*}$ 99 of 134 documents; 35 hard failures.} \\
+\multicolumn{5}{@{}l@{}}{\scriptsize $^{*}$ 99 of 134 documents; 35 hard failures.} \\
 \end{tabular}
 \end{table}
 
-To evaluate structure independently of retrieval, we compare each chunker's boundaries with the section boundaries recorded in the publisher-provided JATS XML. \ds{} achieves the best Pk and WindowDiff (Table~\ref{tab:sections}), ahead of \dsv{}, at $2.4\times$ its speed. WindowDiff punishes the systems that cut most, so the two metrics should be read together.
+To evaluate structure independently of retrieval, we compare each chunker's boundaries with the section boundaries recorded in the publisher-provided JATS XML. \ds{} achieves the best Pk and WindowDiff (Table~\ref{tab:sections}), ahead of \dsv{}, at $2.4\times$ its speed. On the 122 papers that Docling and LumberChunker also scored, \ds{} beats both in a paired bootstrap: Pk by $0.135$ against LumberChunker and $0.248$ against Docling, WindowDiff by $0.225$ and $0.447$ (all 95\% intervals exclude zero). WindowDiff punishes the systems that cut most, so the two metrics should be read together.
 
 The metric and the design do not fully match: $57.4\%$ of the gold sections are shorter than \ds{}'s 200-word minimum, so \ds{} merges them by construction and the score partly measures how the floor treats short sections. Agreement with publisher sections also measures structural recovery, and says nothing about whether those boundaries suit retrieval.
 
@@ -317,7 +320,7 @@ The broader finding is about evaluation itself: chunker rankings depend on how r
 
 \paragraph{Scope.} \ds{} reads the PDF text layer and performs no OCR, which keeps it deterministic; scanned PDFs without a text layer are out of scope, and every baseline also runs with OCR off. All corpora are English. Two parts of the pipeline assume a space-delimited Latin script: chunk sizes count whitespace-separated words, and heading levels read Arabic, Roman and appendix numbering. Neither has been tested on other scripts, and a language without spaces between words would break the size floor. The reading-order heuristic handles at most two columns and can misplace full-width elements above a two-column body.
 
-\paragraph{Context budget and baselines.} At $k{=}5$ \ds{} returns about four times more context per query than Unstructured. Raising the baselines' top-$k$ leaves our lead in place; enlarging their chunks removes the span lead and keeps the region lead (\S\ref{sec:inversion}). Neither control scores the page rule, and the enlarged LangChain and LlamaIndex chunks overshoot our budget. LumberChunker's numbers come from one run of one model, and a different model or run would give different chunks. Docling and LumberChunker were not run on PMC.
+\paragraph{Context budget and baselines.} At $k{=}5$ \ds{} returns about four times more context per query than Unstructured. Raising the baselines' top-$k$ leaves our lead in place; enlarging their chunks removes the span lead and keeps the region lead (\S\ref{sec:inversion}). Neither control scores the page rule, and the enlarged LangChain and LlamaIndex chunks overshoot our budget. LumberChunker's numbers come from one run of one model, and a different model or run would give different chunks.
 
 \paragraph{Parse fidelity.} We do not evaluate PDF parsing fidelity with benchmarks such as OmniDocBench or READoc; our structural evaluation instead measures agreement with publisher-provided section boundaries. We report no layout detection accuracy: our two annotated documents were drafted from the pipeline's output, so a score would favour \ds{}, and DocLayNet is the vision detector's training data.
 

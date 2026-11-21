@@ -1,0 +1,77 @@
+{
+  "n_docs": 10,
+  "gold": "shard_gold.json",
+  "results": {
+    "lumberchunker": {
+      "pk": 0.4928,
+      "windowdiff": 0.6719,
+      "straddle_rate": 0.2808,
+      "mean_chunks": 75.2,
+      "n_docs": 10,
+      "errors": 0,
+      "seconds": 718.1,
+      "per_doc": {
+        "elife__PMC12755884.pdf": {
+          "pk": 0.7577555316523358,
+          "windowdiff": 1.0,
+          "straddle": 0.043209876543209874,
+          "n_chunks": 164
+        },
+        "frontiers__PMC12794290.pdf": {
+          "pk": 0.25328056164157653,
+          "windowdiff": 0.3655382005795463,
+          "straddle": 0.5416666666666666,
+          "n_chunks": 55
+        },
+        "natcomm__PMC12847928.pdf": {
+          "pk": 0.5372356641999945,
+          "windowdiff": 0.803913417033896,
+          "straddle": 0.203125,
+          "n_chunks": 77
+        },
+        "natcomm__PMC12868822.pdf": {
+          "pk": 0.45393389249444793,
+          "windowdiff": 0.7173074020569654,
+          "straddle": 0.22,
+          "n_chunks": 55
+        },
+        "peerj__PMC12721105.pdf": {
+          "pk": 0.5979429983961861,
+          "windowdiff": 0.8127069140561777,
+          "straddle": 0.16216216216216217,
+          "n_chunks": 77
+        },
+        "peerj__PMC12988730.pdf": {
+          "pk": 0.46083543990524845,
+          "windowdiff": 0.5911011331294526,
+          "straddle": 0.3484848484848485,
+          "n_chunks": 67
+        },
+        "peerj__PMC13245425.pdf": {
+          "pk": 0.47158556934348567,
+          "windowdiff": 0.559063273173632,
+          "straddle": 0.32075471698113206,
+          "n_chunks": 53
+        },
+        "plos__PMC13298746.pdf": {
+          "pk": 0.3057659540957317,
+          "windowdiff": 0.39989404504517406,
+          "straddle": 0.42857142857142855,
+          "n_chunks": 73
+        },
+        "plos__PMC13298937.pdf": {
+          "pk": 0.49084559903397407,
+          "windowdiff": 0.6493913384027936,
+          "straddle": 0.34210526315789475,
+          "n_chunks": 38
+        },
+        "scirep__PMC12834942.pdf": {
+          "pk": 0.5992158659157663,
+          "windowdiff": 0.8202554498666164,
+          "straddle": 0.19767441860465115,
+          "n_chunks": 93
+        }
+      }
+    }
+  }
+}

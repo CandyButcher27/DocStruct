@@ -123,7 +123,8 @@ Do the chunk boundaries land where the *document's own* boundaries land? Scored
 against section boundaries the publishers wrote in JATS XML for **134 PubMed Central
 papers** — gold that predates this project and was written for an unrelated purpose.
 Pk and WindowDiff are **error** rates; lower is better. Docling and LumberChunker were
-not run here.
+scored later on the 122 papers with locatable gold (rows marked 122); docstruct scores
+0.4240 / 0.3447 on those 122.
 
 | Tool | WindowDiff | Pk | Chunks | Docs |
 |---|---|---|---|---|
@@ -131,7 +132,9 @@ not run here.
 | pymupdf4llm | 0.4800 | 0.4490 | 17.7 | 134 |
 | docstruct + vision | 0.4818 | 0.3531 | 37.5 | 134 |
 | llamaindex_semantic | 0.5337 | 0.5128 | 29.1 | 134 |
+| lumberchunker | 0.6486 | 0.4793 | 60.6 | 122 |
 | llamaindex | 0.6952 | 0.5979 | 42.7 | 134 |
+| docling | 0.8706 | 0.5926 | 106.5 | 122 |
 | langchain | 0.8787 | 0.6200 | 85.6 | 134 |
 | unstructured | 0.8933 | 0.6025 | 106.9 | **99** |
 

@@ -1,0 +1,113 @@
+{
+  "n_docs": 16,
+  "gold": "shard_gold.json",
+  "results": {
+    "docling": {
+      "pk": 0.6064,
+      "windowdiff": 0.925,
+      "straddle_rate": 0.0383,
+      "mean_chunks": 91.2,
+      "n_docs": 16,
+      "errors": 0,
+      "seconds": 501.5,
+      "per_doc": {
+        "bmc__PMC12729160.pdf": {
+          "pk": 0.5989901362141851,
+          "windowdiff": 0.9104744011272898,
+          "straddle": 0.014084507042253521,
+          "n_chunks": 73
+        },
+        "bmc__PMC12831358.pdf": {
+          "pk": 0.5552588040652328,
+          "windowdiff": 0.9628456629638383,
+          "straddle": 0.0,
+          "n_chunks": 79
+        },
+        "bmc__PMC12866578.pdf": {
+          "pk": 0.5498327608027481,
+          "windowdiff": 0.7389260531549449,
+          "straddle": 0.045454545454545456,
+          "n_chunks": 93
+        },
+        "elife__PMC12747519.pdf": {
+          "pk": 0.6414510020514439,
+          "windowdiff": 0.9843577402556415,
+          "straddle": 0.011363636363636364,
+          "n_chunks": 93
+        },
+        "elife__PMC12755881.pdf": {
+          "pk": 0.6402841282964112,
+          "windowdiff": 0.9508005871534867,
+          "straddle": 0.04081632653061224,
+          "n_chunks": 100
+        },
+        "frontiers__PMC12757273.pdf": {
+          "pk": 0.5147897215566388,
+          "windowdiff": 0.7735891927621251,
+          "straddle": 0.19736842105263158,
+          "n_chunks": 139
+        },
+        "frontiers__PMC12766322.pdf": {
+          "pk": 0.5537235737809413,
+          "windowdiff": 0.8436205248061192,
+          "straddle": 0.1891891891891892,
+          "n_chunks": 81
+        },
+        "natcomm__PMC12775072.pdf": {
+          "pk": 0.6314211276606203,
+          "windowdiff": 0.9969768470727032,
+          "straddle": 0.03225806451612903,
+          "n_chunks": 66
+        },
+        "natcomm__PMC12864733.pdf": {
+          "pk": 0.601666820149185,
+          "windowdiff": 1.0,
+          "straddle": 0.0,
+          "n_chunks": 74
+        },
+        "natcomm__PMC12996568.pdf": {
+          "pk": 0.6126807143532079,
+          "windowdiff": 0.9978078049702352,
+          "straddle": 0.0,
+          "n_chunks": 176
+        },
+        "peerj__PMC12988725.pdf": {
+          "pk": 0.6374068486261601,
+          "windowdiff": 1.0,
+          "straddle": 0.0,
+          "n_chunks": 79
+        },
+        "peerj__PMC13245422.pdf": {
+          "pk": 0.7208133900169457,
+          "windowdiff": 0.9084044355917591,
+          "straddle": 0.034482758620689655,
+          "n_chunks": 65
+        },
+        "plos__PMC12987582.pdf": {
+          "pk": 0.5813013037180106,
+          "windowdiff": 0.9135079671656204,
+          "straddle": 0.0,
+          "n_chunks": 54
+        },
+        "plos__PMC13298916.pdf": {
+          "pk": 0.6478130992290735,
+          "windowdiff": 0.9938430231799742,
+          "straddle": 0.024,
+          "n_chunks": 127
+        },
+        "scirep__PMC12815906.pdf": {
+          "pk": 0.5992895805142084,
+          "windowdiff": 0.9356224627875508,
+          "straddle": 0.0,
+          "n_chunks": 76
+        },
+        "scirep__PMC12858950.pdf": {
+          "pk": 0.6155946738885127,
+          "windowdiff": 0.8890543895283232,
+          "straddle": 0.023809523809523808,
+          "n_chunks": 85
+        }
+      }
+    }
+  }
+}
