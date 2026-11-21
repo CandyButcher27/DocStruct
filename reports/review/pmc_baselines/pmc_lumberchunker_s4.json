@@ -1,0 +1,47 @@
+{
+  "n_docs": 15,
+  "gold": "shard_gold.json",
+  "results": {
+    "lumberchunker": {
+      "pk": 0.4535,
+      "windowdiff": 0.5972,
+      "straddle_rate": 0.3354,
+      "mean_chunks": 79.8,
+      "n_docs": 5,
+      "errors": 10,
+      "seconds": 1732.6,
+      "per_doc": {
+        "bmc__PMC12751606.pdf": {
+          "pk": 0.4145414403452212,
+          "windowdiff": 0.573001994555741,
+          "straddle": 0.4230769230769231,
+          "n_chunks": 79
+        },
+        "bmc__PMC12859858.pdf": {
+          "pk": 0.5290447621432693,
+          "windowdiff": 0.7400834050151893,
+          "straddle": 0.29069767441860467,
+          "n_chunks": 89
+        },
+        "elife__PMC12726831.pdf": {
+          "pk": 0.48492272898605354,
+          "windowdiff": 0.5831673038608584,
+          "straddle": 0.3,
+          "n_chunks": 90
+        },
+        "elife__PMC12747526.pdf": {
+          "pk": 0.37849160334665755,
+          "windowdiff": 0.47957554587249573,
+          "straddle": 0.3225806451612903,
+          "n_chunks": 93
+        },
+        "frontiers__PMC12757385.pdf": {
+          "pk": 0.4606450018534536,
+          "windowdiff": 0.6104040528852095,
+          "straddle": 0.3404255319148936,
+          "n_chunks": 48
+        }
+      }
+    }
+  }
+}
