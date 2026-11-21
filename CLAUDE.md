@@ -39,6 +39,7 @@ it was kept). Project memory is in `mimi/` (loaded below).
    files it was written from, and nothing else.
 10. **Two extraction defects are open** (cross-gutter text, full-width elements sorted
     after columns). Rule 1 applies to fixing them.
+11. **Never delete the LumberChunker answer cache** (`.cache/lumberchunker/`, 96 files, 9,821 Gemini answers, about 500 Rs to regenerate). Gitignored, so `git clean` or `rm -rf .cache` destroys it. Backup: `../DocStruct_backups/lumberchunker-cache-2026-11-22/` and Actions artifact `lumber-cache` (90 days). Reuse it for every LumberChunker run; confirm it is present before any rerun.
 
 ## The paper
 

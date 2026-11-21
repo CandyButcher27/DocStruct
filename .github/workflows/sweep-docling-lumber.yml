@@ -9,7 +9,7 @@ on:
     branches: ["bench/sweep-docling-lumber"]
 
 env:
-  LIMIT_DOCS: "2"   # 0 = all documents; 2 = smoke test
+  LIMIT_DOCS: "0"   # 0 = all documents; 2 = smoke test
   NLTK_DATA: /home/runner/nltk_data
   LUMBER_MODEL: gemini-3.5-flash-lite
   LUMBER_CACHE_DIR: .cache/lumberchunker
@@ -43,9 +43,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        embedder: [BAAI/bge-base-en-v1.5]
-        mode: [span]
-        shard: [0]
+        embedder: [BAAI/bge-base-en-v1.5, intfloat/e5-base-v2]
+        mode: [span, region, page]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7]
     name: docling ${{ matrix.embedder }} ${{ matrix.mode }} shard ${{ matrix.shard }}
     steps:
       - uses: actions/checkout@v4
@@ -85,8 +85,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        embedder: [BAAI/bge-base-en-v1.5]
-        mode: [span]
+        embedder: [BAAI/bge-base-en-v1.5, intfloat/e5-base-v2]
+        mode: [span, region, page]
     name: lumberchunker ${{ matrix.embedder }} ${{ matrix.mode }}
     steps:
       - uses: actions/checkout@v4
