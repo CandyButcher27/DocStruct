@@ -1,0 +1,25 @@
+name: save lumber cache
+
+on:
+  push:
+    branches: ["bench/lumberchunker"]
+    paths: [".github/workflows/save-lumber-cache.yml"]
+
+jobs:
+  save:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/cache/restore@v4
+        with:
+          path: .cache/lumberchunker
+          key: lumber-0-restore
+          restore-keys: lumber-0-
+          fail-on-cache-miss: true
+      - run: |
+          ls .cache/lumberchunker | wc -l
+          du -sh .cache/lumberchunker
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lumber-cache
+          path: .cache/lumberchunker
+          retention-days: 90
