@@ -9,7 +9,7 @@ on:
     branches: ["bench/pmc"]
 
 env:
-  LIMIT: "1"   # documents per shard; 0 = all
+  LIMIT: "0"   # documents per shard; 0 = all
   NLTK_DATA: /home/runner/nltk_data
   LUMBER_MODEL: gemini-3.5-flash-lite
   LUMBER_CACHE_DIR: .cache/lumberchunker
@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       matrix:
         tool: [lumberchunker]
-        shard: [0, 1, 2, 3, 4, 5, 7]
+        shard: [0, 1, 3, 4, 5, 7]
     name: ${{ matrix.tool }} shard ${{ matrix.shard }}
     steps:
       - uses: actions/checkout@v4
