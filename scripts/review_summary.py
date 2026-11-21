@@ -135,6 +135,40 @@ def table1(rng):
     return out
 
 
+def pmc_baselines(rng):
+    geo = load(REVIEW / "floor_pmc/pmc_min200_max500.json")["results"]["docstruct_geo"]["per_doc"]
+    out = ["", "## PMC section boundaries: Docling and LumberChunker vs docstruct_geo (same gold)", "",
+           "Gold `data/qa/pmc_sections.json` (126 papers; Actions run 44773185163, 8 shards per tool). "
+           "Diff = tool minus docstruct_geo on documents both scored (lower is better, so positive = "
+           "docstruct_geo ahead).", "",
+           "| system | Pk | WindowDiff | chunks/doc | docs | errors | Pk diff | WindowDiff diff |",
+           "|---|---|---|---|---|---|---|---|",
+           f"| docstruct_geo | {sum(d['pk'] for d in geo.values()) / len(geo):.4f} | "
+           f"{sum(d['windowdiff'] for d in geo.values()) / len(geo):.4f} | "
+           f"{sum(d['n_chunks'] for d in geo.values()) / len(geo):.1f} | {len(geo)} | | | |"]
+    for tool in ("docling", "lumberchunker"):
+        per_doc, errors = {}, 0
+        for p in sorted(glob.glob(str(REVIEW / f"pmc_baselines/pmc_{tool}_s*.json"))):
+            r = load(p)["results"].get(tool)
+            if r:
+                per_doc.update(r["per_doc"])
+                if not Path(p.replace(".json", "_retry.json")).exists():
+                    errors += r["errors"]
+        both = [d for d in per_doc if d in geo]
+        cells = []
+        for metric in ("pk", "windowdiff"):
+            d = [per_doc[x][metric] - geo[x][metric] for x in both]
+            means = sorted(sum(rng.choices(d, k=len(d))) / len(d) for _ in range(RESAMPLES))
+            cells.append(f"{sum(d) / len(d):+.4f} [{means[int(0.025 * RESAMPLES)]:+.4f}, "
+                         f"{means[int(0.975 * RESAMPLES) - 1]:+.4f}]")
+        n = len(per_doc)
+        out.append(f"| {tool} | {sum(v['pk'] for v in per_doc.values()) / n:.4f} | "
+                   f"{sum(v['windowdiff'] for v in per_doc.values()) / n:.4f} | "
+                   f"{sum(v['n_chunks'] for v in per_doc.values()) / n:.1f} | {n} | {errors} | "
+                   f"{cells[0]} | {cells[1]} |")
+    return out
+
+
 def main():
     rng = random.Random(0)
     base = {m: load(REVIEW / f"floor_ohr/floor_min200_max500_{m}.json") for m in MODES}
@@ -182,6 +216,7 @@ def main():
                    f"{r['span']['metrics']['mrr']:.4f} | {r['region']['metrics']['mrr']:.4f} | {diffs[0]} | {diffs[1]} |")
 
     out += table1(rng)
+    out += pmc_baselines(rng)
     (REVIEW / "summary.md").write_text("\n".join(out) + "\n", encoding="utf-8")
     print("\n".join(out))
 

@@ -71,3 +71,13 @@ Spearman(mean chunk words, MRR): span rho=0.119 p=0.779 (n=8), region rho=-0.238
 | llamaindex_semantic | 0.2857 | 0.5352 | 0.8412 | 0.7077 | 0.7748 | 0.3074 | 1.0000 | 1.0000 |
 | docling | 0.5137 | 0.4385 | 0.8159 | 0.7190 | 0.8254 | 0.1830 | 0.9336 | 1.1518 |
 | lumberchunker | 0.5349 | 0.5157 | 0.8298 | 0.8154 | 0.8431 | 0.3106 | 0.9706 | 1.0801 |
+
+## PMC section boundaries: Docling and LumberChunker vs docstruct_geo (same gold)
+
+Gold `data/qa/pmc_sections.json` (126 papers; Actions run 44773185163, 8 shards per tool). Diff = tool minus docstruct_geo on documents both scored (lower is better, so positive = docstruct_geo ahead).
+
+| system | Pk | WindowDiff | chunks/doc | docs | errors | Pk diff | WindowDiff diff |
+|---|---|---|---|---|---|---|---|
+| docstruct_geo | 0.3447 | 0.4240 | 27.0 | 122 | | | |
+| docling | 0.5926 | 0.8706 | 106.5 | 122 | 0 | +0.2479 [+0.2268, +0.2699] | +0.4466 [+0.4241, +0.4696] |
+| lumberchunker | 0.4793 | 0.6486 | 60.6 | 122 | 0 | +0.1346 [+0.1097, +0.1605] | +0.2246 [+0.1968, +0.2511] |
