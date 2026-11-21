@@ -1,0 +1,118 @@
+name: sweep docling lumber
+
+# Docling and LumberChunker under bge-base and e5-base, to match the five-tool embedder
+# sweep. LumberChunker answers come from the saved cache (run 44953510060, artifact
+# lumber-cache) with a dummy key, so a cache miss fails instead of spending on Gemini.
+
+on:
+  push:
+    branches: ["bench/sweep-docling-lumber"]
+
+env:
+  LIMIT_DOCS: "2"   # 0 = all documents; 2 = smoke test
+  NLTK_DATA: /home/runner/nltk_data
+  LUMBER_MODEL: gemini-3.5-flash-lite
+  LUMBER_CACHE_DIR: .cache/lumberchunker
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/cache@v4
+        with:
+          path: data/ohrbench/_download
+          key: ohrbench-download-v1
+      - run: |
+          pip install pyarrow pdfplumber
+          python scripts/fetch_ohrbench.py --limit 0
+          git checkout -- data/qa/ohrbench.json reports/ohrbench_manifest.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ohrbench-pdfs
+          path: data/ohrbench/*.pdf
+          retention-days: 3
+
+  docling:
+    needs: fetch
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        embedder: [BAAI/bge-base-en-v1.5]
+        mode: [span]
+        shard: [0]
+    name: docling ${{ matrix.embedder }} ${{ matrix.mode }} shard ${{ matrix.shard }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bench-setup
+        with:
+          extra: docling
+          constraints: ""
+      - uses: actions/download-artifact@v4
+        with:
+          name: ohrbench-pdfs
+          path: data/ohrbench
+      - name: Keep this shard's documents
+        run: |
+          mkdir -p data/shard
+          ls data/ohrbench/*.pdf | sort | awk 'NR % 8 == ${{ matrix.shard }}' | xargs -I{} cp {} data/shard/
+          ls data/shard | wc -l
+      - name: Score
+        run: |
+          name="sw_docling_$(echo '${{ matrix.embedder }}' | tr '/' '_')_${{ matrix.mode }}_s${{ matrix.shard }}"
+          python scripts/ablate.py --tool docling --name "$name" \
+            --set EMBEDDING_MODEL=${{ matrix.embedder }} --relevance ${{ matrix.mode }} \
+            --pdfs-dir data/shard --qa data/qa/ohrbench.json --cache-dir "" \
+            --limit-docs "$LIMIT_DOCS" --out-dir reports/sweep_ext
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: swx-docling-${{ strategy.job-index }}
+          path: reports/sweep_ext/
+
+  lumberchunker:
+    needs: fetch
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    permissions:
+      actions: read
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        embedder: [BAAI/bge-base-en-v1.5]
+        mode: [span]
+    name: lumberchunker ${{ matrix.embedder }} ${{ matrix.mode }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bench-setup
+      - uses: actions/download-artifact@v4
+        with:
+          name: ohrbench-pdfs
+          path: data/ohrbench
+      - uses: actions/download-artifact@v4
+        with:
+          name: lumber-cache
+          path: .cache/lumberchunker
+          run-id: 44953510060
+          github-token: ${{ github.token }}
+      - name: Score from the saved answers
+        env:
+          GEMINI_API_KEY: dummy-never-valid
+        run: |
+          ls .cache/lumberchunker | wc -l
+          name="sw_lumberchunker_$(echo '${{ matrix.embedder }}' | tr '/' '_')_${{ matrix.mode }}"
+          python scripts/ablate.py --tool lumberchunker --name "$name" \
+            --set EMBEDDING_MODEL=${{ matrix.embedder }} --relevance ${{ matrix.mode }} \
+            --pdfs-dir data/ohrbench --qa data/qa/ohrbench.json --cache-dir "" \
+            --limit-docs "$LIMIT_DOCS" --out-dir reports/sweep_ext
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: swx-lumber-${{ strategy.job-index }}
+          path: reports/sweep_ext/
