@@ -1,0 +1,67 @@
+name: embedder sweep
+
+# Review gate: do the OHR-Bench rankings survive a change of embedder? Five chunkers whose
+# chunks do not depend on the embedder, three embedders, three relevance rules. Each run
+# records dense, BM25-only and hybrid reciprocal rank per question. llamaindex_semantic is
+# left out because its chunk boundaries come from the embedder.
+
+on:
+  push:
+    branches: ["bench/embedder-sweep"]
+
+env:
+  NLTK_DATA: /home/runner/nltk_data
+  UNSTRUCTURED_DISABLE_NOTICE: "1"
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/cache@v4
+        with:
+          path: data/ohrbench/_download
+          key: ohrbench-download-v1
+      - run: |
+          pip install pyarrow pdfplumber
+          python scripts/fetch_ohrbench.py --limit 0
+          git checkout -- data/qa/ohrbench.json reports/ohrbench_manifest.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ohrbench-pdfs
+          path: data/ohrbench/*.pdf
+          retention-days: 3
+
+  run:
+    needs: fetch
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      matrix:
+        tool: [docstruct_geo, pymupdf4llm, unstructured, langchain, llamaindex]
+        embedder: [all-MiniLM-L6-v2, BAAI/bge-base-en-v1.5, intfloat/e5-base-v2]
+        mode: [span, region, page]
+    name: ${{ matrix.tool }} ${{ matrix.embedder }} ${{ matrix.mode }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/bench-setup
+      - uses: actions/download-artifact@v4
+        with:
+          name: ohrbench-pdfs
+          path: data/ohrbench
+      - name: Score
+        run: |
+          name="sw_${{ matrix.tool }}_$(echo '${{ matrix.embedder }}' | tr '/' '_')_${{ matrix.mode }}"
+          python scripts/ablate.py --tool ${{ matrix.tool }} --name "$name" \
+            --set EMBEDDING_MODEL=${{ matrix.embedder }} --relevance ${{ matrix.mode }} \
+            --pdfs-dir data/ohrbench --qa data/qa/ohrbench.json --cache-dir "" \
+            --out-dir reports/sweep
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sw-${{ matrix.tool }}-${{ strategy.job-index }}
+          path: reports/sweep/

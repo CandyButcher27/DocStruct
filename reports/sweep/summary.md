@@ -1,0 +1,33 @@
+# Embedder x retriever sweep (OHR-Bench)
+
+MRR per tool; rank in brackets. Last column: docstruct_geo minus the best other tool, with the paired-bootstrap p. Positive = docstruct_geo ahead.
+
+- span / BAAI/bge-base-en-v1.5 / dense: docstruct_geo 0.660 (1), langchain 0.618 (4), llamaindex 0.619 (3), pymupdf4llm 0.645 (2), unstructured 0.617 (5) | vs pymupdf4llm +0.015 (p=0.013)
+- span / BAAI/bge-base-en-v1.5 / bm25: docstruct_geo 0.751 (1), langchain 0.643 (5), llamaindex 0.679 (3), pymupdf4llm 0.731 (2), unstructured 0.665 (4) | vs pymupdf4llm +0.020 (p=0.000)
+- span / BAAI/bge-base-en-v1.5 / hybrid: docstruct_geo 0.724 (1), langchain 0.649 (5), llamaindex 0.669 (3), pymupdf4llm 0.708 (2), unstructured 0.665 (4) | vs pymupdf4llm +0.016 (p=0.004)
+- span / all-MiniLM-L6-v2 / dense: docstruct_geo 0.618 (2), langchain 0.588 (5), llamaindex 0.588 (4), pymupdf4llm 0.623 (1), unstructured 0.596 (3) | vs pymupdf4llm -0.005 (p=0.457)
+- span / all-MiniLM-L6-v2 / bm25: docstruct_geo 0.751 (1), langchain 0.643 (5), llamaindex 0.679 (3), pymupdf4llm 0.731 (2), unstructured 0.665 (4) | vs pymupdf4llm +0.020 (p=0.000)
+- span / all-MiniLM-L6-v2 / hybrid: docstruct_geo 0.704 (1), langchain 0.640 (5), llamaindex 0.648 (4), pymupdf4llm 0.698 (2), unstructured 0.656 (3) | vs pymupdf4llm +0.006 (p=0.288)
+- span / intfloat/e5-base-v2 / dense: docstruct_geo 0.679 (1), langchain 0.625 (5), llamaindex 0.642 (3), pymupdf4llm 0.671 (2), unstructured 0.635 (4) | vs pymupdf4llm +0.008 (p=0.209)
+- span / intfloat/e5-base-v2 / bm25: docstruct_geo 0.751 (1), langchain 0.643 (5), llamaindex 0.679 (3), pymupdf4llm 0.731 (2), unstructured 0.665 (4) | vs pymupdf4llm +0.020 (p=0.000)
+- span / intfloat/e5-base-v2 / hybrid: docstruct_geo 0.734 (1), langchain 0.654 (5), llamaindex 0.677 (3), pymupdf4llm 0.720 (2), unstructured 0.675 (4) | vs pymupdf4llm +0.014 (p=0.006)
+- region / BAAI/bge-base-en-v1.5 / dense: docstruct_geo 0.596 (1), langchain 0.575 (2), llamaindex 0.548 (4), pymupdf4llm 0.546 (5), unstructured 0.565 (3) | vs langchain +0.021 (p=0.013)
+- region / BAAI/bge-base-en-v1.5 / bm25: docstruct_geo 0.743 (1), langchain 0.614 (5), llamaindex 0.651 (3), pymupdf4llm 0.676 (2), unstructured 0.618 (4) | vs pymupdf4llm +0.067 (p=0.000)
+- region / BAAI/bge-base-en-v1.5 / hybrid: docstruct_geo 0.690 (1), langchain 0.616 (4), llamaindex 0.617 (3), pymupdf4llm 0.625 (2), unstructured 0.611 (5) | vs pymupdf4llm +0.065 (p=0.000)
+- region / all-MiniLM-L6-v2 / dense: docstruct_geo 0.547 (1), langchain 0.540 (3), llamaindex 0.511 (4), pymupdf4llm 0.510 (5), unstructured 0.543 (2) | vs unstructured +0.003 (p=0.724)
+- region / all-MiniLM-L6-v2 / bm25: docstruct_geo 0.743 (1), langchain 0.614 (5), llamaindex 0.651 (3), pymupdf4llm 0.676 (2), unstructured 0.618 (4) | vs pymupdf4llm +0.067 (p=0.000)
+- region / all-MiniLM-L6-v2 / hybrid: docstruct_geo 0.656 (1), langchain 0.602 (4), llamaindex 0.588 (5), pymupdf4llm 0.603 (3), unstructured 0.604 (2) | vs unstructured +0.052 (p=0.000)
+- region / intfloat/e5-base-v2 / dense: docstruct_geo 0.628 (1), langchain 0.581 (2), llamaindex 0.573 (5), pymupdf4llm 0.577 (4), unstructured 0.579 (3) | vs langchain +0.047 (p=0.000)
+- region / intfloat/e5-base-v2 / bm25: docstruct_geo 0.743 (1), langchain 0.614 (5), llamaindex 0.651 (3), pymupdf4llm 0.676 (2), unstructured 0.618 (4) | vs pymupdf4llm +0.067 (p=0.000)
+- region / intfloat/e5-base-v2 / hybrid: docstruct_geo 0.703 (1), langchain 0.618 (5), llamaindex 0.634 (3), pymupdf4llm 0.642 (2), unstructured 0.620 (4) | vs pymupdf4llm +0.061 (p=0.000)
+- page / BAAI/bge-base-en-v1.5 / dense: docstruct_geo 0.665 (4), langchain 0.752 (2), llamaindex 0.707 (3), pymupdf4llm 0.624 (5), unstructured 0.775 (1) | vs unstructured -0.111 (p=0.000)
+- page / BAAI/bge-base-en-v1.5 / bm25: docstruct_geo 0.807 (1), langchain 0.746 (5), llamaindex 0.767 (3), pymupdf4llm 0.753 (4), unstructured 0.790 (2) | vs unstructured +0.017 (p=0.000)
+- page / BAAI/bge-base-en-v1.5 / hybrid: docstruct_geo 0.753 (4), langchain 0.774 (2), llamaindex 0.758 (3), pymupdf4llm 0.700 (5), unstructured 0.804 (1) | vs unstructured -0.051 (p=0.000)
+- page / all-MiniLM-L6-v2 / dense: docstruct_geo 0.616 (4), langchain 0.713 (2), llamaindex 0.671 (3), pymupdf4llm 0.574 (5), unstructured 0.749 (1) | vs unstructured -0.133 (p=0.000)
+- page / all-MiniLM-L6-v2 / bm25: docstruct_geo 0.807 (1), langchain 0.746 (5), llamaindex 0.767 (3), pymupdf4llm 0.753 (4), unstructured 0.790 (2) | vs unstructured +0.017 (p=0.002)
+- page / all-MiniLM-L6-v2 / hybrid: docstruct_geo 0.723 (4), langchain 0.757 (2), llamaindex 0.730 (3), pymupdf4llm 0.672 (5), unstructured 0.797 (1) | vs unstructured -0.074 (p=0.000)
+- page / intfloat/e5-base-v2 / dense: docstruct_geo 0.690 (4), langchain 0.759 (2), llamaindex 0.730 (3), pymupdf4llm 0.677 (5), unstructured 0.777 (1) | vs unstructured -0.087 (p=0.000)
+- page / intfloat/e5-base-v2 / bm25: docstruct_geo 0.807 (1), langchain 0.746 (5), llamaindex 0.767 (3), pymupdf4llm 0.753 (4), unstructured 0.790 (2) | vs unstructured +0.017 (p=0.000)
+- page / intfloat/e5-base-v2 / hybrid: docstruct_geo 0.765 (4), langchain 0.779 (2), llamaindex 0.777 (3), pymupdf4llm 0.728 (5), unstructured 0.805 (1) | vs unstructured -0.040 (p=0.000)
+
+docstruct_geo ranks first in 20 of 27 cells.

@@ -2083,3 +2083,22 @@ Paired bootstrap against docstruct_geo, Pk: LumberChunker +0.135, Docling +0.248
 WindowDiff +0.225 and +0.447; all intervals exclude zero. Kept: a structure result in
 our favour against both, unlike retrieval where LumberChunker leads. Added to paper
 Table 2, README, claim ledger. The row N differs from the 134-paper rows and is shown.
+
+## Stage 33 -- Embedder x retriever sweep (2026-11-22)
+
+Actions run 44870393583 (`bench/embedder-sweep`, 2h10m): docstruct_geo, pymupdf4llm,
+unstructured, langchain, llamaindex x {all-MiniLM-L6-v2, bge-base-en-v1.5,
+e5-base-v2} x {span, region, page}, 3,558 questions per cell; dense, BM25 and hybrid
+scored from the same run. Docling, LumberChunker and llamaindex-sem not included.
+`scripts/sweep_summary.py` (paired bootstrap, 2000 resamples, seed 0) writes
+`reports/sweep/summary.md`; raw `sw_*.json` (60 MB) stay local, the run artifacts hold them.
+
+**Result.** docstruct_geo ranks first in 20 of 27 cells. Region 9/9 (8 significant;
+MiniLM dense p=0.72). Span 8/9 (6 significant; MiniLM dense, pymupdf4llm +0.005,
+p=0.46). Page: first only with BM25 (+0.017 over unstructured); 4th in all six dense and
+hybrid cells, behind unstructured by 0.040 to 0.133 (p<0.001). BM25 scores are identical
+across embedders, as expected. Embedder change moves hybrid MRR by at most 0.056 for any
+tool and leaves the page ranking unchanged.
+
+**Kept.** Result reported in the paper (Results, "Embedder and retriever"). The page
+loss stands in the main text; it is not an artefact of the small embedder.
