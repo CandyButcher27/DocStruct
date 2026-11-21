@@ -263,6 +263,11 @@ DOCLAYNET_LABEL_MAP = {
 
 # --- Indexing / retrieval ---
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+# (query prefix, passage prefix) the model card requires; unlisted models take none.
+EMBEDDING_PREFIXES = {
+    "intfloat/e5-base-v2": ("query: ", "passage: "),
+    "BAAI/bge-base-en-v1.5": ("Represent this sentence for searching relevant passages: ", ""),
+}
 COLLECTION_NAME = "docstruct"
 RETRIEVAL_TOP_K = 5
 

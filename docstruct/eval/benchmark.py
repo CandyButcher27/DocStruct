@@ -234,6 +234,7 @@ def benchmark_tool(
         print(f"  [{adapter.name}] resuming: {len(done_docs)}/{n_total} docs already done", flush=True)
 
     candidates = max(top_k * 4, config.BM25_CANDIDATES)
+    q_prefix, d_prefix = config.EMBEDDING_PREFIXES.get(config.EMBEDDING_MODEL, ("", ""))
 
     for doc_idx, pdf in enumerate(pdf_paths):
         doc_id = os.path.basename(pdf)
@@ -283,7 +284,7 @@ def benchmark_tool(
         store.collection.add(
             ids=[str(i) for i in range(len(index_texts))],
             documents=index_texts,
-            embeddings=embedder.encode(index_texts, show_progress_bar=False).tolist(),
+            embeddings=embedder.encode([d_prefix + t for t in index_texts], show_progress_bar=False).tolist(),
         )
         bm25 = BM25Okapi([t.lower().split() for t in index_texts])
 
@@ -291,7 +292,7 @@ def benchmark_tool(
         doc_hits = 0
         doc_rr = 0.0; doc_recall = 0.0; doc_hit1 = 0.0
         for case in cases:
-            qv = embedder.encode([case.question], show_progress_bar=False).tolist()
+            qv = embedder.encode([q_prefix + case.question], show_progress_bar=False).tolist()
             res = store.collection.query(query_embeddings=qv, n_results=min(candidates, len(texts)))
             vec_order = [int(i) for i in res.get("ids", [[]])[0]]
             scores = bm25.get_scores(case.question.lower().split())
@@ -309,6 +310,7 @@ def benchmark_tool(
             keys = chunk_pages if by_page else texts
             vr = _score([keys[i] for i in vec_order[:top_k]], gold, top_k, relevant)
             hr = _score([keys[i] for i in hyb_order], gold, top_k, relevant)
+            br = _score([keys[i] for i in bm_order[:top_k]], gold, top_k, relevant)
             for i in range(4):
                 v[i] += vr[i]; h[i] += hr[i]
             result.n_questions += 1
@@ -318,7 +320,7 @@ def benchmark_tool(
             # the paired test need the raw per-question vector, and it cannot be
             # recovered from an average after the fact.
             row = {"doc": doc_id, "question": case.question,
-                   "vec_rr": round(vr[0], 4), "hyb_rr": round(hr[0], 4),
+                   "vec_rr": round(vr[0], 4), "bm_rr": round(br[0], 4), "hyb_rr": round(hr[0], 4),
                    "hyb_hit1": hr[1], "hyb_recall": hr[2], "hyb_ndcg": round(hr[3], 4),
                    "context_words": sum(len(t.split()) for t in retrieved)}
             if scorer is not None:
