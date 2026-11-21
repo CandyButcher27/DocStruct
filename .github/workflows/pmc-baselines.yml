@@ -1,6 +1,6 @@
 name: pmc baselines
 
-# Docling and LumberChunker on PMC section boundaries (Table 2). Europe PMC refuses
+# LumberChunker retry on the PMC documents that lost Gemini credits (Table 2). Europe PMC refuses
 # runner IPs, so the PDFs and gold come from an AES-256 encrypted release asset whose
 # passphrase is a repository secret. Eight shards per tool; results merge offline.
 
@@ -9,7 +9,7 @@ on:
     branches: ["bench/pmc"]
 
 env:
-  LIMIT: "0"   # documents per shard; 0 = all
+  LIMIT: "1"   # documents per shard; 0 = all
   NLTK_DATA: /home/runner/nltk_data
   LUMBER_MODEL: gemini-3.5-flash-lite
   LUMBER_CACHE_DIR: .cache/lumberchunker
@@ -21,8 +21,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        tool: [docling, lumberchunker]
-        shard: [0, 1, 2, 3, 4, 5, 6, 7]
+        tool: [lumberchunker]
+        shard: [0, 1, 2, 3, 4, 5, 7]
     name: ${{ matrix.tool }} shard ${{ matrix.shard }}
     steps:
       - uses: actions/checkout@v4
@@ -45,7 +45,8 @@ jobs:
           python - <<'PY'
           import json
           g = json.load(open("data/qa/pmc_sections.json", encoding="utf-8"))
-          keep = {k: v for i, (k, v) in enumerate(sorted(g.items())) if i % 8 == ${{ matrix.shard }}}
+          miss = set(open(".github/pmc_missing.txt").read().split())
+          keep = {k: v for i, (k, v) in enumerate(sorted(g.items())) if i % 8 == ${{ matrix.shard }} and k in miss}
           json.dump(keep, open("shard_gold.json", "w", encoding="utf-8"))
           print(len(keep), "documents")
           PY
@@ -53,7 +54,7 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
-          out="reports/review/pmc_baselines/pmc_${{ matrix.tool }}_s${{ matrix.shard }}"
+          out="reports/review/pmc_baselines/pmc_${{ matrix.tool }}_s${{ matrix.shard }}_retry"
           mkdir -p reports/review/pmc_baselines
           python scripts/score_sections.py --tools ${{ matrix.tool }} --gold shard_gold.json \
             --pdfs-dir data/pmc --limit "$LIMIT" --ckpt-dir .cache/section_ckpt \
