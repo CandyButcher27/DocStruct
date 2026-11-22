@@ -2102,3 +2102,21 @@ tool and leaves the page ranking unchanged.
 
 **Kept.** Result reported in the paper (Results, "Embedder and retriever"). The page
 loss stands in the main text; it is not an artefact of the small embedder.
+
+## Stage 34 -- Docling and LumberChunker in the embedder sweep (2026-11-22)
+
+Actions run 44957049218 (`bench/sweep-docling-lumber`, 54 jobs): Docling (8 shards per
+cell) and LumberChunker (answer cache reused) x {bge-base-en-v1.5, e5-base-v2} x {span,
+region, page}, same 3,558 questions. MiniLM not run for either. Docling shards merged
+into one `sw_docling_*.json` per cell; `scripts/sweep_summary.py` needed no change.
+
+**Result (18 cells, 7 tools).** docstruct_geo first in 5, LumberChunker in 11, Docling in
+2. docstruct_geo keeps BM25 under span (+0.012 over LumberChunker, p<0.01) and ties span
+hybrid. LumberChunker leads region dense and hybrid by 0.027 to 0.056 and page hybrid by
+0.053 to 0.055 (all p<0.001). Docling leads page dense by 0.097 to 0.115 (p<0.001). The
+27-cell "20 of 27" figure covers the five model-free tools only; `summary.md` now mixes
+tool sets per cell (9 MiniLM cells have five tools).
+
+**Kept.** Added to the paper's Embedder and retriever paragraph, losses included; the
+paragraph was compressed to hold 8 pages. Fixed two literal tab characters that had
+replaced `\t` in `\texttt`. Raw shards backed up to `../DocStruct_backups/sweep-ext-2026-11-22/`.
